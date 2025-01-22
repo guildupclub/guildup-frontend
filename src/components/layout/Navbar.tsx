@@ -11,7 +11,7 @@ import {
   Search,
   Video,
 } from "lucide-react";
-
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,25 @@ export function Navbar({
 }: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
 
+  useEffect(() => {
+    if (session) {
+      // Send data to the backend
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user: session.user }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+  }, [session]);
   return (
     <>
       <nav
