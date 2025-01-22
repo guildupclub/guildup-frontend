@@ -24,16 +24,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/guildup_logo.svg";
+import { signIn, signOut, useSession } from "next-auth/react";
 
 export function Navbar({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
+  const { data: session } = useSession();
+
   return (
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 px-4 lg:px-20",
+          "fixed top-0 z-50 w-full  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 px-4 lg:px-20",
           className
         )}
         {...props}
@@ -101,37 +104,47 @@ export function Navbar({
             </ul>
           </div>
           <div className="hidden md:block">
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="/placeholder.svg" alt="User" />
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Sign out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        src={session.user?.image || "/placeholder.svg"}
+                        alt="User"
+                      />
+                      <AvatarFallback>
+                        {session.user?.name?.[0] || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>{session.user?.name}</DropdownMenuItem>
+                  <DropdownMenuItem>{session.user?.email}</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button className="bg-primary-gradient" onClick={() => signIn()}>
+                Sign in
+              </Button>
+            )}
           </div>
         </div>
       </nav>
-
-      {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
+        <div className="grid h-full max-w-lg grid-cols-5 mx-auto ">
           <Link
             href="/home"
             className="flex flex-col items-center justify-center"
           >
-            <Home className="w-6 h-6" />
+            <Home className="w-6 h-6 " />
             <span className="text-xs mt-1">Home</span>
           </Link>
           <Link
@@ -155,13 +168,32 @@ export function Navbar({
             <Users className="w-6 h-6" />
             <span className="text-xs mt-1">Community</span>
           </Link>
-          <button className="flex flex-col items-center justify-center">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src="/placeholder.svg" alt="User" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <span className="text-xs mt-1">Profile</span>
-          </button>
+          {session ? (
+            <button
+              className="flex flex-col items-center justify-center "
+              onClick={() => signOut()}
+            >
+              <Avatar className="h-6 w-6">
+                <AvatarImage
+                  src={session.user?.image || "/placeholder.svg"}
+                  alt="User"
+                />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <span className="text-xs mt-1">Sign out</span>
+            </button>
+          ) : (
+            <button
+              className="flex flex-col items-center justify-center bg-primary-gradient"
+              onClick={() => signIn()}
+            >
+              <Avatar className="h-6 w-6">
+                <AvatarImage src="/placeholder.svg" alt="User" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <span className="text-xs mt-1">Sign in</span>
+            </button>
+          )}
         </div>
       </div>
     </>

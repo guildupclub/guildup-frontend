@@ -1,7 +1,3 @@
-import Image from "next/image";
-
 export default function Home() {
-  return (
-   <>Hello GuildUp Club</>
-  );
+  return <div className="bg-black min-h-screen text-white  pt-16">Hello</div>;
 }
