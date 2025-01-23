@@ -11,7 +11,7 @@ import {
   Search,
   Video,
 } from "lucide-react";
-
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,16 +32,7 @@ export function Navbar({
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
-  const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user.user);
 
-  React.useEffect(() => {
-    if (session?.user) {
-      dispatch(setUser(session.user));
-    } else {
-      dispatch(clearUser());
-    }
-  }, [session, dispatch]);
   return (
     <>
       <nav
