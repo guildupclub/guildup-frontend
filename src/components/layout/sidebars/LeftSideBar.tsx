@@ -47,7 +47,7 @@ export function LeftSidebar() {
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-black pt-20 pb-3 px-4 space-y-3">
+    <aside className="fixed top-0 left-0 h-screen w-80 bg-black pt-20 pb-3 px-4 space-y-3">
       <div className="bg-zinc-900 rounded-xl p-3 space-y-1">
         <div>
           <button

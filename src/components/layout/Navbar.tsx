@@ -1,6 +1,6 @@
 "use client";
 
-import type * as React from "react";
+import * as React from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -25,13 +25,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/guildup_logo.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
-
+import { useDispatch, useSelector } from "react-redux"; import { RootState } from "@/redux/store";
+import { clearUser, setUser } from "@/redux/userSlice";
 export function Navbar({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.user.user);
 
+  React.useEffect(() => {
+    if (session?.user) {
+      dispatch(setUser(session.user));
+    } else {
+      dispatch(clearUser());
+    }
+  }, [session, dispatch]);
   return (
     <>
       <nav
@@ -117,7 +127,7 @@ export function Navbar({
                         alt="User"
                       />
                       <AvatarFallback>
-                        {session.user?.name?.[0] || "U"}
+                        {session?.user?.name?.[0] || "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
