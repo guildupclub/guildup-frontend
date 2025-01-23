@@ -39,7 +39,6 @@
 //     console.log("@selectedCommunity", selectedCommunity);
 //   }, [communitys]);
 
-
 //   return (
 //     <div className="bg-black min-h-screen text-white   columns-1 sm:columns-2 md:columns-2 lg:columns-3 gap-4">
 //       {communitys.length > 0 ? (
@@ -95,15 +94,13 @@
 
 // export default React.memo(CommunitySection);
 
-
-
-
 "use client";
 import axios from "axios";
-import Image from "next/image";
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "../ui/card";
 import MemoizedCommunityCard from "./MemoizedCommunityCard";
+import { useRouter } from "next/router"; // Optional: If you want to navigate to the community's page
+import { Button } from "../ui/button";
 
 interface CommunitySectionProps {
   activeCategory: string;
@@ -111,21 +108,17 @@ interface CommunitySectionProps {
 
 // Main Component
 function CommunitySection({ activeCategory }: CommunitySectionProps) {
-  console.log("@this is community section", activeCategory);
-
   const [communities, setCommunities] = useState([]);
   const [openCommunityModal, setOpenCommunityModal] = useState(false);
   const [clickedCommunity, setClickedCommunity] = useState<any>(null);
 
-  // Fetch communities only when activeCategory changes
+  // Fetch communities when activeCategory changes
   useEffect(() => {
     const fetchTopCommunity = async () => {
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/search`,
-          {
-            categoryId: activeCategory,
-          }
+          { categoryId: activeCategory }
         );
         setCommunities(response.data.data);
       } catch (error) {
@@ -138,25 +131,32 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
   }, [activeCategory]);
 
   // Optimized click handler using useCallback
-  const handleClickCommunity = useCallback((communityId: string) => {
-    const selectedCommunity = communities.find((comm: any) => comm._id === communityId);
-    setClickedCommunity(selectedCommunity || null);
-    setOpenCommunityModal(true);
-  }, [communities]);
+  const handleClickCommunity = useCallback(
+    (communityId: string) => {
+      const selectedCommunity = communities.find(
+        (comm: any) => comm._id === communityId
+      );
+      setClickedCommunity(selectedCommunity || null);
+      setOpenCommunityModal(true);
+    },
+    [communities]
+  );
 
   return (
-    <div className="bg-black min-h-screen text-white columns-1 sm:columns-2 md:columns-2 lg:columns-3 gap-4">
-      {communities.length > 0 ? (
-        communities.map((community: any) => (
-          <MemoizedCommunityCard
-            key={community._id}
-            community={community}
-            onClick={handleClickCommunity}
-          />
-        ))
-      ) : (
-        <div>No community found</div>
-      )}
+    <div className="bg-black min-h-screen text-white p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {communities.length > 0 ? (
+          communities.map((community: any) => (
+            <MemoizedCommunityCard
+              key={community._id}
+              community={community}
+              onClick={handleClickCommunity}
+            />
+          ))
+        ) : (
+          <div>No community found</div>
+        )}
+      </div>
 
       {openCommunityModal && clickedCommunity && (
         <CommunityModal
@@ -170,17 +170,36 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
 
 export default React.memo(CommunitySection);
 
-
-// Modal Component (outside main rendering to prevent unnecessary renders)
-const CommunityModal = ({ community, onClose }: { community: any; onClose: () => void }) => {
+// Modal Component
+const CommunityModal = ({
+  community,
+  onClose,
+}: {
+  community: any;
+  onClose: () => void;
+}) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg w-[400px]">
-        <h2 className="text-lg font-bold mb-2">{community.name}</h2>
-        <p className="text-gray-600 mb-4">{community.description}</p>
-        <button onClick={onClose} className="px-4 py-2 bg-red-500 text-white rounded-md">
-          Close
-        </button>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60  p-6 rounded-lg w-[400px] max-w-full">
+        <h2 className="text-xl font-semibold mb-4 text-zinc-100">
+          {community.name}
+        </h2>
+        <p className="text-zinc-200 mb-4">{community.description}</p>
+        <div className="flex justify-between items-center">
+          <Button
+            onClick={onClose}
+            className="px-4 py-2 "
+            variant="destructive"
+          >
+            Close
+          </Button>
+          <Button
+            onClick={() => alert("Join community functionality here")}
+            className="px-4 py-2 "
+          >
+            Join Community
+          </Button>
+        </div>
       </div>
     </div>
   );

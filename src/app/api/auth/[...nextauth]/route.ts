@@ -1,21 +1,45 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import axios from "axios";
+
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        name: { label: "name", type: "text", placeholder: "" },
-        email: { label: "email", type: "text", placeholder: "" },
-        password: { label: "password", type: "password", placeholder: "" },
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize() {
-        return {
-          id: "user1",
-          name: "adarsh",
-          email: "adarsh9540@gmail.com",
-        };
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
+        }
+
+        try {
+          const response = await axios.post(
+            "http://localhost:8000/v1/auth/login",
+            {
+              email: credentials.email,
+              password: credentials.password,
+            }
+          );
+
+          const user = response.data;
+
+          if (user) {
+            return {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              image: user.image,
+            };
+          }
+
+          return null;
+        } catch (error: any) {
+          throw new Error(error.response?.data?.error || "Invalid credentials");
+        }
       },
     }),
     GoogleProvider({
@@ -23,6 +47,13 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
+  pages: {
+    signIn: "/auth/signin",
+    signUp: "/auth/signup",
+  },
+  session: {
+    strategy: "jwt",
+  },
   secret: process.env.NEXTAUTH_SECRET,
 });
 

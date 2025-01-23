@@ -62,5 +62,24 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    function ({ addUtilities }: any) {
+      addUtilities({
+        ".scrollbar-none": {
+          "::-webkit-scrollbar": {
+            display: "none",
+          } /* Hide scrollbar for Chrome, Safari, and Opera */,
+          "scrollbar-width": "none" /* Hide scrollbar for Firefox */,
+        },
+        ".text-gradient": {
+          backgroundImage:
+            "linear-gradient(to right, hsl(270, 100%, 49%), hsl(224, 100%, 60%))",
+          "-webkit-background-clip": "text",
+          "background-clip": "text",
+          color: "transparent",
+        },
+      });
+    },
+  ],
 } satisfies Config;
