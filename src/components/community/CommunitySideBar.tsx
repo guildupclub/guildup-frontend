@@ -81,7 +81,7 @@ function CommunitySideBar({ communityId, communityName = "Community Name",  onTa
             <span className="font-medium text-sm">Channels</span>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-1">
-            {channels?.map((channel) => (
+            {channels?.map((channel:any) => (
               <a
                 key={channel._id}
                 href={channel.href}
