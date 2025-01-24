@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function SignIn() {
   const router = useRouter();
@@ -32,6 +33,7 @@ export default function SignIn() {
       if (result?.error) {
         setError(result.error);
       } else {
+        toast.success("Signed in successfully!");
         router.push("/");
         router.refresh();
       }

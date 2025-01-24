@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 export default function SignUp() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function SignUp() {
       if (result?.error) {
         setError(result.error);
       } else {
+        toast.success("Account created and signed in successfully!");
         router.push("/");
         router.refresh();
       }
