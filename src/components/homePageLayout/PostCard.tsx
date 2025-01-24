@@ -3,7 +3,16 @@
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, Share2, MoreVertical, Eye } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Share2,
+  MoreVertical,
+  Eye,
+  Plus,
+  Send,
+} from "lucide-react";
+import { Comment } from "./Comment";
 
 interface PostCardProps {
   post: {
@@ -21,7 +30,10 @@ interface PostCardProps {
 export function PostCard({ post }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
+  const [showComments, setShowComments] = useState(false);
+  const [newComment, setNewComment] = useState("");
 
+  // Existing functions remain the same
   const formatTimeAgo = (date: string) => {
     const now = new Date();
     const postDate = new Date(date);
@@ -68,11 +80,34 @@ export function PostCard({ post }: PostCardProps) {
         text: post.body,
         url: shareUrl,
       });
-      
     } catch (error) {
       console.log(error);
     }
   };
+
+  // Example comments data
+  const comments = [
+    {
+      author: "Reena Singh",
+      level: 5,
+      content:
+        "This is really insightful! Thanks for sharing your knowledge about index funds.",
+      timestamp: "11:00 pm",
+      likes: 15,
+      replies: [
+        {
+          author: "Ravi Kumar",
+          level: 2,
+          content:
+            "I completely agree! Index funds are a great way to start investing.",
+          timestamp: "11:00 pm",
+          likes: 8,
+          replies: [],
+        },
+      ],
+    },
+    
+  ];
 
   return (
     <div className="bg-zinc-900 rounded-xl mb-4">
@@ -128,7 +163,10 @@ export function PostCard({ post }: PostCardProps) {
             <Share2 className="h-5 w-5" />
             <span className="text-sm">Share</span>
           </button>
-          <button className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300">
+          <button
+            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
+            onClick={() => setShowComments(!showComments)}
+          >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
               {formatNumber(post.reply_count || 35)} Comments
@@ -140,6 +178,60 @@ export function PostCard({ post }: PostCardProps) {
           <span className="text-sm">25k Views</span>
         </div>
       </div>
+
+      {showComments && (
+        <div className="border-t border-zinc-800/50">
+          <div className="p-4">
+            <div className="flex gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="/placeholder.svg" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-purple-500"
+                    onClick={() => {
+                      // Handle comment submission
+                      setNewComment("");
+                    }}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="px-4">
+            {comments.map((comment, index) => (
+              <Comment key={index} {...comment} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
