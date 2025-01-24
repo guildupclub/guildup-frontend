@@ -25,7 +25,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/guildup_logo.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useDispatch, useSelector } from "react-redux"; import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import { clearUser, setUser } from "@/redux/userSlice";
 export function Navbar({
   className,
@@ -104,7 +105,7 @@ export function Navbar({
               </li>
             </ul>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:block ">
             {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -118,15 +119,25 @@ export function Navbar({
                         alt="User"
                       />
                       <AvatarFallback>
-                        {session?.user?.name?.[0] || "U"}
+                        {session?.user?.name?.[0] || "S"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>{session.user?.name}</DropdownMenuItem>
-                  <DropdownMenuItem>{session.user?.email}</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => signOut()}>
+                <DropdownMenuContent
+                  className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 text-zinc-200 border-gray-700 "
+                  align="end"
+                >
+                  <DropdownMenuItem className="hover:bg-primary-gradient">
+                    {session.user?.name}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="hover:bg-primary-gradient">
+                    {session.user?.email}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="hover:bg-primary-gradient"
+                    onClick={() => signOut()}
+                  >
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
