@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 
@@ -57,15 +56,17 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
+      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg bg-zinc-800">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Create an account</h1>
+          <h1 className="text-3xl font-bold text-zinc-200">
+            Create an account
+          </h1>
           <p className="text-muted-foreground">
             Enter your information to get started
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-zinc-300">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -75,6 +76,7 @@ export default function SignUp() {
               placeholder="Enter your name"
               required
               disabled={isLoading}
+              className="border-gray-700"
             />
           </div>
           <div className="space-y-2">
@@ -86,6 +88,7 @@ export default function SignUp() {
               placeholder="Enter your email"
               required
               disabled={isLoading}
+              className="border-gray-700"
             />
           </div>
           <div className="space-y-2">
@@ -97,6 +100,7 @@ export default function SignUp() {
               placeholder="Create a password"
               required
               disabled={isLoading}
+              className="border-gray-700"
             />
           </div>
 
@@ -122,7 +126,7 @@ export default function SignUp() {
 
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full bg-slate-200"
           onClick={() => signIn("google", { callbackUrl: "/" })}
           disabled={isLoading}
         >
@@ -146,9 +150,12 @@ export default function SignUp() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/auth/signin" className="text-primary hover:underline">
+          <button
+            onClick={() => signIn()}
+            className="text-gradient hover:underline"
+          >
             Sign in
-          </Link>
+          </button>
         </p>
       </div>
     </div>

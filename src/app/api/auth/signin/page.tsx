@@ -45,14 +45,14 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-zinc-800">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome back</h1>
+          <h1 className="text-3xl font-bold text-zinc-200">Welcome back</h1>
           <p className="text-muted-foreground">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="space-y-4 text-zinc-300">
+          <div className="space-y-2 ">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -61,6 +61,7 @@ export default function SignIn() {
               placeholder="Enter your email"
               required
               disabled={isLoading}
+              className="border-gray-700"
             />
           </div>
           <div className="space-y-2">
@@ -72,6 +73,7 @@ export default function SignIn() {
               placeholder="Enter your password"
               required
               disabled={isLoading}
+              className="border-gray-700"
             />
           </div>
 
@@ -97,7 +99,7 @@ export default function SignIn() {
 
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full bg-slate-200"
           onClick={() => signIn("google", { callbackUrl: "/" })}
           disabled={isLoading}
         >
@@ -123,7 +125,7 @@ export default function SignIn() {
           Don't have an account?{" "}
           <Link
             href="/api/auth/signup"
-            className="text-primary hover:underline"
+            className="text-gradient hover:underline"
           >
             Sign up
           </Link>
