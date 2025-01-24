@@ -75,7 +75,7 @@ function ChatContent() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-[calc(100%-20rem)] ml-72 pb-20">
+    <div className="flex flex-col h-screen pb-20">
       <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-medium"># {activeChannel.name}</h1>
@@ -130,10 +130,5 @@ function ChatContent() {
 }
 
 export default function CommunityChat() {
-  return (
-    <div className="h-screen bg-black text-zinc-200">
-      <Sidebar />
-      <ChatContent />
-    </div>
-  );
+  return <ChatContent />;
 }
