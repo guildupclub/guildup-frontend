@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -47,31 +47,31 @@ export function Sidebar() {
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
-  const router = useRouter(); 
+  const router = useRouter();
   const handleEventsClick = () => {
-    router.push("/community/event"); 
+    router.push("/community/event");
   };
 
   return (
-    <div className="fixed left-0 top-0 h-screen w-72 bg-background/95  border-r p-4">
+    <div className="fixed left-0 h-screen w-72 bg-background/95  border-r p-4 py-20">
       <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800"
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
         >
           <Plus className="h-4 w-4" />
           Create
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800"
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
         >
           <Rss className="h-4 w-4" />
           Feed
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800"
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
         >
           <Users className="h-4 w-4" />
           Members
@@ -79,15 +79,15 @@ export function Sidebar() {
 
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800"
-          onClick={handleEventsClick} 
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          onClick={handleEventsClick}
         >
           <Calendar className="h-4 w-4" />
           Events
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800"
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
         >
           <MessageSquare className="h-4 w-4" />
           Announcements

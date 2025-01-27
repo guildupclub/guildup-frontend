@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PostDialog } from "./CreateEventDialouge";
 
 interface Event {
   id: string;
@@ -158,10 +159,7 @@ export function EventCalendar() {
           </Select>
         </div>
 
-        <Button className="bg-primary-gradient text-white hover:scale-105">
-          <Plus className="mr-2 h-4 w-4" />
-          Create Event
-        </Button>
+        <PostDialog />
       </div>
 
       <div className="flex-1 grid grid-cols-[auto_1fr] border border-zinc-800 rounded-lg overflow-hidden">
