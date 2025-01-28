@@ -48,16 +48,18 @@ export function Sidebar() {
     (state: RootState) => state.channel.activeChannel
   );
   const router = useRouter();
-  const handleEventsClick = () => {
-    router.push("/community/event");
+
+  const handleNavigation = (route: string) => {
+    router.push(route);
   };
 
   return (
-    <div className="fixed left-0 h-screen w-72 bg-background/95  border-r p-4 py-20">
+    <div className="fixed left-0 h-screen w-72 bg-background/95 border-r p-4 py-20">
       <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 border-b border-zinc-700"
+          onClick={() => handleNavigation("/create")}
         >
           <Plus className="h-4 w-4" />
           Create
@@ -65,6 +67,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          onClick={() => handleNavigation("/feed")}
         >
           <Rss className="h-4 w-4" />
           Feed
@@ -72,6 +75,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          onClick={() => handleNavigation("/members")}
         >
           <Users className="h-4 w-4" />
           Members
@@ -80,7 +84,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
-          onClick={handleEventsClick}
+          onClick={() => handleNavigation("/community/event")}
         >
           <Calendar className="h-4 w-4" />
           Events
@@ -88,6 +92,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          onClick={() => handleNavigation("/community/announcements")}
         >
           <MessageSquare className="h-4 w-4" />
           Announcements
@@ -107,11 +112,13 @@ export function Sidebar() {
                     ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 hover:text-zinc-300"
                     : "text-zinc-300 hover:bg-zinc-800 hover:text-zinc-300"
                 }`}
-                onClick={() =>
+                onClick={() => {
                   dispatch(
                     setActiveChannel({ id: channel.id, name: channel.name })
-                  )
-                }
+                  );
+                  // You can also add channel-specific routing here if needed
+                  // For example: router.push(`/channels/${channel.id}`);
+                }}
               >
                 <channel.icon className="h-4 w-4" />
                 {channel.name}
