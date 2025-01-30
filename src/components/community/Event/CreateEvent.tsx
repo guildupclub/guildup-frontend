@@ -110,7 +110,7 @@ export function EventCalendar() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-black text-zinc-200 p-4 pt-24">
+    <div className="flex flex-col h-screen bg-black text-zinc-200 p-4 py-24">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
