@@ -13,79 +13,139 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Settings } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-// Sample data for subscribed channels
-const subscribedChannels = [
-  {
-    id: "1",
-    name: "GuildUp",
-    avatar: "/placeholder.svg",
-    unreadCount: 3,
-  },
-  {
-    id: "2",
-    name: "Trading Hub",
-    avatar: "/placeholder.svg",
-    unreadCount: 0,
-  },
-  {
-    id: "3",
-    name: "Crypto Club",
-    avatar: "/placeholder.svg",
-    unreadCount: 5,
-  },
-];
+// Type for community data
+interface Community {
+  _id: string;
+  title: string;
+  name: string;
+  description: string;
+  subscription: boolean;
+  subscription_price: number;
+  num_member: number;
+}
 
 export function LeftmostSidebar() {
-  const [channels, setChannels] = useState(subscribedChannels);
+  const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
-  const [activeChannel, setActiveChannel] = useState(channels[0]?.id);
+  const [activeChannel, setActiveChannel] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCommunities();
+  }, []);
+
+  const fetchCommunities = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: "6704eaa88019d1fa807773ea",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch communities");
+      }
+
+      const result = await response.json();
+
+      // Filter out null values and map to the communities array
+      const validCommunities = result.data.filter(
+        (community: Community | null) => community !== null
+      );
+      setCommunities(validCommunities);
+
+      // Set the first community as active if exists
+      if (validCommunities.length > 0) {
+        setActiveChannel(validCommunities[0]._id);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch communities"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
-      const newChannel = {
-        id: Date.now().toString(),
-        name: newChannelName,
-        avatar: "/placeholder.svg",
-        unreadCount: 0,
-      };
-      setChannels([...channels, newChannel]);
+      // Here you would typically make an API call to create a new community
       setNewChannelName("");
     }
   };
 
+  // Function to get initials from community name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  if (error) {
+    return (
+      <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex items-center justify-center text-red-500">
+        Error loading communities
+      </div>
+    );
+  }
+
   return (
-    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center  border-r border-zinc-800 py-20">
-      {" "}
+    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-800 py-20">
       <ScrollArea className="flex-1 w-full">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
-          {channels.map((channel) => (
-            <Button
-              key={channel.id}
-              variant="ghost"
-              size="icon"
-              className={`relative w-12 h-12 rounded-full text-zinc-500 ${
-                activeChannel === channel.id
-                  ? "bg-purple-500/20 ring-2 ring-purple-500"
-                  : "hover:bg-zinc-800"
-              }`}
-              onClick={() => setActiveChannel(channel.id)}
-            >
-              <Avatar className="w-full h-full">
-                <AvatarImage src={channel.avatar} alt={channel.name} />
-                <AvatarFallback>
-                  {channel.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {channel.unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                  {channel.unreadCount}
-                </span>
-              )}
-            </Button>
-          ))}
+          {isLoading ? (
+            // Loading skeleton
+            <div className="space-y-4">
+              {[1, 2, 3].map((n) => (
+                <div
+                  key={n}
+                  className="w-12 h-12 rounded-full bg-zinc-800 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : (
+            communities.map((community) => (
+              <Button
+                key={community._id}
+                variant="ghost"
+                size="icon"
+                className={`relative w-12 h-12 rounded-full text-zinc-500 ${
+                  activeChannel === community._id
+                    ? "bg-purple-500/20 ring-2 ring-purple-500"
+                    : "hover:bg-zinc-800"
+                }`}
+                onClick={() => setActiveChannel(community._id)}
+              >
+                <Avatar className="w-full h-full">
+                  <AvatarImage
+                    src={`/placeholder.svg?text=${getInitials(community.name)}`}
+                    alt={community.name}
+                  />
+                  <AvatarFallback>{getInitials(community.name)}</AvatarFallback>
+                </Avatar>
+                {community.subscription && (
+                  <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    ⭐
+                  </span>
+                )}
+              </Button>
+            ))
+          )}
+
           <Dialog>
             <DialogTrigger asChild>
               <Button
@@ -121,13 +181,14 @@ export function LeftmostSidebar() {
           </Dialog>
         </div>
       </ScrollArea>
-      <Button
+
+      {/* <Button
         variant="ghost"
         size="icon"
-        className="w-8 h-8 rounded-lg   hover:bg-zinc-700 text-zinc-300 mt-4"
+        className="w-8 h-8 rounded-lg hover:bg-zinc-700 text-zinc-300 mt-4"
       >
         <Settings className="w-8 h-8" />
-      </Button>
+      </Button> */}
     </div>
   );
 }

@@ -90,7 +90,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
-          onClick={() => handleNavigation("/feed")}
+          onClick={() => handleNavigation("/community/feed")}
         >
           <Rss className="h-4 w-4" />
           Feed
@@ -98,7 +98,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
-          onClick={() => handleNavigation("/members")}
+          onClick={() => handleNavigation("/community/members")}
         >
           <Users className="h-4 w-4" />
           Members

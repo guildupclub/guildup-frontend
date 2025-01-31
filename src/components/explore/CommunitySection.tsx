@@ -99,20 +99,18 @@ import axios from "axios";
 import React, { useEffect, useState, useCallback } from "react";
 import { Card } from "../ui/card";
 import MemoizedCommunityCard from "./MemoizedCommunityCard";
-import { useRouter } from "next/router"; // Optional: If you want to navigate to the community's page
+import { useRouter } from "next/router";
 import { Button } from "../ui/button";
 
 interface CommunitySectionProps {
   activeCategory: string;
 }
 
-// Main Component
 function CommunitySection({ activeCategory }: CommunitySectionProps) {
   const [communities, setCommunities] = useState([]);
   const [openCommunityModal, setOpenCommunityModal] = useState(false);
   const [clickedCommunity, setClickedCommunity] = useState<any>(null);
 
-  // Fetch communities when activeCategory changes
   useEffect(() => {
     const fetchTopCommunity = async () => {
       try {
@@ -130,7 +128,6 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
     }
   }, [activeCategory]);
 
-  // Optimized click handler using useCallback
   const handleClickCommunity = useCallback(
     (communityId: string) => {
       const selectedCommunity = communities.find(
@@ -170,7 +167,7 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
 
 export default React.memo(CommunitySection);
 
-// Modal Component
+
 const CommunityModal = ({
   community,
   onClose,
