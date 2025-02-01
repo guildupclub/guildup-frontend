@@ -33,6 +33,7 @@ export function LeftmostSidebar() {
   const [activeChannel, setActiveChannel] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCommunities();
@@ -128,7 +129,11 @@ export function LeftmostSidebar() {
                     ? "bg-purple-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
                 }`}
-                onClick={() => setActiveChannel(community._id)}
+                onClick={() => {
+                  setActiveChannel(community._id);      
+                  setSelectedCommunityId(community._id);  
+                }}
+                
               >
                 <Avatar className="w-full h-full">
                   <AvatarImage

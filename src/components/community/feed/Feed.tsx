@@ -39,7 +39,7 @@ export function Feed() {
   const fetchPosts = async () => {
     try {
       const response = await fetch(
-        "http://localhost:8000/v1/post/community/post",
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/community/post`,
         {
           method: "POST",
           headers: {
