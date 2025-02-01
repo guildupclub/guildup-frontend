@@ -1,5 +1,5 @@
 "use client";
-
+import { setActiveCommunity } from "@/redux/channelSlice";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +15,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
 
 // Type for community data
 interface Community {
@@ -30,10 +32,13 @@ interface Community {
 export function LeftmostSidebar() {
   const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
-  const [activeChannel, setActiveChannel] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCommunityId, setSelectedCommunityId] = useState<string | null>(null);
+
+  const dispatch = useDispatch();
+  const activeCommunityId = useSelector(
+    (state: RootState) => state.channel.activeCommunityId
+  );
 
   useEffect(() => {
     fetchCommunities();
@@ -59,16 +64,14 @@ export function LeftmostSidebar() {
       }
 
       const result = await response.json();
-
-      // Filter out null values and map to the communities array
       const validCommunities = result.data.filter(
         (community: Community | null) => community !== null
       );
       setCommunities(validCommunities);
 
-      // Set the first community as active if exists
-      if (validCommunities.length > 0) {
-        setActiveChannel(validCommunities[0]._id);
+      // Set the first community as active if none is selected
+      if (validCommunities.length > 0 && !activeCommunityId) {
+        dispatch(setActiveCommunity(validCommunities[0]._id));
       }
     } catch (err) {
       setError(
@@ -81,7 +84,7 @@ export function LeftmostSidebar() {
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
-      // Here you would typically make an API call to create a new community
+      // API call to create a new community can be placed here
       setNewChannelName("");
     }
   };
@@ -125,15 +128,13 @@ export function LeftmostSidebar() {
                 variant="ghost"
                 size="icon"
                 className={`relative w-12 h-12 rounded-full text-zinc-500 ${
-                  activeChannel === community._id
+                  activeCommunityId === community._id
                     ? "bg-purple-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
                 }`}
                 onClick={() => {
-                  setActiveChannel(community._id);      
-                  setSelectedCommunityId(community._id);  
+                  dispatch(setActiveCommunity(community._id));
                 }}
-                
               >
                 <Avatar className="w-full h-full">
                   <AvatarImage
@@ -186,14 +187,6 @@ export function LeftmostSidebar() {
           </Dialog>
         </div>
       </ScrollArea>
-
-      {/* <Button
-        variant="ghost"
-        size="icon"
-        className="w-8 h-8 rounded-lg hover:bg-zinc-700 text-zinc-300 mt-4"
-      >
-        <Settings className="w-8 h-8" />
-      </Button> */}
     </div>
   );
 }
