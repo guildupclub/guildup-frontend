@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PostDialog } from "./CreateEventDialouge";
 
 interface Event {
   id: string;
@@ -110,9 +109,9 @@ export function EventCalendar() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-black text-zinc-200 p-4 py-24">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col min-h-screen bg-black text-zinc-200 p-4 py-24">
+      <div className="flex items-center justify-between mb-4 bg-zinc-900 p-4 rounded-lg">
+        <div className="flex items-center gap-4 ">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -147,7 +146,7 @@ export function EventCalendar() {
           </div>
 
           <Select defaultValue="calendar">
-            <SelectTrigger className="w-32 border-zinc-800 bg-transparent">
+            <SelectTrigger className="w-32 border-zinc-700 bg-transparent">
               <SelectValue placeholder="View" />
             </SelectTrigger>
             <SelectContent>
@@ -159,28 +158,30 @@ export function EventCalendar() {
           </Select>
         </div>
 
-        <PostDialog />
+        <Button>
+          <Plus /> Create Event
+        </Button>
       </div>
 
-      <div className="flex-1 grid grid-cols-[auto_1fr] border border-zinc-800 rounded-lg overflow-hidden">
-        <div className="w-12 bg-black border-r border-zinc-800">
+      <div className="flex-1 grid grid-cols-[auto_1fr] border border-zinc-700 rounded-lg overflow-hidden">
+        <div className="w-12 bg-zinc-900 border-r border-zinc-700">
           <div className="h-10" /> {/* Header spacer */}
           {Array.from({ length: 6 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
-              className="h-24 flex items-center justify-center text-xs text-zinc-500 border-b border-zinc-800 last:border-b-0"
+              className="h-24 flex items-center justify-center text-xs text-zinc-500 border-b border-zinc-700 last:border-b-0"
             >
               {getWeekNumber(days[weekIndex * 7].date)}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-rows-[auto_1fr]">
+        <div className="grid grid-rows-[auto_1fr] bg-zinc-900">
           <div className="grid grid-cols-7 text-xs text-zinc-500">
             {weekDays.map((day) => (
               <div
                 key={day}
-                className="h-10 flex items-center justify-center border-b border-zinc-800"
+                className="h-10 flex items-center justify-center border-b border-zinc-700"
               >
                 {day}
               </div>
@@ -191,7 +192,7 @@ export function EventCalendar() {
             {days.map(({ date, isCurrentMonth }, index) => (
               <div
                 key={index}
-                className={`h-24 p-1 border-r border-b border-zinc-800 last:border-r-0 ${
+                className={`h-24 p-1 border-r border-b border-zinc-700 last:border-r-0 ${
                   !isCurrentMonth ? "text-zinc-700" : ""
                 }`}
               >

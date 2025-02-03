@@ -27,7 +27,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PostDialog } from "../community/Event/CreateEventDialouge";
 
 const initialChannels = [
   {
@@ -57,7 +58,52 @@ export function Sidebar() {
   const router = useRouter();
   const [channels, setChannels] = useState(initialChannels);
   const [newChannelName, setNewChannelName] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isChannelOpen, setIsChannelOpen] = useState(false);
+  const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchChannels = async () => {
+      const body = {
+        userId: "66f2e0964966b4785acd30d9",
+        session: "wnywp8z6",
+        communityId: "66f7e7ac585e0c3e14e41a50",
+      };
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/getChannels`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        );
+
+        const data = await response.json();
+        if (data.r !== "s" || !data.data) {
+          throw new Error("Failed to fetch channels");
+        }
+
+        const formattedChannels = data.data.map((channel: any) => ({
+          id: channel._id,
+          name: channel.name,
+          icon: channel.type === "chat" ? Lock : Hash,
+          locked: channel.is_locked,
+        }));
+
+        setChannels(formattedChannels);
+      } catch (err: any) {
+        setError("Error fetching channels: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChannels();
+  }, []);
 
   const handleNavigation = (route: string) => {
     router.push(route);
@@ -72,7 +118,7 @@ export function Sidebar() {
       };
       setChannels([...channels, newChannel]);
       setNewChannelName("");
-      setIsOpen(false);
+      setIsChannelOpen(false);
     }
   };
 
@@ -81,11 +127,9 @@ export function Sidebar() {
       <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 border-b border-zinc-700"
-          onClick={() => handleNavigation("/create")}
+          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 "
         >
-          <Plus className="h-4 w-4" />
-          Create
+          <PostDialog />
         </Button>
         <Button
           variant="ghost"
@@ -126,7 +170,7 @@ export function Sidebar() {
         <div className="px-2 py-2">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-lg font-semibold text-zinc-200">Channels</h2>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"

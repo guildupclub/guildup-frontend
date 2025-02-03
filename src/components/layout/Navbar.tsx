@@ -82,7 +82,7 @@ export function Navbar({
           <div className="hidden md:flex items-center justify-center space-x-4">
             <ul className="flex items-center justify-center space-x-12 mx-auto text-muted">
               <li>
-                <Link href="/home">
+                <Link href="/">
                   <Home className="h-6 w-6" />
                   <span className="sr-only">Home</span>
                 </Link>
@@ -152,10 +152,7 @@ export function Navbar({
       </nav>
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-5 mx-auto ">
-          <Link
-            href="/home"
-            className="flex flex-col items-center justify-center"
-          >
+          <Link href="/" className="flex flex-col items-center justify-center">
             <Home className="w-6 h-6 " />
             <span className="text-xs mt-1">Home</span>
           </Link>

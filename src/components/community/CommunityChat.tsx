@@ -76,7 +76,7 @@ function ChatContent() {
 
   return (
     <div className="flex flex-col h-screen pb-20">
-      <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-3">
         <div className="flex items-center gap-2">
           <h1 className="text-lg font-medium"># {activeChannel.name}</h1>
         </div>
@@ -100,8 +100,8 @@ function ChatContent() {
         </ScrollArea>
       </div>
 
-      <div className="fixed bottom-0 w-[calc(100%-20rem)] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-zinc-800 px-6 py-4">
-        <div className="flex items-center gap-2 rounded-lg p-2 bg-black ">
+      <div className="fixed bottom-0 w-[calc(100%-20rem)] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-zinc-800 px-16 py-4">
+        <div className="flex items-center gap-2 rounded-lg p-2 bg-black px-2">
           <input
             type="text"
             placeholder="Share your thoughts..."
@@ -115,13 +115,7 @@ function ChatContent() {
             >
               <Mic className="h-4 w-4" />
             </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 hover:bg-zinc-800"
-            >
-              <Button className="bg-primary-gradient m-4">Send</Button>
-            </Button>
+            <Button className="bg-primary-gradient ">Send</Button>
           </div>
         </div>
       </div>
