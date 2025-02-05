@@ -53,7 +53,7 @@ export function PostCard({ post ,ref}: PostCardProps) {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
     }
-    return num.toString();
+    return num?.toString();
   };
 
   const renderBodyWithHashtags = (text: string) => {
@@ -135,7 +135,7 @@ export function PostCard({ post ,ref}: PostCardProps) {
                 isLiked ? "text-red-500 fill-red-500" : ""
               }`}
             />
-            <span className="text-sm">{formatNumber(likeCount)} Love</span>
+            <span className="text-sm">{formatNumber(post.up_votes)} Love</span>
           </button>
           <button
             className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
@@ -150,7 +150,7 @@ export function PostCard({ post ,ref}: PostCardProps) {
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post.reply_count || 35)} Comments
+              {formatNumber(post?.replies?.length )} Comments
             </span>
           </button>
         </div>

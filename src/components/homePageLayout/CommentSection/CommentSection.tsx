@@ -25,6 +25,12 @@ interface CommentSectionProps {
   postId: string;
 }
 
+interface ReplyInput {
+  text: string;
+  parentCommentId: string;
+}
+
+
 const CommentSection: React.FC<any> = ({ postId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
@@ -34,6 +40,39 @@ const CommentSection: React.FC<any> = ({ postId }) => {
   const [nestedComments, setNestedComments] = useState<{ [key: string]: Comment[] }>({});
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const [loadingComments, setLoadingComments] = useState<Set<string>>(new Set());
+  const [replyInputs, setReplyInputs] = useState<{ [key: string]: ReplyInput }>({});
+  const [showReplyInput, setShowReplyInput] = useState<Set<string>>(new Set());
+
+  const handleAddReply = async (commentId: string) => {
+    const replyInput = replyInputs[commentId];
+    if (!replyInput?.text?.trim()) return;
+  
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/replyComment`,
+        {
+          postId,
+          commentId: replyInput.parentCommentId,
+          text: replyInput.text,
+          userId: "678ce60732c37c1222f913e0",
+        }
+      );
+  
+      setNestedComments(prev => ({
+        ...prev,
+        [replyInput.parentCommentId]: [...(prev[replyInput.parentCommentId] || []), response.data.data]
+      }));
+  
+      // Clear reply input
+      setReplyInputs(prev => ({ ...prev, [commentId]: { text: '', parentCommentId: '' } }));
+      
+    } catch (err) {
+      setError("Failed to add reply");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   
   console.log("@prostId", postId);
@@ -43,7 +82,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/getComments`,
           {
-            postId: "678cecee3ac8fd2f8f8f32b8",
+            postId: postId,
             page: 0,
             userId: "678ce60732c37c1222f913e0",
           }
@@ -86,7 +125,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/getNestedComment`,
         {
-          postId: "678cecee3ac8fd2f8f8f32b8",
+          postId: postId,
           parentComment: commentId,
           userId: "678ce60732c37c1222f913e0",
         }
@@ -102,6 +141,35 @@ const CommentSection: React.FC<any> = ({ postId }) => {
       setError("Failed to load replies");
     }
   };
+
+  const renderReplyInput = (commentId: string) => (
+    <div className="flex gap-2 mt-4 ml-8">
+      <Avatar className="h-6 w-6">
+        <AvatarImage src="/placeholder.svg" />
+        <AvatarFallback>U</AvatarFallback>
+      </Avatar>
+      <div className="flex-1 relative">
+      <input
+        type="text"
+        value={replyInputs[commentId]?.text || ''}
+        onChange={(e) => setReplyInputs(prev => ({
+          ...prev,
+          [commentId]: { text: e.target.value, parentCommentId:commentId }
+        }))}
+        placeholder="Write a reply..."
+        className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-2 top-1/2 -translate-y-1/2"
+          onClick={() => handleAddReply(commentId)}
+        >
+          <Send className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
 
   const renderComments = (comments: Comment[], level = 0) => {
     console.log("@commentREnderData",comments)
@@ -123,26 +191,24 @@ const CommentSection: React.FC<any> = ({ postId }) => {
             variant="ghost"
             size="sm"
             onClick={() => {
-              if (expandedComments.has(comment._id)) {
-                setExpandedComments(prev => {
-                  const next = new Set(prev);
-                  next.delete(comment._id);
-                  return next;
-                });
-              } else {
+              if (!expandedComments.has(comment._id)) {
                 handleFetchReplies(comment._id);
               }
+              setShowReplyInput(prev => {
+                const next = new Set(prev);
+                if (prev.has(comment._id)) {
+                  next.delete(comment._id);
+                } else {
+                  next.add(comment._id);
+                }
+                return next;
+              });
             }}
           >
-            {loadingComments.has(comment._id) ? (
-              'Loading...'
-            ) : expandedComments.has(comment._id) ? (
-              'Hide Replies'
-            ) : (
-              'Show Replies'
-            )}
+            Reply
           </Button>
         </div>
+        {showReplyInput.has(comment._id) && renderReplyInput(comment._id)}
         {expandedComments.has(comment._id) && nestedComments[comment._id] && (
           <div className="ml-4">
             {renderComments(nestedComments[comment._id])}
