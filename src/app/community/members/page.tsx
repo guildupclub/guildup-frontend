@@ -1,9 +1,21 @@
-import React from "react";
+"use client";
 
-export default function page() {
+import Members from "@/components/community/members/Members";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+
+export default function MembersPage() {
+  const activeCommunityId = useSelector(
+    (state: RootState) => state.channel.activeCommunityId
+  );
+
   return (
-    <div className="py-20 text-center text-zinc-200"> 
-      <h1>No Member Found!!</h1>
+    <div className="min-h-screen bg-black py-20 text-center text-zinc-200">
+      {activeCommunityId ? (
+        <Members communityId={activeCommunityId} />
+      ) : (
+        <p className="text-center text-zinc-400">Select a community</p>
+      )}
     </div>
   );
 }
