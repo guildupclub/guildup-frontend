@@ -11,6 +11,11 @@ import {
 } from "@/components/ui/collapsible";
 import { sidebarData } from "./Data";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { API_ENDPOINTS } from "@/config/constants";
+import axios from "axios";
+
 type SelectedItem = {
   section: string;
   id: number | string;
@@ -24,10 +29,19 @@ export function LeftSidebar() {
     communities: true,
   });
 
+  const [myCommunities, setMyCommunities] = useState<any[]>([]);
+  const [showSelectModal, setShowSelectModal] = useState(false);
+  const [selectedCommunities, setSelectedCommunities] = useState<any[]>([]);
+  const [feedName, setFeedName] = useState("");
+  const router = useRouter();
+
   // Initialize with null selected item
   const [selectedItem, setSelectedItem] = React.useState<SelectedItem | null>(
     null
   );
+  const [customFeeds, setCustomFeeds] = useState<
+    { name: string; communityIds: string[] }[]
+  >([]);
 
   const toggleSection = (section: keyof typeof openSections) => {
     setOpenSections((prev) => ({
@@ -46,17 +60,73 @@ export function LeftSidebar() {
     return selectedItem?.section === section && selectedItem?.id === id;
   };
 
+  useEffect(() => {
+    async function fetchCommunities() {
+      try {
+        const res = await axios.post("http://localhost:8000/v1/community/user", {
+          // userId: "678cf08b3755e3d81f93d5ad"
+          userId: "678cf03a3755e3d81f93d5aa"
+        });
+        setMyCommunities(res.data.data);
+        console.log(res.data.data);
+      } catch (error) {
+        console.error(error);
+        setMyCommunities([]);
+      }
+    }
+    fetchCommunities();
+  }, []);
+
+
+  const handleCommunityClick = (id: string) => {
+    router.push(`/community/${id}`);
+  };
+
+  function handleSelectChange(communityId: string) {
+    setSelectedCommunities((prev) =>
+      prev.includes(communityId)
+        ? prev.filter((id) => id !== communityId)
+        : [...prev, communityId]
+    );
+  }
+
+  // console.log("My Communities : ", myCommunities);
+
+  async function handleCloseModal() {
+    setShowSelectModal(false);
+    // After closing, you could do more with selectedCommunities...
+
+    try {
+      const response = await axios.post("http://localhost:8000/v1/feed/custom/create", {
+        userId: "678cf03a3755e3d81f93d5aa",
+        communityIds: selectedCommunities,
+        name: feedName,
+      });
+      console.log("Custom feed created:", response.data);
+
+      setCustomFeeds((prev) => [
+        ...prev,
+        { name: feedName, communityIds: [...selectedCommunities] },
+      ]);
+
+      // Reset
+      setFeedName("");
+      setSelectedCommunities([]);
+    } catch (error) {
+      console.error("Error creating custom feed:", error);
+    }
+  }
+
   return (
     <aside className="fixed top-0 left-0 h-screen w-80 bg-black pt-20 pb-3 px-4 space-y-3">
       <div className="bg-zinc-900 rounded-xl p-3 space-y-1">
         <div>
           <button
             onClick={() => handleItemClick("home", "feed")}
-            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 ${
-              isItemSelected("home", "feed")
-                ? "text-purple-500"
-                : "text-zinc-200 hover:text-white"
-            }`}
+            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 ${isItemSelected("home", "feed")
+              ? "text-purple-500"
+              : "text-zinc-200 hover:text-white"
+              }`}
           >
             Home Feed
           </button>
@@ -75,30 +145,91 @@ export function LeftSidebar() {
               <ChevronDown className="h-4 w-4" />
             )}
           </CollapsibleTrigger>
+
           <CollapsibleContent>
-            {sidebarData.customFeed.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick("customFeed", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-zinc-800 ${
-                  isItemSelected("customFeed", item.id)
-                    ? "bg-[#334BFF]/20 text-purple-500"
-                    : item.isSpecial
-                    ? "text-purple-500"
-                    : "text-zinc-300"
-                }`}
+            <button
+              onClick={() => setShowSelectModal(true)}
+              className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-zinc-800 text-zinc-300"
+            >
+              Select Feed
+            </button>
+
+            {/* {customFeeds.map((feed, idx) => (
+              <div
+                key={`${feed.name}-${idx}`}
+                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
               >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{item.name}</span>
-                {item.isPinned && (
-                  <Pin className="h-4 w-4 ml-auto text-zinc-500" />
-                )}
-              </button>
+                <h4 className="text-purple-300 font-medium mb-1">
+                  {feed.name}
+                </h4>
+                {feed.communityIds.map((cid) => {
+                  const community = myCommunities.find(
+                    (c) => c._id === cid
+                  );
+                  return (
+                    <div key={cid} className="pl-2">
+                      • {community?.name}
+                    </div>
+                  );
+                })}
+              </div>
+            ))} */}
+
+            {customFeeds.map((feed, idx) => (
+              <div
+                key={`${feed.name}-${idx}`}
+                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
+              >
+                <h4 className="text-purple-300 font-medium mb-1">
+                  {feed.name}
+                </h4>
+                {feed.communityIds.map((cid) => {
+                  const community = myCommunities.find((c) => c._id === cid);
+                  return (
+                    <div key={cid} className="pl-2 mt-2 border-l border-zinc-700 text-sm space-y-1">
+                      <div className="font-semibold text-zinc-100">{community?.name}</div>
+
+                    </div>
+                  );
+                })}
+              </div>
             ))}
           </CollapsibleContent>
+
+          {showSelectModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+              <div className="bg-zinc-900 p-4 rounded space-y-2 w-[300px]">
+                <h2 className="text-zinc-200">Create Custom Feed</h2>
+                <input
+                  type="text"
+                  value={feedName}
+                  onChange={(e) => setFeedName(e.target.value)}
+                  className="w-full p-2 rounded-lg text-zinc-200 bg-zinc-800 mb-2"
+                  placeholder="Feed Name"
+                />
+                <p className="text-zinc-200">Select Communities:</p>
+                {myCommunities.map((comm) => (
+                  <label
+                    key={comm?._id}
+                    className="flex items-center gap-2 text-zinc-300"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCommunities.includes(comm?._id)}
+                      onChange={() => handleSelectChange(comm?._id)}
+                    />
+                    {comm?.name}
+                  </label>
+                ))}
+                <button
+                  onClick={handleCloseModal}
+                  className="mt-2 bg-purple-700 hover:bg-purple-600 text-white px-3 py-1 rounded"
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          )}
         </Collapsible>
 
         <Collapsible
@@ -119,11 +250,10 @@ export function LeftSidebar() {
               <button
                 key={item.id}
                 onClick={() => handleItemClick("followedTopics", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${
-                  isItemSelected("followedTopics", item.id) || item.isActive
-                    ? "bg-[#334BFF]/20 text-purple-500"
-                    : "text-zinc-300 hover:bg-zinc-800"
-                }`}
+                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("followedTopics", item.id) || item.isActive
+                  ? "bg-[#334BFF]/20 text-purple-500"
+                  : "text-zinc-300 hover:bg-zinc-800"
+                  }`}
               >
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={item.avatar} />
@@ -158,11 +288,10 @@ export function LeftSidebar() {
               <button
                 key={item.id}
                 onClick={() => handleItemClick("recentFeed", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${
-                  isItemSelected("recentFeed", item.id)
-                    ? "bg-[#334BFF]/20 text-purple-500"
-                    : "text-zinc-300 hover:bg-zinc-800"
-                }`}
+                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("recentFeed", item.id)
+                  ? "bg-[#334BFF]/20 text-purple-500"
+                  : "text-zinc-300 hover:bg-zinc-800"
+                  }`}
               >
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={item.avatar} />
@@ -195,28 +324,17 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
-            {sidebarData.communities.map((item) => (
+            {myCommunities?.map((community) => (
               <button
-                key={item.id}
-                onClick={() => handleItemClick("communities", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${
-                  isItemSelected("communities", item.id)
-                    ? "bg-[#334BFF]/20 text-purple-500"
-                    : "text-zinc-300 hover:bg-zinc-800"
-                }`}
+                key={community?._id}
+                onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}
+                className="w-full flex items-center gap-2 rounded-lg p-2 text-sm text-zinc-300 hover:bg-zinc-800"
               >
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
+                  <AvatarImage src={community?.avatarURL} />
+                  <AvatarFallback>{community?.name[0]}</AvatarFallback>
                 </Avatar>
-                <span>{item.name}</span>
-                {item.isPinned ? (
-                  <Pin className="h-4 w-4 ml-auto text-zinc-500" />
-                ) : (
-                  item.isNew && (
-                    <span className="ml-auto text-xs text-purple-500">New</span>
-                  )
-                )}
+                <span>{community?.name}</span>
               </button>
             ))}
           </CollapsibleContent>
