@@ -29,7 +29,7 @@ export default function SignIn() {
         password,
         redirect: false,
       });
-
+      console.log("@sininreust",result)
       if (result?.error) {
         setError(result.error);
       } else {

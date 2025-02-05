@@ -12,6 +12,7 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("@here",credentials)
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
@@ -24,8 +25,8 @@ const handler = NextAuth({
               password: credentials.password,
             }
           );
-
-          const user = response.data;
+          console.log("@response",response.data)
+          const user = response.data.data.user;
 
           if (user) {
             return {
@@ -38,6 +39,7 @@ const handler = NextAuth({
 
           return null;
         } catch (error: any) {
+          console.log("@error",error)
           throw new Error(error.response?.data?.error || "Invalid credentials");
         }
       },
@@ -47,9 +49,35 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
   ],
+  callbacks:{
+    async signIn({ user, account, profile }) {
+      console.log("@siginIN",user,account,profile)
+      if (account?.provider === "google") {
+        try {
+          console.log("@authDetails",user.name,user.email,user.image)
+          const response = await axios.post("http://localhost:8000/v1/auth/google", {
+           user:{ name: user.name,
+            email: user.email,
+            image: user.image}
+          });
+          console.log("@response",response.data)
+          if (response.status !== 200) {
+            throw new Error('Google authentication failed');
+          }
+          account.access_token= response.data.data.session
+          return true;
+        } catch (error) {
+          console.error("Google auth error:", error);
+          return false;
+        }
+      }
+      // Called when the user signs in; you can send data to the backend here if needed
+      return true;
+    },
+
+  },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
   },
   session: {
     strategy: "jwt",
