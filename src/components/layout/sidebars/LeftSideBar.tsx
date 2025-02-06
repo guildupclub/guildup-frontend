@@ -24,16 +24,26 @@ type SelectedItem = {
 export function LeftSidebar() {
   const [openSections, setOpenSections] = React.useState({
     customFeed: true,
+    customTopics: true,
     followedTopics: true,
     recentFeed: true,
     communities: true,
   });
 
-  const [myCommunities, setMyCommunities] = useState<any[]>([]);
+  const [myCommunities, setMyCommunities] = useState<any>();
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [selectedCommunities, setSelectedCommunities] = useState<any[]>([]);
   const [feedName, setFeedName] = useState("");
   const router = useRouter();
+
+  // topics 
+  const [myTopics, setMyTopics] = useState<any>();
+  const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+  const [customTopics, setCustomTopics] = useState<
+    { name: string; topicIds: string[] }[]
+  >([]);
+  const [topicFeedName, setTopicFeedName] = useState("");
+  const [showTopicsModal, setShowTopicsModal] = useState(false);
 
   // Initialize with null selected item
   const [selectedItem, setSelectedItem] = React.useState<SelectedItem | null>(
@@ -89,6 +99,56 @@ export function LeftSidebar() {
         : [...prev, communityId]
     );
   }
+
+  // Topics 
+  useEffect(() => {
+    async function fetchTopics() {
+      try {
+        const res = await axios.post(
+          "http://localhost:8000/v1/category/interest",
+          { userId : "678cf03a3755e3d81f93d5aa" }
+        );
+  
+        setMyTopics(res.data.data);
+        console.log("Topics:", res.data.data);
+      } catch (error) {
+        console.error(error);
+        setMyTopics([]);
+      }
+    }
+  
+    fetchTopics();
+  }, []);
+
+  const handleTopicSelectChange = (topicId: string) => {
+    setSelectedTopics((prev) =>
+      prev.includes(topicId)
+        ? prev.filter((id) => id !== topicId)
+        : [...prev, topicId]
+    );
+  };
+
+  async function handleCloseTopicsModal() {
+    setShowTopicsModal(false);
+    try {
+      const response = await axios.post("http://localhost:8000/v1/custom-topic/create", {
+        userId: "678cf03a3755e3d81f93d5aa",
+        topicIds: selectedTopics,
+        name: topicFeedName,
+      });
+      console.log("Custom topic feed created:", response.data);
+      setCustomTopics((prev) => [
+        ...prev,
+        { name: topicFeedName, topicIds: [...selectedTopics] },
+      ]);
+      // Reset selection for topics feed
+      setTopicFeedName("");
+      setSelectedTopics([]);
+    } catch (error) {
+      console.error("Error creating custom topic feed:", error);
+    }
+  }
+
 
   // console.log("My Communities : ", myCommunities);
 
@@ -232,6 +292,9 @@ export function LeftSidebar() {
           )}
         </Collapsible>
 
+
+        {/* Followed Topics */}
+
         <Collapsible
           open={openSections.followedTopics}
           onOpenChange={() => toggleSection("followedTopics")}
@@ -246,27 +309,21 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            {sidebarData.followedTopics.map((item) => (
+            {myTopics?.user_interests.map((topic) => (
               <button
-                key={item.id}
-                onClick={() => handleItemClick("followedTopics", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("followedTopics", item.id) || item.isActive
-                  ? "bg-[#334BFF]/20 text-purple-500"
-                  : "text-zinc-300 hover:bg-zinc-800"
+                key={topic?._id}
+                onClick={() => handleItemClick("followedTopics", topic?._id)}
+                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("followedTopics", topic?._id)
+                    ? "bg-[#334BFF]/20 text-purple-500"
+                    : "text-zinc-300 hover:bg-zinc-800"
                   }`}
               >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{item.name}</span>
-                {item.isPinned && (
-                  <Pin className="h-4 w-4 ml-auto text-zinc-500" />
-                )}
+                <span>{topic?.name}</span>
               </button>
             ))}
           </CollapsibleContent>
         </Collapsible>
+
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4 space-y-2">
