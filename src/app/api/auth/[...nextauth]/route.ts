@@ -2,6 +2,9 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+import { store } from '@/redux/store';
+import { setUser } from '@/redux/userSlice';
+
 
 const handler = NextAuth({
   providers: [
@@ -25,7 +28,6 @@ const handler = NextAuth({
               password: credentials.password,
             }
           );
-          console.log("@response",response.data)
           const user = response.data.data.user;
 
           if (user) {
@@ -34,6 +36,7 @@ const handler = NextAuth({
               name: user.name,
               email: user.email,
               image: user.image,
+              session: response.data.data.session
             };
           }
 
@@ -74,7 +77,20 @@ const handler = NextAuth({
       // Called when the user signs in; you can send data to the backend here if needed
       return true;
     },
+    async jwt(jwt) {
+      console.log("@jwt",jwt)
+      // Add custom properties to the token on login
+      if (jwt.user) {
+        jwt.token.id = jwt.user.id;
+        jwt.token.session = (jwt.user as any).session; // Example custom field
+      }
+      return jwt.token;
+    },
+    async session({session,token}) {
+      // console.log("@sessionFunc",sessionData)
 
+      return session;
+    }
   },
   pages: {
     signIn: "/auth/signin",

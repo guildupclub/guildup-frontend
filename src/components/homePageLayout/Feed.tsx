@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostCreator } from "./PostCreator";
+import { useSession } from 'next-auth/react';
 import  {PostCard}  from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
 
@@ -24,10 +25,12 @@ interface ApiResponse {
 
 export function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const data = useSession();
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const observer = useRef<any>(null);
 
+  console.log("@session",data)
   const lastPostElementRef = useCallback(
     (node:any) => {
       if (loading) return;
