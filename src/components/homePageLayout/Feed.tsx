@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostCreator } from "./PostCreator";
-import { PostCard } from "./PostCard";
+import { useSession } from 'next-auth/react';
+import  {PostCard}  from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
 
 interface Post {
@@ -24,37 +25,99 @@ interface ApiResponse {
 
 export function Feed() {
   const [posts, setPosts] = useState<Post[]>([]);
+  const data = useSession();
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const observer = useRef<any>(null);
+
+  console.log("@session",data)
+  const lastPostElementRef = useCallback(
+    (node:any) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          setPage((prevPage) => prevPage + 1); // trigger loading of new posts by chaging page no
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading]
+  );
+
+  const fetchPosts = async (page:any,num:any) => {
+    try {
+      const response:any = await fetch(API_ENDPOINTS.getPosts, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: "678ce60732c37c1222f913e0",
+          page:page
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch posts");
+
+      const data: ApiResponse = await response.json();
+      if (data.r === "s" && Array.isArray(data.data)) {
+        console.log("@Reponse",data)
+        return data.data
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch posts");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadMorePosts = async () => {
+    setLoading(true);
+    console.log("Getting mroe post")
+    const newPosts = await fetchPosts(page, 10);
+    console.log("@newPost",newPosts)
+    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    loadMorePosts();
+  }, [page]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch(API_ENDPOINTS.getPosts, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: "678ce60732c37c1222f913e0",
-          }),
-        });
+  // useEffect(() => {
+  //   const fetchPosts = async () => {
+  //     try {
+  //       const response = await fetch(API_ENDPOINTS.getPosts, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           userId: "678ce60732c37c1222f913e0",
+  //         }),
+  //       });
 
-        if (!response.ok) throw new Error("Failed to fetch posts");
+  //       if (!response.ok) throw new Error("Failed to fetch posts");
 
-        const data: ApiResponse = await response.json();
-        if (data.r === "s" && Array.isArray(data.data)) {
-          setPosts(data.data);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch posts");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       const data: ApiResponse = await response.json();
+  //       if (data.r === "s" && Array.isArray(data.data)) {
+  //         setPosts(data.data);
+  //       }
+  //     } catch (err) {
+  //       setError(err instanceof Error ? err.message : "Failed to fetch posts");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    fetchPosts();
-  }, []);
+  //   fetchPosts();
+  // }, []);
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -84,7 +147,8 @@ export function Feed() {
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post) => <PostCard key={post._id} post={post} />)
+            posts.map((post,index) => <PostCard key={post._id} post={post} ref={posts.length === index + 1 ? lastPostElementRef : null}
+            />)
           )}
         </TabsContent>
 

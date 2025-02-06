@@ -13,6 +13,7 @@ import {
   Send,
 } from "lucide-react";
 import { Comment } from "./Comment";
+import CommentSection from "./CommentSection/CommentSection";
 
 interface PostCardProps {
   post: {
@@ -25,9 +26,10 @@ interface PostCardProps {
     post_type: string;
     slug: string;
   };
+  ref:any;
 }
 
-export function PostCard({ post }: PostCardProps) {
+export function PostCard({ post ,ref}: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
   const [showComments, setShowComments] = useState(false);
@@ -51,7 +53,7 @@ export function PostCard({ post }: PostCardProps) {
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}k`;
     }
-    return num.toString();
+    return num?.toString();
   };
 
   const renderBodyWithHashtags = (text: string) => {
@@ -86,31 +88,10 @@ export function PostCard({ post }: PostCardProps) {
   };
 
   // Example comments data
-  const comments = [
-    {
-      author: "Reena Singh",
-      level: 5,
-      content:
-        "This is really insightful! Thanks for sharing your knowledge about index funds.",
-      timestamp: "11:00 pm",
-      likes: 15,
-      replies: [
-        {
-          author: "Ravi Kumar",
-          level: 2,
-          content:
-            "I completely agree! Index funds are a great way to start investing.",
-          timestamp: "11:00 pm",
-          likes: 8,
-          replies: [],
-        },
-      ],
-    },
-    
-  ];
+
 
   return (
-    <div className="bg-zinc-900 rounded-xl mb-4">
+    <div className="bg-zinc-900 rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
           <Avatar className="h-10 w-10">
@@ -154,7 +135,7 @@ export function PostCard({ post }: PostCardProps) {
                 isLiked ? "text-red-500 fill-red-500" : ""
               }`}
             />
-            <span className="text-sm">{formatNumber(likeCount)} Love</span>
+            <span className="text-sm">{formatNumber(post.up_votes)} Love</span>
           </button>
           <button
             className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
@@ -169,7 +150,7 @@ export function PostCard({ post }: PostCardProps) {
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post.reply_count || 35)} Comments
+              {formatNumber(post?.replies?.length )} Comments
             </span>
           </button>
         </div>
@@ -226,9 +207,7 @@ export function PostCard({ post }: PostCardProps) {
             </div>
           </div>
           <div className="px-4">
-            {comments.map((comment, index) => (
-              <Comment key={index} {...comment} />
-            ))}
+          {showComments && <CommentSection postId={post._id} />}
           </div>
         </div>
       )}
