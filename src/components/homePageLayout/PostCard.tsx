@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Comment } from "./Comment";
 import CommentSection from "./CommentSection/CommentSection";
+import {useSelector} from 'react-redux'
+import axios from 'axios'
 
 interface PostCardProps {
   post: {
@@ -34,7 +36,17 @@ export function PostCard({ post ,ref}: PostCardProps) {
   const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const {user} = useSelector((state:any)=>state.user)
 
+  const handleSendComment =async () => {
+    console.log("@user",user)
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,{
+      postId:post._id,
+      comment:newComment,
+      userId:user.id
+    })
+    console.log("@commentResponse",response)
+  }
   // Existing functions remain the same
   const formatTimeAgo = (date: string) => {
     const now = new Date();
@@ -197,6 +209,7 @@ export function PostCard({ post ,ref}: PostCardProps) {
                     className="h-8 w-8 text-purple-500"
                     onClick={() => {
                       // Handle comment submission
+                      handleSendComment()
                       setNewComment("");
                     }}
                   >

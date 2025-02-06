@@ -16,6 +16,12 @@ import { useRouter } from "next/navigation";
 import { API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
 
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
+import { getSelectedTopic } from "@/redux/postSlice";
+// Optionally, if you're updating selected topics in the topic slice
+import { setSelectedTopics } from "@/redux/topicSlice";
+
 type SelectedItem = {
   section: string;
   id: number | string;
@@ -31,6 +37,8 @@ export function LeftSidebar() {
   });
 
   const [posts, setPosts] = useState<any[]>([]);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const [myCommunities, setMyCommunities] = useState<any>();
   const [showSelectModal, setShowSelectModal] = useState(false);
@@ -161,12 +169,19 @@ export function LeftSidebar() {
         { name: topicFeedName, topicIds: [...selectedTopics] },
       ]);
 
-      const response = await axios.post("http://localhost:8000/v1/category/post", {
-        userId: "678cf03a3755e3d81f93d5aa",
-        categoryIds: selectedTopics,
-      });
+      // const response = await axios.post("http://localhost:8000/v1/category/post", {
+      //   userId: "678cf03a3755e3d81f93d5aa",
+      //   categoryIds: selectedTopics,
+      // });
+
+      await dispatch(
+        getSelectedTopic({
+          userId: "678cf03a3755e3d81f93d5aa",
+          categoryIds: selectedTopics,
+        })
+      );
       console.log("Posts fetched:", response.data);
-      setPosts(response.data.posts || []);
+      // setPosts(response.data.posts || []);
       // Reset selection for topics feed
       setTopicFeedName("");
       setSelectedTopics([]);
@@ -248,47 +263,7 @@ export function LeftSidebar() {
               Select Feed
             </button>
 
-            {/* {customFeeds.map((feed, idx) => (
-              <div
-                key={`${feed.name}-${idx}`}
-                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
-              >
-                <h4 className="text-purple-300 font-medium mb-1">
-                  {feed.name}
-                </h4>
-                {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find(
-                    (c) => c._id === cid
-                  );
-                  return (
-                    <div key={cid} className="pl-2">
-                      • {community?.name}
-                    </div>
-                  );
-                })}
-              </div>
-            ))} */}
-
-            {/* {customFeeds.map((feed, idx) => (
-              <div
-                key={`${feed.name}-${idx}`}
-                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
-              >
-                <h4 className="text-purple-300 font-medium mb-1">
-                  {feed.name}
-                </h4>
-                {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c) => c._id === cid);
-                  return (
-                    <div key={cid} className="pl-2 mt-2 border-l border-zinc-700 text-sm space-y-1">
-                      <div className="font-semibold text-zinc-100">{community?.name}</div>
-
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </CollapsibleContent> */}
+           
 
             {customFeeds.map((feed, idx) => (
               <div
@@ -455,7 +430,7 @@ export function LeftSidebar() {
           )}
         </Collapsible>
 
-        {myTopics?.user_interests && (
+        {/* {myTopics?.user_interests && (
           <div className="mt-4 p-4 bg-zinc-800 rounded-lg text-zinc-300 shadow-lg">
 
             {myTopics.user_interests.map((topic) => (
@@ -467,7 +442,7 @@ export function LeftSidebar() {
               </div>
             ))}
           </div>
-        )}
+        )} */}
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4 space-y-2">

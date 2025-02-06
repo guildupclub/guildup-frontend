@@ -106,7 +106,7 @@ export function Navbar({
             </ul>
           </div>
           <div className="hidden md:block ">
-            {user.accessToken ? (
+            {user?.accessToken ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -180,7 +180,7 @@ export function Navbar({
             <Users className="w-6 h-6" />
             <span className="text-xs mt-1">Community</span>
           </Link>
-          {user.accessToken ? (
+          {user?.accessToken ? (
             <button
               className="flex flex-col items-center justify-center "
               onClick={() => signOut()}

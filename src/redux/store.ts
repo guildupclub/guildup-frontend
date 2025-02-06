@@ -4,6 +4,7 @@ import channelReducer from "./channelSlice";
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 import {thunk} from 'redux-thunk';
+import postsReducer from './postSlice';
 
 const persistConfig = {
   key: 'root',
@@ -16,7 +17,8 @@ const persistedUserReducer = persistReducer(persistConfig, userReducer);
 export const store = configureStore({
   reducer: {
     user: persistedUserReducer,
-    channel: channelReducer
+    channel: channelReducer,
+    posts: postsReducer,
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({
