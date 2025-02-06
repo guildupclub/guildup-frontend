@@ -30,6 +30,8 @@ export function LeftSidebar() {
     communities: true,
   });
 
+  const [posts, setPosts] = useState<any[]>([]);
+
   const [myCommunities, setMyCommunities] = useState<any>();
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [selectedCommunities, setSelectedCommunities] = useState<any[]>([]);
@@ -59,6 +61,28 @@ export function LeftSidebar() {
       [section]: !prev[section],
     }));
   };
+
+  useEffect(() => {
+    const storedFeeds = localStorage.getItem("customFeeds");
+    if (storedFeeds) {
+      setCustomFeeds(JSON.parse(storedFeeds));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("customFeeds", JSON.stringify(customFeeds));
+  }, [customFeeds]);
+
+  useEffect(() => {
+    const storedTopics = localStorage.getItem("customTopics");
+    if (storedTopics) {
+      setCustomTopics(JSON.parse(storedTopics));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("customTopics", JSON.stringify(customTopics));
+  }, [customTopics]);
 
   // Updated handler for item selection
   const handleItemClick = (section: string, id: number | string) => {
@@ -106,9 +130,9 @@ export function LeftSidebar() {
       try {
         const res = await axios.post(
           "http://localhost:8000/v1/category/interest",
-          { userId : "678cf03a3755e3d81f93d5aa" }
+          { userId: "678cf03a3755e3d81f93d5aa" }
         );
-  
+
         setMyTopics(res.data.data);
         console.log("Topics:", res.data.data);
       } catch (error) {
@@ -116,7 +140,7 @@ export function LeftSidebar() {
         setMyTopics([]);
       }
     }
-  
+
     fetchTopics();
   }, []);
 
@@ -131,22 +155,32 @@ export function LeftSidebar() {
   async function handleCloseTopicsModal() {
     setShowTopicsModal(false);
     try {
-      const response = await axios.post("http://localhost:8000/v1/custom-topic/create", {
-        userId: "678cf03a3755e3d81f93d5aa",
-        topicIds: selectedTopics,
-        name: topicFeedName,
-      });
-      console.log("Custom topic feed created:", response.data);
+      // redux implementation 
       setCustomTopics((prev) => [
         ...prev,
         { name: topicFeedName, topicIds: [...selectedTopics] },
       ]);
+
+      const response = await axios.post("http://localhost:8000/v1/category/post", {
+        userId: "678cf03a3755e3d81f93d5aa",
+        categoryIds: selectedTopics,
+      });
+      console.log("Posts fetched:", response.data);
+      setPosts(response.data.posts || []);
       // Reset selection for topics feed
       setTopicFeedName("");
       setSelectedTopics([]);
     } catch (error) {
       console.error("Error creating custom topic feed:", error);
     }
+  }
+
+  function handleDeleteCustomFeed(index: number) {
+    setCustomFeeds((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function handleDeleteCustomTopic(index: number) {
+    setCustomTopics((prev) => prev.filter((_, i) => i !== index));
   }
 
 
@@ -235,7 +269,7 @@ export function LeftSidebar() {
               </div>
             ))} */}
 
-            {customFeeds.map((feed, idx) => (
+            {/* {customFeeds.map((feed, idx) => (
               <div
                 key={`${feed.name}-${idx}`}
                 className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
@@ -254,12 +288,53 @@ export function LeftSidebar() {
                 })}
               </div>
             ))}
+          </CollapsibleContent> */}
+
+            {customFeeds.map((feed, idx) => (
+              <div
+                key={`${feed.name}-${idx}`}
+                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
+              >
+                <div className="flex justify-between items-center">
+                  <h4 className="text-purple-300 font-medium mb-1">{feed.name}</h4>
+                  <button
+                    onClick={() => handleDeleteCustomFeed(idx)}
+                    className="text-red-500 hover:text-red-700 text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
+                {feed.communityIds.map((cid) => {
+                  const community = myCommunities.find((c) => c._id === cid);
+                  return (
+                    <div key={cid} className="pl-2 mt-1 border-l border-zinc-700 pl-4 text-sm">
+                      <div className="font-semibold text-zinc-100">{community?.name}</div>
+                      {/* {community?.description && (
+                        <div className="text-zinc-400">{community.description}</div>
+                      )}
+                      {community?.membersCount && (
+                        <div className="text-zinc-500">Members: {community.membersCount}</div>
+                      )} */}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </CollapsibleContent>
+
 
           {showSelectModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-black/50">
               <div className="bg-zinc-900 p-4 rounded space-y-2 w-[300px]">
-                <h2 className="text-zinc-200">Create Custom Feed</h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-zinc-200">Create Custom Feed</h2>
+                  <button
+                    onClick={() => setShowSelectModal(false)}
+                    className="text-zinc-200 hover:text-white"
+                  >
+                    X
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={feedName}
@@ -269,16 +344,13 @@ export function LeftSidebar() {
                 />
                 <p className="text-zinc-200">Select Communities:</p>
                 {myCommunities.map((comm) => (
-                  <label
-                    key={comm?._id}
-                    className="flex items-center gap-2 text-zinc-300"
-                  >
+                  <label key={comm._id} className="flex items-center gap-2 text-zinc-300">
                     <input
                       type="checkbox"
-                      checked={selectedCommunities.includes(comm?._id)}
-                      onChange={() => handleSelectChange(comm?._id)}
+                      checked={selectedCommunities.includes(comm._id)}
+                      onChange={() => handleSelectChange(comm._id)}
                     />
-                    {comm?.name}
+                    {comm.name}
                   </label>
                 ))}
                 <button
@@ -292,38 +364,110 @@ export function LeftSidebar() {
           )}
         </Collapsible>
 
-
         {/* Followed Topics */}
 
         <Collapsible
-          open={openSections.followedTopics}
-          onOpenChange={() => toggleSection("followedTopics")}
+          open={openSections.customTopics}
+          onOpenChange={() => toggleSection("customTopics")}
           className="space-y-2 border-t border-zinc-800 py-2"
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium text-zinc-200">
-            My Followed Topics
-            {openSections.followedTopics ? (
+            Custom Topics
+            {openSections.customTopics ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
             )}
           </CollapsibleTrigger>
           <CollapsibleContent>
-            {myTopics?.user_interests.map((topic) => (
-              <button
-                key={topic?._id}
-                onClick={() => handleItemClick("followedTopics", topic?._id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("followedTopics", topic?._id)
-                    ? "bg-[#334BFF]/20 text-purple-500"
-                    : "text-zinc-300 hover:bg-zinc-800"
-                  }`}
+            <button
+              onClick={() => setShowTopicsModal(true)}
+              className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-zinc-800 text-zinc-300"
+            >
+              Select Topics
+            </button>
+            {customTopics.map((topicFeed, idx) => (
+              <div
+                key={`${topicFeed.name}-${idx}`}
+                className="mt-2 p-2 bg-zinc-800 rounded-lg text-zinc-300"
               >
-                <span>{topic?.name}</span>
-              </button>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-purple-300 font-medium mb-1">{topicFeed.name}</h4>
+                  <button
+                    onClick={() => handleDeleteCustomTopic(idx)}
+                    className="text-red-500 hover:text-red-700 text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
+                {topicFeed.topicIds.map((tid) => {
+                  const topic = myTopics?.user_interests?.find((t) => t._id === tid);
+                  return (
+                    <div
+                      key={tid}
+                      className="pl-2 mt-1 border-l border-zinc-700 pl-4 text-sm"
+                    >
+                      <div className="font-semibold text-zinc-100">{topic?.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
             ))}
           </CollapsibleContent>
+          {showTopicsModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+              <div className="bg-zinc-900 p-4 rounded space-y-2 w-[300px]">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-zinc-200">Create Custom Topic Feed</h2>
+                  <button
+                    onClick={() => setShowTopicsModal(false)}
+                    className="text-zinc-200 hover:text-white"
+                  >
+                    X
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={topicFeedName}
+                  onChange={(e) => setTopicFeedName(e.target.value)}
+                  className="w-full p-2 rounded-lg text-zinc-200 bg-zinc-800 mb-2"
+                  placeholder="Topic Feed Name"
+                />
+                <p className="text-zinc-200">Select Topics:</p>
+                {myTopics?.user_interests?.map((topic) => (
+                  <label key={topic._id} className="flex items-center gap-2 text-zinc-300">
+                    <input
+                      type="checkbox"
+                      checked={selectedTopics.includes(topic._id)}
+                      onChange={() => handleTopicSelectChange(topic._id)}
+                    />
+                    {topic.name}
+                  </label>
+                ))}
+                <button
+                  onClick={handleCloseTopicsModal}
+                  className="mt-2 bg-purple-700 hover:bg-purple-600 text-white px-3 py-1 rounded"
+                >
+                  Create
+                </button>
+              </div>
+            </div>
+          )}
         </Collapsible>
 
+        {myTopics?.user_interests && (
+          <div className="mt-4 p-4 bg-zinc-800 rounded-lg text-zinc-300 shadow-lg">
+
+            {myTopics.user_interests.map((topic) => (
+              <div
+                key={topic._id}
+                className="mt-2 border-l-4 border-zinc-700 pl-4 text-sm transition-all duration-200 hover:pl-6 hover:text-white"
+              >
+                <span className="font-medium">{topic.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4 space-y-2">
