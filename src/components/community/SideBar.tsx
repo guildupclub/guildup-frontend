@@ -19,8 +19,6 @@ import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -29,6 +27,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { PostDialog } from "../community/Event/CreateEventDialouge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const initialChannels = [
   {
@@ -57,77 +63,114 @@ export function Sidebar() {
   );
   const router = useRouter();
   const [channels, setChannels] = useState(initialChannels);
-  const [newChannelName, setNewChannelName] = useState("");
   const [isChannelOpen, setIsChannelOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    type: "discussion",
+    is_locked: false,
+  });
+
   useEffect(() => {
-    const fetchChannels = async () => {
-      const body = {
-        userId: "66f2e0964966b4785acd30d9",
-        session: "wnywp8z6",
-        communityId: "66f7e7ac585e0c3e14e41a50",
-      };
-
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/getChannels`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          }
-        );
-
-        const data = await response.json();
-        if (data.r !== "s" || !data.data) {
-          throw new Error("Failed to fetch channels");
-        }
-
-        const formattedChannels = data.data.map((channel: any) => ({
-          id: channel._id,
-          name: channel.name,
-          icon: channel.type === "chat" ? Lock : Hash,
-          locked: channel.is_locked,
-        }));
-
-        setChannels(formattedChannels);
-      } catch (err: any) {
-        setError("Error fetching channels: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchChannels();
   }, []);
+
+  const fetchChannels = async () => {
+    const body = {
+      userId: "66f2e0964966b4785acd30d9",
+      session: "wnywp8z6",
+      communityId: "66f7e7ac585e0c3e14e41a50",
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/getChannels`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+
+      const data = await response.json();
+      if (data.r !== "s" || !data.data) {
+        throw new Error("Failed to fetch channels");
+      }
+
+      const formattedChannels = data.data.map((channel: any) => ({
+        id: channel._id,
+        name: channel.name,
+        icon: channel.type === "chat" ? Lock : Hash,
+        locked: channel.is_locked,
+      }));
+
+      setChannels(formattedChannels);
+    } catch (err: any) {
+      setError("Error fetching channels: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleNavigation = (route: string) => {
     router.push(route);
   };
 
-  const handleCreateChannel = () => {
-    if (newChannelName.trim()) {
-      const newChannel = {
-        id: newChannelName.toLowerCase().replace(/\s+/g, "-"),
-        name: newChannelName,
-        icon: Hash,
-      };
-      setChannels([...channels, newChannel]);
-      setNewChannelName("");
+  const handleCreateChannel = async () => {
+    if (!formData.name.trim()) return;
+
+    setIsCreating(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: "66f2e0964966b4785acd30d9",
+            session: "wnywp8z6",
+            communityId: "6704f2e8bc3a87d22b36d236",
+            name: formData.name,
+            type: formData.type,
+            is_locked: formData.is_locked,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create channel");
+      }
+
+      // Reset form and close dialog
+      setFormData({
+        name: "",
+        type: "discussion",
+        is_locked: false,
+      });
       setIsChannelOpen(false);
+
+      // Refresh channels list
+      await fetchChannels();
+    } catch (err: any) {
+      setError("Error creating channel: " + err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
   return (
-    <div className="fixed h-screen w-72 bg-background/95  border-r-zinc-700 p-4 py-24 ">
+    <div className="fixed h-screen w-72 bg-background/95 border-r-zinc-700 p-4 py-24">
       <div className="space-y-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 "
+          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300"
         >
           <PostDialog />
         </Button>
@@ -147,7 +190,6 @@ export function Sidebar() {
           <Users className="h-4 w-4" />
           Members
         </Button>
-
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
@@ -182,33 +224,77 @@ export function Sidebar() {
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200">
                 <DialogHeader>
-                  <DialogTitle>Create Channel</DialogTitle>
-                  <DialogDescription className="text-zinc-400">
-                    Create a new channel for your community.
-                  </DialogDescription>
+                  <DialogTitle>Create a New Channel</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
+                <div className="grid gap-6 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Channel Name</Label>
                     <Input
                       id="name"
-                      value={newChannelName}
-                      onChange={(e) => setNewChannelName(e.target.value)}
-                      className="col-span-3 bg-zinc-800 border-zinc-700 text-zinc-200"
-                      placeholder="new-channel"
+                      placeholder="Enter name"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="bg-zinc-800 border-zinc-700 text-zinc-200"
                     />
                   </div>
+                  <div className="grid gap-2">
+                    <Label>Channel Type</Label>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, type: value })
+                      }
+                    >
+                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-200">
+                        <SelectValue placeholder="Select your topics" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                        <SelectItem value="discussion">Discussion</SelectItem>
+                        <SelectItem value="chat">Chat</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>What to lock your channel?</Label>
+                    <RadioGroup
+                      value={formData.is_locked.toString()}
+                      onValueChange={(value) =>
+                        setFormData({
+                          ...formData,
+                          is_locked: value === "true",
+                        })
+                      }
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="true" id="yes" />
+                        <Label htmlFor="yes">Yes</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="false" id="no" />
+                        <Label htmlFor="no">No</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
                 </div>
-                <DialogFooter>
+                <div className="flex justify-end gap-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsChannelOpen(false)}
+                    className="bg-transparent border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                  >
+                    Cancel
+                  </Button>
                   <Button
                     onClick={handleCreateChannel}
-                    className="bg-[#334BFF] hover:bg-[#334BFF]/90 text-white"
+                    disabled={isCreating}
+                    className="bg-primary-gradient text-white"
                   >
-                    Create Channel
+                    {isCreating ? "Creating..." : "Create"}
                   </Button>
-                </DialogFooter>
+                </div>
               </DialogContent>
             </Dialog>
           </div>
