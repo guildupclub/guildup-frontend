@@ -54,9 +54,9 @@ export function Navbar({
                 <Input
                   type="search"
                   placeholder="Search..."
-                  className="w-full bg-black border-none pr-24 text-muted"
+                  className="w-full bg-black border-none pr-24 text-muted "
                 />
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -71,7 +71,7 @@ export function Navbar({
                     <DropdownMenuItem>Channels</DropdownMenuItem>
                     <DropdownMenuItem>Playlists</DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <div className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg">
                   <Search className="h-4 w-4 text-muted" />
                 </div>
@@ -94,7 +94,7 @@ export function Navbar({
                 </Link>
               </li>
               <li>
-                <Link href="/community/feed">
+                <Link href="/community/channel">
                   <Users className="h-6 w-6" />
                   <span className="sr-only">Community</span>
                 </Link>
