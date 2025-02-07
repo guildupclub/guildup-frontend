@@ -63,6 +63,9 @@ export function Sidebar() {
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
+  const activeCommunityId = useSelector(
+    (state: RootState) => state.channel.activeCommunityId
+  );
   const router = useRouter();
   const [channels, setChannels] = useState(initialChannels);
   const [isChannelOpen, setIsChannelOpen] = useState(false);
@@ -82,9 +85,9 @@ export function Sidebar() {
 
   const fetchChannels = async () => {
     const body = {
-      userId: "66f2e0964966b4785acd30d9",
+      userId: "678ce60732c37c1222f913e0",
       session: "wnywp8z6",
-      communityId: "66f7e7ac585e0c3e14e41a50",
+      communityId: activeCommunityId,
     };
 
     try {
@@ -136,9 +139,9 @@ export function Sidebar() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "66f2e0964966b4785acd30d9",
+            userId: "678ce60732c37c1222f913e0",
             session: "wnywp8z6",
-            communityId: "66f7e7ac585e0c3e14e41a50",
+            communityId: activeCommunityId,
             name: formData.name,
             type: formData.type,
             is_locked: formData.is_locked,

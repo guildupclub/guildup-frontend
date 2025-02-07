@@ -37,6 +37,7 @@ export function Feed({ communityId }: FeedProps) {
   useEffect(() => {
     if (communityId) fetchPosts();
   }, [communityId]);
+  console.log(communityId);
 
   const fetchPosts = async () => {
     try {

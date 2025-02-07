@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface FileResponse {
   signedUrl: string;
@@ -38,9 +40,14 @@ export function PostDialog() {
   const gifInputRef = React.useRef<HTMLInputElement>(null);
   const linkInputRef = React.useRef<HTMLInputElement>(null);
 
+  const activeCommunityId = useSelector(
+    (state: RootState) => state.channel.activeCommunityId
+  );
+  console.log(activeCommunityId);
+
   const { data: session } = useSession();
   const userId = "678ce60732c37c1222f913e0";
-  const communityId = "678ce6e05406c6c5008f18ba";
+  const communityId = activeCommunityId;
   const sessionToken = "WRdSkEhA";
 
   const handleFileUpload = async (
