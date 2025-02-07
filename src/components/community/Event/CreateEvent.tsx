@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CreateEventModal } from "./CreateEventModal";
 
 interface Event {
   id: string;
@@ -60,6 +61,13 @@ const sampleEvents: Event[] = [
 export function EventCalendar() {
   const [currentDate, setCurrentDate] = React.useState(new Date(2025, 0, 15));
   const [events] = React.useState<Event[]>(sampleEvents);
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+
+  const handleCreateEvent = (eventData: any) => {
+    console.log("New Event Created:", eventData);
+    // Here you would typically add the event to your events state
+    // and possibly make an API call to save it
+  };
 
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
@@ -158,9 +166,14 @@ export function EventCalendar() {
           </Select>
         </div>
 
-        <Button>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <Plus /> Create Event
         </Button>
+        <CreateEventModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateEvent}
+        />
       </div>
 
       <div className="flex-1 grid grid-cols-[auto_1fr] border border-zinc-700 rounded-lg overflow-hidden">
