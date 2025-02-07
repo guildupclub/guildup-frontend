@@ -94,7 +94,7 @@ export function Navbar({
                 </Link>
               </li>
               <li>
-                <Link href="/community/channel">
+                <Link href="/community/feed">
                   <Users className="h-6 w-6" />
                   <span className="sr-only">Community</span>
                 </Link>

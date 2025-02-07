@@ -35,7 +35,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
+import { GrAnnounce } from "react-icons/gr";
+import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
+import { FaUserGroup } from "react-icons/fa6";
 const initialChannels = [
   {
     id: "general",
@@ -167,12 +169,20 @@ export function Sidebar() {
 
   return (
     <div className="fixed h-screen w-72 bg-background/95 border-r-zinc-700 p-4 py-24">
-      <div className="space-y-4">
+      <div className="space-y-2">
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300"
         >
           <PostDialog />
+        </Button>
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          onClick={() => handleNavigation("/community/members")}
+        >
+          <FaUserAlt />
+          Profile
         </Button>
         <Button
           variant="ghost"
@@ -187,7 +197,7 @@ export function Sidebar() {
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
           onClick={() => handleNavigation("/community/members")}
         >
-          <Users className="h-4 w-4" />
+          <FaUserGroup />
           Members
         </Button>
         <Button
@@ -195,7 +205,7 @@ export function Sidebar() {
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
           onClick={() => handleNavigation("/community/event")}
         >
-          <Calendar className="h-4 w-4" />
+          <FaCalendarAlt />
           Events
         </Button>
         <Button
@@ -203,9 +213,11 @@ export function Sidebar() {
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
           onClick={() => handleNavigation("/community/announcements")}
         >
-          <MessageSquare className="h-4 w-4" />
+          <GrAnnounce />
           Announcements
         </Button>
+
+        <Button className="w-full ">Creator Studio</Button>
 
         <Separator className="my-4 bg-zinc-800" />
 
@@ -250,7 +262,7 @@ export function Sidebar() {
                       <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-200">
                         <SelectValue placeholder="Select your topics" />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700">
+                      <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-200">
                         <SelectItem value="discussion">Discussion</SelectItem>
                         <SelectItem value="chat">Chat</SelectItem>
                       </SelectContent>
@@ -283,14 +295,14 @@ export function Sidebar() {
                   <Button
                     variant="outline"
                     onClick={() => setIsChannelOpen(false)}
-                    className="bg-transparent border-zinc-700 text-zinc-200 hover:bg-zinc-800"
+                    className="bg-transparent border-zinc-700  hover:bg-zinc-800"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleCreateChannel}
                     disabled={isCreating}
-                    className="bg-primary-gradient text-white"
+                    className="bg-primary-gradient "
                   >
                     {isCreating ? "Creating..." : "Create"}
                   </Button>

@@ -17,6 +17,8 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
+import { FaCompass } from "react-icons/fa";
+import Link from "next/link";
 
 // Type for community data
 interface Community {
@@ -162,6 +164,15 @@ export function LeftmostSidebar() {
                 <Plus className="w-6 h-6" />
               </Button>
             </DialogTrigger>
+             <Link href="/">
+             <Button
+                variant="ghost"
+                size="icon"
+                className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
+              >
+                <FaCompass />
+              </Button>
+             </Link>
             <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200">
               <DialogHeader>
                 <DialogTitle>Join New Channel</DialogTitle>
