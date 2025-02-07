@@ -77,7 +77,6 @@ export function Feed({ communityId }: FeedProps) {
             <h1 className="text-xl font-semibold">Feed</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button>Go Live</Button>
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
             </Button>

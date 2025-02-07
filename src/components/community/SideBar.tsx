@@ -136,7 +136,7 @@ export function Sidebar() {
           body: JSON.stringify({
             userId: "66f2e0964966b4785acd30d9",
             session: "wnywp8z6",
-            communityId: "6704f2e8bc3a87d22b36d236",
+            communityId: "66f7e7ac585e0c3e14e41a50",
             name: formData.name,
             type: formData.type,
             is_locked: formData.is_locked,
@@ -312,9 +312,10 @@ export function Sidebar() {
                   dispatch(
                     setActiveChannel({ id: channel.id, name: channel.name })
                   );
+                  handleNavigation(`/community/channel/${channel.name}`);
                 }}
               >
-                <channel.icon className="h-4 w-4" />
+                <Hash />
                 {channel.name}
                 {channel.locked && (
                   <Lock className="h-3 w-3 ml-auto opacity-50" />

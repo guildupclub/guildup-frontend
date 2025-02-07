@@ -94,7 +94,7 @@ export function Navbar({
                 </Link>
               </li>
               <li>
-                <Link href="/community">
+                <Link href="/community/feed">
                   <Users className="h-6 w-6" />
                   <span className="sr-only">Community</span>
                 </Link>
@@ -171,7 +171,7 @@ export function Navbar({
             <span className="text-xs mt-1">Snips</span>
           </Link>
           <Link
-            href="/community"
+            href="/community/feed"
             className="flex flex-col items-center justify-center"
           >
             <Users className="w-6 h-6" />
