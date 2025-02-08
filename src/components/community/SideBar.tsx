@@ -80,10 +80,17 @@ export function Sidebar() {
   });
 
   useEffect(() => {
-    fetchChannels();
-  }, []);
+    if (activeCommunityId) {
+      fetchChannels();
+    }
+  }, [activeCommunityId]);
 
   const fetchChannels = async () => {
+    if (!activeCommunityId) {
+      console.warn("Community ID is null, skipping fetchChannels");
+      return;
+    }
+
     const body = {
       userId: "678ce60732c37c1222f913e0",
       session: "wnywp8z6",
