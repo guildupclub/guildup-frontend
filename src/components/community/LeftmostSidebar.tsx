@@ -111,7 +111,7 @@ export function LeftmostSidebar() {
 
   return (
     <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-800 py-20">
-      <ScrollArea className="flex-1 w-full">
+      <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
             // Loading skeleton
@@ -197,7 +197,7 @@ export function LeftmostSidebar() {
             </DialogContent>
           </Dialog>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

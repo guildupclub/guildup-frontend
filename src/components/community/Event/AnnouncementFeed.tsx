@@ -137,7 +137,7 @@ export function AnnouncementsFeed() {
         </Button>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="flex-1 overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col">
           {messages.map((message, index) => (
             <div key={message.id}>
@@ -171,7 +171,7 @@ export function AnnouncementsFeed() {
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
