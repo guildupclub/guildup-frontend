@@ -11,6 +11,7 @@ import {
   Rss,
   Crown,
   Lock,
+  Info,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -231,8 +232,8 @@ export function Sidebar() {
 
         <Separator className="my-4 bg-zinc-800" />
 
-        <div className="px-2 py-2">
-          <div className="flex items-center justify-between mb-2">
+        <div className="px-2 py-2 ">
+          <div className="flex items-center justify-between mb-2 ">
             <h2 className="text-lg font-semibold text-zinc-200">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
               <DialogTrigger asChild>
@@ -244,7 +245,7 @@ export function Sidebar() {
                   <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200">
+              <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200 border-none">
                 <DialogHeader>
                   <DialogTitle>Create a New Channel</DialogTitle>
                 </DialogHeader>
@@ -279,7 +280,15 @@ export function Sidebar() {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label>Want to lock your channel?</Label>
+                    <Label className="flex items-center gap-2">
+                      Want to lock your channel?
+                      <div className="relative group">
+                        <Info className="w-4 h-4 text-zinc-400 cursor-pointer" />
+                        <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
+                          Do you want to make this channel private?
+                        </span>
+                      </div>
+                    </Label>
                     <RadioGroup
                       value={formData.is_locked.toString()}
                       onValueChange={(value) =>
@@ -305,14 +314,14 @@ export function Sidebar() {
                   <Button
                     variant="outline"
                     onClick={() => setIsChannelOpen(false)}
-                    className="bg-transparent border-zinc-700  hover:bg-zinc-800"
+                    className="bg-transparent border-zinc-700 hover:bg-zinc-800"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleCreateChannel}
                     disabled={isCreating}
-                    className="bg-primary-gradient "
+                    className="bg-primary-gradient"
                   >
                     {isCreating ? "Creating..." : "Create"}
                   </Button>
