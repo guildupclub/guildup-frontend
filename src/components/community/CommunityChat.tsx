@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, Send, Mic } from "lucide-react";
@@ -20,47 +20,52 @@ interface Post {
   avatar: string;
 }
 
-const initialPosts: Post[] = [
-  {
-    id: "1",
-    author: "Reena Singh",
-    time: "11:00 pm",
-    level: 1,
-    content:
-      "Did you know that investing in index funds can help you build a solid portfolio? They offer low fees, diversification, and good returns over time. Check out my latest video on how to get started with index funds. 📊 #InvestmentTips #PassiveIncome",
-    likes: 15,
-    comments: 45,
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "2",
-    author: "Ravi Kumar",
-    time: "11:00 pm",
-    level: 2,
-    content:
-      "Did you know that investing in index funds can help you build a solid portfolio? They offer low fees, diversification, and good returns over time. Check out my latest video on how to get started with index funds. 📊 #InvestmentTips #PassiveIncome",
-    likes: 15,
-    comments: 45,
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-  {
-    id: "3",
-    author: "Reena Singh",
-    time: "11:00 pm",
-    level: 1,
-    content:
-      "Did you know that investing in index funds can help you build a solid portfolio? They offer low fees, diversification, and good returns over time. Check out my latest video on how to get started with index funds. 📊 #InvestmentTips #PassiveIncome",
-    likes: 15,
-    comments: 45,
-    avatar: "/placeholder.svg?height=40&width=40",
-  },
-];
-
 function ChatContent() {
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
-  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch data when component mounts
+  useEffect(() => {
+    const fetchChannelContent = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("http://localhost:8000/v1/channel/fetch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: "66f2e0964966b4785acd30d9",
+            session: "wnywp8z6",
+            channelId: "678c1e4fdf00b0951cfade8f",
+            page: 0,
+            limit: 20,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch channel content");
+        }
+
+        const data = await response.json();
+
+        // Assuming `data.posts` contains the array of posts
+        setPosts(data.posts || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChannelContent();
+  }, []);
 
   const handleLike = (postId: string) => {
     setPosts(posts.map((post) => (post.id === postId ? { ...post } : post)));
@@ -74,11 +79,25 @@ function ChatContent() {
     );
   };
 
+  if (loading) {
+    return <div className="text-center py-10">Loading posts...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-10 text-red-500">
+        Error: {error}. Please try again.
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen pb-20">
-      <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-3">
+      <div className="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-6 py-3 my-3 mx-2">
         <div className="flex items-center gap-2">
-          <h1 className="text-lg font-medium"># {activeChannel.name}</h1>
+          <h1 className="text-lg font-medium">
+            # {activeChannel?.name || "Channel"}
+          </h1>
         </div>
         <Button variant="ghost" size="icon" className="hover:bg-zinc-800">
           <Settings className="h-5 w-5" />
@@ -100,14 +119,14 @@ function ChatContent() {
         </ScrollArea>
       </div>
 
-      <div className="fixed bottom-0 w-[calc(100%-20rem)] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-zinc-800 px-16 py-4">
-        <div className="flex items-center gap-2 rounded-lg p-2 bg-black px-2">
+      <div className="fixed bottom-0 w-[calc(100%-20rem)] px-8 pr-28 py-2">
+        <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 px-2">
           <input
             type="text"
             placeholder="Share your thoughts..."
             className="flex-1 bg-transparent text-zinc-200 text-sm placeholder-zinc-400 focus:outline-none"
           />
-          <div className="flex gap-8 px-6 py-2">
+          <div className="flex gap-8 px-2 py-1">
             <Button
               size="icon"
               variant="ghost"
@@ -115,7 +134,7 @@ function ChatContent() {
             >
               <Mic className="h-4 w-4" />
             </Button>
-            <Button className="bg-primary-gradient ">Send</Button>
+            <Button className="bg-primary-gradient px-6">Send</Button>
           </div>
         </div>
       </div>
