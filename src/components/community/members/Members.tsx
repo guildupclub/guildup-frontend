@@ -6,7 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import { UserCircle } from "lucide-react";
+import { UserCircle, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
 
 interface User {
   _id: string;
@@ -97,43 +103,67 @@ export default function Members({ communityId }: { communityId: string }) {
             : members.map((member) => (
                 <div
                   key={member._id}
-                  className="flex items-center gap-4 p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors"
+                  className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors"
                 >
-                  <Avatar>
-                    <AvatarImage src={member.user_id.avatar || undefined} />
-                    <AvatarFallback className="bg-zinc-700 text-zinc-100">
-                      {member.user_id.user_name?.[0]?.toUpperCase() ||
-                        member.user_id.email[0].toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium truncate text-white">
-                        {member.user_id.user_name || member.user_id.email}
-                      </p>
-                      <div className="flex gap-1">
-                        {member.is_owner && (
-                          <Badge className="bg-primary-gradient text-white">
-                            Owner
-                          </Badge>
-                        )}
-                        {member.is_moderator && (
-                          <Badge className="bg-green-500 text-white">
-                            Moderator
-                          </Badge>
-                        )}
-                        {member.is_banned && (
-                          <Badge className="bg-red-500 text-white">
-                            Banned
-                          </Badge>
-                        )}
+                  <div className="flex items-center gap-4">
+                    <Avatar>
+                      <AvatarImage src={member.user_id.avatar || undefined} />
+                      <AvatarFallback className="bg-zinc-700 text-zinc-100">
+                        {member.user_id.user_name?.[0]?.toUpperCase() ||
+                          member.user_id.email[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium truncate text-white">
+                          {member.user_id.user_name || member.user_id.email}
+                        </p>
+                        <div className="flex gap-1">
+                          {member.is_owner && (
+                            <Badge className="bg-primary-gradient text-white">
+                              Owner
+                            </Badge>
+                          )}
+                          {member.is_moderator && (
+                            <Badge className="bg-green-500 text-white">
+                              Moderator
+                            </Badge>
+                          )}
+                          {member.is_banned && (
+                            <Badge className="bg-red-500 text-white">
+                              Banned
+                            </Badge>
+                          )}
+                        </div>
                       </div>
+                      <p className="text-sm text-zinc-400">
+                        Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
+                        ago
+                      </p>
                     </div>
-                    <p className="text-sm text-zinc-400">
-                      Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
-                      ago
-                    </p>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <button
+                        aria-label="Options"
+                        className="text-zinc-400 hover:text-white"
+                      >
+                        <MoreHorizontal className="h-5 w-5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                      <DropdownMenuItem
+                        onClick={() => console.log("Block User")}
+                      >
+                        Block User
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => console.log("See Profile")}
+                      >
+                        See Profile
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               ))}
         </div>

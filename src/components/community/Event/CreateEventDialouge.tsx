@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import axios from "axios";
-import { Link2, Smile, Plus, X, Image, Video, Gift, Link } from "lucide-react"; // Import necessary icons
+import { Link2, Smile, Plus,  Image, Video, Gift, Link } from "lucide-react"; // Import necessary icons
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -198,14 +198,14 @@ export function PostDialog() {
                 <span className="font-medium">Technology</span>
               </span>
             </div>
-            <Button
+            {/* <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-zinc-300 hover:text-zinc-600"
               onClick={() => setIsOpen(false)}
             >
               <X className="h-5 w-5" />
-            </Button>
+            </Button> */}
           </div>
 
           {/* Post Inputs */}
@@ -251,7 +251,7 @@ export function PostDialog() {
                     {mediaRef.current.fileName}
                   </span>
                 </div>
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 text-zinc-400 hover:text-zinc-200"
@@ -261,7 +261,7 @@ export function PostDialog() {
                   }}
                 >
                   <X className="h-4 w-4" />
-                </Button>
+                </Button> */}
               </div>
             </div>
           )}

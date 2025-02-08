@@ -14,10 +14,10 @@ export function PostCreator() {
         <div className="flex gap-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarFallback className="text-black">U</AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-3">
-            <div className="rounded-lg bg-zinc-800/50 p-3">
+            <div className="rounded-lg bg-zinc-800/50 p-2">
               <input
                 type="text"
                 placeholder="Create a post..."

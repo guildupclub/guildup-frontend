@@ -182,7 +182,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
-          onClick={() => handleNavigation("/community/members")}
+          // onClick={() => handleNavigation("/community/members")}
         >
           <FaUserAlt />
           Profile
@@ -272,7 +272,7 @@ export function Sidebar() {
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label>What to lock your channel?</Label>
+                    <Label>Want to lock your channel?</Label>
                     <RadioGroup
                       value={formData.is_locked.toString()}
                       onValueChange={(value) =>

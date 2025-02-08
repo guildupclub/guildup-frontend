@@ -164,7 +164,7 @@ export function LeftmostSidebar() {
                 <Plus className="w-6 h-6" />
               </Button>
             </DialogTrigger>
-            <Link href="/">
+            <Link href="/explore">
               <Button
                 variant="ghost"
                 size="icon"

@@ -59,7 +59,7 @@ export function Feed() {
   return (
     <div className="max-w-4xl mx-auto">
       <Tabs defaultValue="feed" className="w-full">
-        <TabsList className="w-full justify-start h-14 bg-transparent border-b border-zinc-800 rounded-none p-0">
+        {/* <TabsList className="w-full justify-start h-14 bg-transparent border-b border-zinc-800 rounded-none p-0">
           <TabsTrigger
             value="feed"
             className="data-[state=active]:bg-transparent data-[state=active]:text-purple-500 rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 px-8 h-14"
@@ -72,7 +72,7 @@ export function Feed() {
           >
             Snipz
           </TabsTrigger>
-        </TabsList>
+        </TabsList> */}
 
         <TabsContent value="feed" className="mt-0 p-4">
           <PostCreator />

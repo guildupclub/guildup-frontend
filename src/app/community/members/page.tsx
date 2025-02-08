@@ -10,7 +10,7 @@ export default function MembersPage() {
   );
 
   return (
-    <div className="min-h-screen bg-black py-20 text-center text-zinc-200">
+    <div className="min-h-screen bg-black py-20 text-center text-zinc-200 px-4">
       {activeCommunityId ? (
         <Members communityId={activeCommunityId} />
       ) : (
