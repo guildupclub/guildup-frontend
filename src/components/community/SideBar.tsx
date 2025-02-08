@@ -178,7 +178,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className="fixed h-screen w-72 bg-background/95 border-r-zinc-700 p-4 py-24">
+    <div className="fixed h-screen w-80 bg-background/95 border-r-zinc-700 p-4 py-24">
       <div className="space-y-2">
         <Button
           variant="ghost"
