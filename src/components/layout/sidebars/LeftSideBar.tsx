@@ -446,45 +446,7 @@ export function LeftSidebar() {
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4 space-y-2">
-        <Collapsible
-          open={openSections.recentFeed}
-          onOpenChange={() => toggleSection("recentFeed")}
-          className="space-y-2"
-        >
-          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium text-zinc-200">
-            Recent Feed
-            {openSections.recentFeed ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {sidebarData.recentFeed.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick("recentFeed", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("recentFeed", item.id)
-                  ? "bg-[#334BFF]/20 text-purple-500"
-                  : "text-zinc-300 hover:bg-zinc-800"
-                  }`}
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{item.name}</span>
-                {item.isPinned ? (
-                  <Pin className="h-4 w-4 ml-auto text-zinc-500" />
-                ) : (
-                  item.isNew && (
-                    <span className="ml-auto text-xs text-purple-500">New</span>
-                  )
-                )}
-              </button>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+        
 
         <Collapsible
           open={openSections.communities}
