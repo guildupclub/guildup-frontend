@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Session } from 'next-auth';
 
 interface UserState {
-  user: Session['user'] | null;
+  user: any;
 }
 
 const initialState: UserState = {
@@ -13,14 +13,12 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<Session['user'] | null>) => {
+    setUser: (state, action: PayloadAction<any>) => {
+      console.log("@actino.playload",action.payload)
       state.user = action.payload;
     },
-    clearUser: (state) => {
-      state.user = null;
-    }
   }
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser } = userSlice.actions;
 export default userSlice.reducer;
