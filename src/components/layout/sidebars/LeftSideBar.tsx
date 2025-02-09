@@ -20,7 +20,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 // Optionally, if you're updating selected topics in the topic slice
-import { setSelectedTopics } from "@/redux/topicSlice";
+// import { setSelectedTopics } from "@/redux/topicSlice";
 
 type SelectedItem = {
   section: string;
@@ -36,7 +36,7 @@ export function LeftSidebar() {
     communities: true,
   });
 
-  const [posts, setPosts] = useState<any[]>([]);
+  // const [posts, setPosts] = useState<any[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -180,7 +180,7 @@ export function LeftSidebar() {
           categoryIds: selectedTopics,
         })
       );
-      console.log("Posts fetched:", response.data);
+      // console.log("Posts fetched:", response.data);
       // setPosts(response.data.posts || []);
       // Reset selection for topics feed
       setTopicFeedName("");
@@ -230,12 +230,13 @@ export function LeftSidebar() {
     <aside className="fixed top-0 left-0 h-screen w-80 bg-black pt-20 pb-3 px-4 space-y-3">
       <div className="bg-zinc-900 rounded-xl p-3 space-y-1">
         <div>
-          <button
+           <button
             onClick={() => handleItemClick("home", "feed")}
-            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 ${isItemSelected("home", "feed")
-              ? "text-purple-500"
-              : "text-zinc-200 hover:text-white"
-              }`}
+            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 bg ${
+              isItemSelected("home", "feed")
+                ? "text-purple-500"
+                : "text-zinc-200 hover:text-white"
+            }`}
           >
             Home Feed
           </button>
