@@ -20,7 +20,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 // Optionally, if you're updating selected topics in the topic slice
-import { setSelectedTopics } from "@/redux/topicSlice";
+// import { setSelectedTopics } from "@/redux/topicSlice";
 
 type SelectedItem = {
   section: string;
@@ -36,7 +36,7 @@ export function LeftSidebar() {
     communities: true,
   });
 
-  const [posts, setPosts] = useState<any[]>([]);
+  // const [posts, setPosts] = useState<any[]>([]);
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -180,7 +180,7 @@ export function LeftSidebar() {
           categoryIds: selectedTopics,
         })
       );
-      console.log("Posts fetched:", response.data);
+      // console.log("Posts fetched:", response.data);
       // setPosts(response.data.posts || []);
       // Reset selection for topics feed
       setTopicFeedName("");
@@ -230,12 +230,13 @@ export function LeftSidebar() {
     <aside className="fixed top-0 left-0 h-screen w-80 bg-black pt-20 pb-3 px-4 space-y-3">
       <div className="bg-zinc-900 rounded-xl p-3 space-y-1">
         <div>
-          <button
+           <button
             onClick={() => handleItemClick("home", "feed")}
-            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 ${isItemSelected("home", "feed")
-              ? "text-purple-500"
-              : "text-zinc-200 hover:text-white"
-              }`}
+            className={`w-full flex items-center text-sm font-medium border-b border-zinc-800 py-2 bg ${
+              isItemSelected("home", "feed")
+                ? "text-purple-500"
+                : "text-zinc-200 hover:text-white"
+            }`}
           >
             Home Feed
           </button>
@@ -446,45 +447,7 @@ export function LeftSidebar() {
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4 space-y-2">
-        <Collapsible
-          open={openSections.recentFeed}
-          onOpenChange={() => toggleSection("recentFeed")}
-          className="space-y-2"
-        >
-          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium text-zinc-200">
-            Recent Feed
-            {openSections.recentFeed ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            {sidebarData.recentFeed.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick("recentFeed", item.id)}
-                className={`w-full flex items-center gap-2 rounded-lg p-2 text-sm ${isItemSelected("recentFeed", item.id)
-                  ? "bg-[#334BFF]/20 text-purple-500"
-                  : "text-zinc-300 hover:bg-zinc-800"
-                  }`}
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={item.avatar} />
-                  <AvatarFallback>{item.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{item.name}</span>
-                {item.isPinned ? (
-                  <Pin className="h-4 w-4 ml-auto text-zinc-500" />
-                ) : (
-                  item.isNew && (
-                    <span className="ml-auto text-xs text-purple-500">New</span>
-                  )
-                )}
-              </button>
-            ))}
-          </CollapsibleContent>
-        </Collapsible>
+        
 
         <Collapsible
           open={openSections.communities}
