@@ -53,7 +53,7 @@ function TrendingSection() {
   return (
     <div className="flex flex-col gap-4">
       {/* Trending Tags Section */}
-      <div className="bg-zinc-900 p-4 text-white rounded-lg h-[30ch] overflow-auto scrollbar-none">
+      <div className="bg-zinc-900 p-4 text-white rounded-lg h-[500px] overflow-auto scrollbar-none">
         <h2 className="text-lg font-semibold mb-3">Trending Tags</h2>
         {trendingPost.length > 0 && (
           <div className="space-y-3">
@@ -75,7 +75,7 @@ function TrendingSection() {
       </div>
 
       {/* Trending Events Section */}
-      <div className="bg-zinc-900 p-4 text-white rounded-lg h-[30ch] overflow-auto scrollbar-none cursor-pointer">
+      {/* <div className="bg-zinc-900 p-4 text-white rounded-lg h-[30ch] overflow-auto scrollbar-none cursor-pointer">
         <h2 className="text-lg font-semibold mb-3">Trending Events</h2>
         <div className="space-y-3">
           {TRENDING_EVENTS.map((event) => (
@@ -100,7 +100,7 @@ function TrendingSection() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -75,7 +75,7 @@ export function Feed() {
         </TabsList> */}
 
         <TabsContent value="feed" className="mt-0 p-4">
-          <PostCreator />
+          {/* <PostCreator /> */}
 
           {isLoading ? (
             <div className="text-center text-zinc-400">Loading posts...</div>
