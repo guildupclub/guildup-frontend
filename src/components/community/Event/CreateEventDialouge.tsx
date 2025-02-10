@@ -92,6 +92,7 @@ export function PostDialog() {
       };
 
       console.log("Storing media data:", newMediaData);
+      //@ts-nocheck
       mediaRef.current = newMediaData;
 
       // Force re-render

@@ -5,6 +5,13 @@ import Image from "next/image";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import CreatorForm from "@/components/form/CreatorForm";
 
 // Sample data structure
 const trendingPosts = [
@@ -78,13 +85,26 @@ const trendingPosts = [
 // ];
 
 export function RightSidebar() {
+  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
+
+  const handleOpenForm = () => {
+    setShowCreatorForm((prev) => !prev);
+  };
+
+  const handleCloseForm = () => {
+    setShowCreatorForm(false);
+  };
   return (
     <aside className="fixed top-0 right-0 h-screen w-80 bg-black pt-20 pb-4 px-4  space-y-2">
       {/* Trending Posts Box */}
 
       <div className="bg-zinc-900 rounded-xl p-4 w-full space-y-4">
         <h1 className="">Ready to start making money?</h1>
-        <Button className="w-full">Become a Creator</Button>
+        <Button className="w-full" onClick={handleOpenForm}>
+          Become a Creator
+        </Button>
+
+        {showCreatorForm && <CreatorForm />}
       </div>
 
       <div className="bg-zinc-900 rounded-xl p-4">

@@ -13,12 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Settings } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { FaCompass } from "react-icons/fa";
 import Link from "next/link";
+import CreatorForm from "../form/CreatorForm";
 
 // Type for community data
 interface Community {
@@ -36,6 +37,11 @@ export function LeftmostSidebar() {
   const [newChannelName, setNewChannelName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
+
+  const handleOpenForm = () => {
+    setShowCreatorForm((prev) => !prev);
+  };
 
   const dispatch = useDispatch();
   const activeCommunityId = useSelector(
@@ -160,6 +166,7 @@ export function LeftmostSidebar() {
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
+                onClick={handleOpenForm}
               >
                 <Plus className="w-6 h-6" />
               </Button>
@@ -173,28 +180,7 @@ export function LeftmostSidebar() {
                 <FaCompass />
               </Button>
             </Link>
-            <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200">
-              <DialogHeader>
-                <DialogTitle>Join New Channel</DialogTitle>
-                <DialogDescription className="text-zinc-400">
-                  Enter the channel name you want to join.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Input
-                    id="name"
-                    value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)}
-                    className="col-span-4 bg-zinc-800 border-zinc-700 text-zinc-200"
-                    placeholder="Channel name"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleCreateChannel}>Join Channel</Button>
-              </DialogFooter>
-            </DialogContent>
+            {showCreatorForm && <CreatorForm />}
           </Dialog>
         </div>
       </div>
