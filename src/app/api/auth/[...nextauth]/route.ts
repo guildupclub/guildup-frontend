@@ -3,6 +3,8 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+import { store } from "@/redux/store";
+import { setUser } from "@/redux/userSlice";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import client from "../lib/db";
 const handler = NextAuth({
@@ -30,6 +32,7 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("@here", credentials);
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
@@ -42,8 +45,7 @@ const handler = NextAuth({
               password: credentials.password,
             }
           );
-
-          const user = response.data;
+          const user = response.data.data.user;
 
           if (user) {
             return {
@@ -51,11 +53,13 @@ const handler = NextAuth({
               name: user.name,
               email: user.email,
               image: user.image,
+              session: response.data.data.session,
             };
           }
 
           return null;
         } catch (error: any) {
+          console.log("@error", error);
           throw new Error(error.response?.data?.error || "Invalid credentials");
         }
       },
@@ -66,9 +70,49 @@ const handler = NextAuth({
       allowDangerousEmailAccountLinking: true,
     }),
   ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log("@siginIN", user, account, profile);
+      if (account?.provider === "google") {
+        try {
+          console.log("@authDetails", user.name, user.email, user.image);
+          const response = await axios.post(
+            "http://localhost:8000/v1/auth/google",
+            {
+              user: { name: user.name, email: user.email, image: user.image },
+            }
+          );
+          console.log("@response", response.data);
+          if (response.status !== 200) {
+            throw new Error("Google authentication failed");
+          }
+          account.access_token = response.data.data.session;
+          return true;
+        } catch (error) {
+          console.error("Google auth error:", error);
+          return false;
+        }
+      }
+      // Called when the user signs in; you can send data to the backend here if needed
+      return true;
+    },
+    async jwt(jwt) {
+      console.log("@jwt", jwt);
+      // Add custom properties to the token on login
+      if (jwt.user) {
+        jwt.token.id = jwt.user.id;
+        jwt.token.session = (jwt.user as any).session; // Example custom field
+      }
+      return jwt.token;
+    },
+    async session({ session, token }) {
+      // console.log("@sessionFunc",sessionData)
+
+      return session;
+    },
+  },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
   },
   session: {
     strategy: "jwt",
