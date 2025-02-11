@@ -1,9 +1,27 @@
+//@ts-nocheck
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
-
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import client from "../lib/db";
 const handler = NextAuth({
+  adapter: MongoDBAdapter(client),
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token._id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user._id = token._id as string;
+      }
+      return session;
+    },
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -45,6 +63,7 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   pages: {
