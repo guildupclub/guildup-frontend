@@ -151,19 +151,19 @@ export function PostCard({ post ,ref}: PostCardProps) {
           </button>
           <button
             className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
-            onClick={handleShareClick}
-          >
-            <Share2 className="h-5 w-5" />
-            <span className="text-sm">Share</span>
-          </button>
-          <button
-            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
             onClick={() => setShowComments(!showComments)}
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
               {formatNumber(post?.replies?.length )} Comments
             </span>
+          </button>
+          <button
+            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
+            onClick={handleShareClick}
+          >
+            <Share2 className="h-5 w-5" />
+            <span className="text-sm">Share</span>
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2 text-zinc-400">

@@ -5,6 +5,13 @@ import Image from "next/image";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import CreatorForm from "@/components/form/CreatorForm";
 
 // Sample data structure
 const trendingPosts = [
@@ -38,45 +45,75 @@ const trendingPosts = [
     comments: "100",
     shares: "12k",
   },
-];
-
-const recommendedCommunities = [
-  {
-    id: 1,
-    name: "Rajat Verma",
-    avatar: "/svg/Aditi_KApoor.svg",
-    status: "Private • 25k Members • Paid",
-  },
   {
     id: 2,
-    name: "Adit Kapoor",
-    avatar: "/svg/Rajat.svg",
-    status: "Public • 15k Members • Free",
-  },
-  {
-    id: 3,
-    name: "Vishal S",
-    avatar: "/svg/Aditi_KApoor.svg",
-    status: "Private • 30k Members • Paid",
-  },
-  {
-    id: 4,
-    name: "Sanjay Rathi",
-    avatar: "/svg/Rajat.svg",
-    status: "Public • 5k Members • Free",
+    title: "The Financier's Forum",
+    description:
+      "A platform for financial professionals, investors, and enthusiasts to discuss market trends, investment...",
+    image: "/svg/pic2.svg",
+    loves: "50k",
+    comments: "1.5k",
+    shares: "8k",
   },
 ];
 
+// const recommendedCommunities = [
+//   {
+//     id: 1,
+//     name: "Rajat Verma",
+//     avatar: "/svg/Aditi_KApoor.svg",
+//     status: "Private • 25k Members • Paid",
+//   },
+//   {
+//     id: 2,
+//     name: "Adit Kapoor",
+//     avatar: "/svg/Rajat.svg",
+//     status: "Public • 15k Members • Free",
+//   },
+//   {
+//     id: 3,
+//     name: "Vishal S",
+//     avatar: "/svg/Aditi_KApoor.svg",
+//     status: "Private • 30k Members • Paid",
+//   },
+//   {
+//     id: 4,
+//     name: "Sanjay Rathi",
+//     avatar: "/svg/Rajat.svg",
+//     status: "Public • 5k Members • Free",
+//   },
+// ];
+
 export function RightSidebar() {
+  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
+
+  const handleOpenForm = () => {
+    setShowCreatorForm((prev) => !prev);
+  };
+
+  const handleCloseForm = () => {
+    setShowCreatorForm(false);
+  };
   return (
-    <aside className="fixed top-0 right-0 h-screen w-80 bg-black pt-20 pb-4 px-4 overflow-y-auto space-y-4">
+    <aside className="fixed top-0 right-0 h-screen w-80 bg-black pt-20 pb-4 px-4  space-y-2">
       {/* Trending Posts Box */}
+
+      <div className="bg-zinc-900 rounded-xl p-4 w-full space-y-4">
+        <h1 className="">Ready to start making money?</h1>
+        <Button className="w-full" onClick={handleOpenForm}>
+          Become a Creator
+        </Button>
+
+        {showCreatorForm && <CreatorForm />}
+      </div>
+
       <div className="bg-zinc-900 rounded-xl p-4">
         <h2 className="text-lg font-semibold text-zinc-200 mb-2 border-b border-zinc-800 pb-2">
           Trending Posts
         </h2>
 
-        <div className="space-y-4">
+        {/* Scrollable container for trending posts */}
+        <div className="space-y-4 max-h-[430px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
           {trendingPosts.map((post) => (
             <div
               key={post.id}
@@ -118,7 +155,7 @@ export function RightSidebar() {
       </div>
 
       {/* Recommended Communities Box */}
-      <div className="bg-zinc-900 rounded-xl p-4">
+      {/* <div className="bg-zinc-900 rounded-xl p-4">
         <h2 className="text-lg font-semibold text-zinc-200 mb-4 border-b border-zinc-800 pb-2">
           Recommended Communities
         </h2>
@@ -149,7 +186,7 @@ export function RightSidebar() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </aside>
   );
 }

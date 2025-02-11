@@ -1,12 +1,34 @@
+//@ts-nocheck
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+<<<<<<< HEAD
 import { store } from '@/redux/store';
 import { setUser } from '@/redux/userSlice';
 
 
+=======
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import client from "../lib/db";
+>>>>>>> main
 const handler = NextAuth({
+  adapter: MongoDBAdapter(client),
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token._id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user._id = token._id as string;
+      }
+      return session;
+    },
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -50,6 +72,7 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks:{

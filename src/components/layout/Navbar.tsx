@@ -54,9 +54,9 @@ export function Navbar({
                 <Input
                   type="search"
                   placeholder="Search..."
-                  className="w-full bg-black border-none pr-24 text-muted"
+                  className="w-full bg-black border-none pr-24 text-muted "
                 />
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -71,7 +71,7 @@ export function Navbar({
                     <DropdownMenuItem>Channels</DropdownMenuItem>
                     <DropdownMenuItem>Playlists</DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <div className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg">
                   <Search className="h-4 w-4 text-muted" />
                 </div>
@@ -82,7 +82,7 @@ export function Navbar({
           <div className="hidden md:flex items-center justify-center space-x-4">
             <ul className="flex items-center justify-center space-x-12 mx-auto text-muted">
               <li>
-                <Link href="/home">
+                <Link href="/">
                   <Home className="h-6 w-6" />
                   <span className="sr-only">Home</span>
                 </Link>
@@ -94,7 +94,7 @@ export function Navbar({
                 </Link>
               </li>
               <li>
-                <Link href="/community">
+                <Link href="/community/feed">
                   <Users className="h-6 w-6" />
                   <span className="sr-only">Community</span>
                 </Link>
@@ -152,10 +152,7 @@ export function Navbar({
       </nav>
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-5 mx-auto ">
-          <Link
-            href="/home"
-            className="flex flex-col items-center justify-center"
-          >
+          <Link href="/" className="flex flex-col items-center justify-center">
             <Home className="w-6 h-6 " />
             <span className="text-xs mt-1">Home</span>
           </Link>
@@ -174,7 +171,7 @@ export function Navbar({
             <span className="text-xs mt-1">Snips</span>
           </Link>
           <Link
-            href="/community"
+            href="/community/feed"
             className="flex flex-col items-center justify-center"
           >
             <Users className="w-6 h-6" />
