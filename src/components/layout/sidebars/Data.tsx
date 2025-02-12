@@ -39,20 +39,6 @@ export const sidebarData = {
       isPinned: true,
     },
   ],
-  recentFeed: [
-    {
-      id: 1,
-      name: "Rajat Verma",
-      avatar: "/svg/Rajat.svg",
-      isNew: true,
-    },
-    {
-      id: 2,
-      name: "AditKapoor",
-      avatar: "/svg/Aditi_KApoor.svg",
-      isPinned: true,
-    },
-  ],
   communities: [
     {
       id: 1,

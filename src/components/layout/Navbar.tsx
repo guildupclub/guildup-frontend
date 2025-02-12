@@ -24,7 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/guildup_logo.svg";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { clearUser, setUser } from "@/redux/userSlice";
@@ -107,7 +107,7 @@ export function Navbar({
             </ul>
           </div>
           <div className="hidden md:block ">
-            {session ? (
+            {user?.accessToken ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -116,11 +116,11 @@ export function Navbar({
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={session.user?.image || "/placeholder.svg"}
+                        src={user?.image || "/placeholder.svg"}
                         alt="User"
                       />
                       <AvatarFallback>
-                        {session?.user?.name?.[0] || "S"}
+                        {user?.name?.[0] || "S"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -130,10 +130,10 @@ export function Navbar({
                   align="end"
                 >
                   <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {session.user?.name}
+                    {user?.name}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {session.user?.email}
+                    {user?.email}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="hover:bg-primary-gradient"
@@ -178,14 +178,14 @@ export function Navbar({
             <Users className="w-6 h-6" />
             <span className="text-xs mt-1">Community</span>
           </Link>
-          {session ? (
+          {user?.accessToken ? (
             <button
               className="flex flex-col items-center justify-center "
               onClick={() => signOut()}
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage
-                  src={session.user?.image || "/placeholder.svg"}
+                  src={user?.image || "/placeholder.svg"}
                   alt="User"
                 />
                 <AvatarFallback>U</AvatarFallback>
