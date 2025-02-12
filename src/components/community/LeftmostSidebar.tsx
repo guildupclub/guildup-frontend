@@ -144,7 +144,7 @@ export function LeftmostSidebar() {
                   dispatch(setActiveCommunity(community._id));
                 }}
               >
-                <Avatar className="w-full h-full">
+                <Avatar className="w-full h-full ">
                   <AvatarImage
                     src={`/placeholder.svg?text=${getInitials(community.name)}`}
                     alt={community.name}

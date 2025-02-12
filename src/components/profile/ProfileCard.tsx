@@ -7,6 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useSession } from "next-auth/react";
 
 interface ProfileCardProps {
   name: string;
@@ -40,6 +43,10 @@ export function ProfileCard({
   avatarUrl,
   offerings,
 }: ProfileCardProps) {
+  const user = useSelector((state: RootState) => state?.user?.user);
+  const { data: session } = useSession();
+  console.log(session);
+
   return (
     <div className="w-full max-w-5xl mx-auto  text-zinc-200 py-20">
       <div className="relative ">
@@ -54,10 +61,14 @@ export function ProfileCard({
         </div>
         <div className="absolute -bottom-12 left-8">
           <Avatar className="h-24 w-24 border-4 border-background">
-            <AvatarImage
-              src="https://fiverr-res.cloudinary.com/images/q_auto,f_auto/gigs/132904242/original/6141d9c91c378763a53f663c2562ec79dc7e8902/do-your-avtar-in-low-cost.jpg"
+            <Image
+              src={user?.image || "/fallback-avatar.png"} // Replace with a valid fallback URL
               alt={name}
+              width={96}
+              height={96}
+              className="rounded-full"
             />
+
             <AvatarFallback className="text-black">{name[0]}</AvatarFallback>
           </Avatar>
         </div>
@@ -66,7 +77,7 @@ export function ProfileCard({
       <div className="bg-background pt-16 pb-8 px-8 rounded-b-lg bg-black">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-2xl font-bold">{name}</h1>
+            <h1 className="text-2xl font-bold">{user?.name}</h1>
             <p className="text-muted-foreground">{title}</p>
             {memberCount && (
               <p className="text-sm text-muted-foreground">

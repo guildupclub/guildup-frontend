@@ -34,7 +34,7 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="text-black">UN</AvatarFallback>
+            <AvatarFallback className="">UN</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-2">

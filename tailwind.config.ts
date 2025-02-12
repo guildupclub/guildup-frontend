@@ -58,7 +58,7 @@ export default {
       },
       backgroundImage: {
         "primary-gradient":
-          "linear-gradient(to right, hsl(270, 100%, 49%), hsl(224, 100%, 60%))",
+          "linear-gradient(to bottom right, hsl(270, 100%, 49%), hsl(224, 100%, 60%))",
       },
     },
   },

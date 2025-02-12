@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import axios from "axios";
-import { Link2, Smile, Plus,  Image, Video, Gift, Link } from "lucide-react"; // Import necessary icons
+import { Link2, Smile, Plus, Image, Video, Gift, Link } from "lucide-react"; // Import necessary icons
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -130,7 +130,7 @@ export function PostDialog() {
       session: sessionToken,
       type: "close",
       communityId,
-      slug: "one-on-one-consultations",
+      slug: title,
       title,
       body: content,
       is_locked: true,

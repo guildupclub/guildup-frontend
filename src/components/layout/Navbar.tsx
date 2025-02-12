@@ -33,7 +33,8 @@ export function Navbar({
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
-
+  const user = useSelector((state: RootState) => state?.user?.sessionId);
+  console.log("Adaes", user);
   return (
     <>
       <nav
