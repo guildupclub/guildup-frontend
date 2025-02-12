@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,7 +52,7 @@ export default function CreatorForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "67aadfe56f58c77fefc263b2",
+            userId: "678ce60732c37c1222f913e0",
             name: formData.name,
             description: formData.description,
             additional_tags: additionalTags,
