@@ -44,11 +44,13 @@ export function PostDialog() {
     (state: RootState) => state.channel.activeCommunityId
   );
   console.log(activeCommunityId);
+  const userID = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const { data: session } = useSession();
-  const userId = "678ce60732c37c1222f913e0";
+  const userId = userID;
   const communityId = activeCommunityId;
-  const sessionToken = "WRdSkEhA";
+  const sessionToken = sessionId;
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,

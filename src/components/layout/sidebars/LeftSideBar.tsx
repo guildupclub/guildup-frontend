@@ -16,8 +16,8 @@ import { useRouter } from "next/navigation";
 import { API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
 
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 // Optionally, if you're updating selected topics in the topic slice
 // import { setSelectedTopics } from "@/redux/topicSlice";
@@ -28,6 +28,9 @@ type SelectedItem = {
 };
 
 export function LeftSidebar() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  // Extract session ID
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [openSections, setOpenSections] = React.useState({
     customFeed: true,
     customTopics: true,
@@ -107,7 +110,7 @@ export function LeftSidebar() {
       try {
         const res = await axios.post("http://localhost:8000/v1/community/user", {
           // userId: "678cf08b3755e3d81f93d5ad"
-          userId: "678cf03a3755e3d81f93d5aa"
+          userId: userId
         });
         setMyCommunities(res.data.data);
         console.log(res.data.data);
@@ -138,7 +141,7 @@ export function LeftSidebar() {
       try {
         const res = await axios.post(
           "http://localhost:8000/v1/category/interest",
-          { userId: "678cf03a3755e3d81f93d5aa" }
+          { userId:userId }
         );
 
         setMyTopics(res.data.data);
@@ -176,7 +179,7 @@ export function LeftSidebar() {
 
       await dispatch(
         getSelectedTopic({
-          userId: "678cf03a3755e3d81f93d5aa",
+          userId: userId,
           categoryIds: selectedTopics,
         })
       );
@@ -207,7 +210,7 @@ export function LeftSidebar() {
 
     try {
       const response = await axios.post("http://localhost:8000/v1/feed/custom/create", {
-        userId: "678cf03a3755e3d81f93d5aa",
+        userId:userId,
         communityIds: selectedCommunities,
         name: feedName,
       });

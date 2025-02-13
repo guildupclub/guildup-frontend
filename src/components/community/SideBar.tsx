@@ -67,6 +67,8 @@ export function Sidebar() {
   const activeCommunityId = useSelector(
     (state: RootState) => state.channel.activeCommunityId
   );
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const router = useRouter();
   const [channels, setChannels] = useState(initialChannels);
   const [isChannelOpen, setIsChannelOpen] = useState(false);
@@ -93,8 +95,8 @@ export function Sidebar() {
     }
 
     const body = {
-      userId: "678ce60732c37c1222f913e0",
-      session: "wnywp8z6",
+      userId: userId,
+      session: sessionId,
       communityId: activeCommunityId,
     };
 
@@ -147,8 +149,8 @@ export function Sidebar() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "678ce60732c37c1222f913e0",
-            session: "wnywp8z6",
+            userId: userId,
+            session: sessionId,
             communityId: activeCommunityId,
             name: formData.name,
             type: formData.type,
@@ -180,6 +182,9 @@ export function Sidebar() {
 
   return (
     <div className="fixed h-screen w-80 bg-background/95 border-r-zinc-700 p-4 py-24">
+      <div>
+        <h2>Hello</h2>
+      </div>
       <div className="space-y-2">
         <Button
           variant="ghost"

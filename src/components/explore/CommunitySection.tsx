@@ -115,7 +115,7 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
     const fetchTopCommunity = async () => {
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/search`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
           { categoryId: activeCategory }
         );
         setCommunities(response.data.data);
@@ -166,7 +166,6 @@ function CommunitySection({ activeCategory }: CommunitySectionProps) {
 }
 
 export default React.memo(CommunitySection);
-
 
 const CommunityModal = ({
   community,

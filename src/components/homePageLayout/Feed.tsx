@@ -5,17 +5,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostCreator } from './PostCreator';
 import { PostCard } from './PostCard';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '../../../store/store';
+import { RootState, AppDispatch } from '../../redux/store';
 import { fetchPosts } from '../../redux/postSlice';
 
 export function Feed() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const dispatch = useDispatch<AppDispatch>();
   const { posts, isLoading, error, page, hasMore } = useSelector((state: RootState) => state.posts);
 
   // Load the first page on mount (make sure your reducer appends posts)
   useEffect(() => {
     if (posts.length === 0) {
-      dispatch(fetchPosts({ userId: "678cf03a3755e3d81f93d5aa", page: 0 }));
+      dispatch(fetchPosts({ userId: userId, page: 0 }));
     }
   }, [dispatch, posts.length]);
 
@@ -29,7 +31,7 @@ export function Feed() {
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && hasMore) {
-            dispatch(fetchPosts({ page, userId: "678cf03a3755e3d81f93d5aa" }));
+            dispatch(fetchPosts({ page, userId: userId}));
           }
         },
         { threshold: 0.5 }  // Adjust threshold as needed

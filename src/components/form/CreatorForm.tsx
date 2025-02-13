@@ -22,7 +22,11 @@ import {
 } from "@/components/ui/dialog";
 
 import { categories } from "./Categories";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 export default function CreatorForm() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -52,12 +56,12 @@ export default function CreatorForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "678ce60732c37c1222f913e0",
+            user_id: userId,
             name: formData.name,
             description: formData.description,
             additional_tags: additionalTags,
             categoryId: categoryId,
-            type: "open",
+            is_locked: false,
           }),
         }
       );

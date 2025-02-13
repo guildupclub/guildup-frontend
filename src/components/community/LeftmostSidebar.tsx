@@ -33,6 +33,8 @@ interface Community {
 }
 
 export function LeftmostSidebar() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +64,7 @@ export function LeftmostSidebar() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "678ce60732c37c1222f913e0",
+            userId: userId,
           }),
         }
       );

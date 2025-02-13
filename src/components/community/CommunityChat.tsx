@@ -24,6 +24,8 @@ function ChatContent() {
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,8 +43,8 @@ function ChatContent() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "66f2e0964966b4785acd30d9",
-            session: "wnywp8z6",
+            userId: userId,
+            session: sessionId,
             channelId: "678c1e4fdf00b0951cfade8f",
             page: 0,
             limit: 20,

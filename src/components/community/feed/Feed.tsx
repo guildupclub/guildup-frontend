@@ -51,7 +51,8 @@ export function Feed({ communityId }: FeedProps) {
           },
           body: JSON.stringify({
             communityId: communityId,
-            type: "close",
+            // is_locked: true,
+            is_locked: true,
           }),
         }
       );
