@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
-
 interface UserState {
-  user: Session["user"] | null;
-  sessionId: string | null; // Add sessionId to the state
+  user: Session["user"] | null; 
+  sessionId: string | null;
 }
-
 const initialState: UserState = {
   user: null,
   sessionId: null, // Initialize sessionId as null

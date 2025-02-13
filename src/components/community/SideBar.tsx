@@ -2,17 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Hash,
-  Users,
-  Calendar,
-  MessageSquare,
-  Plus,
-  Rss,
-  Crown,
-  Lock,
-  Info,
-} from "lucide-react";
+import { Hash, Plus, Rss, Crown, Lock, Info } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { setActiveChannel } from "@/redux/channelSlice";
@@ -39,38 +29,22 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
-const initialChannels = [
-  {
-    id: "general",
-    name: "General Chat",
-    icon: Hash,
-  },
-  {
-    id: "top50",
-    name: "Top 50 Followers Insights",
-    icon: Crown,
-    locked: true,
-  },
-  {
-    id: "exclusive",
-    name: "Exclusive Investment Tips",
-    icon: Lock,
-    locked: true,
-  },
-];
 
 export function Sidebar() {
   const dispatch = useDispatch();
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
-  const activeCommunityId = useSelector(
-    (state: RootState) => state.channel.activeCommunityId
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
   );
+
+  const activeCommunityId = activeCommunity?.id;
+  const activeCommunityName = activeCommunity?.name;
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const router = useRouter();
-  const [channels, setChannels] = useState(initialChannels);
+  const [channels, setChannels] = useState([]);
   const [isChannelOpen, setIsChannelOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -91,6 +65,7 @@ export function Sidebar() {
   const fetchChannels = async () => {
     if (!activeCommunityId) {
       console.warn("Community ID is null, skipping fetchChannels");
+      setChannels([]); 
       return;
     }
 
@@ -113,8 +88,10 @@ export function Sidebar() {
       );
 
       const data = await response.json();
-      if (data.r !== "s" || !data.data) {
-        throw new Error("Failed to fetch channels");
+      if (data.r !== "s" || !data.data || data.data.length === 0) {
+        console.warn("No channels found for the selected community");
+        setChannels([]); 
+        return;
       }
 
       const formattedChannels = data.data.map((channel: any) => ({
@@ -127,6 +104,7 @@ export function Sidebar() {
       setChannels(formattedChannels);
     } catch (err: any) {
       setError("Error fetching channels: " + err.message);
+      setChannels([]); 
     } finally {
       setLoading(false);
     }
@@ -183,15 +161,17 @@ export function Sidebar() {
   return (
     <div className="fixed h-screen w-80 bg-background/95 border-r-zinc-700 p-4 py-24">
       <div>
-        <h2>Hello</h2>
+        <h2 className="px-2 text-lg">{activeCommunityName}</h2>
       </div>
       <div className="space-y-2">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300"
-        >
-          <PostDialog />
-        </Button>
+        <div className="border-b border-zinc-700 p-2">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 "
+          >
+            <PostDialog />
+          </Button>
+        </div>
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
@@ -233,11 +213,9 @@ export function Sidebar() {
           Announcements
         </Button>
 
-        <Button className="w-full ">Creator Studio</Button>
+        <Button className="w-full">Creator Studio</Button>
 
-        <Separator className="my-4 bg-zinc-800" />
-
-        <div className="px-2 py-2 ">
+        <div className="px-2 py-2 border-t border-zinc-700 p-2">
           <div className="flex items-center justify-between mb-2 ">
             <h2 className="text-lg font-semibold text-zinc-200">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
@@ -335,29 +313,30 @@ export function Sidebar() {
             </Dialog>
           </div>
           <div className="space-y-1">
-            {channels.map((channel) => (
-              <Button
-                key={channel.id}
-                variant="ghost"
-                className={`w-full justify-start gap-2 ${
-                  activeChannel.id === channel.id
-                    ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 hover:text-zinc-300"
-                    : "text-zinc-300 hover:bg-zinc-800 hover:text-zinc-300"
-                }`}
-                onClick={() => {
-                  dispatch(
-                    setActiveChannel({ id: channel.id, name: channel.name })
-                  );
-                  handleNavigation(`/community/channel/${channel.name}`);
-                }}
-              >
-                <Hash />
-                {channel.name}
-                {channel.locked && (
-                  <Lock className="h-3 w-3 ml-auto opacity-50" />
-                )}
-              </Button>
-            ))}
+            {channels &&
+              channels.map((channel) => (
+                <Button
+                  key={channel.id}
+                  variant="ghost"
+                  className={`w-full justify-start gap-2 ${
+                    activeChannel.id === channel.id
+                      ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 hover:text-zinc-300"
+                      : "text-zinc-300 hover:bg-zinc-800 hover:text-zinc-300"
+                  }`}
+                  onClick={() => {
+                    dispatch(
+                      setActiveChannel({ id: channel.id, name: channel.name })
+                    );
+                    handleNavigation(`/community/channel/${channel.name}`);
+                  }}
+                >
+                  <Hash />
+                  {channel.name}
+                  {channel.locked && (
+                    <Lock className="h-3 w-3 ml-auto opacity-50" />
+                  )}
+                </Button>
+              ))}
           </div>
         </div>
       </div>

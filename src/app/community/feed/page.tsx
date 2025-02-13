@@ -4,9 +4,11 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 
 export default function FeedPage() {
-  const activeCommunityId = useSelector(
-    (state: RootState) => state.channel.activeCommunityId
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
   );
+
+  const activeCommunityId = activeCommunity?.id;
   return (
     <div className="min-h-screen bg-black">
       {activeCommunityId ? (

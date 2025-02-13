@@ -40,9 +40,11 @@ export function PostDialog() {
   const gifInputRef = React.useRef<HTMLInputElement>(null);
   const linkInputRef = React.useRef<HTMLInputElement>(null);
 
-  const activeCommunityId = useSelector(
-    (state: RootState) => state.channel.activeCommunityId
+const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
   );
+
+  const activeCommunityId = activeCommunity?.id;
   console.log(activeCommunityId);
   const userID = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);

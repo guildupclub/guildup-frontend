@@ -46,9 +46,11 @@ export function LeftmostSidebar() {
   };
 
   const dispatch = useDispatch();
-  const activeCommunityId = useSelector(
-    (state: RootState) => state.channel.activeCommunityId
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
   );
+
+  const activeCommunityId = activeCommunity?.id;
 
   useEffect(() => {
     fetchCommunities();
@@ -74,6 +76,7 @@ export function LeftmostSidebar() {
       }
 
       const result = await response.json();
+      console.log(result);
       const validCommunities = result.data.filter(
         (community: Community | null) => community !== null
       );
@@ -81,7 +84,12 @@ export function LeftmostSidebar() {
 
       // Set the first community as active if none is selected
       if (validCommunities.length > 0 && !activeCommunityId) {
-        dispatch(setActiveCommunity(validCommunities[0]._id));
+        dispatch(
+          setActiveCommunity({
+            id: validCommunities[0]._id,
+            name: validCommunities[0].name, // Include name
+          })
+        );
       }
     } catch (err) {
       setError(
@@ -118,7 +126,7 @@ export function LeftmostSidebar() {
   }
 
   return (
-    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-800 py-20">
+    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-700 py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -142,9 +150,14 @@ export function LeftmostSidebar() {
                     ? "bg-purple-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
                 }`}
-                onClick={() => {
-                  dispatch(setActiveCommunity(community._id));
-                }}
+                onClick={() =>
+                  dispatch(
+                    setActiveCommunity({
+                      id: community._id,
+                      name: community.name,
+                    })
+                  )
+                }
               >
                 <Avatar className="w-full h-full ">
                   <AvatarImage
@@ -163,7 +176,7 @@ export function LeftmostSidebar() {
           )}
 
           <Dialog>
-            <CreatorForm/>
+            <CreatorForm />
             <Link href="/explore">
               <Button
                 variant="ghost"

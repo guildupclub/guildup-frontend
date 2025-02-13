@@ -1,5 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface Community {
+  id: string;
+  name: string;
+}
+
 interface Channel {
   id: string;
   name: string;
@@ -7,12 +12,12 @@ interface Channel {
 
 interface ChannelState {
   activeChannel: Channel;
-  activeCommunityId: string | null;
+  activeCommunity: Community | null;
 }
 
 const initialState: ChannelState = {
   activeChannel: { id: "general", name: "General Chat" },
-  activeCommunityId: null,
+  activeCommunity: null,
 };
 
 export const channelSlice = createSlice({
@@ -22,8 +27,8 @@ export const channelSlice = createSlice({
     setActiveChannel: (state, action: PayloadAction<Channel>) => {
       state.activeChannel = action.payload;
     },
-    setActiveCommunity: (state, action: PayloadAction<string>) => {
-      state.activeCommunityId = action.payload;
+    setActiveCommunity: (state, action: PayloadAction<Community>) => {  // ✅ Accepts an object
+      state.activeCommunity = action.payload;
     },
   },
 });
