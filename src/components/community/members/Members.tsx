@@ -136,7 +136,7 @@ export default function Members({ communityId }: { communityId: string }) {
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-zinc-400">
+                      <p className="text-sm text-start text-zinc-400">
                         Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
                         ago
                       </p>
