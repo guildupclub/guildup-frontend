@@ -163,16 +163,7 @@ export function LeftmostSidebar() {
           )}
 
           <Dialog>
-            <DialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
-                onClick={handleOpenForm}
-              >
-                <Plus className="w-6 h-6" />
-              </Button>
-            </DialogTrigger>
+            <CreatorForm/>
             <Link href="/explore">
               <Button
                 variant="ghost"

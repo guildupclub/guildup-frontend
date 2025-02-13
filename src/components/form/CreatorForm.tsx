@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,25 +19,30 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 
 import { categories } from "./Categories";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+
 export default function CreatorForm() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     tags: "",
     topic: "",
   });
-
   const [categoryId, setCategoryId] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [additionalTags] = useState(["first_community", "abhishek"]);
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
@@ -69,6 +74,7 @@ export default function CreatorForm() {
       const data = await response.json();
       if (data.r === "s") {
         toast.success("Community created successfully! 🎉");
+        setIsDialogOpen(false);
       } else if (data.r === "e") {
         throw new Error(data.e || "Failed to create community");
       } else {
@@ -80,9 +86,18 @@ export default function CreatorForm() {
   };
 
   return (
-    <Dialog defaultOpen>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-[#1C1C1C] text-white border-none">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader className="flex items-center justify-between">
           <DialogTitle className="text-xl font-normal">
             Fill to become a creator
           </DialogTitle>
@@ -137,6 +152,7 @@ export default function CreatorForm() {
         <div className="flex justify-end gap-4 mt-2">
           <Button
             variant="outline"
+            onClick={() => setIsDialogOpen(false)}
             className="text-white bg-transparent border-gray-600 hover:bg-gray-800 hover:text-white"
           >
             Cancel
