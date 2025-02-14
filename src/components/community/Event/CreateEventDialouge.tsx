@@ -40,7 +40,7 @@ export function PostDialog() {
   const gifInputRef = React.useRef<HTMLInputElement>(null);
   const linkInputRef = React.useRef<HTMLInputElement>(null);
 
-const activeCommunity = useSelector(
+  const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
 
@@ -181,7 +181,7 @@ const activeCommunity = useSelector(
     >
       <DialogTrigger asChild>
         <button className="flex items-center gap-2 text-zinc-200 hover:text-zinc-400">
-          <div className="p-1 rounded-md bg-zinc-500 hover:bg-zinc-700 text-zinc-300">
+          <div className="rounded-md bg-zinc-500 hover:bg-zinc-700 text-zinc-300 mx-2">
             <Plus />
           </div>{" "}
           Create

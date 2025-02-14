@@ -10,6 +10,8 @@ import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 interface ProfileCardProps {
   name: string;
@@ -33,6 +35,21 @@ interface ProfileCardProps {
   }>;
 }
 
+interface ProfileData {
+  user: {
+    user_name: string;
+    about: string;
+  };
+  community: {
+    name: string;
+    num_member: number;
+    post_count: number;
+    description: string;
+    is_locked: boolean;
+    tags: string[];
+  };
+}
+
 export function ProfileCard({
   name,
   title,
@@ -44,15 +61,62 @@ export function ProfileCard({
   offerings,
 }: ProfileCardProps) {
   const user = useSelector((state: RootState) => state?.user?.user);
-  const { data: session } = useSession();
-  console.log(session);
+  const communityId = useSelector(
+    (state: RootState) => state.community.communityId
+  );
+
+  // const { data: session } = useSession();
+  const userId = useSelector((state: RootState) => state.community.userId);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [avatarImgUrl, setAvatarImgUrl] = useState("");
+  const [bgImgUrl, setbgImgUrl] = useState("");
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!communityId || !userId) return;
+
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+          { userId, communityId }
+        );
+        setProfileData(response.data.data);
+        if (response.data.data?.user?.user_name) {
+          const userName = response.data.data?.user?.user_name || "Adarsh";
+
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`
+          );
+          setbgImgUrl(
+            "https://random-image-pepebigotes.vercel.app/api/random-image"
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchProfileData();
+  }, [communityId, userId]);
+
+  if (!profileData || !profileData.user || !profileData.community) {
+    return <p>Loading profile...</p>;
+  }
+
+  // console.log("communityId", communityId);
+  // console.log("start");
+  // console.log("userId", userId);
+  // console.log("end");
+  // console.log(session);
+  // const avatarImgUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileData.user.user_name}`;
+  console.log("Generated Avatar URL:", avatarUrl);
 
   return (
     <div className="w-full max-w-5xl mx-auto  text-zinc-200 py-20">
       <div className="relative ">
         <div className="h-48 w-full overflow-hidden ounded-t-lg">
           <img
-            src="https://target.scene7.com/is/image/Target/GUEST_93a59447-93af-4117-aeae-81456b0089f4?fmt=webp&qlt=80&wid=600"
+            src={bgImgUrl}
             alt="Profile banner"
             width={1200}
             height={200}
@@ -60,16 +124,18 @@ export function ProfileCard({
           />
         </div>
         <div className="absolute -bottom-12 left-8">
-          <Avatar className="h-24 w-24 border-4 border-background">
+          <Avatar className="w-32 h-32">
             <Image
-              src={user?.image || "/fallback-avatar.png"} // Replace with a valid fallback URL
+              src={profileData.community.image || avatarImgUrl}
               alt={name}
-              width={96}
-              height={96}
-              className="rounded-full"
+              width={100}
+              height={100}
+              className="w-32 h-32 rounded-full object-cover bg-black border-4 border-primary "
+              unoptimized
             />
-
-            <AvatarFallback className="text-black">{name[0]}</AvatarFallback>
+            <AvatarFallback className="text-black text-2xl w-32 h-32">
+              {profileData?.user?.user_name?.[0] || "?"}
+            </AvatarFallback>
           </Avatar>
         </div>
       </div>
@@ -77,13 +143,14 @@ export function ProfileCard({
       <div className="bg-background pt-16 pb-8 px-8 rounded-b-lg bg-black">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-2xl font-bold">{user?.name}</h1>
-            <p className="text-muted-foreground">{title}</p>
-            {memberCount && (
-              <p className="text-sm text-muted-foreground">
-                {memberCount.toLocaleString()} Members • Free
-              </p>
-            )}
+            <h1 className="text-2xl font-bold">{profileData.user.user_name}</h1>
+            <p className="text-muted-foreground">
+              {profileData.community.name}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {profileData.community.num_member.toLocaleString()} Members •{" "}
+              {profileData.community.post_count} Posts
+            </p>
           </div>
           <div className="flex items-center gap-4">
             {socialLinks.instagram && (
@@ -130,7 +197,9 @@ export function ProfileCard({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
           <div className="bg-zinc-900 p-6">
             <h2 className="text-xl font-semibold mb-4">About</h2>
-            <p className="text-muted-foreground mb-4">{description}</p>
+            <p className="text-muted-foreground mb-4">
+              {profileData?.user?.about || "?"}
+            </p>
             <div className="flex flex-wrap gap-2">
               {skills.map((skill) => (
                 <Badge

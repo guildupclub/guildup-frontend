@@ -22,11 +22,11 @@ export const profileData = {
   },
   avatarUrl: "/placeholder.svg",
   offerings: [
-    {
-      title: "Digital Products",
-      price: 9,
-      description: "Access to digital security tools and resources.",
-    },
+    // {
+    //   title: "Digital Products",
+    //   price: 9,
+    //   description: "Access to digital security tools and resources.",
+    // },
     {
       title: "One-on-One Consulting Sessions",
       price: 59,

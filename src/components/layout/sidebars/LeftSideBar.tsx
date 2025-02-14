@@ -286,7 +286,7 @@ export function LeftSidebar() {
                 {feed.communityIds.map((cid) => {
                   const community = myCommunities.find((c) => c._id === cid);
                   return (
-                    <div key={cid} className="pl-2 mt-1 border-l border-zinc-700 pl-4 text-sm">
+                    <div key={cid} className=" mt-1 border-l border-zinc-700 pl-4 text-sm">
                       <div className="font-semibold text-zinc-100">{community?.name}</div>
                       {/* {community?.description && (
                         <div className="text-zinc-400">{community.description}</div>

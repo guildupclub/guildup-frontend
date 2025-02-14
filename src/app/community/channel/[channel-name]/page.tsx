@@ -5,9 +5,11 @@ import type { RootState } from "@/redux/store";
 import CommunityChat from "@/components/community/CommunityChat";
 
 export default function FeedPage() {
-  const activeCommunityId = useSelector(
-    (state: RootState) => state.channel.activeCommunityId
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
   );
+
+  const activeCommunityId = activeCommunity?.id;
   return (
     <div className="py-16">
       <CommunityChat />

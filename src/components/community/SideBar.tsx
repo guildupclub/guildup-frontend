@@ -38,7 +38,6 @@ export function Sidebar() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
-
   const activeCommunityId = activeCommunity?.id;
   const activeCommunityName = activeCommunity?.name;
   const userId = useSelector((state: RootState) => state.user.user?._id);
@@ -65,7 +64,7 @@ export function Sidebar() {
   const fetchChannels = async () => {
     if (!activeCommunityId) {
       console.warn("Community ID is null, skipping fetchChannels");
-      setChannels([]); 
+      setChannels([]);
       return;
     }
 
@@ -90,7 +89,7 @@ export function Sidebar() {
       const data = await response.json();
       if (data.r !== "s" || !data.data || data.data.length === 0) {
         console.warn("No channels found for the selected community");
-        setChannels([]); 
+        setChannels([]);
         return;
       }
 
@@ -104,7 +103,7 @@ export function Sidebar() {
       setChannels(formattedChannels);
     } catch (err: any) {
       setError("Error fetching channels: " + err.message);
-      setChannels([]); 
+      setChannels([]);
     } finally {
       setLoading(false);
     }
@@ -165,12 +164,9 @@ export function Sidebar() {
       </div>
       <div className="space-y-2">
         <div className="border-b border-zinc-700 p-2">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 "
-          >
+          <div className="w-full justify-start gap-2 p-1 rounded-lg text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 ">
             <PostDialog />
-          </Button>
+          </div>
         </div>
         <Button
           variant="ghost"

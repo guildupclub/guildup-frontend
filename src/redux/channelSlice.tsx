@@ -25,9 +25,9 @@ export const channelSlice = createSlice({
   initialState,
   reducers: {
     setActiveChannel: (state, action: PayloadAction<Channel>) => {
-      state.activeChannel = action.payload;
+      state.activeChannel = action.payload; // ✅ Update active channel
     },
-    setActiveCommunity: (state, action: PayloadAction<Community>) => {  // ✅ Accepts an object
+    setActiveCommunity: (state, action: PayloadAction<Community>) => {
       state.activeCommunity = action.payload;
     },
   },

@@ -1,15 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './userSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./userSlice";
 import channelReducer from "./channelSlice";
-import storage from 'redux-persist/lib/storage';
-import { persistReducer, persistStore } from 'redux-persist';
-import {thunk} from 'redux-thunk';
-import postsReducer from './postSlice';
+import communityReducer from "./communitySlice";
+import storage from "redux-persist/lib/storage";
+import { persistReducer, persistStore } from "redux-persist";
+import { thunk } from "redux-thunk";
+import postsReducer from "./postSlice";
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['user'] // only user will be persisted
+  whitelist: ["user"], // only user will be persisted
 };
 
 const persistedUserReducer = persistReducer(persistConfig, userReducer);
@@ -19,11 +20,12 @@ export const store = configureStore({
     user: persistedUserReducer,
     channel: channelReducer,
     posts: postsReducer,
+    community: communityReducer,
   },
-  middleware: (getDefaultMiddleware) => 
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false
-    }).concat(thunk)
+      serializableCheck: false,
+    }).concat(thunk),
 });
 
 export const persistor = persistStore(store);

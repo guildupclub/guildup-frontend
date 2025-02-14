@@ -49,8 +49,8 @@ export function PostCard({
   };
 
   return (
-    <div className="rounded-xl bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 ">
-      <div className="space-y-4 p-2">
+    <div className="rounded-xl bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-2 ">
+      <div className="space-y-2 p-2">
         <div className="flex items-start gap-4">
           <Avatar className="h-10 w-10 rounded-full border border-zinc-800">
             <AvatarImage src={avatar} />
@@ -89,7 +89,7 @@ export function PostCard({
           </div>
         </div>
 
-        <div className="ml-14 flex items-center gap-2 bg-black rounded-lg p-2">
+        <div className="ml-14 flex items-center gap-2 bg-black rounded-lg p-1">
           {isRecording ? (
             <div className="flex-1 flex items-center gap-2 text-zinc-400 text-sm">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
