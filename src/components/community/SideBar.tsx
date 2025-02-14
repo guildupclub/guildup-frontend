@@ -38,6 +38,7 @@ export function Sidebar() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
+ 
   const activeCommunityId = activeCommunity?.id;
   const activeCommunityName = activeCommunity?.name;
   const userId = useSelector((state: RootState) => state.user.user?._id);
@@ -98,6 +99,7 @@ export function Sidebar() {
         name: channel.name,
         icon: channel.type === "chat" ? Lock : Hash,
         locked: channel.is_locked,
+        type:channel.type,
       }));
 
       setChannels(formattedChannels);
@@ -321,7 +323,11 @@ export function Sidebar() {
                   }`}
                   onClick={() => {
                     dispatch(
-                      setActiveChannel({ id: channel.id, name: channel.name })
+                      setActiveChannel({
+                        id: channel.id,
+                        name: channel.name,
+                        type: channel.type,
+                      })
                     );
                     handleNavigation(`/community/channel/${channel.name}`);
                   }}

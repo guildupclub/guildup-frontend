@@ -8,6 +8,7 @@ interface Community {
 interface Channel {
   id: string;
   name: string;
+  type: "chat" | "discussion";
 }
 
 interface ChannelState {
@@ -16,7 +17,7 @@ interface ChannelState {
 }
 
 const initialState: ChannelState = {
-  activeChannel: { id: "general", name: "General Chat" },
+  activeChannel: { id: "general", name: "General Chat", type: "discussion" },
   activeCommunity: null,
 };
 
