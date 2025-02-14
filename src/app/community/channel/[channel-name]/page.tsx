@@ -3,16 +3,22 @@ import { Feed } from "@/components/community/feed/Feed";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import CommunityChat from "@/components/community/CommunityChat";
+import CommunityChat2 from "@/components/community/ChatCommunity";
 
 export default function FeedPage() {
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
+  const activeChannel = useSelector(
+    (state: RootState) => state.channel.activeChannel
   );
 
-  const activeCommunityId = activeCommunity?.id;
+  const activeChanneltype = activeChannel?.type || "discussion";
+
   return (
     <div className="py-16">
-      <CommunityChat />
+      {activeChanneltype == "discussion" ? (
+        <CommunityChat />
+      ) : (
+        <CommunityChat2 />
+      )}
     </div>
   );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, Send } from "lucide-react";
-import { PostCard } from "./PostCard";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 
@@ -12,10 +11,7 @@ interface Post {
   id: string;
   author: string;
   time: string;
-  level: number;
   content: string;
-  likes: number;
-  comments: number;
   avatar: string;
 }
 
@@ -25,7 +21,7 @@ interface UserData {
   image: string;
 }
 
-function ChatContent() {
+function Chat() {
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
@@ -55,9 +51,8 @@ function ChatContent() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId,
-            session: sessionId,
             channelId: activeChannelId,
+            userId: userId,
           }),
         });
 
@@ -66,16 +61,14 @@ function ChatContent() {
         const data = await response.json();
 
         // Safely transform the data with null checks
+
         setPosts(
           data?.data?.map((item: any) => {
-            const userData: UserData = item.user_id || {};
+            const userData: UserData = item.sender_id || {};
             return {
               id: item._id || "",
-              time: item.created_At || "",
-              level: 0,
-              content: item.body || "",
-              likes: item.up_votes || 0,
-              comments: item.reply_count || 0,
+              time: item.createdAt || "",
+              content: item.message_content || "",
               author: userData.name || "Unknown",
               avatar: userData.image || "",
             };
@@ -95,14 +88,14 @@ function ChatContent() {
     if (!postBody.trim() || !activeChannelId) return;
 
     try {
-      const response = await fetch("http://localhost:8000/v1/channel/post", {
+      const response = await fetch("http://localhost:8000/v1/channel/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId,
-          session: sessionId,
           channelId: activeChannelId,
-          body: postBody,
+          message_type: "text",
+          message_content: postBody,
+          userId: userId,
         }),
       });
 
@@ -118,10 +111,7 @@ function ChatContent() {
           id: newPost._id || "",
           author: userData.name || "Unknown",
           time: newPost.created_At || "",
-          level: 0,
-          content: newPost.body || "",
-          likes: newPost.up_votes || 0,
-          comments: newPost.reply_count || 0,
+          content: newPost.message_content || "",
           avatar: userData.image || "",
         },
         ...prev,
@@ -165,7 +155,22 @@ function ChatContent() {
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
-              posts.map((post) => <PostCard key={post.id} {...post} />)
+              posts.map((post) => (
+                <div key={post.id} className="flex gap-3 items-start">
+                  <img
+                    src={post.avatar || "/placeholder.svg?height=40&width=40"}
+                    alt={post.author}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{post.author}</span>
+                      <span className="text-xs text-zinc-500">{post.time}</span>
+                    </div>
+                    <p className="text-sm text-zinc-300">{post.content}</p>
+                  </div>
+                </div>
+              ))
             ) : (
               <div className="text-center text-zinc-400">No posts yet</div>
             )}
@@ -178,26 +183,20 @@ function ChatContent() {
         <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 ">
           <input
             type="text"
-            placeholder="Share your thoughts..."
+            placeholder="Search"
             value={postBody}
             onChange={(e) => setPostBody(e.target.value)}
             className="flex-1 bg-zinc-800 text-zinc-200 text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
           />
-          <div className="flex gap-8 px-2 py-1">
-            <Button
-              onClick={handleSendPost}
-              className="bg-primary-gradient px-6"
-              disabled={!postBody.trim()}
-            >
-              <Send className="h-4 w-4" aria-hidden="true" />
-            </Button>
-          </div>
+          <Button onClick={handleSendPost} disabled={!postBody.trim()}>
+            <Send className="h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>
   );
 }
 
-export default function CommunityChat() {
-  return <ChatContent />;
+export default function CommunityChat2() {
+  return <Chat />;
 }
