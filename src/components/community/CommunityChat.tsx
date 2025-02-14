@@ -174,8 +174,8 @@ function ChatContent() {
       </div>
 
       {/* Input Box */}
-      <div className="fixed bottom-0 w-[calc(100%-20rem)] px-8 pr-28 py-2">
-        <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 px-2">
+      <div className="fixed bottom-0 w-[calc(100%-20rem)] px-3 pr-28 py-2">
+        <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 ">
           <input
             type="text"
             placeholder="Share your thoughts..."
