@@ -103,10 +103,11 @@ const CommentSection: React.FC<any> = ({ postId }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/comments`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
         {
           postId,
-          content: newComment,
+          comment: newComment,
+          userId: "678ce60732c37c1222f913e0",
         }
       );
 
@@ -177,12 +178,12 @@ const CommentSection: React.FC<any> = ({ postId }) => {
       <div key={comment._id} className="pl-[20px] mt-4">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={comment.postedBy?.avatar || "/placeholder.svg"} />
-            <AvatarFallback>{comment.postedBy?.user_name}</AvatarFallback>
+            <AvatarImage src={comment?.postedBy?.avatar || "/placeholder.svg"} />
+            <AvatarFallback>{comment?.postedBy?.user_name}</AvatarFallback>
           </Avatar>
           <strong>{comment.postedBy?.user_name}</strong>
           <span className="text-sm text-zinc-400">
-            {new Date(comment.commentedAt).toLocaleDateString()}
+            {new Date(comment?.commentedAt).toLocaleDateString()}
           </span>
         </div>
         <div className="mt-2 text-zinc-200">{comment.text}</div>
