@@ -103,7 +103,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
     setLoading(true);
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/comments`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
         {
           postId,
           content: newComment,
