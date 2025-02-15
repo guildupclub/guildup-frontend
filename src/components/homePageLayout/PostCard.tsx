@@ -157,7 +157,7 @@ export function PostCard({ post, ref }: PostCardProps) {
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post?.replies?.length)} Comments
+              {formatNumber(post.reply_count)} Comments
             </span>
           </button>
           <button
