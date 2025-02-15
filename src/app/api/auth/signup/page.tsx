@@ -150,7 +150,7 @@ export default function SignUp() {
           Continue with Google
         </Button>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <button
             onClick={() => signIn()}
@@ -158,7 +158,7 @@ export default function SignUp() {
           >
             Sign in
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );

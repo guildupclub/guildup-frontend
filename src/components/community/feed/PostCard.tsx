@@ -34,7 +34,7 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>UN</AvatarFallback>
+            <AvatarFallback className="">UN</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2"
+            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setLiked(!liked)}
           >
             <Heart
@@ -80,10 +80,11 @@ export function PostCard({ post }: PostCardProps) {
             />
             <span>{post.up_votes}</span>
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2"
+            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageSquare className="w-5 h-5" />
@@ -92,7 +93,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2"
+            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
           >
             <Share2 className="w-5 h-5" />
             <span>Share</span>

@@ -1,125 +1,51 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PostCreator } from "./PostCreator";
-import  {PostCard}  from "./PostCard";
-import { API_ENDPOINTS } from "@/config/constants";
-
-interface Post {
-  _id: string;
-  title: string;
-  body: string;
-  created_At: string;
-  up_votes: number;
-  reply_count: number;
-  post_type: string;
-  slug: string;
-}
-
-interface ApiResponse {
-  r: string;
-  data: Post[];
-}
+import { PostCreator } from './PostCreator';
+import { PostCard } from './PostCard';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../../redux/store';
+import { fetchPosts } from '../../redux/postSlice';
 
 export function Feed() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const observer = useRef<any>(null);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
+  const dispatch = useDispatch<AppDispatch>();
+  const { posts, isLoading, error, page, hasMore } = useSelector((state: RootState) => state.posts);
 
+  // Load the first page on mount (make sure your reducer appends posts)
+  useEffect(() => {
+    if (posts.length === 0) {
+      dispatch(fetchPosts({ userId: userId, page: 0 }));
+    }
+  }, [dispatch, posts.length]);
+
+  // Infinite scroll: observe the last post element.
+  // Using a threshold of 0.5 to trigger loading earlier.
+  const observer = useRef<IntersectionObserver | null>(null);
   const lastPostElementRef = useCallback(
-    (node:any) => {
-      if (loading) return;
+    (node: HTMLDivElement | null) => {
+      if (isLoading) return;
       if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          setPage((prevPage) => prevPage + 1); // trigger loading of new posts by chaging page no
-        }
-      });
-
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore) {
+            dispatch(fetchPosts({ page, userId: userId}));
+          }
+        },
+        { threshold: 0.5 }  // Adjust threshold as needed
+      );
       if (node) observer.current.observe(node);
     },
-    [loading]
+    [isLoading, hasMore, dispatch, page]
   );
 
-  const fetchPosts = async (page:any,num:any) => {
-    try {
-      const response:any = await fetch(API_ENDPOINTS.getPosts, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: "678ce60732c37c1222f913e0",
-          page:page
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch posts");
-
-      const data: ApiResponse = await response.json();
-      if (data.r === "s" && Array.isArray(data.data)) {
-        console.log("@Reponse",data)
-        return data.data
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch posts");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadMorePosts = async () => {
-    setLoading(true);
-    console.log("Getting mroe post")
-    const newPosts = await fetchPosts(page, 10);
-    console.log("@newPost",newPosts)
-    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    loadMorePosts();
-  }, [page]);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     try {
-  //       const response = await fetch(API_ENDPOINTS.getPosts, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           userId: "678ce60732c37c1222f913e0",
-  //         }),
-  //       });
-
-  //       if (!response.ok) throw new Error("Failed to fetch posts");
-
-  //       const data: ApiResponse = await response.json();
-  //       if (data.r === "s" && Array.isArray(data.data)) {
-  //         setPosts(data.data);
-  //       }
-  //     } catch (err) {
-  //       setError(err instanceof Error ? err.message : "Failed to fetch posts");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchPosts();
-  // }, []);
-
   return (
+    // Optionally wrap posts in a container that does not force scroll-top on re-render.
     <div className="max-w-4xl mx-auto">
       <Tabs defaultValue="feed" className="w-full">
-        <TabsList className="w-full justify-start h-14 bg-transparent border-b border-zinc-800 rounded-none p-0">
+        {/* <TabsList className="w-full justify-start h-14 bg-transparent border-b border-zinc-800 rounded-none p-0">
           <TabsTrigger
             value="feed"
             className="data-[state=active]:bg-transparent data-[state=active]:text-purple-500 rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 px-8 h-14"
@@ -132,10 +58,10 @@ export function Feed() {
           >
             Snipz
           </TabsTrigger>
-        </TabsList>
+        </TabsList> */}
 
         <TabsContent value="feed" className="mt-0 p-4">
-          <PostCreator />
+          {/* <PostCreator /> */}
 
           {isLoading ? (
             <div className="text-center text-zinc-400">Loading posts...</div>
@@ -144,15 +70,25 @@ export function Feed() {
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post,index) => <PostCard key={post._id} post={post} ref={posts.length === index + 1 ? lastPostElementRef : null}
-            />)
+            posts.map((post, index) => {
+              if (posts.length === index + 1) {
+                // Attach observer ref to the last post.
+                return (
+                  <div key={post._id} ref={lastPostElementRef}>
+                    <PostCard post={post} />
+                  </div>
+                );
+              } else {
+                return <PostCard key={post._id} post={post} />;
+              }
+            })
+          )}
+          {isLoading && posts.length > 0 && (
+            <div className="text-center text-zinc-400">Loading more posts...</div>
           )}
         </TabsContent>
-
         <TabsContent value="snipz">
-          <div className="p-4 text-center text-zinc-400">
-            No snipz available
-          </div>
+          <div className="p-4 text-center text-zinc-400">No snipz available</div>
         </TabsContent>
       </Tabs>
     </div>

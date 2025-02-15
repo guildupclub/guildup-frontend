@@ -1,27 +1,38 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Channel {
+interface Community {
   id: string;
   name: string;
 }
 
+interface Channel {
+  id: string;
+  name: string;
+  type: "chat" | "discussion";
+}
+
 interface ChannelState {
   activeChannel: Channel;
+  activeCommunity: Community | null;
 }
 
 const initialState: ChannelState = {
-  activeChannel: { id: 'general', name: 'General Chat' }
+  activeChannel: { id: "general", name: "General Chat", type: "discussion" },
+  activeCommunity: null,
 };
 
 export const channelSlice = createSlice({
-  name: 'channel',
+  name: "channel",
   initialState,
   reducers: {
     setActiveChannel: (state, action: PayloadAction<Channel>) => {
-      state.activeChannel = action.payload;
-    }
-  }
+      state.activeChannel = action.payload; // ✅ Update active channel
+    },
+    setActiveCommunity: (state, action: PayloadAction<Community>) => {
+      state.activeCommunity = action.payload;
+    },
+  },
 });
 
-export const { setActiveChannel } = channelSlice.actions;
+export const { setActiveChannel, setActiveCommunity } = channelSlice.actions;
 export default channelSlice.reducer;

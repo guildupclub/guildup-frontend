@@ -24,8 +24,10 @@ interface Post {
   is_locked: boolean;
   post_type: string;
 }
-
-export function Feed() {
+interface FeedProps {
+  communityId: string;
+}
+export function Feed({ communityId }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
@@ -33,21 +35,24 @@ export function Feed() {
   const [channel, setChannel] = useState("Open Discussion");
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    if (communityId) fetchPosts();
+  }, [communityId]);
+  console.log(communityId);
 
   const fetchPosts = async () => {
     try {
+      console.log("Community ID:", communityId);
       const response = await fetch(
-        "http://localhost:8000/v1/post/community/post",
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/community/post`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            communityId: "678ce8ac311510420fa318ae",
-            type: "close",
+            communityId: communityId,
+            // is_locked: true,
+            is_locked: false,
           }),
         }
       );
@@ -56,8 +61,9 @@ export function Feed() {
 
       const result = await response.json();
       setPosts(result.data);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
+      useEffect(() => {
+        if (communityId) fetchPosts();
+      }, [communityId]);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +79,6 @@ export function Feed() {
             <h1 className="text-xl font-semibold">Feed</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button>Go Live</Button>
             <Button variant="ghost" size="icon">
               <Settings className="w-5 h-5" />
             </Button>

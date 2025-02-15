@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Comment } from "./Comment";
 import CommentSection from "./CommentSection/CommentSection";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
 interface PostCardProps {
   post: {
@@ -26,15 +28,28 @@ interface PostCardProps {
     post_type: string;
     slug: string;
   };
-  ref:any;
+  ref: any;
 }
 
-export function PostCard({ post ,ref}: PostCardProps) {
+export function PostCard({ post, ref }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const { user } = useSelector((state: any) => state.user);
 
+  const handleSendComment = async () => {
+    console.log("@user", user);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
+      {
+        postId: post._id,
+        comment: newComment,
+        userId: user.id,
+      }
+    );
+    console.log("@commentResponse", response);
+  };
   // Existing functions remain the same
   const formatTimeAgo = (date: string) => {
     const now = new Date();
@@ -89,12 +104,11 @@ export function PostCard({ post ,ref}: PostCardProps) {
 
   // Example comments data
 
-
   return (
     <div className="bg-zinc-900 rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-10 w-10  border-2 border-purple-500">
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
@@ -139,19 +153,19 @@ export function PostCard({ post ,ref}: PostCardProps) {
           </button>
           <button
             className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
-            onClick={handleShareClick}
-          >
-            <Share2 className="h-5 w-5" />
-            <span className="text-sm">Share</span>
-          </button>
-          <button
-            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
             onClick={() => setShowComments(!showComments)}
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post?.replies?.length )} Comments
+              {formatNumber(post.reply_count)} Comments
             </span>
+          </button>
+          <button
+            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
+            onClick={handleShareClick}
+          >
+            <Share2 className="h-5 w-5" />
+            <span className="text-sm">Share</span>
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2 text-zinc-400">
@@ -162,8 +176,53 @@ export function PostCard({ post ,ref}: PostCardProps) {
 
       {showComments && (
         <div className="border-t border-zinc-800/50">
+          <div className="p-4">
+            <div className="flex gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="/placeholder.svg" />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-purple-500"
+                    onClick={() => {
+                      // Handle comment submission
+                      handleSendComment();
+                      setNewComment("");
+                    }}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="px-4">
-          {showComments && <CommentSection postId={post._id} />}
+            {showComments && <CommentSection postId={post._id} />}
           </div>
         </div>
       )}

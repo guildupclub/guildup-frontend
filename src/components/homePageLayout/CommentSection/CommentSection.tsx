@@ -3,6 +3,8 @@ import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Plus, Send } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface Comment {
   _id: string;
@@ -44,6 +46,9 @@ const CommentSection: React.FC<any> = ({ postId }) => {
   const [showReplyInput, setShowReplyInput] = useState<Set<string>>(new Set());
 
   const handleAddReply = async (commentId: string) => {
+    const userId = useSelector((state: RootState) => state.user.user?._id);
+
+    const sessionId = useSelector((state: RootState) => state.user.sessionId);
     const replyInput = replyInputs[commentId];
     if (!replyInput?.text?.trim()) return;
   
@@ -55,7 +60,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
           postId,
           commentId: replyInput.parentCommentId,
           text: replyInput.text,
-          userId: "678ce60732c37c1222f913e0",
+          userId: userId,
         }
       );
   

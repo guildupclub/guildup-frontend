@@ -1,83 +1,38 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import axios from "axios";
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import client from "../lib/db";
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 const handler = NextAuth({
+  adapter: MongoDBAdapter(client),
+  callbacks: {
+    async jwt({ token, user }) {
+      console.log("Hello  --->");
+      console.log(user);
+      if (user) {
+        token._id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      console.log("Session: ", session, token);
+      if (session.user) {
+        session.user._id = token._id as string;
+      }
+      return session;
+    },
+  },
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        console.log("@here",credentials)
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
-        }
-
-        try {
-          const response = await axios.post(
-            "http://localhost:8000/v1/auth/login",
-            {
-              email: credentials.email,
-              password: credentials.password,
-            }
-          );
-          console.log("@response",response.data)
-          const user = response.data.data.user;
-
-          if (user) {
-            return {
-              id: user.id,
-              name: user.name,
-              email: user.email,
-              image: user.image,
-            };
-          }
-
-          return null;
-        } catch (error: any) {
-          console.log("@error",error)
-          throw new Error(error.response?.data?.error || "Invalid credentials");
-        }
-      },
-    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
-  callbacks:{
-    async signIn({ user, account, profile }) {
-      console.log("@siginIN",user,account,profile)
-      if (account?.provider === "google") {
-        try {
-          console.log("@authDetails",user.name,user.email,user.image)
-          const response = await axios.post("http://localhost:8000/v1/auth/google", {
-           user:{ name: user.name,
-            email: user.email,
-            image: user.image}
-          });
-          console.log("@response",response.data)
-          if (response.status !== 200) {
-            throw new Error('Google authentication failed');
-          }
-          account.access_token= response.data.data.session
-          return true;
-        } catch (error) {
-          console.error("Google auth error:", error);
-          return false;
-        }
-      }
-      // Called when the user signs in; you can send data to the backend here if needed
-      return true;
-    },
-
-  },
   pages: {
     signIn: "/auth/signin",
+    signUp: "/auth/signup",
   },
   session: {
     strategy: "jwt",

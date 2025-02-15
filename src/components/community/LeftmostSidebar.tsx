@@ -1,5 +1,5 @@
 "use client";
-
+import { setActiveCommunity } from "@/redux/channelSlice";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,8 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Settings } from "lucide-react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { FaCompass } from "react-icons/fa";
+import Link from "next/link";
+import CreatorForm from "../form/CreatorForm";
 
 // Type for community data
 interface Community {
@@ -28,11 +33,24 @@ interface Community {
 }
 
 export function LeftmostSidebar() {
+  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
-  const [activeChannel, setActiveChannel] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
+
+  const handleOpenForm = () => {
+    setShowCreatorForm((prev) => !prev);
+  };
+
+  const dispatch = useDispatch();
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
+  );
+
+  const activeCommunityId = activeCommunity?.id;
 
   useEffect(() => {
     fetchCommunities();
@@ -48,7 +66,7 @@ export function LeftmostSidebar() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: "6704eaa88019d1fa807773ea",
+            userId: userId,
           }),
         }
       );
@@ -58,16 +76,20 @@ export function LeftmostSidebar() {
       }
 
       const result = await response.json();
-
-      // Filter out null values and map to the communities array
+      console.log(result);
       const validCommunities = result.data.filter(
         (community: Community | null) => community !== null
       );
       setCommunities(validCommunities);
 
-      // Set the first community as active if exists
-      if (validCommunities.length > 0) {
-        setActiveChannel(validCommunities[0]._id);
+      // Set the first community as active if none is selected
+      if (validCommunities.length > 0 && !activeCommunityId) {
+        dispatch(
+          setActiveCommunity({
+            id: validCommunities[0]._id,
+            name: validCommunities[0].name, // Include name
+          })
+        );
       }
     } catch (err) {
       setError(
@@ -80,7 +102,7 @@ export function LeftmostSidebar() {
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
-      // Here you would typically make an API call to create a new community
+      // API call to create a new community can be placed here
       setNewChannelName("");
     }
   };
@@ -104,8 +126,8 @@ export function LeftmostSidebar() {
   }
 
   return (
-    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-800 py-20">
-      <ScrollArea className="flex-1 w-full">
+    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-700 py-20">
+      <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
             // Loading skeleton
@@ -124,13 +146,20 @@ export function LeftmostSidebar() {
                 variant="ghost"
                 size="icon"
                 className={`relative w-12 h-12 rounded-full text-zinc-500 ${
-                  activeChannel === community._id
+                  activeCommunityId === community._id
                     ? "bg-purple-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
                 }`}
-                onClick={() => setActiveChannel(community._id)}
+                onClick={() =>
+                  dispatch(
+                    setActiveCommunity({
+                      id: community._id,
+                      name: community.name,
+                    })
+                  )
+                }
               >
-                <Avatar className="w-full h-full">
+                <Avatar className="w-full h-full ">
                   <AvatarImage
                     src={`/placeholder.svg?text=${getInitials(community.name)}`}
                     alt={community.name}
@@ -147,48 +176,20 @@ export function LeftmostSidebar() {
           )}
 
           <Dialog>
-            <DialogTrigger asChild>
+            <CreatorForm />
+            <Link href="/explore">
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
               >
-                <Plus className="w-6 h-6" />
+                <FaCompass />
               </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200">
-              <DialogHeader>
-                <DialogTitle>Join New Channel</DialogTitle>
-                <DialogDescription className="text-zinc-400">
-                  Enter the channel name you want to join.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Input
-                    id="name"
-                    value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)}
-                    className="col-span-4 bg-zinc-800 border-zinc-700 text-zinc-200"
-                    placeholder="Channel name"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button onClick={handleCreateChannel}>Join Channel</Button>
-              </DialogFooter>
-            </DialogContent>
+            </Link>
+            {showCreatorForm && <CreatorForm />}
           </Dialog>
         </div>
-      </ScrollArea>
-
-      {/* <Button
-        variant="ghost"
-        size="icon"
-        className="w-8 h-8 rounded-lg hover:bg-zinc-700 text-zinc-300 mt-4"
-      >
-        <Settings className="w-8 h-8" />
-      </Button> */}
+      </div>
     </div>
   );
 }

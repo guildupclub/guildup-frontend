@@ -8,10 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { toast } from "sonner";
+import axios from "axios";
+import { setUser } from "@/redux/userSlice";
+import { useDispatch } from "react-redux";
 
 export default function SignIn() {
   const router = useRouter();
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -24,14 +28,26 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      // const result = await signIn("credentials", {
+      //   email,
+      //   password,
+      //   redirect: false,
+      // });
+      const result = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,{
+        email,password
+      })
+
+      console.log("@result",result)
+      dispatch(setUser({
+        id: result.data.data.user.id,
+        name: result.data.data.user.name || "",
+        email: result.data.data.user.email,
+        image: result.data.data.user.avatar,
+        accessToken: result.data.data.session
+      }));
       console.log("@sininreust",result)
-      if (result?.error) {
-        setError(result.error);
+      if (result?.data?.e === "e") {
+        setError(result.data.data);
       } else {
         toast.success("Signed in successfully!");
         router.push("/");

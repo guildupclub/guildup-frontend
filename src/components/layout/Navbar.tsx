@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import Link from "next/link";
 import {
   Bell,
@@ -11,7 +11,7 @@ import {
   Search,
   Video,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,14 +25,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/guildup_logo.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { clearUser, setUser } from "@/redux/userSlice";
+import { useRouter } from "next/navigation";
+
 export function Navbar({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState("post");
+  const router = useRouter();
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return;
+    router.push(
+      `/api/search?type=${searchType}&q=${encodeURIComponent(searchQuery)}`
+    );
+  };
 
   return (
     <>
@@ -45,7 +54,11 @@ export function Navbar({
       >
         <div className="container flex h-14 items-center justify-between mx-auto">
           <Link href="/" className="flex items-center space-x-2 mr-6">
-            <Image src={guildup_logo} alt="GuildUp" className="h-8 w-auto" />
+            <Image
+              src={guildup_logo || "/placeholder.svg"}
+              alt="GuildUp"
+              className="h-8 w-auto"
+            />
           </Link>
 
           <div className="flex flex-1 items-center space-x-2 justify-between md:justify-center lg:max-w-2xl">
@@ -55,24 +68,35 @@ export function Navbar({
                   type="search"
                   placeholder="Search..."
                   className="w-full bg-black border-none pr-24 text-muted"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="absolute right-12 top-0 h-full px-2 py-1 hover:bg-transparent text-muted"
+                      className="absolute right-12 top-0 h-full px-2 py-1 hover:bg-transparent text-zinc-200 hover:text-zinc-300"
                     >
-                      Videos
+                      {searchType}
                       <ChevronDown className="ml-1 h-4 w-4 text-muted" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Videos</DropdownMenuItem>
-                    <DropdownMenuItem>Channels</DropdownMenuItem>
-                    <DropdownMenuItem>Playlists</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setSearchType("post")}>
+                      post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setSearchType("community")}
+                    >
+                      community
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <div className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg">
+                <div
+                  className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg cursor-pointer"
+                  onClick={handleSearch}
+                >
                   <Search className="h-4 w-4 text-muted" />
                 </div>
               </div>
@@ -82,7 +106,7 @@ export function Navbar({
           <div className="hidden md:flex items-center justify-center space-x-4">
             <ul className="flex items-center justify-center space-x-12 mx-auto text-muted">
               <li>
-                <Link href="/home">
+                <Link href="/">
                   <Home className="h-6 w-6" />
                   <span className="sr-only">Home</span>
                 </Link>
@@ -94,7 +118,7 @@ export function Navbar({
                 </Link>
               </li>
               <li>
-                <Link href="/community">
+                <Link href="/community/feed">
                   <Users className="h-6 w-6" />
                   <span className="sr-only">Community</span>
                 </Link>
@@ -152,10 +176,7 @@ export function Navbar({
       </nav>
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-5 mx-auto ">
-          <Link
-            href="/home"
-            className="flex flex-col items-center justify-center"
-          >
+          <Link href="/" className="flex flex-col items-center justify-center">
             <Home className="w-6 h-6 " />
             <span className="text-xs mt-1">Home</span>
           </Link>
@@ -174,7 +195,7 @@ export function Navbar({
             <span className="text-xs mt-1">Snips</span>
           </Link>
           <Link
-            href="/community"
+            href="/community/feed"
             className="flex flex-col items-center justify-center"
           >
             <Users className="w-6 h-6" />
