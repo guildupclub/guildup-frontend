@@ -41,7 +41,7 @@ const {user} = useSelector((state:any)=>state.user)
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     router.push(
-      `/api/search?type=${searchType}&q=${encodeURIComponent(searchQuery)}`
+      `/api/search?q=${encodeURIComponent(searchQuery)}`
     );
   };
   const dispatch = useDispatch();
@@ -89,7 +89,7 @@ const {user} = useSelector((state:any)=>state.user)
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -109,7 +109,7 @@ const {user} = useSelector((state:any)=>state.user)
                       community
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <div
                   className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg cursor-pointer"
                   onClick={handleSearch}

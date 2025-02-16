@@ -212,14 +212,14 @@ export function Sidebar() {
             <PostDialog />
           </div>
         </div>
-        {/* <Button
+        <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
           onClick={() => handleNavigation("/community/profile")}
         >
           <FaUserAlt />
           Profile
-        </Button> */}
+        </Button>
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
@@ -236,14 +236,14 @@ export function Sidebar() {
           <FaUserGroup />
           Members
         </Button>
-        <Button
+        {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
           onClick={() => handleNavigation("/community/event")}
         >
           <FaCalendarAlt />
           Events
-        </Button>
+        </Button> */}
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"

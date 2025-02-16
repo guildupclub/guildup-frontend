@@ -15,7 +15,7 @@ export default function SearchPage() {
 
   // Get query params
   const query = searchParams.get("q") || "";
-  const type = searchParams.get("type") || "post";
+  const type = 'community'
 
   const [searchQuery, setSearchQuery] = useState(query);
   const [searchType, setSearchType] = useState(type);
@@ -32,10 +32,7 @@ export default function SearchPage() {
       setError("");
 
       try {
-        const endpoint =
-          type === "post"
-            ? "http://localhost:8000/v1/post/search"
-            : "http://localhost:8000/v1/community/look";
+        const endpoint = "http://localhost:8000/v1/community/look";
 
         const response = await fetch(endpoint, {
           method: "POST",
@@ -133,13 +130,14 @@ export default function SearchPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {results.map((result) =>
-                type === "post" ? (
-                  <PostCard
-                    key={result._id}
-                    post={result}
-                    onClick={handleCardClick}
-                  />
-                ) : (
+                // type === "post" ? (
+                //   <PostCard
+                //     key={result._id}
+                //     post={result}
+                //     onClick={handleCardClick}
+                //   />
+                // ) :
+                 (
                   <CommunityCard
                     key={result._id}
                     community={result}
