@@ -71,6 +71,22 @@ export function ProfileCard({
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setbgImgUrl] = useState("");
 
+  const handleJoinCommunity = async () => {
+  
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
+        {
+          userId: user.id,
+          communityId
+        }
+      );
+  
+    console.log("@resposenJoin",response)
+    } catch (err) {
+      console.error('Error joining community:', err);
+    } 
+  };
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!communityId || !userId) return;
@@ -186,10 +202,11 @@ export function ProfileCard({
               </Link>
             )}
             <Button
+            onClick={handleJoinCommunity}
               variant="secondary"
               className="bg-primary-gradient text-primary-foreground hover:bg-primary/90"
             >
-              Join Group
+              Join Group sbe
             </Button>
           </div>
         </div>

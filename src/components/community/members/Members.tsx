@@ -107,16 +107,16 @@ export default function Members({ communityId }: { communityId: string }) {
                 >
                   <div className="flex items-center gap-4">
                     <Avatar>
-                      <AvatarImage src={member.user_id.avatar || undefined} />
+                      <AvatarImage src={member.user_id?.avatar || undefined} />
                       <AvatarFallback className="bg-zinc-700 text-zinc-100">
-                        {member.user_id.user_name?.[0]?.toUpperCase() ||
-                          member.user_id.email[0].toUpperCase()}
+                        {member.user_id?.user_name?.[0]?.toUpperCase() ||
+                          member.user_id?.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-medium truncate text-white">
-                          {member.user_id.user_name || member.user_id.email}
+                          {member.user_id?.user_name || member.user_id?.email}
                         </p>
                         <div className="flex gap-1">
                           {member.is_owner && (
@@ -137,7 +137,7 @@ export default function Members({ communityId }: { communityId: string }) {
                         </div>
                       </div>
                       <p className="text-sm text-start text-zinc-400">
-                        Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
+                        Joined {formatDistanceToNow(new Date(member?.createdAt))}{" "}
                         ago
                       </p>
                     </div>

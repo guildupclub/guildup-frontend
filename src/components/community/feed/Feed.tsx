@@ -52,7 +52,7 @@ export function Feed({ communityId }: FeedProps) {
           body: JSON.stringify({
             communityId: communityId,
             // is_locked: true,
-            is_locked: true,
+            is_locked: false,
           }),
         }
       );
