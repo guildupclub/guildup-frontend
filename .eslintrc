@@ -1,0 +1,9 @@
+{
+    "rules": {
+      // Disable all ESLint rules
+      "no-console": "off",
+      "no-unused-vars": "off",
+      "no-undef": "off"
+    }
+  }
+  

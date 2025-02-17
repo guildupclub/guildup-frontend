@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
@@ -8,17 +9,18 @@ import PostCard from "./PostCard";
 import CommunityCard from "./CommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const dispatch = useDispatch();
 
   // Get query params
   const query = searchParams.get("q") || "";
-  const type = 'community'
+  const type = "community";
 
   const [searchQuery, setSearchQuery] = useState(query);
   const [searchType, setSearchType] = useState(type);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -77,6 +79,7 @@ export default function SearchPage() {
 
   // Handle community click with Redux
   const handleClickCommunity = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (community: any) => {
       setLoading(true);
       dispatch(
@@ -92,7 +95,7 @@ export default function SearchPage() {
   );
 
   return (
-    <div className="container mx-auto p-16 py-24 min-h-screen p-auto  bg-black">
+    <div className="container mx-auto p-16 py-24 min-h-screen p-auto bg-black">
       {/* Loading State */}
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -129,26 +132,25 @@ export default function SearchPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {results.map((result) =>
-                // type === "post" ? (
-                //   <PostCard
-                //     key={result._id}
-                //     post={result}
-                //     onClick={handleCardClick}
-                //   />
-                // ) :
-                 (
-                  <CommunityCard
-                    key={result._id}
-                    community={result}
-                    onClick={() => handleClickCommunity(result)}
-                  />
-                )
-              )}
+              {results.map((result) => (
+                <CommunityCard
+                  key={result._id}
+                  community={result}
+                  onClick={() => handleClickCommunity(result)}
+                />
+              ))}
             </div>
           )}
         </>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading search results...</div>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

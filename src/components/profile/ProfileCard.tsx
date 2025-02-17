@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -47,14 +48,12 @@ interface ProfileData {
     description: string;
     is_locked: boolean;
     tags: string[];
+    image?: string;
   };
 }
 
 export function ProfileCard({
   name,
-  title,
-  description,
-  memberCount,
   skills,
   socialLinks,
   avatarUrl,

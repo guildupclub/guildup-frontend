@@ -27,8 +27,8 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
-    community_id:string;
-    upvote_userId:any;
+    community_id?:string;
+    upvote_userId?:any;
   };
   ref: any;
 }
