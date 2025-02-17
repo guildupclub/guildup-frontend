@@ -8,15 +8,12 @@ interface MemberDetails {
   joinedAt: string;
   status: string;
   isBanned: boolean;
-  is_owner?: boolean;
-  is_moderator?: boolean;
 }
 
 interface MemberState {
   memberDetails: MemberDetails | null;
   loading: boolean;
   error: string | null;
- 
 }
 
 const initialState: MemberState = {

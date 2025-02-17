@@ -32,7 +32,6 @@ export function PostCard({
   onComment,
 }: PostCardProps) {
   const [isRecording, setIsRecording] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [duration, setDuration] = useState("0:00");
   const [message, setMessage] = useState("");
   const [isLiked, setIsLiked] = useState(false);

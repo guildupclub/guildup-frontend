@@ -8,8 +8,6 @@ import  {PostCard}  from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
 
 interface Post {
-  upvote_userId: null;
-  community_id: string;
   _id: string;
   title: string;
   body: string;
@@ -81,7 +79,7 @@ export function Feed() {
     console.log("Getting mroe post")
     const newPosts = await fetchPosts(page, 10);
     console.log("@newPost",newPosts)
-    setPosts((prevPosts = [], newPosts = []) => [...(prevPosts || []), ...(newPosts || [])]);
+    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
     setLoading(false);
   };
 
@@ -149,18 +147,9 @@ export function Feed() {
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post, index) => (
-              <PostCard
-                key={post._id}
-                post={{
-                  ...post,
-                  community_id: post.community_id || '', // Add a default if needed
-                  upvote_userId: post.upvote_userId || null, // Add a default if needed
-                }}
-                ref={posts.length === index + 1 ? lastPostElementRef : null}
-              />
-            )))
-          }
+            posts.map((post,index) => <PostCard key={post._id} post={post} ref={posts.length === index + 1 ? lastPostElementRef : null}
+            />)
+          )}
         </TabsContent>
 
         <TabsContent value="snipz">

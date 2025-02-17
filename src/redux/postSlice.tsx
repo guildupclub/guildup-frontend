@@ -24,7 +24,6 @@ const initialState: PostsState = {
 
 export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async (body: any, thunkAPI) => {
     console.log("@body",body)
     const res = await fetch(`${API_BASE_URL}/v1/post/getPosts`,
@@ -92,12 +91,12 @@ const postsSlice = createSlice({
         console.log("@action", action);
         state.isLoading = false;
         // Filter out duplicate posts based on _id.
-        const uniqueNewPosts = action.payload.posts.filter(newPost =>
+        const uniqueNewPosts = action.payload.filter(newPost =>
           !state.posts.some(existingPost => existingPost._id === newPost._id)
         );
         // Append only unique posts
         state.posts = state.posts.concat(uniqueNewPosts);
-        if (!action.payload.posts.length) {
+        if (!action.payload.length) {
           state.hasMore = false;
         }else{
             state.hasMore = true
