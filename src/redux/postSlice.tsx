@@ -91,12 +91,12 @@ const postsSlice = createSlice({
         console.log("@action", action);
         state.isLoading = false;
         // Filter out duplicate posts based on _id.
-        const uniqueNewPosts = action.payload.filter(newPost =>
+        const uniqueNewPosts = action.payload.posts.filter(newPost =>
           !state.posts.some(existingPost => existingPost._id === newPost._id)
         );
         // Append only unique posts
         state.posts = state.posts.concat(uniqueNewPosts);
-        if (!action.payload.length) {
+        if (!action.payload.posts.length) {
           state.hasMore = false;
         }else{
             state.hasMore = true

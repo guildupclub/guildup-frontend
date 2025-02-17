@@ -8,6 +8,8 @@ interface MemberDetails {
   joinedAt: string;
   status: string;
   isBanned: boolean;
+  is_owner: boolean;
+  is_moderator: boolean;
 }
 
 interface MemberState {

@@ -8,6 +8,8 @@ import  {PostCard}  from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
 
 interface Post {
+  community_id: string;
+  upvote_userId: any;
   _id: string;
   title: string;
   body: string;
@@ -79,7 +81,13 @@ export function Feed() {
     console.log("Getting mroe post")
     const newPosts = await fetchPosts(page, 10);
     console.log("@newPost",newPosts)
-    setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+    setPosts((prevPosts) => {
+      if (prevPosts) {
+        return [...prevPosts, ...newPosts || []];
+      } else {
+        return [...newPosts || []]; // Or return newPosts; if you want to replace previous posts entirely.
+      }
+    });
     setLoading(false);
   };
 
@@ -147,7 +155,7 @@ export function Feed() {
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post,index) => <PostCard key={post._id} post={post} ref={posts.length === index + 1 ? lastPostElementRef : null}
+            posts.map((post,index) => <PostCard key={post._id} post={{...post, community_id: post.community_id || 'default', upvote_userId: post.upvote_userId}} ref={posts.length === index + 1 ? lastPostElementRef : null}
             />)
           )}
         </TabsContent>

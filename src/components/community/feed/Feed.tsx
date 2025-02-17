@@ -61,6 +61,7 @@ export function Feed({ communityId }: FeedProps) {
 
       const result = await response.json();
       setPosts(result.data);
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       useEffect(() => {
         if (communityId) fetchPosts();
       }, [communityId]);

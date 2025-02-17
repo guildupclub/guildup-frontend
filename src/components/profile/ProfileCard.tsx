@@ -47,6 +47,7 @@ interface ProfileData {
     description: string;
     is_locked: boolean;
     tags: string[];
+    image: string;
   };
 }
 

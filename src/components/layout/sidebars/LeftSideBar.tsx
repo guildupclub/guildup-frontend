@@ -284,7 +284,7 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c) => c._id === cid);
+                  const community = myCommunities.find((c: any) => c._id === cid);
                   return (
                     <div key={cid} className=" mt-1 border-l border-zinc-700 pl-4 text-sm">
                       <div className="font-semibold text-zinc-100">{community?.name}</div>
@@ -322,7 +322,7 @@ export function LeftSidebar() {
                   placeholder="Feed Name"
                 />
                 <p className="text-zinc-200">Select Communities:</p>
-                {myCommunities.map((comm) => (
+                {myCommunities.map((comm : any) => (
                   <label key={comm._id} className="flex items-center gap-2 text-zinc-300">
                     <input
                       type="checkbox"
@@ -380,7 +380,7 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {topicFeed.topicIds.map((tid) => {
-                  const topic = myTopics?.user_interests?.find((t) => t._id === tid);
+                  const topic = myTopics?.user_interests?.find((t: any) => t._id === tid);
                   return (
                     <div
                       key={tid}
@@ -413,7 +413,7 @@ export function LeftSidebar() {
                   placeholder="Topic Feed Name"
                 />
                 <p className="text-zinc-200">Select Topics:</p>
-                {myTopics?.user_interests?.map((topic) => (
+                {myTopics?.user_interests?.map((topic: any) => (
                   <label key={topic._id} className="flex items-center gap-2 text-zinc-300">
                     <input
                       type="checkbox"
@@ -466,7 +466,7 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
-            {myCommunities?.map((community) => (
+            {myCommunities?.map((community: any) => (
               <button
                 key={community?._id}
                 onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}
