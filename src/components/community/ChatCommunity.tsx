@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { API_BASE_URL } from "@/config/constants";
 
 interface Post {
   id: string;
@@ -48,7 +49,7 @@ function Chat() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("http://localhost:8000/v1/channel/fetch", {
+        const response = await fetch(`${API_BASE_URL}/v1/channel/fetch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -90,7 +91,7 @@ function Chat() {
     if (!postBody.trim() || !activeChannelId) return;
 
     try {
-      const response = await fetch("http://localhost:8000/v1/channel/chat", {
+      const response = await fetch(`${API_BASE_URL}/v1/channel/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

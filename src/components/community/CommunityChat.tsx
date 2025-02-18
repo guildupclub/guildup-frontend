@@ -7,6 +7,7 @@ import { Settings, Send } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { API_BASE_URL } from "@/config/constants";
 
 interface Post {
   id: string;
@@ -51,7 +52,7 @@ function ChatContent() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("http://localhost:8000/v1/channel/fetch", {
+        const response = await fetch(`${API_BASE_URL}/v1/channel/fetch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -95,7 +96,7 @@ function ChatContent() {
     if (!postBody.trim() || !activeChannelId) return;
 
     try {
-      const response = await fetch("http://localhost:8000/v1/channel/post", {
+      const response = await fetch(`${API_BASE_URL}/v1/channel/post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

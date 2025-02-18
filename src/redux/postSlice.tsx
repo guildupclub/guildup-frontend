@@ -51,7 +51,7 @@ export const fetchPosts = createAsyncThunk(
 export const getSelectedTopic = createAsyncThunk(
     'posts/getSelectedTopic',
     async (body: { userId: string, categoryIds: string[] }, thunkAPI) => {
-      const res = await fetch("http://localhost:8000/v1/category/post", {
+      const res = await fetch(`${API_BASE_URL}/v1/category/post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

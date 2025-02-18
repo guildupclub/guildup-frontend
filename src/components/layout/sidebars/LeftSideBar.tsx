@@ -13,7 +13,7 @@ import { sidebarData } from "./Data";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_ENDPOINTS } from "@/config/constants";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -108,7 +108,7 @@ export function LeftSidebar() {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const res = await axios.post("http://localhost:8000/v1/community/user", {
+        const res = await axios.post(`${API_BASE_URL}/v1/community/user `, {
           // userId: "678cf08b3755e3d81f93d5ad"
           userId: userId
         });
@@ -140,7 +140,7 @@ export function LeftSidebar() {
     async function fetchTopics() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/category/interest",
+          `${API_BASE_URL}/v1/category/interest`,
           { userId:userId }
         );
 
@@ -209,7 +209,7 @@ export function LeftSidebar() {
     // After closing, you could do more with selectedCommunities...
 
     try {
-      const response = await axios.post("http://localhost:8000/v1/feed/custom/create", {
+      const response = await axios.post(`${API_BASE_URL}/v1/feed/custom/create`, {
         userId:userId,
         communityIds: selectedCommunities,
         name: feedName,

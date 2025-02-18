@@ -7,6 +7,7 @@ import { setCommunityData } from "@/redux/communitySlice";
 import PostCard from "./PostCard";
 import CommunityCard from "./CommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { API_BASE_URL } from "@/config/constants";
 
 function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -32,7 +33,7 @@ function SearchPageContent() {
       setError("");
 
       try {
-        const endpoint = "http://localhost:8000/v1/community/look";
+        const endpoint = `${API_BASE_URL}/v1/community/look`;
 
         const response = await fetch(endpoint, {
           method: "POST",
