@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/config/constants";
 
 export default function SignUp() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export default function SignUp() {
 
     try {
       // First register the user
-      await axios.post("http://localhost:8000/v1/auth/register", {
+      await axios.post(`${API_BASE_URL}/v1/auth/register`, {
         name,
         email,
         password,

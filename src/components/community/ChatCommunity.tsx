@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Settings, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { API_BASE_URL } from "@/config/constants";
 
 interface Post {
   id: string;
@@ -27,7 +28,7 @@ function Chat() {
   );
 
   const activeChannelId = activeChannel?.id || null;
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -35,6 +36,7 @@ function Chat() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("@userIdInCommunityChat",userId)
   useEffect(() => {
     if (!activeChannelId) {
       setLoading(false);
@@ -47,7 +49,7 @@ function Chat() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("http://localhost:8000/v1/channel/fetch", {
+        const response = await fetch(`${API_BASE_URL}/v1/channel/fetch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -56,6 +58,7 @@ function Chat() {
           }),
         });
 
+        console.log("@thisiscall",response)
         if (!response.ok) throw new Error("Failed to fetch channel content");
 
         const data = await response.json();
@@ -88,7 +91,7 @@ function Chat() {
     if (!postBody.trim() || !activeChannelId) return;
 
     try {
-      const response = await fetch("http://localhost:8000/v1/channel/chat", {
+      const response = await fetch(`${API_BASE_URL}/v1/channel/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
