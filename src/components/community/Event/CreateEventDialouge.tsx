@@ -46,7 +46,7 @@ export function PostDialog() {
 
   const activeCommunityId = activeCommunity?.id;
   console.log(activeCommunityId);
-  const userID = useSelector((state: RootState) => state.user.user?._id);
+  const userID = useSelector((state: RootState) => state.user.user?.id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const { data: session } = useSession();
@@ -137,7 +137,7 @@ export function PostDialog() {
       slug: title,
       title,
       body: content,
-      is_locked: true,
+      is_locked: false,
       media: mediaPayload,
     };
 

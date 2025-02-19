@@ -7,6 +7,7 @@ import { Settings, Send } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { API_BASE_URL } from "@/config/constants";
 
 interface Post {
   id: string;
@@ -31,7 +32,7 @@ function ChatContent() {
   );
 
   const activeChannelId = activeChannel?.id || null;
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -51,7 +52,7 @@ function ChatContent() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("http://localhost:8000/v1/channel/fetch", {
+        const response = await fetch(`${API_BASE_URL}/v1/channel/fetch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -95,7 +96,7 @@ function ChatContent() {
     if (!postBody.trim() || !activeChannelId) return;
 
     try {
-      const response = await fetch("http://localhost:8000/v1/channel/post", {
+      const response = await fetch(`${API_BASE_URL}/v1/channel/post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -165,7 +166,11 @@ function ChatContent() {
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
-              posts.map((post) => <PostCard key={post.id} {...post} />)
+              posts.map((post) => <PostCard onLike={function (id: string): void {
+                throw new Error("Function not implemented.");
+              } } onComment={function (id: string, comment: string): void {
+                throw new Error("Function not implemented.");
+              } } key={post.id} {...post} />)
             ) : (
               <div className="text-center text-zinc-400">No posts yet</div>
             )}

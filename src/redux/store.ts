@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./userSlice";
 import channelReducer from "./channelSlice";
 import communityReducer from "./communitySlice";
+import memberReducer from "./memberSlice"
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { thunk } from "redux-thunk";
@@ -21,6 +22,7 @@ export const store = configureStore({
     channel: channelReducer,
     posts: postsReducer,
     community: communityReducer,
+  member: memberReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

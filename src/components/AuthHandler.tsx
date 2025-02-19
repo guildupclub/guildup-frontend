@@ -39,12 +39,15 @@ const AuthHandler = () => {
       }
     };
 
+    console.log("@session",session)
     if (session?.user) {
       dispatch(setUser(session.user));
 
       const userId = session.user._id;
       console.log("User ID:", userId);
-      fetchSessionId(userId);
+      // if(userId){
+      //   fetchSessionId(userId);
+      // }
     }
   }, [session, dispatch]);
 

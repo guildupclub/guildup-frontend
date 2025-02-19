@@ -13,7 +13,7 @@ import { sidebarData } from "./Data";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_ENDPOINTS } from "@/config/constants";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -28,7 +28,7 @@ type SelectedItem = {
 };
 
 export function LeftSidebar() {
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   // Extract session ID
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [openSections, setOpenSections] = React.useState({
@@ -108,7 +108,7 @@ export function LeftSidebar() {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const res = await axios.post("http://localhost:8000/v1/community/user", {
+        const res = await axios.post(`${API_BASE_URL}/v1/community/user `, {
           // userId: "678cf08b3755e3d81f93d5ad"
           userId: userId
         });
@@ -140,7 +140,7 @@ export function LeftSidebar() {
     async function fetchTopics() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/category/interest",
+          `${API_BASE_URL}/v1/category/interest`,
           { userId:userId }
         );
 
@@ -209,7 +209,7 @@ export function LeftSidebar() {
     // After closing, you could do more with selectedCommunities...
 
     try {
-      const response = await axios.post("http://localhost:8000/v1/feed/custom/create", {
+      const response = await axios.post(`${API_BASE_URL}/v1/feed/custom/create`, {
         userId:userId,
         communityIds: selectedCommunities,
         name: feedName,
@@ -284,7 +284,7 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c) => c._id === cid);
+                  const community = myCommunities.find((c: any) => c._id === cid);
                   return (
                     <div key={cid} className=" mt-1 border-l border-zinc-700 pl-4 text-sm">
                       <div className="font-semibold text-zinc-100">{community?.name}</div>
@@ -322,7 +322,7 @@ export function LeftSidebar() {
                   placeholder="Feed Name"
                 />
                 <p className="text-zinc-200">Select Communities:</p>
-                {myCommunities.map((comm) => (
+                {myCommunities.map((comm : any) => (
                   <label key={comm._id} className="flex items-center gap-2 text-zinc-300">
                     <input
                       type="checkbox"
@@ -380,7 +380,7 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {topicFeed.topicIds.map((tid) => {
-                  const topic = myTopics?.user_interests?.find((t) => t._id === tid);
+                  const topic = myTopics?.user_interests?.find((t: any) => t._id === tid);
                   return (
                     <div
                       key={tid}
@@ -413,7 +413,7 @@ export function LeftSidebar() {
                   placeholder="Topic Feed Name"
                 />
                 <p className="text-zinc-200">Select Topics:</p>
-                {myTopics?.user_interests?.map((topic) => (
+                {myTopics?.user_interests?.map((topic: any) => (
                   <label key={topic._id} className="flex items-center gap-2 text-zinc-300">
                     <input
                       type="checkbox"
@@ -466,7 +466,7 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
-            {myCommunities?.map((community) => (
+            {myCommunities?.map((community: any) => (
               <button
                 key={community?._id}
                 onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}

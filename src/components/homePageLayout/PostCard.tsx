@@ -27,17 +27,20 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
+    community_id:string;
+    upvote_userId:any;
   };
   ref: any;
 }
 
 export function PostCard({ post, ref }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
+  const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const { user } = useSelector((state: any) => state.user);
-
+  const [isLiked, setIsLiked] = useState(
+    post.upvote_userId?.some((id: string) => id === user?.id) || false
+  );
   const handleSendComment = async () => {
     console.log("@user", user);
     const response = await axios.post(
@@ -83,8 +86,15 @@ export function PostCard({ post, ref }: PostCardProps) {
     );
   };
 
-  const handleLikeClick = () => {
+  const handleLikeClick =async () => {
     setIsLiked(!isLiked);
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,{
+      userId:user.id,
+      postId:post._id,
+      action:isLiked?"down_vote":"up_vote",
+      communityId:post.community_id
+    })
+    console.log("@resposneVote",response)
     setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
   };
 
@@ -149,7 +159,7 @@ export function PostCard({ post, ref }: PostCardProps) {
                 isLiked ? "text-red-500 fill-red-500" : ""
               }`}
             />
-            <span className="text-sm">{formatNumber(post.up_votes)} Love</span>
+            <span className="text-sm">{likeCount} Love</span>
           </button>
           <button
             className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
@@ -157,7 +167,7 @@ export function PostCard({ post, ref }: PostCardProps) {
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post?.replies?.length)} Comments
+              {formatNumber(post.reply_count)} Comments
             </span>
           </button>
           <button
@@ -176,51 +186,6 @@ export function PostCard({ post, ref }: PostCardProps) {
 
       {showComments && (
         <div className="border-t border-zinc-800/50">
-          <div className="p-4">
-            <div className="flex gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Write a comment..."
-                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-purple-500"
-                    onClick={() => {
-                      // Handle comment submission
-                      handleSendComment();
-                      setNewComment("");
-                    }}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
           <div className="px-4">
             {showComments && <CommentSection postId={post._id} />}
           </div>
