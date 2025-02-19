@@ -43,6 +43,15 @@ export function Navbar({
     );
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem("persist:root");
+    localStorage.removeItem("nextauth.message");
+    localStorage.removeItem("stomFeeds");
+    localStorage.removeItem("customTopics");
+    localStorage.removeItem("loglevel");
+    signOut();
+  };
+
   return (
     <>
       <nav
@@ -160,7 +169,7 @@ export function Navbar({
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="hover:bg-primary-gradient"
-                    onClick={() => signOut()}
+                    onClick={handleSignOut}
                   >
                     Sign out
                   </DropdownMenuItem>

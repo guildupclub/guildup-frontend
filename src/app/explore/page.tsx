@@ -3,11 +3,29 @@ import CategoryBar from "@/components/explore/CategoryBar";
 import CommunitySection from "@/components/explore/CommunitySection";
 import TrendingSection from "@/components/explore/TrendingSection";
 import axios from "axios";
+import { useSession, signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
 
 function Page() {
   const [category, setCategory] = useState<any>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const { data: session, status } = useSession();
+  const [isMounted, setIsMounted] = useState(false);
+  const router = useRouter();
+
+  // Set isMounted to true after the component is mounted on the client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Redirect to Google auth if not authenticated, but only on the client side
+  useEffect(() => {
+    if (isMounted && status !== "loading" && !session) {
+      signIn("google"); // Redirect to Google authentication
+    }
+  }, [session, status, isMounted]);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -19,6 +37,11 @@ function Page() {
     };
     fetchCategory();
   }, []);
+
+  // Render nothing while loading or redirecting
+  if (status === "loading" || !isMounted || !session) {
+    return <div>Loading...</div>; // You can add a loading spinner here
+  }
 
   return (
     <div className="bg-black text-white">
