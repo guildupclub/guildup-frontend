@@ -13,7 +13,7 @@ import { sidebarData } from "./Data";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { API_ENDPOINTS } from "@/config/constants";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +29,7 @@ type SelectedItem = {
 };
 
 export function LeftSidebar() {
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   // Extract session ID
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [openSections, setOpenSections] = React.useState({
@@ -287,7 +287,7 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c) => c._id === cid);
+                  const community = myCommunities.find((c: any) => c._id === cid);
                   return (
                     <div
                       key={cid}
@@ -473,7 +473,7 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2">
-            {myCommunities?.map((community) => (
+            {myCommunities?.map((community: any) => (
               <button
                 key={community?._id}
                 onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}

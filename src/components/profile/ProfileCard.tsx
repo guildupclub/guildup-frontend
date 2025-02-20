@@ -47,6 +47,7 @@ interface ProfileData {
     description: string;
     is_locked: boolean;
     tags: string[];
+    image: string;
   };
 }
 
@@ -71,6 +72,22 @@ export function ProfileCard({
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setbgImgUrl] = useState("");
 
+  const handleJoinCommunity = async () => {
+  
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
+        {
+          userId: user.id,
+          communityId
+        }
+      );
+  
+    console.log("@resposenJoin",response)
+    } catch (err) {
+      console.error('Error joining community:', err);
+    } 
+  };
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!communityId || !userId) return;

@@ -27,17 +27,20 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
+    community_id:string;
+    upvote_userId:any;
   };
   ref: any;
 }
 
 export function PostCard({ post, ref }: PostCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.up_votes || 12500);
+  const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const { user } = useSelector((state: any) => state.user);
-
+  const [isLiked, setIsLiked] = useState(
+    post.upvote_userId?.some((id: string) => id === user?.id) || false
+  );
   const handleSendComment = async () => {
     console.log("@user", user);
     const response = await axios.post(
@@ -83,8 +86,15 @@ export function PostCard({ post, ref }: PostCardProps) {
     );
   };
 
-  const handleLikeClick = () => {
+  const handleLikeClick =async () => {
     setIsLiked(!isLiked);
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,{
+      userId:user.id,
+      postId:post._id,
+      action:isLiked?"down_vote":"up_vote",
+      communityId:post.community_id
+    })
+    console.log("@resposneVote",response)
     setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
   };
 

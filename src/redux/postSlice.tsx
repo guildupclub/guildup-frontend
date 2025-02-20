@@ -51,7 +51,7 @@ export const fetchPosts = createAsyncThunk(
 export const getSelectedTopic = createAsyncThunk(
     'posts/getSelectedTopic',
     async (body: { userId: string, categoryIds: string[] }, thunkAPI) => {
-      const res = await fetch("http://localhost:8000/v1/category/post", {
+      const res = await fetch(`${API_BASE_URL}/v1/category/post`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -91,12 +91,12 @@ const postsSlice = createSlice({
         console.log("@action", action);
         state.isLoading = false;
         // Filter out duplicate posts based on _id.
-        const uniqueNewPosts = action.payload.filter(newPost =>
+        const uniqueNewPosts = action.payload.posts.filter(newPost =>
           !state.posts.some(existingPost => existingPost._id === newPost._id)
         );
         // Append only unique posts
         state.posts = state.posts.concat(uniqueNewPosts);
-        if (!action.payload.length) {
+        if (!action.payload.posts.length) {
           state.hasMore = false;
         }else{
             state.hasMore = true
