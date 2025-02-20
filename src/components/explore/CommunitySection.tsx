@@ -66,8 +66,8 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   );
 
   return (
-    <div className="bg-black min-h-screen text-white p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="bg-background min-h-screen  lg:p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
         {communities.length > 0 ? (
           communities.map((community) => (
             <MemoizedCommunityCard

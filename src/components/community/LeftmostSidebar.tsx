@@ -119,14 +119,14 @@ export function LeftmostSidebar() {
 
   if (error) {
     return (
-      <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex items-center justify-center text-red-500">
+      <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
         Error loading communities
       </div>
     );
   }
 
   return (
-    <div className="fixed left-0 h-screen w-20 bg-zinc-900 flex flex-col items-center border-r border-zinc-700 py-20">
+    <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -135,7 +135,7 @@ export function LeftmostSidebar() {
               {[1, 2, 3].map((n) => (
                 <div
                   key={n}
-                  className="w-12 h-12 rounded-full bg-zinc-800 animate-pulse"
+                  className="w-12 h-12 rounded-full bg-background animate-pulse"
                 />
               ))}
             </div>
@@ -145,9 +145,9 @@ export function LeftmostSidebar() {
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative w-12 h-12 rounded-full text-zinc-500 ${
+                className={`relative w-12 h-12 rounded-full  ${
                   activeCommunityId === community._id
-                    ? "bg-purple-500/20 ring-2 ring-purple-500"
+                    ? "bg-blue-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
                 }`}
                 onClick={() =>
@@ -181,7 +181,7 @@ export function LeftmostSidebar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
+                className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
               >
                 <FaCompass />
               </Button>

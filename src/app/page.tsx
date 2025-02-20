@@ -24,7 +24,7 @@ export default function Home() {
       // If the user is new, open the modal
       if (session.user?.isNewUser) {
         setIsModalOpen(true); // Open modal for topic selection
-        console.log("asdasada: ===", session)
+        console.log("asdasada: ===", session);
       }
     } else {
       router.push("/"); // Redirect to sign-in page if not authenticated
@@ -36,13 +36,13 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-black min-h-screen text-white pt-16">
+    <div className=" min-h-screen pt-16">
       <HomePage />
-      <TopicSelectionModal
+      {/* <TopicSelectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleTopicSelection}
-      />
+      /> */}
     </div>
   );
 }

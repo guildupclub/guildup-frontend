@@ -105,7 +105,7 @@ export function PostCard({ post, ref }: PostCardProps) {
   // Example comments data
 
   return (
-    <div className="bg-zinc-900 rounded-xl mb-4" ref={ref}>
+    <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
           <Avatar className="h-10 w-10  border-2 border-purple-500">
@@ -115,33 +115,35 @@ export function PostCard({ post, ref }: PostCardProps) {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-zinc-200">{post.title}</h3>
+                <h3 className="font-medium text-muted">{post.title}</h3>
                 <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-zinc-400">
+                  <span className="text-xs text-muted-foreground">
                     {formatTimeAgo(post.created_At)}
                   </span>
-                  <span className="text-xs text-zinc-500">•</span>
-                  <span className="text-xs text-zinc-400">Public</span>
+                  <span className="text-xs  text-muted-foreground">•</span>
+                  <span className="text-xs  text-muted-foreground ">
+                    Public
+                  </span>
                 </div>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-zinc-400"
+                className="h-8 w-8  hover:bg-background"
               >
-                <MoreVertical className="h-5 w-5" />
+                <MoreVertical className="h-5 w-5  " />
               </Button>
             </div>
-            <p className="text-sm text-zinc-300 mt-2">
+            <p className="text-sm text-accent mt-2">
               {renderBodyWithHashtags(post.body)}
             </p>
           </div>
         </div>
       </div>
-      <div className="flex items-center px-4 py-3 border-t border-zinc-800/50">
-        <div className="flex items-center gap-6">
+      <div className="flex items-center px-4 py-3 border-t border-zinc-300/50 mx-2">
+        <div className="flex items-center gap-6 ">
           <button
-            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300 rounded-full p-2"
+            className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
             onClick={handleLikeClick}
           >
             <Heart
@@ -149,33 +151,33 @@ export function PostCard({ post, ref }: PostCardProps) {
                 isLiked ? "text-red-500 fill-red-500" : ""
               }`}
             />
-            <span className="text-sm">{formatNumber(post.up_votes)} Love</span>
+            <span className="text-sm">{formatNumber(post.up_votes)} </span>
           </button>
           <button
-            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
+            className="flex items-center gap-2 text-muted-foreground"
             onClick={() => setShowComments(!showComments)}
           >
             <MessageCircle className="h-5 w-5" />
             <span className="text-sm">
-              {formatNumber(post?.replies?.length)} Comments
+              {formatNumber(post?.replies?.length)}
             </span>
           </button>
           <button
-            className="flex items-center gap-2 text-zinc-400 hover:text-zinc-300"
+            className="flex items-center gap-2 text-muted-foreground"
             onClick={handleShareClick}
           >
             <Share2 className="h-5 w-5" />
-            <span className="text-sm">Share</span>
+            {/* <span className="text-sm">Share</span> */}
           </button>
         </div>
-        <div className="ml-auto flex items-center gap-2 text-zinc-400">
+        <div className="ml-auto flex items-center gap-2 text-muted-foreground">
           <Eye className="h-5 w-5" />
-          <span className="text-sm">25k Views</span>
+          <span className="text-sm">25k </span>
         </div>
       </div>
 
       {showComments && (
-        <div className="border-t border-zinc-800/50">
+        <div className="border-t border-zinc-300/50">
           <div className="p-4">
             <div className="flex gap-2">
               <Avatar className="h-8 w-8">
@@ -188,20 +190,20 @@ export function PostCard({ post, ref }: PostCardProps) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8 text-muted hover:text-accent"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8 text-muted hover:text-accent"
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>

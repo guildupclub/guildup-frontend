@@ -38,7 +38,7 @@ export function Sidebar() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
- 
+
   const activeCommunityId = activeCommunity?.id;
   const activeCommunityName = activeCommunity?.name;
   const userId = useSelector((state: RootState) => state.user.user?._id);
@@ -99,7 +99,7 @@ export function Sidebar() {
         name: channel.name,
         icon: channel.type === "chat" ? Lock : Hash,
         locked: channel.is_locked,
-        type:channel.type,
+        type: channel.type,
       }));
 
       setChannels(formattedChannels);
@@ -160,19 +160,19 @@ export function Sidebar() {
   };
 
   return (
-    <div className="fixed h-screen w-80 bg-background/95 border-r-zinc-700 p-4 py-24">
+    <div className="fixed h-screen w-80 bg-card p-4 py-24">
       <div>
-        <h2 className="px-2 text-lg">{activeCommunityName}</h2>
+        <h2 className="px-2 text-lg text-muted">{activeCommunityName}</h2>
       </div>
       <div className="space-y-2">
-        <div className="border-b border-zinc-700 p-2">
-          <div className="w-full justify-start gap-2 p-1 rounded-lg text-zinc-200 bg-black hover:bg-zinc-800 hover:text-zinc-300 ">
+        <div className="border-b border-background p-2">
+          <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
             <PostDialog />
           </div>
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2  text-muted-foreground  hover:bg-background "
           onClick={() => handleNavigation("/community/profile")}
         >
           <FaUserAlt />
@@ -180,7 +180,7 @@ export function Sidebar() {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/feed")}
         >
           <Rss className="h-4 w-4" />
@@ -188,7 +188,7 @@ export function Sidebar() {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2  text-muted-foreground  hover:bg-background  "
           onClick={() => handleNavigation("/community/members")}
         >
           <FaUserGroup />
@@ -196,7 +196,7 @@ export function Sidebar() {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/event")}
         >
           <FaCalendarAlt />
@@ -204,29 +204,29 @@ export function Sidebar() {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+          className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/announcements")}
         >
           <GrAnnounce />
           Announcements
         </Button>
 
-        <Button className="w-full">Creator Studio</Button>
+        <Button className="w-full text-white">Creator Studio</Button>
 
-        <div className="px-2 py-2 border-t border-zinc-700 p-2">
+        <div className="px-2 py-2 border-t border-background p-2">
           <div className="flex items-center justify-between mb-2 ">
-            <h2 className="text-lg font-semibold text-zinc-200">Channels</h2>
+            <h2 className="text-lg font-semibold text-muted ">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 text-zinc-200 hover:bg-zinc-800 hover:text-zinc-300"
+                  className="h-8 w-8  hover:bg-background "
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-muted-foreground" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-zinc-900 text-zinc-200 border-none">
+              <DialogContent className="sm:max-w-[425px] bg-background  border-none">
                 <DialogHeader>
                   <DialogTitle>Create a New Channel</DialogTitle>
                 </DialogHeader>
@@ -240,7 +240,7 @@ export function Sidebar() {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="bg-zinc-800 border-zinc-700 text-zinc-200"
+                      className="bg-card border-background "
                     />
                   </div>
                   <div className="grid gap-2">
@@ -251,10 +251,10 @@ export function Sidebar() {
                         setFormData({ ...formData, type: value })
                       }
                     >
-                      <SelectTrigger className="bg-zinc-800 border-zinc-700 text-zinc-200">
+                      <SelectTrigger className="bg-card border-background text-muted">
                         <SelectValue placeholder="Select your topics" />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-800 border-zinc-700 text-zinc-200">
+                      <SelectContent className="bg-card border-background text-muted">
                         <SelectItem value="discussion">Discussion</SelectItem>
                         <SelectItem value="chat">Chat</SelectItem>
                       </SelectContent>
@@ -264,7 +264,7 @@ export function Sidebar() {
                     <Label className="flex items-center gap-2">
                       Want to lock your channel?
                       <div className="relative group">
-                        <Info className="w-4 h-4 text-zinc-400 cursor-pointer" />
+                        <Info className="w-4 h-4 text-muted cursor-pointer" />
                         <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
                           Do you want to make this channel private?
                         </span>
@@ -295,14 +295,14 @@ export function Sidebar() {
                   <Button
                     variant="outline"
                     onClick={() => setIsChannelOpen(false)}
-                    className="bg-transparent border-zinc-700 hover:bg-zinc-800"
+                    className="bg-transparent border-background hover:bg-background text-muted-foreground"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleCreateChannel}
                     disabled={isCreating}
-                    className="bg-primary-gradient"
+                    className="bg-primary-gradient text-white"
                   >
                     {isCreating ? "Creating..." : "Create"}
                   </Button>
@@ -318,8 +318,8 @@ export function Sidebar() {
                   variant="ghost"
                   className={`w-full justify-start gap-2 ${
                     activeChannel.id === channel.id
-                      ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 hover:text-zinc-300"
-                      : "text-zinc-300 hover:bg-zinc-800 hover:text-zinc-300"
+                      ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 "
+                      : " hover:bg-background text-muted-foreground"
                   }`}
                   onClick={() => {
                     dispatch(

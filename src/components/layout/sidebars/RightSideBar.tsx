@@ -95,36 +95,32 @@ export function RightSidebar() {
     setShowCreatorForm(false);
   };
   return (
-    <aside className="fixed top-0 right-0 h-screen w-80 bg-black pt-20 pb-4 px-4  space-y-2">
+    <aside className="fixed top-0 right-0 h-screen w-80  pt-20 pb-4 px-4  space-y-2">
       {/* Trending Posts Box */}
 
-      <div className="bg-zinc-900 rounded-xl p-4 w-full space-y-4">
+      <div className="bg-card rounded-xl p-4 w-full space-y-4">
         <h1 className="">Ready to start making money?</h1>
-        <Button className="w-full" onClick={handleOpenForm}>
+        <Button className="w-full text-white" onClick={handleOpenForm}>
           Become a Creator
         </Button>
 
         {showCreatorForm && <CreatorForm />}
       </div>
 
-      <div className="bg-zinc-900 rounded-xl p-4">
-        <h2 className="text-lg font-semibold text-zinc-200 mb-2 border-b border-zinc-800 pb-2">
+      <div className="bg-card rounded-xl p-4">
+        <h2 className="text-lg font-semibold mb-2 border-b border-zinc-300 pb-2">
           Trending Posts
         </h2>
-
-        {/* Scrollable container for trending posts */}
         <div className="space-y-4 max-h-[430px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
           {trendingPosts.map((post) => (
             <div
               key={post.id}
-              className="space-y-2 border-b border-zinc-800 last:border-0 pb-4 last:pb-0"
+              className="space-y-2 border-b border-zinc-300 last:border-0 pb-4 last:pb-0"
             >
               <div className="flex gap-3">
                 <div className="flex-1 space-y-1">
-                  <h3 className="font-medium text-zinc-200">{post.title}</h3>
-                  <p className="text-xs text-zinc-400 line-clamp-2">
-                    {post.description}
-                  </p>
+                  <h3 className="font-medium">{post.title}</h3>
+                  <p className="text-xs  line-clamp-2">{post.description}</p>
                 </div>
                 <div className="relative h-16 w-24 rounded-lg overflow-hidden flex-shrink-0">
                   <Image
@@ -135,7 +131,7 @@ export function RightSidebar() {
                   />
                 </div>
               </div>
-              <div className="flex items-center gap-4 text-xs text-zinc-400">
+              <div className="flex items-center gap-4 text-xs">
                 <div className="flex items-center gap-1">
                   <Heart className="h-3.5 w-3.5" />
                   <span>{post.loves}</span>

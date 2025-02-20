@@ -10,11 +10,11 @@ export default function FeedPage() {
 
   const activeCommunityId = activeCommunity?.id;
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       {activeCommunityId ? (
         <Feed communityId={activeCommunityId} />
       ) : (
-        <p className="text-center text-zinc-400">Select a community</p>
+        <p className="text-center">Select a community</p>
       )}
     </div>
   );

@@ -44,8 +44,8 @@ function Page() {
   }
 
   return (
-    <div className="bg-black text-white">
-      <div className="w-full mx-auto px-6 py-4">
+    <div className="bg-background">
+      <div className="w-full mx-auto lg:px-6  lg:py-4">
         <CategoryBar
           categorys={category}
           selectCategory={setSelectedCategory}
@@ -54,12 +54,14 @@ function Page() {
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {/* Top Communities Section */}
             <div className="md:col-span-2 lg:col-span-3">
-              <h1 className="text-2xl font-bold mb-4">Top Communities</h1>
+              <h1 className="text-xl lg:text-2xl font-bold mb-4">
+                Top Communities
+              </h1>
               <CommunitySection activeCategory={selectedCategory} />
             </div>
 
             {/* Trending Section */}
-            <div className="col-span-1">
+            <div className="col-span-1  hidden md:block">
               <h1 className="text-2xl font-bold mb-4">Trending Tags</h1>
               <TrendingSection />
             </div>

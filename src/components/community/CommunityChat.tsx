@@ -136,7 +136,7 @@ function ChatContent() {
 
   if (!activeChannel) {
     return (
-      <div className="flex items-center justify-center h-screen text-zinc-400">
+      <div className="flex items-center justify-center h-screen text-muted">
         Please select a channel to start chatting
       </div>
     );
@@ -153,7 +153,7 @@ function ChatContent() {
   return (
     <div className="flex flex-col h-screen pb-20">
       {/* Channel Header */}
-      <div className="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-6 py-3 my-3 mx-2">
+      <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
           # {activeChannel.name || "Unnamed Channel"}
         </h1>
@@ -167,7 +167,7 @@ function ChatContent() {
             {posts.length > 0 ? (
               posts.map((post) => <PostCard key={post.id} {...post} />)
             ) : (
-              <div className="text-center text-zinc-400">No posts yet</div>
+              <div className="text-center text-muted">No posts yet</div>
             )}
           </div>
         </ScrollArea>
@@ -175,21 +175,21 @@ function ChatContent() {
 
       {/* Input Box */}
       <div className="fixed bottom-0 w-[calc(100%-20rem)] px-3 pr-28 py-2">
-        <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 ">
+        <div className="flex items-center gap-2 rounded-lg p-1 bg-card border border-background">
           <input
             type="text"
             placeholder="Share your thoughts..."
             value={postBody}
             onChange={(e) => setPostBody(e.target.value)}
-            className="flex-1 bg-zinc-800 text-zinc-200 text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
+            className="flex-1 bg-card text-muted text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
           />
           <div className="flex gap-8 px-2 py-1">
             <Button
               onClick={handleSendPost}
-              className="bg-primary-gradient px-6"
+              className="px-6"
               disabled={!postBody.trim()}
             >
-              <Send className="h-4 w-4" aria-hidden="true" />
+              <Send className="h-4 w-4 text-white" aria-hidden="true" />
             </Button>
           </div>
         </div>

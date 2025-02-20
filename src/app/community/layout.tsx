@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 export default function CommunityLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="h-screen bg-black text-zinc-200">
+    <div className="h-screen bg-background text-muted">
       <LeftmostSidebar />
       <div className="ml-20">
         <Sidebar />

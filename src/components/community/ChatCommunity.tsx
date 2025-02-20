@@ -143,7 +143,7 @@ function Chat() {
   return (
     <div className="flex flex-col h-screen pb-20">
       {/* Channel Header */}
-      <div className="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-6 py-3 my-3 mx-2">
+      <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
           # {activeChannel.name || "Unnamed Channel"}
         </h1>
@@ -165,9 +165,11 @@ function Chat() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{post.author}</span>
-                      <span className="text-xs text-zinc-500">{post.time}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {post.time}
+                      </span>
                     </div>
-                    <p className="text-sm text-zinc-300">{post.content}</p>
+                    <p className="text-sm text-accent">{post.content}</p>
                   </div>
                 </div>
               ))
@@ -180,16 +182,16 @@ function Chat() {
 
       {/* Input Box */}
       <div className="fixed bottom-0 w-[calc(100%-20rem)] px-3 pr-28 py-2">
-        <div className="flex items-center gap-2 rounded-lg p-1 bg-zinc-900 ">
+        <div className="flex items-center gap-2 rounded-lg p-1 bg-card border border-background">
           <input
             type="text"
             placeholder="Search"
             value={postBody}
             onChange={(e) => setPostBody(e.target.value)}
-            className="flex-1 bg-zinc-800 text-zinc-200 text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
+            className="flex-1 text-muted text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
           />
           <Button onClick={handleSendPost} disabled={!postBody.trim()}>
-            <Send className="h-4 w-4" />
+            <Send className="h-4 w-4 text-white" />
           </Button>
         </div>
       </div>

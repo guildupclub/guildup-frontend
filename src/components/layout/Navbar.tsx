@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import guildup_logo from "../../../public/guildup_logo.svg";
+import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -38,9 +38,7 @@ export function Navbar({
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
-    router.push(
-      `/api/search?type=${searchType}&q=${encodeURIComponent(searchQuery)}`
-    );
+    router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
   };
 
   const handleSignOut = () => {
@@ -56,7 +54,7 @@ export function Navbar({
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 w-full  bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2 px-4 lg:px-20",
+          "fixed top-0 z-50 w-full  bg-card py-2 px-4 lg:px-20",
           className
         )}
         {...props}
@@ -72,16 +70,16 @@ export function Navbar({
 
           <div className="flex flex-1 items-center space-x-2 justify-between md:justify-center lg:max-w-2xl">
             <div className="relative w-full max-w-lg">
-              <div className="flex">
+              <div className="flex border-none">
                 <Input
                   type="search"
                   placeholder="Search..."
-                  className="w-full bg-black border-none pr-24 text-muted"
+                  className="w-full bg-background border-none pr-24 text-muted"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -101,12 +99,12 @@ export function Navbar({
                       community
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
                 <div
-                  className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-primary-gradient rounded-tr-lg rounded-br-lg cursor-pointer"
+                  className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-[#334bff]  rounded-tr-lg rounded-br-lg cursor-pointer"
                   onClick={handleSearch}
                 >
-                  <Search className="h-4 w-4 text-muted" />
+                  <Search className="h-4 w-4 text-white" />
                 </div>
               </div>
             </div>
@@ -184,7 +182,7 @@ export function Navbar({
         </div>
       </nav>
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-5 mx-auto ">
+        <div className="grid h-full max-w-lg grid-cols-4 mx-auto ">
           <Link href="/" className="flex flex-col items-center justify-center">
             <Home className="w-6 h-6 " />
             <span className="text-xs mt-1">Home</span>
@@ -196,13 +194,13 @@ export function Navbar({
             <Compass className="w-6 h-6" />
             <span className="text-xs mt-1">Explore</span>
           </Link>
-          <Link
+          {/* <Link
             href="/snips"
             className="flex flex-col items-center justify-center"
           >
             <Video className="w-6 h-6" />
             <span className="text-xs mt-1">Snips</span>
-          </Link>
+          </Link> */}
           <Link
             href="/community/feed"
             className="flex flex-col items-center justify-center"

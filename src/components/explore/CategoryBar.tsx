@@ -19,13 +19,13 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
   };
 
   return (
-    <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 text-white overflow-auto scrollbar-none cursor-pointer pb-4">
-      <div className="flex gap-4">
+    <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 overflow-auto scrollbar-none cursor-pointer pb-4">
+      <div className="flex gap-4 px-4">
         {categorys?.map((cat: Category) => (
           <button
             className={`text-md cursor-pointer font-semibold flex-shrink-0 ${
               selectedCategory === cat._id
-                ? "text-gradient"
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
                 : "hover:text-gradient"
             }`}
             onClick={() => handleCategorySelect(cat._id)}

@@ -53,7 +53,7 @@ export function CreateEventModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[800px] p-0 bg-[#111111] text-white border-0">
+      <DialogContent className="max-w-[800px] p-0 bg-card text-muted border-0">
         <DialogHeader className="p-4">
           <div className="flex justify-between items-center">
             <DialogTitle className="text-xl font-normal">
@@ -67,10 +67,10 @@ export function CreateEventModal({
           <div className="grid grid-cols-[350px_1fr] gap-4 p-4">
             {/* Left side - Image upload */}
             <div>
-              <div className="aspect-square bg-black rounded-lg flex items-center justify-center border border-dashed border-zinc-700">
+              <div className="aspect-square bg-background rounded-lg flex items-center justify-center border border-dashed border-zinc-700">
                 <div className="text-center">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-zinc-500" />
-                  <p className="text-sm text-zinc-500">Upload event image</p>
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-accent" />
+                  <p className="text-sm text-accent">Upload event image</p>
                 </div>
               </div>
             </div>
@@ -88,7 +88,7 @@ export function CreateEventModal({
                   onChange={(e) =>
                     setFormData({ ...formData, eventName: e.target.value })
                   }
-                  className="bg-black border-0"
+                  className="bg-background border-0"
                 />
               </div>
 
@@ -103,7 +103,7 @@ export function CreateEventModal({
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="bg-black border-0 min-h-[100px]"
+                  className="bg-background border-0 min-h-[100px]"
                 />
               </div>
 
@@ -117,10 +117,10 @@ export function CreateEventModal({
                     setFormData({ ...formData, attendees: value })
                   }
                 >
-                  <SelectTrigger className="bg-black border-0">
+                  <SelectTrigger className="bg-background border-0">
                     <SelectValue placeholder="Select attendees" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#111111] border-zinc-800 text-zinc-200">
+                  <SelectContent className="bg-card border-zinc-800 text-muted-foreground">
                     <SelectItem value="everyone">Everyone</SelectItem>
                     <SelectItem value="invited">Invited Only</SelectItem>
                     <SelectItem value="members">Members Only</SelectItem>
@@ -140,10 +140,10 @@ export function CreateEventModal({
                   setFormData({ ...formData, recurring: value })
                 }
               >
-                <SelectTrigger className="bg-black border-0">
+                <SelectTrigger className="bg-background border-0">
                   <SelectValue>Yes</SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-[#111111] border-zinc-800 text-zinc-200">
+                <SelectContent className="bg-card border-zinc-800 text-muted-foreground">
                   <SelectItem value="yes">Yes</SelectItem>
                   <SelectItem value="no">No</SelectItem>
                 </SelectContent>
@@ -157,18 +157,18 @@ export function CreateEventModal({
                 onChange={(e) =>
                   setFormData({ ...formData, date: e.target.value })
                 }
-                className="bg-black border-0"
+                className="bg-background border-0"
               />
             </div>
             <div>
               <Label className="text-sm mb-1 block">Time</Label>
               <Input
+                className="bg-background"
                 type="time"
                 value={formData.time}
                 onChange={(e) =>
                   setFormData({ ...formData, time: e.target.value })
                 }
-                className="bg-black border-0"
               />
             </div>
             <div>
@@ -179,10 +179,10 @@ export function CreateEventModal({
                   setFormData({ ...formData, timezone: value })
                 }
               >
-                <SelectTrigger className="bg-black border-0">
+                <SelectTrigger className="bg-background border-0">
                   <SelectValue>America/New_York</SelectValue>
                 </SelectTrigger>
-                <SelectContent className="bg-[#111111] border-zinc-800">
+                <SelectContent className="bg-card border-zinc-800">
                   <SelectItem value="America/New_York">GMT-5</SelectItem>
                 </SelectContent>
               </Select>
@@ -191,7 +191,7 @@ export function CreateEventModal({
 
           {/* Zoom Link */}
           <div className="px-6 pt-2">
-            <Label htmlFor="zoomLink" className="text-sm mb-1 block">
+            <Label htmlFor="zoomLink" className="text-sm mb-1 block ">
               Zoom link
             </Label>
             <Input
@@ -201,7 +201,7 @@ export function CreateEventModal({
               onChange={(e) =>
                 setFormData({ ...formData, zoomLink: e.target.value })
               }
-              className="bg-black border-0"
+              className="bg-background border-0"
             />
           </div>
 
@@ -245,7 +245,7 @@ export function CreateEventModal({
               type="button"
               onClick={onClose}
               variant="outline"
-              className="bg-transparent hover:bg-zinc-800 text-white border-zinc-700 px-8"
+              className="bg-transparent hover:bg-background text-accent border-zinc-700 px-8"
             >
               Cancel
             </Button>

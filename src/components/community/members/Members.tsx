@@ -72,7 +72,7 @@ export default function Members({ communityId }: { communityId: string }) {
 
   if (error) {
     return (
-      <Card className="bg-zinc-900 border-zinc-700">
+      <Card className="bg-card border-zinc-700">
         <CardContent className="pt-6">
           <p className="text-red-500 text-center">{error}</p>
         </CardContent>
@@ -81,10 +81,10 @@ export default function Members({ communityId }: { communityId: string }) {
   }
 
   return (
-    <Card className="bg-zinc-900 border-zinc-800 text-zinc-100 m-4">
+    <Card className="bg-card border-zinc-800 text-muted-foreground m-4">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <UserCircle className="h-5 w-5 text-zinc-400" />
+        <CardTitle className="flex items-center gap-2 text-muted">
+          <UserCircle className="h-5 w-5 text-accent" />
           Community Members
         </CardTitle>
       </CardHeader>
@@ -93,50 +93,50 @@ export default function Members({ communityId }: { communityId: string }) {
           {isLoading
             ? Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4">
-                  <Skeleton className="h-10 w-10 rounded-full bg-zinc-700" />
+                  <Skeleton className="h-10 w-10 rounded-full bg-card" />
                   <div className="space-y-2">
-                    <Skeleton className="h-4 w-[200px] bg-zinc-700" />
-                    <Skeleton className="h-4 w-[150px] bg-zinc-700" />
+                    <Skeleton className="h-4 w-[200px] bg-card" />
+                    <Skeleton className="h-4 w-[150px] bg-card" />
                   </div>
                 </div>
               ))
             : members.map((member) => (
                 <div
                   key={member._id}
-                  className="flex items-center justify-between p-4 bg-zinc-800 rounded-lg hover:bg-zinc-700 transition-colors"
+                  className="flex items-center justify-between p-4 bg-card rounded-lg hover:bg-background transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar>
                       <AvatarImage src={member.user_id.avatar || undefined} />
-                      <AvatarFallback className="bg-zinc-700 text-zinc-100">
+                      <AvatarFallback className="bg-card text-muted-foreground">
                         {member.user_id.user_name?.[0]?.toUpperCase() ||
                           member.user_id.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium truncate text-white">
+                        <p className="font-medium truncate text-muted-foreground">
                           {member.user_id.user_name || member.user_id.email}
                         </p>
                         <div className="flex gap-1">
                           {member.is_owner && (
-                            <Badge className="bg-primary-gradient text-white">
+                            <Badge className="bg-primary-gradient text-card">
                               Owner
                             </Badge>
                           )}
                           {member.is_moderator && (
-                            <Badge className="bg-green-500 text-white">
+                            <Badge className="bg-green-500 text-muted-foreground">
                               Moderator
                             </Badge>
                           )}
                           {member.is_banned && (
-                            <Badge className="bg-red-500 text-white">
+                            <Badge className="bg-red-500 text-muted-foreground">
                               Banned
                             </Badge>
                           )}
                         </div>
                       </div>
-                      <p className="text-sm text-start text-zinc-400">
+                      <p className="text-sm text-start text-muted-foreground">
                         Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
                         ago
                       </p>
@@ -146,12 +146,12 @@ export default function Members({ communityId }: { communityId: string }) {
                     <DropdownMenuTrigger>
                       <button
                         aria-label="Options"
-                        className="text-zinc-400 hover:text-white"
+                        className="text-muted-foreground"
                       >
                         <MoreHorizontal className="h-5 w-5" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-zinc-800 border-zinc-700">
+                    <DropdownMenuContent className="bg-card border-zinc-700 hover:bg-background">
                       <DropdownMenuItem
                         onClick={() => console.log("Block User")}
                       >
