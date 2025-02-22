@@ -29,7 +29,7 @@ type SelectedItem = {
 };
 
 export function LeftSidebar() {
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   // Extract session ID
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [openSections, setOpenSections] = React.useState({

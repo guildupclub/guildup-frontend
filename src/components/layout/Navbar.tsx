@@ -81,29 +81,7 @@ const {user} = useSelector((state:any)=>state.user)
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
-                {/* <DropdownMenu>
-                {/* <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="absolute right-12 top-0 h-full px-2 py-1 hover:bg-transparent text-zinc-200 hover:text-zinc-300"
-                    >
-                      {searchType}
-                      <ChevronDown className="ml-1 h-4 w-4 text-muted" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setSearchType("post")}>
-                      post
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => setSearchType("community")}
-                    >
-                      community
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu> */}
-                </DropdownMenu> */}
+               
                 <div
                   className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-[#334bff]  rounded-tr-lg rounded-br-lg cursor-pointer"
                   onClick={handleSearch}
@@ -141,7 +119,7 @@ const {user} = useSelector((state:any)=>state.user)
             </ul>
           </div>
           <div className="hidden md:block ">
-            {user?.id ? (
+            {user?._id ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -171,7 +149,6 @@ const {user} = useSelector((state:any)=>state.user)
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="hover:bg-primary-gradient"
-                    onClick={handleSignOut}
                     onClick={handleSignOut}
                   >
                     Sign out
@@ -213,14 +190,14 @@ const {user} = useSelector((state:any)=>state.user)
             <Users className="w-6 h-6" />
             <span className="text-xs mt-1">Community</span>
           </Link>
-          {session ? (
+          {user?._id ? (
             <button
               className="flex flex-col items-center justify-center "
               onClick={handleSignOut}
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage
-                  src={session.user?.image || "/placeholder.svg"}
+                  src={user.image || "/placeholder.svg"}
                   alt="User"
                 />
                 <AvatarFallback>U</AvatarFallback>

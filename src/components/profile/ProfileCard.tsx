@@ -71,6 +71,7 @@ export function ProfileCard({
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setbgImgUrl] = useState("");
+  console.log("@[rpfile")
 
   const handleJoinCommunity = async () => {
   
@@ -78,7 +79,7 @@ export function ProfileCard({
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
-          userId: user.id,
+          userId: user?._id,
           communityId
         }
       );

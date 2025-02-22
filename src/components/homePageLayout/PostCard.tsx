@@ -48,7 +48,7 @@ export function PostCard({ post, ref }: PostCardProps) {
       {
         postId: post._id,
         comment: newComment,
-        userId: user.id,
+        userId: user?._id,
       }
     );
     console.log("@commentResponse", response);
@@ -89,7 +89,7 @@ export function PostCard({ post, ref }: PostCardProps) {
   const handleLikeClick =async () => {
     setIsLiked(!isLiked);
     const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,{
-      userId:user.id,
+      userId:user._id,
       postId:post._id,
       action:isLiked?"down_vote":"up_vote",
       communityId:post.community_id

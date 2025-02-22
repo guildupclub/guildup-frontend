@@ -33,7 +33,7 @@ interface Community {
 }
 
 export function LeftmostSidebar() {
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");

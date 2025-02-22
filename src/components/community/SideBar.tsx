@@ -45,7 +45,7 @@ export function Sidebar() {
   const activeCommunityId = activeCommunity?.id;
   console.log("@activeCommunityId",activeCommunityId)
   const activeCommunityName = activeCommunity?.name;
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const router = useRouter();
   const [channels, setChannels] = useState([]);
@@ -259,8 +259,8 @@ export function Sidebar() {
           <div className="flex items-center justify-between mb-2 ">
             <h2 className="text-lg font-semibold text-muted ">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
-              {
-                isAdmin && (
+              {/* {
+                isAdmin && ( */}
 
                   <DialogTrigger asChild>
                 <Button
