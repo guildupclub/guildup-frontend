@@ -70,7 +70,7 @@ export function Feed({ communityId }: FeedProps) {
   };
 
   return (
-    <div className="min-h-screen  py-20">
+    <div className="min-h-screen  py-8 lg:py-20">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between py-4 border-b border-zinc-300">

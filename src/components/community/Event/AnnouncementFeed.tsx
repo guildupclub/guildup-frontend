@@ -110,7 +110,7 @@ const messages: Message[] = [
 
 export function AnnouncementsFeed() {
   return (
-    <div className="flex flex-col h-full w-full border border-background rounded-lg bg-card mx-10">
+    <div className="flex flex-col h-full w-full border border-background rounded-lg bg-card mx-6 lg:mx-10">
       <div className="flex items-center justify-between p-4 border-b border-background">
         <div className="flex items-center gap-2">
           <svg

@@ -21,11 +21,11 @@ function Page() {
   }, []);
 
   // Redirect to Google auth if not authenticated, but only on the client side
-  useEffect(() => {
-    if (isMounted && status !== "loading" && !session) {
-      signIn("google"); // Redirect to Google authentication
-    }
-  }, [session, status, isMounted]);
+  // useEffect(() => {
+  //   if (isMounted && status !== "loading" && !session) {
+  //     signIn("google"); // Redirect to Google authentication
+  //   }
+  // }, [session, status, isMounted]);
 
   useEffect(() => {
     const fetchCategory = async () => {
