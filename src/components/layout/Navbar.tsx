@@ -37,7 +37,13 @@ export function Navbar({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("post");
   const router = useRouter();
-const {user} = useSelector((state:any)=>state.user)
+  const { user } = useSelector((state: any) => state.user);
+  const activeCommunity = useSelector(
+    (state: any) => state.channel.activeCommunity
+  );
+  const activeCommunityId = activeCommunity?.id;
+  console.log("khbjkn",activeCommunityId)
+
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
@@ -81,7 +87,7 @@ const {user} = useSelector((state:any)=>state.user)
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
-               
+
                 <div
                   className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-[#334bff]  rounded-tr-lg rounded-br-lg cursor-pointer"
                   onClick={handleSearch}
@@ -107,9 +113,15 @@ const {user} = useSelector((state:any)=>state.user)
                 </Link>
               </li>
               <li>
-                <Link href="/community/feed">
-                  <Users className="h-6 w-6" />
-                  <span className="sr-only">Community</span>
+                <Link
+                  href={
+                    activeCommunityId
+                      ? `/community/${activeCommunityId}/feed`
+                      : "/community/feed"
+                  }
+                  className="flex flex-col items-center justify-center"
+                >
+                  <Users className="w-6 h-6" />
                 </Link>
               </li>
               <li>
@@ -131,9 +143,7 @@ const {user} = useSelector((state:any)=>state.user)
                         src={user?.avatar || "/placeholder.svg"}
                         alt="User"
                       />
-                      <AvatarFallback>
-                        {user?.email?.[0] || "S"}
-                      </AvatarFallback>
+                      <AvatarFallback>{user?.email?.[0] || "S"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -184,12 +194,17 @@ const {user} = useSelector((state:any)=>state.user)
             <span className="text-xs mt-1">Snips</span>
           </Link> */}
           <Link
-            href="/community/feed"
+            href={
+              activeCommunityId
+                ? `/community/${activeCommunityId}/feed`
+                : "/community/feed"
+            }
             className="flex flex-col items-center justify-center"
           >
             <Users className="w-6 h-6" />
             <span className="text-xs mt-1">Community</span>
           </Link>
+
           {user?._id ? (
             <button
               className="flex flex-col items-center justify-center "

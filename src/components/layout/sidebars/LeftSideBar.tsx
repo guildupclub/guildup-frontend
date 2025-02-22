@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 import { Button } from "@/components/ui/button";
+import { setActiveCommunity } from "@/redux/channelSlice";
 // Optionally, if you're updating selected topics in the topic slice
 // import { setSelectedTopics } from "@/redux/topicSlice";
 
@@ -112,24 +113,36 @@ export function LeftSidebar() {
         const res = await axios.post(
           "http://localhost:8000/v1/community/user",
           {
-            // userId: "678cf08b3755e3d81f93d5ad"
             userId: userId,
           }
         );
+
         setMyCommunities(res.data.data);
-        console.log(res.data.data);
+        console.log("Comm ======>>>>", res.data.data);
       } catch (error) {
         console.error(error);
         setMyCommunities([]);
       }
     }
     fetchCommunities();
-  }, []);
+  }, [userId]); // Ensure this runs when `userId` changes
 
-  const handleCommunityClick = (id: string) => {
-    router.push(`/community/${id}`);
+  // ✅ Set active community AFTER myCommunities is updated
+  useEffect(() => {
+    if (myCommunities && myCommunities.length > 0) {
+      dispatch(
+        setActiveCommunity({
+          id: myCommunities[0]._id, // Now it's properly set
+          name: myCommunities[0].name,
+        })
+      );
+    }
+  }, [myCommunities, dispatch]); // Runs when `myCommunities` updates
+
+  const handleCommunityClick = (community: { _id: string; name: string }) => {
+    dispatch(setActiveCommunity({ id: community._id, name: community.name }));
+    router.push(`/community/${community._id}/feed`);
   };
-
   function handleSelectChange(communityId: string) {
     setSelectedCommunities((prev) =>
       prev.includes(communityId)
@@ -148,7 +161,7 @@ export function LeftSidebar() {
         );
 
         setMyTopics(res.data.data);
-        console.log("Topics:", res.data.data);
+        console.log("Topics:----->>>>", res.data.data);
       } catch (error) {
         console.error(error);
         setMyTopics([]);
@@ -287,7 +300,9 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c: any) => c._id === cid);
+                  const community = myCommunities.find(
+                    (c: any) => c._id === cid
+                  );
                   return (
                     <div
                       key={cid}
@@ -476,8 +491,8 @@ export function LeftSidebar() {
             {myCommunities?.map((community: any) => (
               <button
                 key={community?._id}
-                onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}
-                className="w-full flex items-center gap-2 rounded-lg p-2 text-sm  hover:bg-background"
+                onClick={() => handleCommunityClick(community)}
+                className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-background"
               >
                 <Avatar className="h-6 w-6">
                   <AvatarImage src={community?.avatarURL} />
