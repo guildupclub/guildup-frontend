@@ -37,8 +37,8 @@ export function BookingDialog({ offering, isOpen, onClose }: BookingDialogProps)
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/booking/available-slots`,
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots?offering_id=${offering._id}&date=${formattedDate}`,
         {
           params: {
             offering_id: offering._id,
