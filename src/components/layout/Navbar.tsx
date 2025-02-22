@@ -26,6 +26,8 @@ import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser } from "@/redux/userSlice";
 
 export function Navbar({
   className,
@@ -35,7 +37,7 @@ export function Navbar({
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("post");
   const router = useRouter();
-
+const {user} = useSelector((state:any)=>state.user)
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
@@ -80,6 +82,7 @@ export function Navbar({
                   onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 />
                 {/* <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
@@ -99,6 +102,7 @@ export function Navbar({
                       community
                     </DropdownMenuItem>
                   </DropdownMenuContent>
+                </DropdownMenu> */}
                 </DropdownMenu> */}
                 <div
                   className="absolute right-0 top-0 h-full w-12 text-center items-center flex justify-center bg-[#334bff]  rounded-tr-lg rounded-br-lg cursor-pointer"
@@ -137,7 +141,7 @@ export function Navbar({
             </ul>
           </div>
           <div className="hidden md:block ">
-            {session ? (
+            {user?.id ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -146,11 +150,11 @@ export function Navbar({
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={session.user?.image || "/placeholder.svg"}
+                        src={user?.avatar || "/placeholder.svg"}
                         alt="User"
                       />
                       <AvatarFallback>
-                        {session?.user?.name?.[0] || "S"}
+                        {user?.email?.[0] || "S"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -160,13 +164,14 @@ export function Navbar({
                   align="end"
                 >
                   <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {session.user?.name}
+                    {user?.name}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {session.user?.email}
+                    {user?.email}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="hover:bg-primary-gradient"
+                    onClick={handleSignOut}
                     onClick={handleSignOut}
                   >
                     Sign out
@@ -211,7 +216,7 @@ export function Navbar({
           {session ? (
             <button
               className="flex flex-col items-center justify-center "
-              onClick={() => signOut()}
+              onClick={handleSignOut}
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage

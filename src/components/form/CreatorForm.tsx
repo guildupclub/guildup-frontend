@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
 export default function CreatorForm() {
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [formData, setFormData] = useState({

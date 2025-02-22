@@ -29,9 +29,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
+import { setMemberDetails } from "@/redux/memberSlice";
 
 export function Sidebar() {
   const dispatch = useDispatch();
+  const memberDetails = useSelector((state: RootState) => state.member.memberDetails);
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
@@ -40,8 +43,9 @@ export function Sidebar() {
   );
 
   const activeCommunityId = activeCommunity?.id;
+  console.log("@activeCommunityId",activeCommunityId)
   const activeCommunityName = activeCommunity?.name;
-  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const userId = useSelector((state: RootState) => state.user.user?.id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const router = useRouter();
   const [channels, setChannels] = useState([]);
@@ -61,6 +65,44 @@ export function Sidebar() {
       fetchChannels();
     }
   }, [activeCommunityId]);
+
+
+  const getMemberDetails = async () => {
+    console.log("@log",userId,activeCommunityId)
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/getMemberDetails`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId,
+            communityId: activeCommunityId,
+          }),
+        }
+      );
+  
+      const data = await response.json();
+      console.log("@data",data)
+      if (data.r === "s" && data.data) {
+        dispatch(setMemberDetails(data.data));
+      } else {
+        console.log("@data",data)
+         }
+    } catch (err: any) {
+      console.log("err",err)
+       }
+  };
+  
+  useEffect(() => {
+    if (activeCommunityId) {
+      console.log("@here in useEffect")
+      getMemberDetails();
+    }
+  }, [activeCommunityId]);
+
 
   const fetchChannels = async () => {
     if (!activeCommunityId) {
@@ -194,14 +236,14 @@ export function Sidebar() {
           <FaUserGroup />
           Members
         </Button>
-        <Button
+        {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/event")}
         >
           <FaCalendarAlt />
           Events
-        </Button>
+        </Button> */}
         <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
@@ -217,7 +259,10 @@ export function Sidebar() {
           <div className="flex items-center justify-between mb-2 ">
             <h2 className="text-lg font-semibold text-muted ">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
-              <DialogTrigger asChild>
+              {
+                isAdmin && (
+
+                  <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -312,9 +357,9 @@ export function Sidebar() {
           </div>
           <div className="space-y-1">
             {channels &&
-              channels.map((channel) => (
+              channels.map((channel:any) => (
                 <Button
-                  key={channel.id}
+                  key={channel?.id}
                   variant="ghost"
                   className={`w-full justify-start gap-2 ${
                     activeChannel.id === channel.id
