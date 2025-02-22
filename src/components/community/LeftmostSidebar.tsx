@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaCompass } from "react-icons/fa";
 import Link from "next/link";
 import CreatorForm from "../form/CreatorForm";
+import { setCommunityData } from "@/redux/communitySlice";
 
 // Type for community data
 interface Community {
@@ -49,8 +50,12 @@ export function LeftmostSidebar() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
+  const user = useSelector(
+    (state: RootState) => state.user.user
+  );
 
   const activeCommunityId = activeCommunity?.id;
+
 
   useEffect(() => {
     fetchCommunities();
@@ -127,6 +132,7 @@ export function LeftmostSidebar() {
 
   return (
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
+
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -151,12 +157,21 @@ export function LeftmostSidebar() {
                     : "hover:bg-zinc-800"
                 }`}
                 onClick={() =>
+                {
+
                   dispatch(
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
                     })
                   )
+                 dispatch(
+                        setCommunityData({
+                          communityId: community._id,
+                          userId: user._id,
+                        })
+                      ); 
+                }
                 }
               >
                 <Avatar className="w-full h-full ">
