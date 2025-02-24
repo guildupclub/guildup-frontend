@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect} from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "../ui/calendar";
 import { Button } from "@/components/ui/button";
 import axios from 'axios';
+
+// Declare Razorpay on the window object
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 import { format } from "date-fns";
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface BookingDialogProps {
   offering: {
@@ -33,12 +42,20 @@ export function BookingDialog({ offering, isOpen, onClose }: BookingDialogProps)
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/booking/available-slots`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`,
         {
           params: {
             offering_id: offering._id,
@@ -67,16 +84,64 @@ export function BookingDialog({ offering, isOpen, onClose }: BookingDialogProps)
   };
 
   const handleBookSlot = async () => {
-    if (!selectedDate || !selectedSlot) return;
+    if (!selectedDate || !selectedSlot) {
+      return;
+    }
 
     try {
       // Add your booking API call here
-      console.log("Booking slot:", {
-        offering_id: offering._id,
-        date: selectedDate,
-        slot: selectedSlot,
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
+      {
+          offering_id: offering._id,
+          date: selectedDate,
+          slot: selectedSlot,
       });
-      onClose();
+
+      if (response.data.success) {
+        console.log("Order Created:", response.data.order);
+
+        // Start Razorpay payment process
+        const razorpayOptions = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
+          amount: response.data.order.amount, // Amount in paisa (100 INR = 10000)
+          currency: response.data.order.currency || "INR",
+          name: "GuildUp", // Your business name
+          description: "Slot Booking Payment",
+          order_id: response.data.order.id, // Razorpay order ID from backend
+          handler: async function (paymentResponse: any) {
+            console.log("Payment Success:", paymentResponse);
+            // After successful payment, call your backend to verify the payment
+            const dateObject = new Date(selectedSlot.start);
+
+            // Adjust for IST (UTC +5:30)
+            dateObject.setMinutes(dateObject.getMinutes() - dateObject.getTimezoneOffset());
+            const startTime = dateObject.toISOString().slice(0, 19);
+
+            await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+                offering_id: offering._id,
+                user_id: userId, // Replace with actual user ID
+                startTime,
+              }
+            );
+            console.log("Payment Verified");
+            alert("Payment Successful! Booking confirmed.");
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+  
+        const razorpayInstance = new window.Razorpay(razorpayOptions);
+        razorpayInstance.open();
+      } else {
+        console.error("Failed to create order:", response.data.message);
+      }
     } catch (error) {
       console.error("Error booking slot:", error);
     }
