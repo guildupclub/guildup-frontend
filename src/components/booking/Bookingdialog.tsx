@@ -16,9 +16,8 @@ import { format } from "date-fns";
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { toast } from "react-toastify";
 import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, Clock, CalendarIcon, DollarSign } from "lucide-react"
 
 
@@ -278,7 +277,7 @@ return (
               selected={selectedDate}
               onSelect={handleDateSelect}
               className="rounded-md border border-border/50 shadow-lg"
-              disabled={(date) => date < new Date()}
+              disabled={(date: any) => date < new Date()}
             />
 
             {selectedDate && (
