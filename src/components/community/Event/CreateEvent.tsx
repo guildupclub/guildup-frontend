@@ -117,8 +117,8 @@ export function EventCalendar() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-zinc-200 p-4 py-24">
-      <div className="flex items-center justify-between mb-4 bg-zinc-900 p-4 rounded-lg">
+    <div className="flex flex-col min-h-screen bg-background text-muted-foreground p-4 py-24">
+      <div className="flex items-center justify-between mb-4 bg-card p-4 rounded-lg">
         <div className="flex items-center gap-4 ">
           <div className="flex items-center gap-2">
             <Button
@@ -129,7 +129,7 @@ export function EventCalendar() {
                   new Date(currentDate.setMonth(currentDate.getMonth() - 1))
                 )
               }
-              className="hover:bg-zinc-800"
+              className="hover:bg-background"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -147,14 +147,14 @@ export function EventCalendar() {
                   new Date(currentDate.setMonth(currentDate.getMonth() + 1))
                 )
               }
-              className="hover:bg-zinc-800"
+              className="hover:bg-background"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
           <Select defaultValue="calendar">
-            <SelectTrigger className="w-32 border-zinc-700 bg-transparent">
+            <SelectTrigger className="w-32 border-background ">
               <SelectValue placeholder="View" />
             </SelectTrigger>
             <SelectContent>
@@ -166,7 +166,10 @@ export function EventCalendar() {
           </Select>
         </div>
 
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button
+          className="text-white"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           <Plus /> Create Event
         </Button>
         <CreateEventModal
@@ -176,25 +179,25 @@ export function EventCalendar() {
         />
       </div>
 
-      <div className="flex-1 grid grid-cols-[auto_1fr] border border-zinc-700 rounded-lg overflow-hidden">
-        <div className="w-12 bg-zinc-900 border-r border-zinc-700">
+      <div className="flex-1 grid grid-cols-[auto_1fr] border border-background rounded-lg overflow-hidden">
+        <div className="w-12 bg-card border-r border-background">
           <div className="h-10" /> {/* Header spacer */}
           {Array.from({ length: 6 }).map((_, weekIndex) => (
             <div
               key={weekIndex}
-              className="h-24 flex items-center justify-center text-xs text-zinc-500 border-b border-zinc-700 last:border-b-0"
+              className="h-24 flex items-center justify-center text-xs text-accent border-b border-background last:border-b-0"
             >
               {getWeekNumber(days[weekIndex * 7].date)}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-rows-[auto_1fr] bg-zinc-900">
-          <div className="grid grid-cols-7 text-xs text-zinc-500">
+        <div className="grid grid-rows-[auto_1fr] bg-card">
+          <div className="grid grid-cols-7 text-xs text-acccent">
             {weekDays.map((day) => (
               <div
                 key={day}
-                className="h-10 flex items-center justify-center border-b border-zinc-700"
+                className="h-10 flex items-center justify-center border-b border-background"
               >
                 {day}
               </div>
@@ -205,8 +208,8 @@ export function EventCalendar() {
             {days.map(({ date, isCurrentMonth }, index) => (
               <div
                 key={index}
-                className={`h-24 p-1 border-r border-b border-zinc-700 last:border-r-0 ${
-                  !isCurrentMonth ? "text-zinc-700" : ""
+                className={`h-24 p-1 border-r border-b border-background last:border-r-0 ${
+                  !isCurrentMonth ? "text-accent" : ""
                 }`}
               >
                 <div className="text-xs mb-1">{date.getDate()}</div>

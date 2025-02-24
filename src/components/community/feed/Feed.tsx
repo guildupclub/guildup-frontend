@@ -74,8 +74,8 @@ export function Feed({ communityId }: FeedProps) {
     <div className="min-h-screen  py-20">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
-        <div className="flex items-center justify-between py-4 border-b border-zinc-800">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between py-4 border-b border-zinc-300">
+          <div className="flex items-center text-muted  gap-2">
             <FileText className="w-5 h-5" />
             <h1 className="text-xl font-semibold">Feed</h1>
           </div>
@@ -87,43 +87,43 @@ export function Feed({ communityId }: FeedProps) {
         </div>
 
         {/* Filter Bar */}
-        <div className="flex items-center gap-4 py-4 text-sm">
+        <div className="flex items-center gap-4 py-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
-            <span className="text-zinc-400">Showing:</span>
+            <span className="">Showing:</span>
             <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[140px] h-8 bg-transparent border-zinc-800">
+              <SelectTrigger className="w-[140px] h-8 bg-transparent border-zinc-400">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-background hover:bg-card border-zinc-400">
                 <SelectItem value="Your Activity">Your Activity</SelectItem>
                 <SelectItem value="All Posts">All Posts</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-400">Channel:</span>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="">Channel:</span>
             <Select value={channel} onValueChange={setChannel}>
-              <SelectTrigger className="w-[180px] h-8 bg-transparent border-zinc-800">
+              <SelectTrigger className="w-[180px] h-8 bg-transparent border-zinc-400">
                 <span className="flex items-center gap-1">
-                  <span className="text-zinc-400">#</span>
+                  <span className="">#</span>
                   <SelectValue />
                 </span>
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-background border-zinc-400">
                 <SelectItem value="Open Discussion">Open Discussion</SelectItem>
                 <SelectItem value="General">General</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-zinc-400">Sorted By:</span>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <span className="">Sorted By:</span>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[140px] h-8 bg-transparent border-zinc-800">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800">
+              <SelectContent className="bg-background border-zinc-400">
                 <SelectItem value="newest">Newest</SelectItem>
                 <SelectItem value="popular">Popular</SelectItem>
               </SelectContent>
@@ -137,18 +137,18 @@ export function Feed({ communityId }: FeedProps) {
             ? Array.from({ length: 2 }).map((_, i) => (
                 <div
                   key={i}
-                  className="bg-zinc-800/30 rounded-lg p-6 space-y-4 animate-pulse"
+                  className="bg-card rounded-lg p-6 space-y-4 animate-pulse"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-zinc-700 rounded-full" />
+                    <div className="w-10 h-10 bg-card rounded-full" />
                     <div className="flex-1">
-                      <div className="h-4 bg-zinc-700 rounded w-1/4 mb-2" />
-                      <div className="h-3 bg-zinc-700 rounded w-1/6" />
+                      <div className="h-4 bg-card rounded w-1/4 mb-2" />
+                      <div className="h-3 bg-card rounded w-1/6" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="h-4 bg-zinc-700 rounded w-3/4" />
-                    <div className="h-4 bg-zinc-700 rounded w-1/2" />
+                    <div className="h-4 bg-card rounded w-3/4" />
+                    <div className="h-4 bg-card rounded w-1/2" />
                   </div>
                 </div>
               ))

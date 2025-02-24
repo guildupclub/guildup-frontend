@@ -46,7 +46,8 @@ export function PostDialog() {
 
   const activeCommunityId = activeCommunity?.id;
   console.log(activeCommunityId);
-  const userID = useSelector((state: RootState) => state.user.user?.id);
+  const userID = useSelector((state: RootState) => state.user.user?._id);
+  
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const { data: session } = useSession();
@@ -180,15 +181,15 @@ export function PostDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 text-zinc-200 hover:text-zinc-400">
-          <div className="rounded-md bg-zinc-500 hover:bg-zinc-700 text-zinc-300 mx-2">
+        <button className="flex items-center gap-2 text-muted">
+          <div className="rounded-md bg-card hover:bg-background text-muted mx-2">
             <Plus />
           </div>{" "}
           Create
         </button>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[600px] bg-[#1a1a1a] border-zinc-800 p-0">
+      <DialogContent className="sm:max-w-[600px] bg-background border-background p-0">
         <div className="p-4 space-y-3">
           {/* Header */}
           <div className="flex items-start justify-between">
@@ -197,9 +198,9 @@ export function PostDialog() {
                 <AvatarImage src={session?.user?.image || ""} />
                 <AvatarFallback>AR</AvatarFallback>
               </Avatar>
-              <span className="text-zinc-200">
+              <span className="text-muted">
                 {session?.user?.name || "User Name"}{" "}
-                <span className="text-zinc-500">posting in</span>{" "}
+                <span className="text-maccent">posting in</span>{" "}
                 <span className="font-medium">Technology</span>
               </span>
             </div>
@@ -216,7 +217,7 @@ export function PostDialog() {
           {/* Post Inputs */}
           <Input
             placeholder="Heading"
-            className="bg-transparent p-2 text-lg text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-0 border border-zinc-800"
+            className="p-2 text-lg text-muted placeholder:text-mutedfocus-visible:ring-0 border border-background bg-card"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -224,13 +225,13 @@ export function PostDialog() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write something..."
-            className="min-h-[200px] bg-transparent border border-zinc-800 p-2 text-zinc-200 placeholder:text-zinc-500 focus-visible:ring-0 resize-none"
+            className="min-h-[200px] bg-card border border-background p-2 text-muted placeholder:text-mutedfocus-visible:ring-0 resize-none"
           />
 
           {/* File Preview */}
           {mediaRef.current && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#2a2a2a]">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-card">
                 <div className="flex items-center gap-2">
                   {mediaRef.current.fileType.includes("video") && (
                     <video

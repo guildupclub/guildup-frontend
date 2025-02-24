@@ -110,8 +110,8 @@ const messages: Message[] = [
 
 export function AnnouncementsFeed() {
   return (
-    <div className="flex flex-col h-full w-full border border-blue-500/20 rounded-lg bg-zinc-900/95 mx-10">
-      <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+    <div className="flex flex-col h-full w-full border border-background rounded-lg bg-card mx-10">
+      <div className="flex items-center justify-between p-4 border-b border-background">
         <div className="flex items-center gap-2">
           <svg
             width="24"
@@ -119,54 +119,54 @@ export function AnnouncementsFeed() {
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="text-zinc-100"
+            className="text-muted-foreground"
           >
             <path
               d="M18 2v2H6V2h12zm-6 3a6 6 0 0 1 6 6v3.586l2.707 2.707a1 1 0 0 1-1.414 1.414L18 17.414V20a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-2.586l-1.293 1.293a1 1 0 0 1-1.414-1.414L6 14.586V11a6 6 0 0 1 6-6zm0 2a4 4 0 0 0-4 4v4.414l-2 2V20h12v-1.586l-2-2V11a4 4 0 0 0-4-4z"
               fill="currentColor"
             />
           </svg>
-          <h1 className="text-lg font-semibold text-zinc-100">Announcements</h1>
+          <h1 className="text-lg font-semibold text-muted-foreground">
+            Announcements
+          </h1>
         </div>
         <Button
           variant="ghost"
           size="icon"
-          className="text-zinc-400 hover:text-zinc-100"
+          className="text-muted hover:text-muted-foreground"
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
 
       <div className="flex-1 overflow-auto scrollbar-none cursor-pointer">
-        <div className="flex flex-col">
+        <div className="flex flex-col ">
           {messages.map((message, index) => (
-            <div key={message.id}>
+            <div key={message.id} className="border-b border-background">
               {(index === 0 || messages[index - 1].date !== message.date) && (
                 <div className="py-2 px-4 text-center">
-                  <span className="text-xs text-zinc-500">{message.date}</span>
+                  <span className="text-xs text-muted">{message.date}</span>
                 </div>
               )}
-              <div className="flex gap-3 p-4 hover:bg-zinc-800/50">
+              <div className="flex gap-3 p-4 hover:bg-background">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={message.author.image} />
                   <AvatarFallback>{message.author.name[0]}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-sm font-medium text-zinc-100">
+                    <span className="text-sm font-medium text-muted-foreground">
                       {message.author.name}
                     </span>
-                    <span className="text-xs text-zinc-500">
+                    <span className="text-xs text-muted">
                       {message.timestamp}
                     </span>
                   </div>
-                  <p className="text-sm text-zinc-300 mt-1">
-                    {message.content}
-                  </p>
+                  <p className="text-sm text-muted mt-1">{message.content}</p>
                 </div>
               </div>
               {index !== messages.length - 1 && (
-                <Separator className="bg-zinc-800" />
+                <Separator className="bg-card" />
               )}
             </div>
           ))}

@@ -1,4 +1,3 @@
-import axios from "axios";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import client from "../lib/db";
 import NextAuth from "next-auth";
@@ -8,18 +7,39 @@ const handler = NextAuth({
   adapter: MongoDBAdapter(client),
   callbacks: {
     async jwt({ token, user }) {
-      console.log("Hello  --->");
-      console.log(user);
+      console.log("JWT Callback - Token:", token);
+      console.log("JWT Callback - User:", user);
+
       if (user) {
+        const userExists = await client
+          .db("your-database-name") 
+          .collection("users")
+          .findOne({ email: user.email });
+
+        console.log("User Exists:", userExists);
+
+        // Set isNewUser flag based on database check
+        if (!userExists) {
+          token.isNewUser = true;
+          console.log("New User - Setting isNewUser flag to true");
+        } else {
+          token.isNewUser = false;
+          console.log("Existing User - Setting isNewUser flag to false");
+        }
+
         token._id = user.id;
+      } else if (token.isNewUser === undefined) {
+        token.isNewUser = false; // Fallback for undefined user
       }
+
       return token;
     },
     async session({ session, token }) {
-      console.log("Session: ", session, token);
-      if (session.user) {
-        session.user._id = token._id as string;
-      }
+      console.log("Session Callback - Token:", token);
+      session.user._id = token._id;
+      session.user.isNewUser = token.isNewUser;
+
+      console.log("Session Callback - Session User:", session.user);
       return session;
     },
   },
@@ -32,7 +52,7 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: "/auth/signin",
-    newUser: "/auth/signup",
+    //signUp: "/auth/signup", // Customize the sign-up page for new users
   },
   session: {
     strategy: "jwt",

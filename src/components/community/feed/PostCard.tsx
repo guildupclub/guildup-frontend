@@ -28,7 +28,7 @@ export function PostCard({ post }: PostCardProps) {
   const [liked, setLiked] = useState(false);
 
   return (
-    <div className="bg-zinc-800/30 rounded-lg overflow-hidden">
+    <div className="bg-card rounded-lg overflow-hidden">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3">
@@ -36,16 +36,13 @@ export function PostCard({ post }: PostCardProps) {
             <AvatarImage src="/placeholder.svg" />
             <AvatarFallback className="">UN</AvatarFallback>
           </Avatar>
-          <div className="flex-1">
+          <div className="flex-1 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="font-medium">User Name</span>
-              <Badge
-                variant="outline"
-                className="text-xs text-zinc-200 bg-transparent"
-              >
+              <span className="font-medium ">User Name</span>
+              <Badge variant="outline" className="text-xs bg-transparent ">
                 Host
               </Badge>
-              <span className="text-sm text-zinc-400">
+              <span className="text-sm">
                 {formatDistanceToNow(new Date(post.created_At), {
                   addSuffix: true,
                 })}
@@ -55,12 +52,12 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Content */}
-        <div className="mt-3">
-          <p className="text-zinc-200">{post.body}</p>
+        <div className="mt-3 text-muted-foreground">
+          <p className="">{post.body}</p>
           {post.post_type === "video" && (
-            <div className="mt-4 aspect-video bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="mt-4 aspect-video bg-background rounded-lg overflow-hidden">
               {/* Video player would go here */}
-              <div className="w-full h-full flex items-center justify-center text-zinc-500">
+              <div className="w-full h-full flex items-center justify-center ">
                 Video Content
               </div>
             </div>
@@ -68,11 +65,11 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-6 mt-4">
+        <div className="flex items-center gap-6 mt-4 text-muted-foreground">
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
+            className=" hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setLiked(!liked)}
           >
             <Heart
@@ -84,7 +81,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
+            className="hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageSquare className="w-5 h-5" />
@@ -93,7 +90,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="text-zinc-400 hover:text-purple-400 gap-2 hover:bg-transparent"
+            className=" hover:text-purple-400 gap-2 hover:bg-transparent"
           >
             <Share2 className="w-5 h-5" />
             <span>Share</span>

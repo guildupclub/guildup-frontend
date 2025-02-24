@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
 export default function CreatorForm() {
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [formData, setFormData] = useState({
@@ -91,12 +91,12 @@ export default function CreatorForm() {
         <Button
           variant="ghost"
           size="icon"
-          className="w-8 h-8 rounded-lg bg-zinc-500 hover:bg-zinc-700 text-zinc-300"
+          className="w-8 h-8 rounded-lg bg-card hover:bg-background text-accent"
         >
           <Plus className="h-6 w-6" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-[#1C1C1C] text-white border-none">
+      <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
         <DialogHeader className="flex items-center justify-between">
           <DialogTitle className="text-xl font-normal">
             Fill to become a creator
@@ -110,16 +110,16 @@ export default function CreatorForm() {
               value={formData.name}
               onChange={handleInputChange}
               placeholder="Enter name"
-              className="bg-[#2C2C2C] border-none"
+              className="bg-background border-none"
             />
           </div>
           <div className="space-y-2">
             <Label>Select Topic</Label>
             <Select onValueChange={handleCategoryChange}>
-              <SelectTrigger className="bg-[#2C2C2C] border-none">
+              <SelectTrigger className="bg-background border-none">
                 <SelectValue placeholder="Select your topic" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 text-zinc-300 border-none h-64">
+              <SelectContent className="bg-background  text-accent border-none h-64 cursor-pointer">
                 {categories.map((category) => (
                   <SelectItem key={category._id} value={category._id}>
                     {category.name}
@@ -135,7 +135,7 @@ export default function CreatorForm() {
               value={formData.tags}
               onChange={handleInputChange}
               placeholder="Enter Tags"
-              className="bg-[#2C2C2C] border-none"
+              className="bg-background  border-none"
             />
           </div>
           <div className="space-y-2">
@@ -145,7 +145,7 @@ export default function CreatorForm() {
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Type anything"
-              className="bg-[#2C2C2C] border-none min-h-[30px]"
+              className="bg-background  border-none min-h-[30px]"
             />
           </div>
         </div>
@@ -153,11 +153,13 @@ export default function CreatorForm() {
           <Button
             variant="outline"
             onClick={() => setIsDialogOpen(false)}
-            className="text-white bg-transparent border-gray-600 hover:bg-gray-800 hover:text-white"
+            className="text-muted bg-transparent border-gray-600 hover:bg-background  "
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit}>Create</Button>
+          <Button className="text-white" onClick={handleSubmit}>
+            Create
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

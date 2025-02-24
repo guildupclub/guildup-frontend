@@ -39,7 +39,7 @@ export default function SignIn() {
 
       console.log("@result",result)
       dispatch(setUser({
-        id: result.data.data.user.id,
+        _id: result.data.data.user.id,
         name: result.data.data.user.name || "",
         email: result.data.data.user.email,
         image: result.data.data.user.avatar,

@@ -8,6 +8,7 @@ import MemoizedCommunityCard from "./MemoizedCommunityCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setCommunityData } from "@/redux/communitySlice";
+import { setActiveCommunity } from "@/redux/channelSlice";
 
 interface Community {
   _id: string;
@@ -50,9 +51,18 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     }
   }, [activeCategory]);
 
+  // const communityDetails = communities?.community;
   const handleClickCommunity = useCallback(
     (community: Community) => {
+      if (!community || !community._id) {
+        console.error("Invalid community data:", community);
+        return;
+      }
+
+      console.log("Clicked community:", community); // ✅ Check if this appears in the console
+
       setLoading(true);
+
       dispatch(
         setCommunityData({
           communityId: community._id,
@@ -60,20 +70,22 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         })
       );
 
+      console.log("Navigating to /community/profile"); // ✅ Check if this appears
+
       router.push("/community/profile");
     },
     [dispatch, router]
   );
 
   return (
-    <div className="bg-black min-h-screen text-white p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="bg-background min-h-screen  lg:p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
         {communities.length > 0 ? (
-          communities.map((community) => (
+          communities.map((community: any) => (
             <MemoizedCommunityCard
               key={community._id}
               community={community}
-              onClick={() => handleClickCommunity(community)}
+              onClick={() => handleClickCommunity(community.community)}
             />
           ))
         ) : (

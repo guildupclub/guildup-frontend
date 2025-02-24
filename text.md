@@ -5,6 +5,8 @@ import { Badge } from "../ui/badge";
 import { IoVideocam } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
+import { FaGraduationCap } from "react-icons/fa";
+import { BsInstagram } from "react-icons/bs";
 import { FaYoutube } from "react-icons/fa";
 function CommunityCard({
   community,
@@ -13,15 +15,9 @@ function CommunityCard({
   community: any;
   onClick: (id: string) => void;
 }) {
-  const tags: string[] = [
-    ...new Set(
-      community?.offerings?.flatMap((offering: any) =>
-        Array.isArray(offering.tags) ? offering.tags : []
-      )
-    ),
-  ] as string[];
-  
-
+  const tags = [
+    ...new Set(community?.offerings?.flatMap((offering: any) => offering.tags)),
+  ];
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
 
@@ -31,7 +27,7 @@ function CommunityCard({
       className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
-      <div className="relative h-[80px] w-full bg-gray-200">
+      <div className="relative h-[100px] w-full bg-gray-200">
         <Image
           src={community.image || "/defaultCommunityIcon.png"}
           alt="Background"
@@ -41,7 +37,7 @@ function CommunityCard({
       </div>
 
       {/* Profile Image */}
-      <div className="absolute left-4 top-[50px] w-14 h-14 rounded-full border-4 border-white">
+      <div className="absolute left-4 top-[70px] w-14 h-14 rounded-full border-4 border-white">
         <Image
           src={community.icon || "/defaultCommunityIcon.png"}
           alt="Profile"
@@ -52,7 +48,7 @@ function CommunityCard({
       </div>
 
       {/* Card Content */}
-      <div className="p-4 pt-8 flex-1">
+      <div className="p-4 pt-10 flex-1">
         {/* Name & Stats */}
         <h3 className="font-semibold text-gray-800 text-lg">
           {communityDetails?.name}
@@ -83,9 +79,9 @@ function CommunityCard({
       {/* Offerings Section (Stuck at Bottom) */}
       <div className="mt-auto flex items-center justify-between m-4 p-3 bg-blue-50 rounded-lg">
         <div className="flex items-center space-x-2">
-          <IoVideocam className="text-primary h-6 w-6" />
+          <IoVideocam className="text-blue-600 h-6 w-6" />
           <div>
-            <span className="text-primary font-medium">
+            <span className="text-blue-700 font-medium">
               {OfferingDetails?.[0]?.type}
             </span>
             <p className="text-xs text-gray-500">
@@ -94,7 +90,7 @@ function CommunityCard({
           </div>
         </div>
         {OfferingDetails && (
-          <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
+          <Button className="text-sm font-semibold text-white bg-blue-600 px-4 py-1 rounded-lg">
             {OfferingDetails?.[0]?.price?.amount ? (
               <>
                 <span className="line-through text-xs opacity-60">
@@ -113,3 +109,48 @@ function CommunityCard({
 }
 
 export default React.memo(CommunityCard);
+
+
+
+
+
+
+
+
+
+
+
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-background text-accent shadow ",
+        secondary: "border-transparent bg-secondary text-secondary-foreground ",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground shadow",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
+}
+
+export { Badge, badgeVariants };

@@ -53,20 +53,18 @@ function TrendingSection() {
   return (
     <div className="flex flex-col gap-4">
       {/* Trending Tags Section */}
-      <div className="bg-zinc-900 p-4 text-white rounded-lg h-[500px] overflow-auto scrollbar-none">
+      <div className="bg-card p-4 rounded-lg h-[500px] overflow-auto scrollbar-none">
         <h2 className="text-lg font-semibold mb-3">Trending Tags</h2>
         {trendingPost.length > 0 && (
           <div className="space-y-3">
             {trendingPost.map((post: any, index: number) => (
               <div
                 key={post.id || index}
-                className="p-2 border-b border-zinc-800 hover:bg-zinc-800 transition-colors"
+                className="p-2 border-b border-background hover:bg-background transition-colors"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-300">#{post.title}</span>
-                  <span className="text-xs text-gray-400">
-                    {post.up_votes} posts
-                  </span>
+                  <span className="text-sm">#{post.title}</span>
+                  <span className="text-xs ">{post.up_votes} posts</span>
                 </div>
               </div>
             ))}
