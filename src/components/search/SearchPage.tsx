@@ -33,7 +33,7 @@ function SearchPageContent() {
       setError("");
 
       try {
-        const endpoint = `${API_BASE_URL}/v1/community/look`;
+        const endpoint = `${API_BASE_URL}/v1/community/relook`;
 
         const response = await fetch(endpoint, {
           method: "POST",
@@ -93,7 +93,7 @@ function SearchPageContent() {
   );
 
   return (
-    <div className="container mx-auto p-16 py-24 min-h-screen p-auto bg-black">
+    <div className="container mx-auto p-16 py-24 min-h-screen p-auto bg-background">
       {/* Loading State */}
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -119,7 +119,7 @@ function SearchPageContent() {
       {/* Results */}
       {!loading && !error && (
         <>
-          <h1 className="text-2xl font-bold text-white mb-6">
+          <h1 className="text-2xl font-bold text-muted mb-6">
             Search Results for &quot;{query}&quot;
           </h1>
 

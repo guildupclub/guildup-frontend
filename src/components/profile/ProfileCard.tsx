@@ -156,7 +156,7 @@ export function ProfileCard() {
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
-          <div className="h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+          <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
             <img
               src={bgImgUrl || "/placeholder.svg"}
               alt="Profile banner"
@@ -167,13 +167,13 @@ export function ProfileCard() {
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           </div>
           <div className="absolute -bottom-16 left-8">
-            <Avatar className="w-32 h-32 ring-4 ring-background shadow-xl">
+            <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
               <Image
                 src={avatarImgUrl || "/placeholder.svg"}
                 alt={profile.community.name}
-                width={128}
-                height={128}
-                className="w-32 h-32 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
+                width={100}
+                height={100}
+                className="w-24 h-24 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
                 unoptimized
               />
               {/* <AvatarFallback className="text-primary text-3xl w-32 h-32 bg-primary/5">
@@ -183,7 +183,7 @@ export function ProfileCard() {
           </div>
         </div>
 
-        <div className="pt-20 pb-6 px-8">
+        <div className="pt-16 pb-4 px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="space-y-2">
               <h1 className="text-3xl font-bold text-foreground tracking-tight">
@@ -224,20 +224,22 @@ export function ProfileCard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
+        <div className="p-4 ">
           <h2 className="text-2xl font-semibold text-foreground mb-4">About</h2>
-          <p className="text-muted-foreground leading-relaxed mb-6">
-            {profile.community.description}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {profile.community.tags.map((tag) => (
-              <span
-                key={tag}
-                className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
+            <p className="text-muted-foreground leading-relaxed mb-6">
+              {profile.community.description}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {profile.community.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -274,7 +276,7 @@ export function ProfileCard() {
         </div> */}
 
         <div className="rounded-xl p-4   transition-all duration-300 border border-border/5">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-foreground">
               Offerings
             </h2>

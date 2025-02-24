@@ -20,7 +20,7 @@ function PostCard({ post, onClick }: PostCardProps) {
   return (
     <Card
     //   onClick={() => onClick(post._id)}
-      className="mb-4 break-inside-avoid border-none rounded-lg bg-[#19191A]  w-[292px] overflow-hidden shadow-md cursor-pointer hover:bg-[#242425] transition-colors"
+      className="mb-4 break-inside-avoid border-none rounded-lg bg-card w-[292px] overflow-hidden shadow-md cursor-pointer transition-colors"
     >
       <div className="p-3 pb-0 flex justify-center align-center">
         <div className="relative aspect-video h-[100px] w-[100%] rounded-lg overflow-hidden">

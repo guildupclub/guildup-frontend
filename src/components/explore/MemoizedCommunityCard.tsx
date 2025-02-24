@@ -31,7 +31,7 @@ function CommunityCard({
       className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
-      <div className="relative h-[100px] w-full bg-gray-200">
+      <div className="relative h-[80px] w-full bg-gray-200">
         <Image
           src={community.image || "/defaultCommunityIcon.png"}
           alt="Background"
@@ -41,7 +41,7 @@ function CommunityCard({
       </div>
 
       {/* Profile Image */}
-      <div className="absolute left-4 top-[70px] w-14 h-14 rounded-full border-4 border-white">
+      <div className="absolute left-4 top-[50px] w-14 h-14 rounded-full border-4 border-white">
         <Image
           src={community.icon || "/defaultCommunityIcon.png"}
           alt="Profile"
@@ -52,7 +52,7 @@ function CommunityCard({
       </div>
 
       {/* Card Content */}
-      <div className="p-4 pt-10 flex-1">
+      <div className="p-4 pt-8 flex-1">
         {/* Name & Stats */}
         <h3 className="font-semibold text-gray-800 text-lg">
           {communityDetails?.name}
@@ -83,9 +83,9 @@ function CommunityCard({
       {/* Offerings Section (Stuck at Bottom) */}
       <div className="mt-auto flex items-center justify-between m-4 p-3 bg-blue-50 rounded-lg">
         <div className="flex items-center space-x-2">
-          <IoVideocam className="text-blue-600 h-6 w-6" />
+          <IoVideocam className="text-primary h-6 w-6" />
           <div>
-            <span className="text-blue-700 font-medium">
+            <span className="text-primary font-medium">
               {OfferingDetails?.[0]?.type}
             </span>
             <p className="text-xs text-gray-500">
@@ -94,7 +94,7 @@ function CommunityCard({
           </div>
         </div>
         {OfferingDetails && (
-          <Button className="text-sm font-semibold text-white bg-blue-600 px-4 py-1 rounded-lg">
+          <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
             {OfferingDetails?.[0]?.price?.amount ? (
               <>
                 <span className="line-through text-xs opacity-60">
