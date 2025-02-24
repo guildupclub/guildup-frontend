@@ -305,7 +305,6 @@ export function ProfileCard() {
                 </div>
               ))}
           
-// Add this just before closing div of ProfileCard
 {selectedOffering && (
   <BookingDialog
     offering={selectedOffering}
