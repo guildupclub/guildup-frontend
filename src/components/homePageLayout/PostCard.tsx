@@ -29,6 +29,7 @@ interface PostCardProps {
     slug: string;
     community_id: string;
     upvote_userId: any;
+    replies?: any;
   };
   ref: any;
 }

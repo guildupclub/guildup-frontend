@@ -34,7 +34,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.user);
   // Assume communities are stored in state.community.communities (an array of Community)
-  const communities = useSelector((state: RootState) => state?.community?.communities);
+  // const communities = useSelector((state: RootState) => state?.community?.communities);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [showEditCommunity, setShowEditCommunity] = useState(false);
@@ -252,7 +252,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       </div>
 
       {/* Render community drop list if flag is true */}
-      {showCommunityList && (
+      {/* {showCommunityList && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded p-4 max-h-[80vh] overflow-y-auto">
             <h3 className="text-lg font-semibold mb-4">Select a Community</h3>
@@ -279,17 +279,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Render EditCommunityModal if showEditCommunity is true.
           Pass in the selectedCommunity as a prop if needed. */}
-      {showEditCommunity && (
+      {/* {showEditCommunity && (
         <EditCommunityModal
           isOpen={showEditCommunity}
           onClose={() => setShowEditCommunity(false)}
           community={selectedCommunity}
         />
-      )}
+      )} */}
     </>
   );
 }

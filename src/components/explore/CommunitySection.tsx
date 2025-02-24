@@ -51,7 +51,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     }
   }, [activeCategory]);
 
-  const communityDetails = communities?.community;
+  // const communityDetails = communities?.community;
   const handleClickCommunity = useCallback(
     (community: Community) => {
       if (!community || !community._id) {
@@ -81,7 +81,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     <div className="bg-background min-h-screen  lg:p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
         {communities.length > 0 ? (
-          communities.map((community) => (
+          communities.map((community: any) => (
             <MemoizedCommunityCard
               key={community._id}
               community={community}
