@@ -8,6 +8,7 @@ import MemoizedCommunityCard from "./MemoizedCommunityCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setCommunityData } from "@/redux/communitySlice";
+import { setActiveCommunity } from "@/redux/channelSlice";
 
 interface Community {
   _id: string;
@@ -50,15 +51,26 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     }
   }, [activeCategory]);
 
+  const communityDetails = communities?.community;
   const handleClickCommunity = useCallback(
     (community: Community) => {
+      if (!community || !community._id) {
+        console.error("Invalid community data:", community);
+        return;
+      }
+
+      console.log("Clicked community:", community); // ✅ Check if this appears in the console
+
       setLoading(true);
+
       dispatch(
         setCommunityData({
           communityId: community._id,
           userId: community.user_id,
         })
       );
+
+      console.log("Navigating to /community/profile"); // ✅ Check if this appears
 
       router.push("/community/profile");
     },
@@ -73,7 +85,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
             <MemoizedCommunityCard
               key={community._id}
               community={community}
-              onClick={() => handleClickCommunity(community)}
+              onClick={() => handleClickCommunity(community.community)}
             />
           ))
         ) : (

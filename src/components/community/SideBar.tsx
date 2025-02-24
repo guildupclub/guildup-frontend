@@ -222,12 +222,15 @@ export function Sidebar() {
         </Button>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
-          onClick={() => handleNavigation("/community/feed")}
+          className="w-full justify-start gap-2 text-muted-foreground hover:bg-background"
+          onClick={() =>
+            handleNavigation(`/community/${activeCommunityId}/feed`)
+          }
         >
           <Rss className="h-4 w-4" />
           Feed
         </Button>
+
         <Button
           variant="ghost"
           className="w-full justify-start gap-2  text-muted-foreground  hover:bg-background  "
@@ -278,7 +281,7 @@ export function Sidebar() {
                   className={`h-8 w-8 hover:bg-background ${
                     isAdmin ? "" : "cursor-not-allowed opacity-50"
                   }`}
-                  disabled={!isAdmin} 
+                  disabled={!isAdmin}
                 >
                   <Plus className="h-4 w-4 text-muted-foreground" />
                 </Button>

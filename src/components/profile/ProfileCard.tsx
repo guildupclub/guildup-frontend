@@ -57,6 +57,7 @@ export function ProfileCard() {
     null
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
+  
 
   // Update the Book Now button in the offering card
 
@@ -94,38 +95,37 @@ export function ProfileCard() {
     fetchOfferings();
   }, [community.communityId]);
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!community.communityId) return;
+ useEffect(() => {
+  if (!community?.communityId ) return; // Ensure communityId is set before fetching
 
-      try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          { communityId: community.communityId }
+  const fetchProfileData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        { communityId: community.communityId }
+      );
+
+      if (response.data.r === "s") {
+        setProfile(response.data.data);
+        setAvatarImgUrl(
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
         );
-
-        console.log("@profileREsponse", response.data.data);
-
-        if (response.data.r === "s") {
-          setProfile(response.data.data);
-          // Generate avatar URL based on username
-          setAvatarImgUrl(
-            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-          );
-          setBgImgUrl(
-            "https://random-image-pepebigotes.vercel.app/api/random-image"
-          );
-        }
-      } catch (error) {
-        setError("Failed to load community profile");
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
+        setBgImgUrl(
+          "https://random-image-pepebigotes.vercel.app/api/random-image"
+        );
       }
-    };
+    } catch (error) {
+      setError("Failed to load community profile");
+      console.error("Error fetching profile data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchProfileData();
-  }, [community.communityId]);
+  fetchProfileData();
+}, [community?.communityId]); // Dependency array includes communityId
+
 
   const handleJoinCommunity = async () => {
     if (!user?._id || !community.communityId) return;
