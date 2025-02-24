@@ -60,8 +60,8 @@ export function BookingDialog({ offering, isOpen, onClose }: BookingDialogProps)
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots?offering_id=${offering._id}&date=${formattedDate}`,
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`,
         {
           params: {
             offering_id: offering._id,
@@ -226,33 +226,33 @@ const handlePaymentVerification = async (paymentResponse: RazorpayResponse) => {
   }
 };
 
-const handleBookSlot = async () => {
-  if (!selectedDate || !selectedSlot) return;
+  // const handleBookSlot = async () => {
+  //   if (!selectedDate || !selectedSlot) return;
 
-  try {
-    setIsProcessing(true);
-    // Create Razorpay order
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/create-order`,
-      {
-        amount: offering.price.amount,
-        currency: offering.price.currency,
-        offering_id: offering._id,
-      }
-    );
+  //   try {
+  //     setIsProcessing(true);
+  //     // Create Razorpay order
+  //     const response = await axios.post(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/create-order`,
+  //       {
+  //         amount: offering.price.amount,
+  //         currency: offering.price.currency,
+  //         offering_id: offering._id,
+  //       }
+  //     );
 
-    if (response.data.success && response.data.order.id) {
-      await handlePayment(response.data.order.id);
-    } else {
-      // toast.error("Failed to create payment order");
-    }
-  } catch (error) {
-    console.error("Error creating order:", error);
-    // toast.error("Failed to initiate payment");
-  } finally {
-    setIsProcessing(false);
-  }
-};
+  //     if (response.data.success && response.data.order.id) {
+  //       await handlePayment(response.data.order.id);
+  //     } else {
+  //       // toast.error("Failed to create payment order");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error creating order:", error);
+  //     // toast.error("Failed to initiate payment");
+  //   } finally {
+  //     setIsProcessing(false);
+  //   }
+  // };
 
 return (
   <Dialog open={isOpen} onOpenChange={onClose}>

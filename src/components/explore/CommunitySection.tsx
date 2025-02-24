@@ -85,7 +85,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
             <MemoizedCommunityCard
               key={community._id}
               community={community}
-              onClick={() => handleClickCommunity(community.community)}
+              onClick={() => handleClickCommunity(community)}
             />
           ))
         ) : (

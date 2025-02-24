@@ -52,7 +52,7 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup", // Customize the sign-up page for new users
+    //signUp: "/auth/signup", // Customize the sign-up page for new users
   },
   session: {
     strategy: "jwt",
