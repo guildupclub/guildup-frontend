@@ -17,7 +17,7 @@ import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, Clock, CalendarIcon, DollarSign } from "lucide-react"
 
 

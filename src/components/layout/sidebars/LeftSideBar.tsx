@@ -342,7 +342,7 @@ export function LeftSidebar() {
                   placeholder="Feed Name"
                 />
                 <p className="">Select Communities:</p>
-                {myCommunities.map((comm) => (
+                {myCommunities.map((comm: any) => (
                   <label key={comm._id} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -403,7 +403,7 @@ export function LeftSidebar() {
                 </div>
                 {topicFeed.topicIds.map((tid) => {
                   const topic = myTopics?.user_interests?.find(
-                    (t) => t._id === tid
+                    (t: any) => t._id === tid
                   );
                   return (
                     <div
@@ -437,7 +437,7 @@ export function LeftSidebar() {
                   placeholder="Topic Feed Name"
                 />
                 <p className="">Select Topics:</p>
-                {myTopics?.user_interests?.map((topic) => (
+                {myTopics?.user_interests?.map((topic: any) => (
                   <label key={topic._id} className="flex items-center gap-2 ">
                     <input
                       type="checkbox"
