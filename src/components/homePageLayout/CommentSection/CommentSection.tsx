@@ -32,7 +32,6 @@
 //   parentCommentId: string;
 // }
 
-
 // const CommentSection: React.FC<any> = ({ postId }) => {
 //   const [comments, setComments] = useState<Comment[]>([]);
 //   const [newComment, setNewComment] = useState<string>("");
@@ -51,7 +50,7 @@
 //     const sessionId = useSelector((state: RootState) => state.user.sessionId);
 //     const replyInput = replyInputs[commentId];
 //     if (!replyInput?.text?.trim()) return;
-  
+
 //     setLoading(true);
 //     try {
 //       const response = await axios.post(
@@ -63,15 +62,15 @@
 //           userId: userId,
 //         }
 //       );
-  
+
 //       setNestedComments(prev => ({
 //         ...prev,
 //         [replyInput.parentCommentId]: [...(prev[replyInput.parentCommentId] || []), response.data.data]
 //       }));
-  
+
 //       // Clear reply input
 //       setReplyInputs(prev => ({ ...prev, [commentId]: { text: '', parentCommentId: '' } }));
-      
+
 //     } catch (err) {
 //       setError("Failed to add reply");
 //     } finally {
@@ -79,7 +78,6 @@
 //     }
 //   };
 
-  
 //   console.log("@prostId", postId);
 //   useEffect(() => {
 //     const fetchComments = async () => {
@@ -142,7 +140,7 @@
 //         [commentId]: response.data.data
 //       }));
 //       setExpandedComments(prev => new Set([...prev, commentId]));
-   
+
 //     } catch (err) {
 //       setError("Failed to load replies");
 //     }
@@ -262,13 +260,11 @@
 
 // export default CommentSection;
 
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Plus, Send } from "lucide-react";
+import { Plus, Reply, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
@@ -298,25 +294,31 @@ interface ReplyInput {
   parentCommentId: string;
 }
 
-
 const CommentSection: React.FC<any> = ({ postId }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loadedReplies, setLoadedReplies] = useState<Set<string>>(new Set());
-  const [nestedComments, setNestedComments] = useState<{ [key: string]: Comment[] }>({});
-  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
-  const [loadingComments, setLoadingComments] = useState<Set<string>>(new Set());
-  const [replyInputs, setReplyInputs] = useState<{ [key: string]: ReplyInput }>({});
+  const [nestedComments, setNestedComments] = useState<{
+    [key: string]: Comment[];
+  }>({});
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(
+    new Set()
+  );
+  const [loadingComments, setLoadingComments] = useState<Set<string>>(
+    new Set()
+  );
+  const [replyInputs, setReplyInputs] = useState<{ [key: string]: ReplyInput }>(
+    {}
+  );
   const [showReplyInput, setShowReplyInput] = useState<Set<string>>(new Set());
-  const userId = useSelector((state: RootState) => state.user.user?.id);
-
+  const userId = useSelector((state: RootState) => state.user.user?._id);
 
   const handleAddReply = async (commentId: string) => {
     const replyInput = replyInputs[commentId];
     if (!replyInput?.text?.trim()) return;
-  
+
     setLoading(true);
     try {
       const response = await axios.post(
@@ -328,15 +330,20 @@ const CommentSection: React.FC<any> = ({ postId }) => {
           userId: userId,
         }
       );
-  
-      setNestedComments(prev => ({
+
+      setNestedComments((prev) => ({
         ...prev,
-        [replyInput.parentCommentId]: [...(prev[replyInput.parentCommentId] || []), response.data.data]
+        [replyInput.parentCommentId]: [
+          ...(prev[replyInput.parentCommentId] || []),
+          response.data.data,
+        ],
       }));
-  
+
       // Clear reply input
-      setReplyInputs(prev => ({ ...prev, [commentId]: { text: '', parentCommentId: '' } }));
-      
+      setReplyInputs((prev) => ({
+        ...prev,
+        [commentId]: { text: "", parentCommentId: "" },
+      }));
     } catch (err) {
       setError("Failed to add reply");
     } finally {
@@ -344,7 +351,6 @@ const CommentSection: React.FC<any> = ({ postId }) => {
     }
   };
 
-  
   console.log("@prostId", postId);
   useEffect(() => {
     const fetchComments = async () => {
@@ -377,7 +383,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
         {
           postId,
           comment: newComment,
-          userId: userId
+          userId: userId,
         }
       );
 
@@ -391,7 +397,7 @@ const CommentSection: React.FC<any> = ({ postId }) => {
   };
 
   const handleFetchReplies = async (commentId: string) => {
-    console.log("@commentID",commentId)
+    console.log("@commentID", commentId);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/getNestedComment`,
@@ -402,12 +408,11 @@ const CommentSection: React.FC<any> = ({ postId }) => {
         }
       );
       console.log("@CommentData", response.data);
-      setNestedComments(prev => ({
+      setNestedComments((prev) => ({
         ...prev,
-        [commentId]: response.data.data
+        [commentId]: response.data.data,
       }));
-      setExpandedComments(prev => new Set([...prev, commentId]));
-   
+      setExpandedComments((prev) => new Set([...prev, commentId]));
     } catch (err) {
       setError("Failed to load replies");
     }
@@ -420,16 +425,18 @@ const CommentSection: React.FC<any> = ({ postId }) => {
         <AvatarFallback>U</AvatarFallback>
       </Avatar>
       <div className="flex-1 relative">
-      <input
-        type="text"
-        value={replyInputs[commentId]?.text || ''}
-        onChange={(e) => setReplyInputs(prev => ({
-          ...prev,
-          [commentId]: { text: e.target.value, parentCommentId:commentId }
-        }))}
-        placeholder="Write a reply..."
-        className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
+        <input
+          type="text"
+          value={replyInputs[commentId]?.text || ""}
+          onChange={(e) =>
+            setReplyInputs((prev) => ({
+              ...prev,
+              [commentId]: { text: e.target.value, parentCommentId: commentId },
+            }))
+          }
+          placeholder="Write a reply..."
+          className="w-full bg-background rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
         <Button
           variant="ghost"
           size="icon"
@@ -443,29 +450,39 @@ const CommentSection: React.FC<any> = ({ postId }) => {
   );
 
   const renderComments = (comments: Comment[], level = 0) => {
-    console.log("@commentREnderData",comments)
-    return comments.map((comment,index) => (
-      <div key={`${comment?._id}-${index}`} className="pl-[20px] mt-4">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={comment?.postedBy?.avatar || "/placeholder.svg"} />
+    console.log("@commentREnderData", comments);
+    return comments.map((comment, index) => (
+      <div
+        key={`${comment?._id}-${index}`}
+        className={`pl-${level * 4} mt-4 border-l border-background`}
+      >
+        <div className="flex items-center gap-3">
+          <Avatar className="h-7 w-7">
+            <AvatarImage
+              src={comment?.postedBy?.avatar || "/placeholder.svg"}
+            />
             <AvatarFallback>{comment?.postedBy?.user_name}</AvatarFallback>
           </Avatar>
-          <strong>{comment?.postedBy?.user_name}</strong>
-          <span className="text-sm text-zinc-400">
-            {new Date(comment?.commentedAt).toLocaleDateString()}
-          </span>
+          <div className="flex flex-col">
+            <strong className="text-accent">
+              {comment?.postedBy?.user_name}
+            </strong>
+            <span className="text-xs text-accent">
+              {new Date(comment?.commentedAt).toLocaleDateString()}
+            </span>
+          </div>
         </div>
-        <div className="mt-2 text-zinc-200">{comment?.text}</div>
-        <div className="mt-2 flex gap-4">
-        <Button
-            variant="ghost"
-            size="sm"
+        <div className="mt-2 text-accent bg-background p-3 rounded-md">
+          {comment?.text}
+        </div>
+        <div className="mt-2 flex gap-4 items-center">
+          <button
+            className="text-sm text-muted-foreground transition"
             onClick={() => {
               if (!expandedComments.has(comment?._id)) {
                 handleFetchReplies(comment?._id);
               }
-              setShowReplyInput(prev => {
+              setShowReplyInput((prev) => {
                 const next = new Set(prev);
                 if (prev.has(comment?._id)) {
                   next.delete(comment?._id);
@@ -476,47 +493,47 @@ const CommentSection: React.FC<any> = ({ postId }) => {
               });
             }}
           >
-            Reply
-          </Button>
+            <Reply className="h-4 w-4 inline-block mr-1" /> Reply
+          </button>
         </div>
         {showReplyInput.has(comment?._id) && renderReplyInput(comment?._id)}
         {expandedComments.has(comment?._id) && nestedComments[comment?._id] && (
-          <div className="ml-4">
-            {renderComments(nestedComments[comment?._id])}
+          <div className="ml-6 ">
+            {renderComments(nestedComments[comment?._id], level + 1)}
           </div>
         )}
-        </div>
+      </div>
     ));
   };
 
   return (
     <div className="border-t border-zinc-800/50">
-        <div className="flex gap-2 mt-4">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Write a comment..."
-              className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
-                onClick={handleAddComment}
-                disabled={loading}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+      {/* <div className="flex gap-2 mt-4">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src="/placeholder.svg" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-accent"
+              onClick={handleAddComment}
+              disabled={loading}
+            >
+              <Send className="h-4 w-4" />
+            </Button>
           </div>
         </div>
+      </div> */}
       <div className="p-4">
         {error && <div className="error">{error}</div>}
         {renderComments(comments)}

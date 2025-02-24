@@ -28,7 +28,7 @@ function Chat() {
   );
 
   const activeChannelId = activeChannel?.id || null;
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -36,7 +36,7 @@ function Chat() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("@userIdInCommunityChat",userId)
+  console.log("@userIdInCommunityChat", userId);
   useEffect(() => {
     if (!activeChannelId) {
       setLoading(false);
@@ -58,7 +58,7 @@ function Chat() {
           }),
         });
 
-        console.log("@thisiscall",response)
+        console.log("@thisiscall", response);
         if (!response.ok) throw new Error("Failed to fetch channel content");
 
         const data = await response.json();

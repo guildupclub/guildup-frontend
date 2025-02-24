@@ -35,15 +35,15 @@ export function Comment({
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-zinc-200">{author}</span>
-            <span className="text-xs text-zinc-400">Level {level}</span>
-            <span className="text-xs text-zinc-400">{timestamp}</span>
+            <span className="font-medium text-muted">{author}</span>
+            <span className="text-xs text-accent">Level {level}</span>
+            <span className="text-xs  text-accent">{timestamp}</span>
           </div>
-          <p className="text-sm text-zinc-300 mt-1">{content}</p>
+          <p className="text-sm  text-accent mt-1">{content}</p>
           <div className="flex items-center gap-4 mt-2">
             <button
               onClick={() => setIsLiked(!isLiked)}
-              className="flex items-center gap-1 text-zinc-400 hover:text-zinc-300"
+              className="flex items-center gap-1  text-accent"
             >
               <Heart
                 className={`h-4 w-4 ${
@@ -54,7 +54,7 @@ export function Comment({
             </button>
             <button
               onClick={() => setIsReplying(!isReplying)}
-              className="text-xs text-zinc-400 hover:text-zinc-300"
+              className="text-xs  text-accent"
             >
               Reply
             </button>
@@ -72,20 +72,20 @@ export function Comment({
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Write a reply..."
-                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-background rounded-full px-4 py-2 text-sm  text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8 text-accent"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8  text-accent"
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
