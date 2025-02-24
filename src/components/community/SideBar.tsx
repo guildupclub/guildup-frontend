@@ -33,7 +33,9 @@ import { setMemberDetails } from "@/redux/memberSlice";
 
 export function Sidebar() {
   const dispatch = useDispatch();
-  const memberDetails = useSelector((state: RootState) => state.member.memberDetails);
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
   const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
@@ -43,7 +45,7 @@ export function Sidebar() {
   );
 
   const activeCommunityId = activeCommunity?.id;
-  console.log("@activeCommunityId",activeCommunityId)
+  console.log("@activeCommunityId", activeCommunityId);
   const activeCommunityName = activeCommunity?.name;
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
@@ -66,9 +68,8 @@ export function Sidebar() {
     }
   }, [activeCommunityId]);
 
-
   const getMemberDetails = async () => {
-    console.log("@log",userId,activeCommunityId)
+    console.log("@log", userId, activeCommunityId);
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/getMemberDetails`,
@@ -83,26 +84,25 @@ export function Sidebar() {
           }),
         }
       );
-  
+
       const data = await response.json();
-      console.log("@data",data)
+      console.log("@data", data);
       if (data.r === "s" && data.data) {
         dispatch(setMemberDetails(data.data));
       } else {
-        console.log("@data",data)
-         }
+        console.log("@data", data);
+      }
     } catch (err: any) {
-      console.log("err",err)
-       }
+      console.log("err", err);
+    }
   };
-  
+
   useEffect(() => {
     if (activeCommunityId) {
-      console.log("@here in useEffect")
+      console.log("@here in useEffect");
       getMemberDetails();
     }
   }, [activeCommunityId]);
-
 
   const fetchChannels = async () => {
     if (!activeCommunityId) {
@@ -253,7 +253,16 @@ export function Sidebar() {
           Announcements
         </Button>
 
-        <Button className="w-full text-white">Creator Studio</Button>
+        {/* {isAdmin && ( */}
+        <Button
+          className={`w-full text-white ${
+            isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
+          }`}
+        >
+          Creator Studio
+        </Button>
+
+        {/* )} */}
 
         <div className="px-2 py-2 border-t border-background p-2">
           <div className="flex items-center justify-between mb-2 ">
@@ -262,11 +271,14 @@ export function Sidebar() {
               {/* {
                 isAdmin && ( */}
 
-                  <DialogTrigger asChild>
+              <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8  hover:bg-background "
+                  className={`h-8 w-8 hover:bg-background ${
+                    isAdmin ? "" : "cursor-not-allowed opacity-50"
+                  }`}
+                  disabled={!isAdmin} 
                 >
                   <Plus className="h-4 w-4 text-muted-foreground" />
                 </Button>
@@ -357,7 +369,7 @@ export function Sidebar() {
           </div>
           <div className="space-y-1">
             {channels &&
-              channels.map((channel:any) => (
+              channels.map((channel: any) => (
                 <Button
                   key={channel?.id}
                   variant="ghost"

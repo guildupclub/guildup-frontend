@@ -27,8 +27,8 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
-    community_id:string;
-    upvote_userId:any;
+    community_id: string;
+    upvote_userId: any;
   };
   ref: any;
 }
@@ -86,15 +86,18 @@ export function PostCard({ post, ref }: PostCardProps) {
     );
   };
 
-  const handleLikeClick =async () => {
+  const handleLikeClick = async () => {
     setIsLiked(!isLiked);
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,{
-      userId:user._id,
-      postId:post._id,
-      action:isLiked?"down_vote":"up_vote",
-      communityId:post.community_id
-    })
-    console.log("@resposneVote",response)
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,
+      {
+        userId: user._id,
+        postId: post._id,
+        action: isLiked ? "down_vote" : "up_vote",
+        communityId: post.community_id,
+      }
+    );
+    console.log("@resposneVote", response);
     setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
   };
 
@@ -200,7 +203,7 @@ export function PostCard({ post, ref }: PostCardProps) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write a comment..."
-                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <Button

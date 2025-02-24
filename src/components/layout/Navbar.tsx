@@ -34,7 +34,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.user);
   // Assume communities are stored in state.community.communities (an array of Community)
-  const communities = useSelector((state: RootState) => state.community.communities);
+  const communities = useSelector((state: RootState) => state?.community?.communities);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [showEditCommunity, setShowEditCommunity] = useState(false);
@@ -45,8 +45,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   } | null>(null);
 
   const [searchType, setSearchType] = useState("post");
-  const router = useRouter();
-  const { user } = useSelector((state: any) => state.user);
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );

@@ -1,14 +1,26 @@
-"user client"
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+"user client";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -18,19 +30,24 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const user = useSelector((state: RootState) => state.user.user);
-  const communityId = useSelector((state: RootState) => state.community.communityId);
-
+  const communityId = useSelector(
+    (state: RootState) => state.community.communityId
+  );
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    type: 'mentorship',
+    title: "",
+    description: "",
+    type: "mentorship",
     price: {
       amount: 0,
-      currency: 'INR'
+      currency: "INR",
     },
     duration: 60,
     is_free: false,
-    tags: '',
+    tags: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,31 +60,31 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/create`,
         {
           ...formData,
-          tags: formData.tags.split(',').map(tag => tag.trim()),
+          tags: formData.tags.split(",").map((tag) => tag.trim()),
           userId: user._id,
           communityId,
         }
       );
 
-      if (response.data.r === 's') {
+      if (response.data.r === "s") {
         setOpen(false);
         onOfferingAdded();
         // Reset form
         setFormData({
-          title: '',
-          description: '',
-          type: 'mentorship',
+          title: "",
+          description: "",
+          type: "mentorship",
           price: {
             amount: 0,
-            currency: 'INR'
+            currency: "INR",
           },
           duration: 60,
           is_free: false,
-          tags: '',
+          tags: "",
         });
       }
     } catch (error) {
-      console.error('Error creating offering:', error);
+      console.error("Error creating offering:", error);
     } finally {
       setLoading(false);
     }
@@ -77,8 +94,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
-          className="bg-primary-gradient text-primary-foreground hover:bg-primary/90"
+          variant="default"
+          className={` text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
+            isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
+          }`}
         >
           Add Offering
         </Button>
@@ -93,7 +112,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
               placeholder="Enter offering title"
               required
             />
@@ -104,7 +125,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               placeholder="Describe your offering"
               required
             />
@@ -114,7 +137,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             <Label htmlFor="type">Type</Label>
             <Select
               value={formData.type}
-              onValueChange={(value) => setFormData({ ...formData, type: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, type: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
@@ -134,11 +159,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 id="price"
                 type="number"
                 value={formData.price.amount}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  price: { ...formData.price, amount: Number(e.target.value) },
-                  is_free: Number(e.target.value) === 0
-                })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    price: {
+                      ...formData.price,
+                      amount: Number(e.target.value),
+                    },
+                    is_free: Number(e.target.value) === 0,
+                  })
+                }
                 min="0"
                 required
               />
@@ -149,7 +179,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 id="duration"
                 type="number"
                 value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, duration: Number(e.target.value) })
+                }
                 min="15"
                 required
               />
@@ -161,7 +193,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             <Input
               id="tags"
               value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, tags: e.target.value })
+              }
               placeholder="e.g., Design, Technology, Business"
             />
           </div>
@@ -179,7 +213,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               className="bg-primary-gradient"
               disabled={loading}
             >
-              {loading ? 'Creating...' : 'Create Offering'}
+              {loading ? "Creating..." : "Create Offering"}
             </Button>
           </div>
         </form>

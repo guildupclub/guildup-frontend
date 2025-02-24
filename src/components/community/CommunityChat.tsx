@@ -32,7 +32,7 @@ function ChatContent() {
   );
 
   const activeChannelId = activeChannel?.id || null;
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [posts, setPosts] = useState<Post[]>([]);

@@ -7,11 +7,9 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { Badge } from "lucide-react";
+import { ArrowRight, Badge, Video } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
-
-
 
 // Add this state in ProfileCard component
 
@@ -55,42 +53,46 @@ export function ProfileCard() {
   const [error, setError] = useState<string | null>(null);
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setBgImgUrl] = useState("");
-  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
+  const [offerings, setOfferings] = useState<Offering[]>([]);
 
-// Update the Book Now button in the offering card
+  // Update the Book Now button in the offering card
 
-
-    // First, add the Offering interface
+  // First, add the Offering interface
 
   // Add offerings state to existing states
-  const [offerings, setOfferings] = useState<Offering[]>([]);
-  
+
   // Add fetchOfferings function
   const fetchOfferings = async () => {
     if (!community.communityId) return;
-  
+
     try {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${community.communityId}`
       );
-  
+
       if (response.data.r === "s") {
-        setOfferings(Array.isArray(response.data.data) ? response.data.data : [response.data.data]);
+        setOfferings(
+          Array.isArray(response.data.data)
+            ? response.data.data
+            : [response.data.data]
+        );
       }
     } catch (error) {
       console.error("Error fetching offerings:", error);
     }
   };
-  
+
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
   const user = useSelector((state: RootState) => state.user.user);
-  
+
   const community = useSelector((state: RootState) => state.community);
   useEffect(() => {
     fetchOfferings();
   }, [community.communityId]);
-  
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -99,10 +101,10 @@ export function ProfileCard() {
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          { communityId:community.communityId }
+          { communityId: community.communityId }
         );
 
-        console.log("@profileREsponse",response.data.data)
+        console.log("@profileREsponse", response.data.data);
 
         if (response.data.r === "s") {
           setProfile(response.data.data);
@@ -133,7 +135,7 @@ export function ProfileCard() {
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
           userId: user._id,
-          communityId:community.communityId
+          communityId: community.communityId,
         }
       );
       // Handle successful join
@@ -142,7 +144,7 @@ export function ProfileCard() {
       //   fetchProfileData();
       // }
     } catch (err) {
-      console.error('Error joining community:', err);
+      console.error("Error joining community:", err);
     }
   };
 
@@ -151,51 +153,68 @@ export function ProfileCard() {
   if (!profile) return <div>No profile data available</div>;
 
   return (
-    <div className="w-full max-w-5xl mx-auto py-20">
-      <div className="bg-card rounded-lg p-4 shadow-lg">
+    <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
-          <div className="h-28 w-full overflow-hidden rounded-t-lg bg-card">
+          <div className="h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
             <img
-              src={bgImgUrl}
+              src={bgImgUrl || "/placeholder.svg"}
               alt="Profile banner"
               width={1200}
-              height={200}
-              className="w-full h-full object-cover"
+              height={400}
+              className="w-full h-full object-cover opacity-90 transition-transform duration-500 hover:scale-105"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
           </div>
-          <div className="absolute -bottom-12 left-8">
-            <Avatar className="w-32 h-32">
+          <div className="absolute -bottom-16 left-8">
+            <Avatar className="w-32 h-32 ring-4 ring-background shadow-xl">
               <Image
-                src={avatarImgUrl}
+                src={avatarImgUrl || "/placeholder.svg"}
                 alt={profile.community.name}
-                width={100}
-                height={100}
-                className="w-32 h-32 rounded-full object-cover bg-black border-4 border-primary"
+                width={128}
+                height={128}
+                className="w-32 h-32 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
                 unoptimized
               />
-              <AvatarFallback className="text-black text-2xl w-32 h-32">
+              {/* <AvatarFallback className="text-primary text-3xl w-32 h-32 bg-primary/5">
                 {profile.user.user_name[0]}
-              </AvatarFallback>
+              </AvatarFallback> */}
             </Avatar>
           </div>
         </div>
 
-        <div className="pt-16 pb-2 px-8 rounded-b-lg text-muted-foreground">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h1 className="text-2xl font-bold text-muted">
+        <div className="pt-20 pb-6 px-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-foreground tracking-tight">
                 {profile.community.name}
               </h1>
-              <p className="text-muted-foreground">
-                Created by {profile.user.user_name}
+              <p className="text-muted-foreground text-lg">
+                Created by{" "}
+                <span className="text-foreground">
+                  {profile.user.user_name}
+                </span>
               </p>
-              <p className="text-sm text-muted-foreground">
-                {profile.community.num_member.toLocaleString()} Members • {profile.community.post_count} Posts
-              </p>
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-medium text-foreground">
+                    {profile.community.num_member.toLocaleString()}
+                  </span>
+                  Members
+                </div>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <span className="font-medium text-foreground">
+                    {profile.community.post_count}
+                  </span>
+                  Posts
+                </div>
+              </div>
             </div>
             <Button
-              variant="secondary"
-              className="bg-primary-gradient text-primary-foreground hover:bg-primary/90"
+              variant="default"
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
               onClick={handleJoinCommunity}
             >
               Join Community
@@ -204,114 +223,120 @@ export function ProfileCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-8 text-muted">
-        <div className="bg-card p-6">
-          <h2 className="text-xl font-semibold mb-4">About</h2>
-          <p className="text-muted-foreground mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">About</h2>
+          <p className="text-muted-foreground leading-relaxed mb-6">
             {profile.community.description}
           </p>
           <div className="flex flex-wrap gap-2">
             {profile.community.tags.map((tag) => (
-              <Badge key={tag} className="bg-background">
+              <span
+                key={tag}
+                className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
+              >
                 {tag}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
 
-        <div className="bg-card p-6">
-          <h2 className="text-xl font-semibold mb-4">Community Info</h2>
-          <div className="space-y-4">
+        {/* <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
+            Community Info
+          </h2>
+          <div className="space-y-6">
             <div>
-              <h3 className="font-medium">Privacy</h3>
-              <p className="text-muted-foreground">
-                {profile.community.is_locked ? "Private Community" : "Public Community"}
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                Privacy
+              </h3>
+              <p className="text-muted-foreground flex items-center gap-2">
+                {profile.community.is_locked ? (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />
+                    Private Community
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+                    Public Community
+                  </>
+                )}
               </p>
             </div>
             <div>
-              <h3 className="font-medium">Created By</h3>
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                Created By
+              </h3>
               <p className="text-muted-foreground">{profile.user.user_name}</p>
             </div>
           </div>
-        </div>        {/* Add this after the existing grid */}
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-muted">Offerings</h2>
+        </div> */}
+
+        <div className="rounded-xl p-4   transition-all duration-300 border border-border/5">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-semibold text-foreground">
+              Offerings
+            </h2>
             <AddOfferingDialog onOfferingAdded={fetchOfferings} />
           </div>
-        
+
           {offerings.length === 0 ? (
-            <div className="text-center py-8 bg-card rounded-lg">
-              <p className="text-muted-foreground">No offerings available yet</p>
+            <div className="text-center py-16 bg-card rounded-xl border border-border/5">
+              <p className="text-lg text-muted-foreground">
+                No offerings available yet
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-4">
               {offerings.map((offering) => (
                 <div
                   key={offering._id}
-                  className="bg-card p-6 rounded-lg hover:shadow-lg transition-shadow"
+                  className="group bg-white rounded-lg p-6 flex items-center justify-between hover:shadow-sm transition-all duration-300"
                 >
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                      <Video className="w-5 h-5 text-blue-600 " />
+                    </div>
                     <div>
-                      <h3 className="font-semibold text-lg text-foreground">
+                      <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
                         {offering.title}
                       </h3>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {offering.type}
+                      <p className="text-sm text-gray-500 mt-1 max-w-xl">
+                        {offering.description}
                       </p>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <div className="text-right">
-                      <p className="font-bold text-primary">
-                        {offering.is_free 
-                          ? "Free" 
-                          : `${offering.price.currency} ${offering.price.amount}`}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {offering.duration} mins
-                      </p>
-                    </div>
-                  </div>
-        
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {offering.description}
-                  </p>
-        
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {offering.tags.map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-        
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        {offering.rating.toFixed(1)} ★
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        ({offering.total_ratings} ratings)
-                      </span>
+                      <div className="flex items-center gap-2">
+                        {/* <span className="text-sm text-gray-500 line-through">
+                          ₹{offering.price.original}
+                        </span> */}
+                        <span className="text-xl font-semibold text-gray-900">
+                          ₹{offering.price.amount}
+                        </span>
+                      </div>
                     </div>
                     <Button
                       size="sm"
-                      variant="default"
-                      className="bg-primary-gradient"
-                  onClick={() => setSelectedOffering(offering)}
+                      className=" text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                      onClick={() => setSelectedOffering(offering)}
                     >
-                      Book Now
+                      <span>Book Now</span>
+                      <ArrowRight className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               ))}
-          
-{selectedOffering && (
-  <BookingDialog
-    offering={selectedOffering}
-    isOpen={!!selectedOffering}
-    onClose={() => setSelectedOffering(null)}
-  />
-)}
+
+              {selectedOffering && (
+                <BookingDialog
+                  offering={selectedOffering}
+                  isOpen={!!selectedOffering}
+                  onClose={() => setSelectedOffering(null)}
+                />
+              )}
             </div>
           )}
         </div>

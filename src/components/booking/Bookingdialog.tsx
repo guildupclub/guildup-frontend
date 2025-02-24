@@ -11,6 +11,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "react-toastify";
 import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
+import { motion, AnimatePresence } from "framer-motion"
+import { ChevronLeft, Clock, CalendarIcon, DollarSign } from "lucide-react"
+
 
 interface BookingDialogProps {
   offering: {
@@ -174,78 +177,115 @@ const handleBookSlot = async () => {
 
 return (
   <Dialog open={isOpen} onOpenChange={onClose}>
-    <DialogContent className="sm:max-w-[425px] bg-card text-foreground">
+    <DialogContent className="sm:max-w-[425px] bg-gradient-to-br from-card to-card/80 text-foreground backdrop-blur-sm border border-border/50">
       <DialogHeader>
-        <DialogTitle>Book {offering.title}</DialogTitle>
+        <DialogTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">
+          Book {offering.title}
+        </DialogTitle>
       </DialogHeader>
 
-      {!showConfirmation ? (
-        <div className="space-y-4">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-            className="rounded-md border"
-            disabled={(date) => date < new Date()}
-          />
+      <AnimatePresence mode="wait">
+        {!showConfirmation ? (
+          <motion.div
+            key="selection"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+              className="rounded-md border border-border/50 shadow-lg"
+              disabled={(date) => date < new Date()}
+            />
 
-          {selectedDate && (
-            <div className="mt-4 space-y-2">
-              <h3 className="font-medium">Available Slots</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {availableSlots.map((slot, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className={`text-sm ${selectedSlot === slot ? "bg-primary text-primary-foreground" : ""
+            {selectedDate && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="space-y-4"
+              >
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-primary" />
+                  Available Slots
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {availableSlots.map((slot, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className={`text-sm transition-all duration-200 hover:scale-105 ${
+                        selectedSlot === slot ? "bg-primary text-primary-foreground shadow-md" : "hover:bg-primary/10"
                       }`}
-                    onClick={() => handleSlotSelect(slot)}
-                  >
-                    {formatTime(slot.start)} - {formatTime(slot.end)}
-                  </Button>
-                ))}
+                      onClick={() => handleSlotSelect(slot)}
+                    >
+                      {formatTime(slot.start)} - {formatTime(slot.end)}
+                    </Button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="confirmation"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="bg-background/50 p-6 rounded-lg space-y-4 shadow-inner">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <CalendarIcon className="w-5 h-5 text-primary" />
+                  Selected Date & Time
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {format(selectedDate!, "PPP")}
+                  <br />
+                  {formatTime(selectedSlot!.start)} - {formatTime(selectedSlot!.end)}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-lg">Offering Details</h3>
+                <p className="text-sm text-muted-foreground">{offering.description}</p>
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  Duration: {offering.duration} minutes
+                </p>
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-primary" />
+                  Price: {offering.price.currency} {offering.price.amount}
+                </p>
               </div>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="bg-background p-4 rounded-lg space-y-3">
-            <div>
-              <h3 className="font-medium">Selected Date & Time</h3>
-              <p className="text-sm text-muted-foreground">
-                {format(selectedDate!, "PPP")}
-                <br />
-                {formatTime(selectedSlot!.start)} - {formatTime(selectedSlot!.end)}
-              </p>
-            </div>
 
-            <div>
-              <h3 className="font-medium">Offering Details</h3>
-              <p className="text-sm text-muted-foreground">{offering.description}</p>
-              <p className="text-sm font-medium mt-2">
-                Duration: {offering.duration} minutes
-              </p>
-              <p className="text-sm font-medium">
-                Price: {offering.price.currency} {offering.price.amount}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowConfirmation(false)}>
-              Back
-            </Button>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowConfirmation(false)}
+                className="flex items-center gap-2"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Back
+              </Button>
               <Button
                 onClick={handleBookSlot}
-                className="bg-primary-gradient"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200"
                 disabled={isProcessing}
-              >Confirm Booking
+              >
                 {isProcessing ? "Processing..." : "Confirm Booking"}
               </Button>
-          </div>
-        </div>
-      )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </DialogContent>
   </Dialog>
 );

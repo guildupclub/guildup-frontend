@@ -487,20 +487,22 @@ export function LeftSidebar() {
               <ChevronDown className="h-4 w-4" />
             )}
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2">
-            {myCommunities?.map((community: any) => (
-              <button
-                key={community?._id}
-                onClick={() => handleCommunityClick(community)}
-                className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-background"
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={community?.avatarURL} />
-                  <AvatarFallback>{community?.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{community?.name}</span>
-              </button>
-            ))}
+          <CollapsibleContent className="space-y-2 max-h-[330px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
+            {myCommunities
+              ?.filter((community: any) => community !== null)
+              .map((community: any) => (
+                <button
+                  key={community?._id}
+                  onClick={() => handleCommunityClick(community)}
+                  className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-background"
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage src={community?.avatarURL} />
+                    <AvatarFallback>{community?.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <span>{community?.name}</span>
+                </button>
+              ))}
           </CollapsibleContent>
         </Collapsible>
       </div>

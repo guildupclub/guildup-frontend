@@ -46,7 +46,8 @@ export function PostDialog() {
 
   const activeCommunityId = activeCommunity?.id;
   console.log(activeCommunityId);
-  const userID = useSelector((state: RootState) => state.user.user?.id);
+  const userID = useSelector((state: RootState) => state.user.user?._id);
+  
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const { data: session } = useSession();
