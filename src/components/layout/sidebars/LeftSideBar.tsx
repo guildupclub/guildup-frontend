@@ -132,8 +132,8 @@ export function LeftSidebar() {
     if (myCommunities && myCommunities.length > 0) {
       dispatch(
         setActiveCommunity({
-          id: myCommunities[0]._id, // Now it's properly set
-          name: myCommunities[0].name,
+          id: myCommunities[0]?._id, // Now it's properly set
+          name: myCommunities[0]?.name,
         })
       );
     }
