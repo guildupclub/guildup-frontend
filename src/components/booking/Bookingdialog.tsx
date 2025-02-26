@@ -35,6 +35,7 @@ import {
 } from "@/components/utils/razorpay";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { GoDotFill } from "react-icons/go";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -347,9 +348,15 @@ export function BookingDialog({
                 </div>
 
                 {/* User Name */}
-                <h1 className="text-xl font-semibold text-primary text-center">
-                  Booking {offering.title}
-                </h1>
+                <div className="text-center">
+                  <p className="text-xl font-semibold text-primary leading-tight">
+                    Booking {offering.title}
+                  </p>
+                  <p className="flex items-center justify-center gap-1 text-muted-foreground">
+                    <GoDotFill className="" />
+                    {offering?.type}
+                  </p>
+                </div>
 
                 {/* Details (Duration & Price) */}
                 <div className="flex justify-between items-center w-full px-4">
@@ -377,10 +384,11 @@ export function BookingDialog({
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                {/* <p className="text-sm text-muted-foreground leading-relaxed">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                   Totam, nulla dolorem aspernatur doloribus officia asperiores.
-                </p>
+                </p> */}
+                <p>{offering?.description}</p>
               </div>
             </div>
 
@@ -388,7 +396,7 @@ export function BookingDialog({
             <div className="p-6 bg-background">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
-                Selected Date & Time
+                  Selected Date & Time
                 </DialogTitle>
               </DialogHeader>
 

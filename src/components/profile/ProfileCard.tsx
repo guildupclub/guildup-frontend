@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { ArrowRight, Badge, Video } from "lucide-react";
+import { ArrowRight, Badge, Instagram, Video } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
@@ -131,7 +131,7 @@ export function ProfileCard() {
 
   const handleJoinCommunity = async () => {
     if (!user?._id || !community.communityId) return;
-  
+
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
@@ -140,11 +140,10 @@ export function ProfileCard() {
           communityId: community.communityId,
         }
       );
-  
+
       // Show toast notification if the response is successful
       if (response.data.r === "s") {
         toast.success("Successfully joined the community!");
-
       }
     } catch (err) {
       console.error("Error joining community:", err);
@@ -223,6 +222,7 @@ export function ProfileCard() {
             >
               Join Community
             </Button>
+            
           </div>
         </div>
       </div>
@@ -312,7 +312,6 @@ export function ProfileCard() {
                     </div>
                   </div>
 
- 
                   <div className="flex items-center justify-between mt-4 px-2">
                     <span className="text-xl font-semibold text-gray-900 pl-12">
                       ₹{offering.price.amount}
