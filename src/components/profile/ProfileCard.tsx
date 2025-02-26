@@ -11,6 +11,7 @@ import { ArrowRight, Badge, Video } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 
+
 // Add this state in ProfileCard component
 
 interface CommunityProfile {

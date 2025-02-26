@@ -33,19 +33,25 @@ export default function SignIn() {
       //   password,
       //   redirect: false,
       // });
-      const result = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,{
-        email,password
-      })
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,
+        {
+          email,
+          password,
+        }
+      );
 
-      console.log("@result",result)
-      dispatch(setUser({
-        _id: result.data.data.user.id,
-        name: result.data.data.user.name || "",
-        email: result.data.data.user.email,
-        image: result.data.data.user.avatar,
-        accessToken: result.data.data.session
-      }));
-      console.log("@sininreust",result)
+      console.log("@result", result);
+      dispatch(
+        setUser({
+          _id: result.data.data.user.id,
+          name: result.data.data.user.name || "",
+          email: result.data.data.user.email,
+          image: result.data.data.user.avatar,
+          accessToken: result.data.data.session,
+        })
+      );
+      console.log("@sininreust", result);
       if (result?.data?.e === "e") {
         setError(result.data.data);
       } else {
@@ -63,13 +69,13 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-zinc-800">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-zinc-200">Welcome back</h1>
+          <h1 className="text-3xl font-bold text-accent">Welcome back</h1>
           <p className="text-muted-foreground">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-zinc-300">
+        <form onSubmit={handleSubmit} className="space-y-4 text-accent">
           <div className="space-y-2 ">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -79,7 +85,7 @@ export default function SignIn() {
               placeholder="Enter your email"
               required
               disabled={isLoading}
-              className="border-gray-700"
+              className="border-background"
             />
           </div>
           <div className="space-y-2">
@@ -91,7 +97,7 @@ export default function SignIn() {
               placeholder="Enter your password"
               required
               disabled={isLoading}
-              className="border-gray-700"
+              className="border-background"
             />
           </div>
 
@@ -99,7 +105,11 @@ export default function SignIn() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full text-white"
+            disabled={isLoading}
+          >
             {isLoading ? "Signing in..." : "Sign in"}
           </Button>
         </form>
@@ -117,7 +127,7 @@ export default function SignIn() {
 
         <Button
           variant="outline"
-          className="w-full bg-slate-200"
+          className="w-full bg-slate-200 "
           onClick={() => signIn("google", { callbackUrl: "/" })}
           disabled={isLoading}
         >
