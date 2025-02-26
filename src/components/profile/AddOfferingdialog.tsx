@@ -116,6 +116,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           className={` text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
             isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
           }`}
+          disabled={!isAdmin}
         >
           Add Offering
         </Button>

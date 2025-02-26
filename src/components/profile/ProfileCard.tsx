@@ -10,7 +10,9 @@ import { Button } from "../ui/button";
 import { ArrowRight, Badge, Video } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
-
+import { IoVideocam } from "react-icons/io5";
+import { signIn, useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 // Add this state in ProfileCard component
 
@@ -49,6 +51,7 @@ interface Offering {
 }
 
 export function ProfileCard() {
+  const { data: session, status } = useSession();
   const [profile, setProfile] = useState<CommunityProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +61,6 @@ export function ProfileCard() {
     null
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
-  
 
   // Update the Book Now button in the offering card
 
@@ -96,41 +98,40 @@ export function ProfileCard() {
     fetchOfferings();
   }, [community.communityId]);
 
- useEffect(() => {
-  if (!community?.communityId ) return; // Ensure communityId is set before fetching
+  useEffect(() => {
+    if (!community?.communityId) return; // Ensure communityId is set before fetching
 
-  const fetchProfileData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-        { communityId: community.communityId }
-      );
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+          { communityId: community.communityId }
+        );
 
-      if (response.data.r === "s") {
-        setProfile(response.data.data);
-        setAvatarImgUrl(
-          `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-        );
-        setBgImgUrl(
-          "https://random-image-pepebigotes.vercel.app/api/random-image"
-        );
+        if (response.data.r === "s") {
+          setProfile(response.data.data);
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+          );
+          setBgImgUrl(
+            "https://random-image-pepebigotes.vercel.app/api/random-image"
+          );
+        }
+      } catch (error) {
+        setError("Failed to load community profile");
+        console.error("Error fetching profile data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setError("Failed to load community profile");
-      console.error("Error fetching profile data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchProfileData();
-}, [community?.communityId]); // Dependency array includes communityId
-
+    fetchProfileData();
+  }, [community?.communityId]); // Dependency array includes communityId
 
   const handleJoinCommunity = async () => {
     if (!user?._id || !community.communityId) return;
-
+  
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
@@ -139,13 +140,15 @@ export function ProfileCard() {
           communityId: community.communityId,
         }
       );
-      // Handle successful join
-      // if (response.data.r === "s") {
-      //   // Refresh profile data
-      //   fetchProfileData();
-      // }
+  
+      // Show toast notification if the response is successful
+      if (response.data.r === "s") {
+        toast.success("Successfully joined the community!");
+
+      }
     } catch (err) {
       console.error("Error joining community:", err);
+      toast.error("Failed to join the community. Please try again.");
     }
   };
 
@@ -293,13 +296,11 @@ export function ProfileCard() {
           ) : (
             <div className="flex flex-col gap-4">
               {offerings.map((offering) => (
-                <div
-                  key={offering._id}
-                  className="group bg-white rounded-lg p-6 flex items-center justify-between hover:shadow-sm transition-all duration-300"
-                >
+                <div className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300">
+                  {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 rounded-lg">
-                      <Video className="w-5 h-5 text-blue-600 " />
+                      <IoVideocam className="text-primary h-6 w-6" />
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
@@ -310,21 +311,22 @@ export function ProfileCard() {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <div className="flex items-center gap-2">
-                        {/* <span className="text-sm text-gray-500 line-through">
-                          ₹{offering.price.original}
-                        </span> */}
-                        <span className="text-xl font-semibold text-gray-900">
-                          ₹{offering.price.amount}
-                        </span>
-                      </div>
-                    </div>
+
+ 
+                  <div className="flex items-center justify-between mt-4 px-2">
+                    <span className="text-xl font-semibold text-gray-900 pl-12">
+                      ₹{offering.price.amount}
+                    </span>
                     <Button
                       size="sm"
-                      className=" text-white px-6 py-2 rounded-lg flex items-center gap-2"
-                      onClick={() => setSelectedOffering(offering)}
+                      className="text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                      onClick={() => {
+                        if (!session) {
+                          signIn("google");
+                          return;
+                        }
+                        setSelectedOffering(offering);
+                      }}
                     >
                       <span>Book Now</span>
                       <ArrowRight className="w-4 h-4" />

@@ -2,14 +2,7 @@
 
 import type * as React from "react";
 import Link from "next/link";
-import {
-  Bell,
-  Home,
-  Compass,
-  Users,
-  ChevronDown,
-  Search,
-} from "lucide-react";
+import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -35,7 +28,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const { user } = useSelector((state: RootState) => state.user);
   // Assume communities are stored in state.community.communities (an array of Community)
   // const communities = useSelector((state: RootState) => state?.community?.communities);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
@@ -49,7 +42,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: any) => state.channel.activeCommunity
   );
   const activeCommunityId = activeCommunity?.id;
-  console.log("khbjkn",activeCommunityId)
+  console.log("khbjkn", activeCommunityId);
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
@@ -128,17 +121,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 </Link>
               </li>
               <li>
-                <Link
-                  href={
-                    activeCommunityId
-                      ? `/community/${activeCommunityId}/feed`
-                      : "/community/feed"
-                  }
-                  className="flex flex-col items-center justify-center"
-                >
-                  <Users className="w-6 h-6" />
-                </Link>
+                {activeCommunityId ? (
+                  <Link
+                    href={`/community/${activeCommunityId}/feed`}
+                    className="flex flex-col items-center justify-center"
+                  >
+                    <Users className="w-6 h-6" />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/no-community"
+                    className="flex flex-col items-center justify-center"
+                  >
+                    <Users className="w-6 h-6" />
+                  </Link>
+                )}
               </li>
+
               <li>
                 <Bell className="h-6 w-6" />
                 <span className="sr-only">Notifications</span>
@@ -150,15 +149,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             {user?._id ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
                         src={user?.avatar || "/placeholder.svg"}
                         alt="User"
                       />
-                      <AvatarFallback>
-                        {user?.email?.[0] || "U"}
-                      </AvatarFallback>
+                      <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -187,7 +187,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button className="bg-primary-gradient" onClick={() => signIn()}>
+              <Button className="text-white" onClick={() => signIn()}>
                 Sign in
               </Button>
             )}
@@ -202,7 +202,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <Home className="w-6 h-6" />
             <span className="text-xs mt-1">Home</span>
           </Link>
-          <Link href="/explore" className="flex flex-col items-center justify-center">
+          <Link
+            href="/explore"
+            className="flex flex-col items-center justify-center"
+          >
             <Compass className="w-6 h-6" />
             <span className="text-xs mt-1">Explore</span>
           </Link>
@@ -213,17 +216,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <Video className="w-6 h-6" />
             <span className="text-xs mt-1">Snips</span>
           </Link> */}
-          <Link
-            href={
-              activeCommunityId
-                ? `/community/${activeCommunityId}/feed`
-                : "/community/feed"
-            }
-            className="flex flex-col items-center justify-center"
-          >
-            <Users className="w-6 h-6" />
-            <span className="text-xs mt-1">Community</span>
-          </Link>
+          {activeCommunityId ? (
+            <Link
+              href={`/community/${activeCommunityId}/feed`}
+              className="flex flex-col items-center justify-center"
+            >
+              <Users className="w-6 h-6" />
+            </Link>
+          ) : (
+            <Link
+              href="/no-community"
+              className="flex flex-col items-center justify-center"
+            >
+              <Users className="w-6 h-6" />
+
+              <span className="text-xs mt-1">Community</span>
+            </Link>
+          )}
 
           {user?._id ? (
             <button
@@ -231,7 +240,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               onClick={handleSignOut}
             >
               <Avatar className="h-6 w-6">
-                <AvatarImage src={user.image || "/placeholder.svg"} alt="User" />
+                <AvatarImage
+                  src={user.image || "/placeholder.svg"}
+                  alt="User"
+                />
                 <AvatarFallback>HHH</AvatarFallback>
               </Avatar>
               <span className="text-xs mt-1">Sign out</span>
