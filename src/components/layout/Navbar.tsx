@@ -77,7 +77,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 w-full bg-card py-2 px-4 lg:px-20",
+          "fixed top-0 z-50 w-full bg-card pt-2 px-4 lg:px-20",
           props.className
         )}
         {...props}

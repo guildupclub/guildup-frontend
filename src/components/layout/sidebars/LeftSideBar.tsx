@@ -132,8 +132,8 @@ export function LeftSidebar() {
     if (myCommunities && myCommunities.length > 0) {
       dispatch(
         setActiveCommunity({
-          id: myCommunities[0]._id, // Now it's properly set
-          name: myCommunities[0].name,
+          id: myCommunities[0]?._id, // Now it's properly set
+          name: myCommunities[0]?.name,
         })
       );
     }
@@ -248,7 +248,7 @@ export function LeftSidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-80  pt-20 pb-3 px-4 space-y-3">
+    <aside className="left-0 h-screen w-80 pl-5 pr-2 py-4 pb-3 space-y-3 ">
       <div className="bg-card rounded-xl p-3 space-y-1">
         <div>
           <button

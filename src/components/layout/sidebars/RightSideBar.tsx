@@ -46,7 +46,7 @@ const trendingPosts = [
     shares: "12k",
   },
   {
-    id: 2,
+    id: 4,
     title: "The Financier's Forum",
     description:
       "A platform for financial professionals, investors, and enthusiasts to discuss market trends, investment...",
@@ -95,7 +95,7 @@ export function RightSidebar() {
     setShowCreatorForm(false);
   };
   return (
-    <aside className="fixed top-0 right-0 h-screen w-80  pt-20 pb-4 px-4  space-y-2">
+    <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-2">
       {/* Trending Posts Box */}
 
       <div className="bg-card rounded-xl p-4 w-full space-y-4">
