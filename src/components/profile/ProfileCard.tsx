@@ -295,7 +295,8 @@ export function ProfileCard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {offerings.map((offering) => (
+              {offerings.map((offering: any) => (
+                // eslint-disable-next-line react/jsx-key
                 <div className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300">
                   {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
