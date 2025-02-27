@@ -291,6 +291,7 @@ export function Sidebar() {
           className={`w-full text-white ${
             isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
           }`}
+          onClick={() => handleNavigation("/creator-studio")}
         >
           Creator Studio
         </Button>
