@@ -20,12 +20,12 @@ function Page() {
     setIsMounted(true);
   }, []);
 
-  // Redirect to Google auth if not authenticated, but only on the client side
-  useEffect(() => {
-    if (isMounted && status !== "loading" && !session) {
-      signIn("google"); // Redirect to Google authentication
-    }
-  }, [session, status, isMounted]);
+  //Redirect to Google auth if not authenticated, but only on the client side
+  // useEffect(() => {
+  //   if (isMounted && status !== "loading" && !session) {
+  //     signIn("google"); // Redirect to Google authentication
+  //   }
+  // }, [session, status, isMounted]);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -39,7 +39,7 @@ function Page() {
   }, []);
 
   // Render nothing while loading or redirecting
-  if (status === "loading" || !isMounted || !session) {
+  if (status === "loading" || !isMounted) {
     return <div>Loading...</div>; // You can add a loading spinner here
   }
 
@@ -52,7 +52,6 @@ function Page() {
         />
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Top Communities Section */}
             <div className="md:col-span-2 lg:col-span-3">
               <h1 className="text-xl lg:text-2xl font-bold mb-4">
                 Top Communities
@@ -60,7 +59,6 @@ function Page() {
               <CommunitySection activeCategory={selectedCategory} />
             </div>
 
-            {/* Trending Section */}
             <div className="col-span-1  hidden md:block">
               <h1 className="text-2xl font-bold mb-4">Trending Tags</h1>
               <TrendingSection />

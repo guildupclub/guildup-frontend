@@ -12,7 +12,7 @@ interface CategoryBarProps {
 
 function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
+  console.log("slected cat",selectCategory,categorys);
   const handleCategorySelect = (id: string) => {
     setSelectedCategory(id); // Update the selected category state
     selectCategory(id); // Call the parent function

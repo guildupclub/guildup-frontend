@@ -51,11 +51,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log("in handle submit");
     e.preventDefault();
     if (!user?._id || !communityId) return;
-
+  
     setLoading(true);
+    let newTab: Window | null = null;
     try {
+      // Open a new tab before making the API call
+      //newTab = window.open("", "_blank");
+  
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/create`,
         {
@@ -65,7 +70,17 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           communityId,
         }
       );
-
+      console.log(response);
+      console.log(response.data.data.authUrl);
+      if (response.data.data.authUrl) {
+        console.log("Redirecting...");
+        newTab = window.open(response.data.data.authUrl, "_blank");
+        if (!newTab) {
+          alert("Pop-up blocked! Please allow pop-ups for this site.");
+        }
+        return;
+      }
+  
       if (response.data.r === "s") {
         setOpen(false);
         onOfferingAdded();
@@ -85,6 +100,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       }
     } catch (error) {
       console.error("Error creating offering:", error);
+      if (newTab) {
+        newTab.close();
+      }
     } finally {
       setLoading(false);
     }
@@ -98,6 +116,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           className={` text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
             isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
           }`}
+          disabled={!isAdmin}
         >
           Add Offering
         </Button>
