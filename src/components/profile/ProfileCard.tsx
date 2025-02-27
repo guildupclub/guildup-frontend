@@ -52,9 +52,7 @@ interface Offering {
 }
 
 export function ProfileCard() {
-  const userFollowedCommunities = useSelector(
-    (state: RootState) => state.user.userFollowedCommunities
-  );
+  const userFollowedCommunities = useSelector((state: RootState) => state.user.userFollowedCommunities);
   const user = useSelector((state: RootState) => state.user.user);
   const community = useSelector((state: RootState) => state.community);
   const memberDetails = useSelector(
@@ -76,6 +74,7 @@ export function ProfileCard() {
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
   );
+
 
   // Now button in the offering card
 
@@ -227,19 +226,17 @@ export function ProfileCard() {
                 </div>
               </div>
             </div>
-            {memberDetails?.is_owner ? (
-              ""
-            ) : (
-              <Button
-                variant="default"
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
-                onClick={handleJoinCommunity}
-              >
-                <HiMiniUserGroup className="h-8 w-8" />
-                {isCommunityFollowed ? "Joined" : "Join Community"}
-              </Button>
-            )}
+           {
+            memberDetails?.is_owner ?"":( <Button
+              variant="default"
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+              onClick={handleJoinCommunity}
+            >
+              <HiMiniUserGroup className="h-8 w-8" />
+            {isCommunityFollowed? "Joined":"Join Community"}  
+            </Button>)
+           }
           </div>
         </div>
       </div>
