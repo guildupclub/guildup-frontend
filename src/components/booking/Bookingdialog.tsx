@@ -24,18 +24,15 @@ import {
   Check,
 } from "lucide-react";
 import { format } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "react-toastify";
-import {
-  loadRazorpayScript,
-  RazorpayOptions,
-  RazorpayResponse,
-} from "@/components/utils/razorpay";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
+import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, Clock, CalendarIcon, DollarSign } from "lucide-react"
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -356,6 +353,7 @@ export function BookingDialog({
                     <GoDotFill className="" />
                     {offering?.type}
                   </p>
+
                 </div>
 
                 {/* Details (Duration & Price) */}
