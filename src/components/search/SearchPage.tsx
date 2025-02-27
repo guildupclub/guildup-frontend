@@ -33,7 +33,7 @@ function SearchPageContent() {
       setError("");
 
       try {
-        const endpoint = `${API_BASE_URL}/v1/community/relook`;
+        const endpoint = `${API_BASE_URL}/v1/community/look`;
 
         const response = await fetch(endpoint, {
           method: "POST",
