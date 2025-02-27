@@ -30,6 +30,8 @@ import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { setMemberDetails } from "@/redux/memberSlice";
+import { FiEdit } from "react-icons/fi";
+import { EditCommunityModal } from "../form/editCommunity";
 
 export function Sidebar() {
   const dispatch = useDispatch();
@@ -57,6 +59,7 @@ export function Sidebar() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "discussion",
@@ -204,11 +207,21 @@ export function Sidebar() {
 
   return (
     <div className="fixed h-screen w-80 bg-card p-4 py-24">
-      <div>
-        <h2 className="px-2 text-lg text-muted">{activeCommunityName}</h2>
+      <div className="flex items-center justify-between px-2">
+        <h2 className="text-lg text-muted font-semibold">
+          {activeCommunityName}
+        </h2>
+  
+        <button
+          className="p-1 rounded-md hover:bg-background transition"
+          onClick={() => setIsEditOpen(true)}
+        >
+          <FiEdit size={18} className="text-muted hover:text-primary" />
+        </button>
       </div>
+      <Separator />
       <div className="space-y-2">
-        <div className="border-b border-background p-2">
+        <div className="border-b border-background py-2">
           <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
             <PostDialog />
           </div>
@@ -433,6 +446,12 @@ export function Sidebar() {
           </div>
         </div>
       </div>
+      {isEditOpen && (
+        <EditCommunityModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

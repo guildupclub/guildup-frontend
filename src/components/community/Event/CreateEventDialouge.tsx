@@ -43,11 +43,15 @@ export function PostDialog() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
 
   const activeCommunityId = activeCommunity?.id;
   console.log(activeCommunityId);
   const userID = useSelector((state: RootState) => state.user.user?._id);
-  
+
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const { data: session } = useSession();
@@ -181,10 +185,19 @@ export function PostDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 text-muted">
-          <div className="rounded-md bg-card hover:bg-background text-muted mx-2">
+        <button
+          className={`flex items-center gap-2  text-accent ${
+            !isAdmin ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isAdmin}
+        >
+          <div
+            className={`rounded-md bg-card text-accent mx-2 ${
+              isAdmin ? "hover:bg-background" : ""
+            }`}
+          >
             <Plus />
-          </div>{" "}
+          </div>
           Create
         </button>
       </DialogTrigger>
