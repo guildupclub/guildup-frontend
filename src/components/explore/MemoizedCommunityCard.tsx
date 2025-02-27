@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
@@ -6,6 +6,10 @@ import { IoVideocam } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
 import { FaYoutube } from "react-icons/fa";
+import { ArrowRight } from "lucide-react";
+import { BookingDialog } from "../booking/Bookingdialog"; // Ensure correct import path
+import { useSession, signIn } from "next-auth/react";
+
 function CommunityCard({
   community,
   onClick,
@@ -13,6 +17,9 @@ function CommunityCard({
   community: any;
   onClick: (id: string) => void;
 }) {
+  const { data: session } = useSession();
+  const [selectedOffering, setSelectedOffering] = useState<any>(null);
+
   const tags: string[] = [
     ...new Set(
       community?.offerings?.flatMap((offering: any) =>
@@ -20,7 +27,6 @@ function CommunityCard({
       )
     ),
   ] as string[];
-  
 
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
@@ -93,8 +99,19 @@ function CommunityCard({
             </p>
           </div>
         </div>
+
         {OfferingDetails && (
-          <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
+          <Button
+            size="sm"
+            className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
+            onClick={(e) => {
+              if (!session) {
+                signIn("google");
+                return;
+              }
+              setSelectedOffering(OfferingDetails[0]);
+            }}
+          >
             {OfferingDetails?.[0]?.price?.amount ? (
               <>
                 <span className="line-through text-xs opacity-60">
@@ -108,8 +125,30 @@ function CommunityCard({
           </Button>
         )}
       </div>
+      {/* {selectedOffering && (
+        <BookingDialog
+          offering={selectedOffering}
+          isOpen={!!selectedOffering}
+          onClose={() => setSelectedOffering(null)}
+        />
+      )} */}
     </Card>
   );
 }
 
 export default React.memo(CommunityCard);
+
+{
+  /* <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
+{OfferingDetails?.[0]?.price?.amount ? (
+  <>
+    <span className="line-through text-xs opacity-60">
+      ₹{OfferingDetails[0].price.amount + 1000}
+    </span>{" "}
+  </>
+) : null}
+{OfferingDetails?.[0]?.price?.amount
+  ? `₹${OfferingDetails[0].price.amount}`
+  : "FREE"}
+</Button> */
+}

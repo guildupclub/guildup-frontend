@@ -13,6 +13,7 @@ import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
 import { signIn, useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { HiMiniUserGroup } from "react-icons/hi2";
 
 // Add this state in ProfileCard component
 
@@ -51,6 +52,14 @@ interface Offering {
 }
 
 export function ProfileCard() {
+  const userFollowedCommunities = useSelector(
+    (state: RootState) => state.user.userFollowedCommunities
+  );
+  const user = useSelector((state: RootState) => state.user.user);
+  const community = useSelector((state: RootState) => state.community);
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<CommunityProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +71,13 @@ export function ProfileCard() {
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
 
-  // Update the Book Now button in the offering card
+  const activeCommunityId = community?.communityId;
+
+  const isCommunityFollowed = userFollowedCommunities.some(
+    (c) => c?._id === activeCommunityId
+  );
+
+  // Now button in the offering card
 
   // First, add the Offering interface
 
@@ -91,9 +106,7 @@ export function ProfileCard() {
 
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
-  const user = useSelector((state: RootState) => state.user.user);
 
-  const community = useSelector((state: RootState) => state.community);
   useEffect(() => {
     fetchOfferings();
   }, [community.communityId]);
@@ -214,15 +227,19 @@ export function ProfileCard() {
                 </div>
               </div>
             </div>
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
-              onClick={handleJoinCommunity}
-            >
-              Join Community
-            </Button>
-            
+            {memberDetails?.is_owner ? (
+              ""
+            ) : (
+              <Button
+                variant="default"
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                onClick={handleJoinCommunity}
+              >
+                <HiMiniUserGroup className="h-8 w-8" />
+                {isCommunityFollowed ? "Joined" : "Join Community"}
+              </Button>
+            )}
           </div>
         </div>
       </div>

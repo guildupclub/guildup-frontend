@@ -257,7 +257,7 @@ export function Sidebar() {
         </Button>
 
         {/* Announcements */}
-        <Button
+        {/* <Button
           variant="ghost"
           className={`w-full justify-start gap-2 ${
             pathname === "/community/announcements"
@@ -268,7 +268,7 @@ export function Sidebar() {
         >
           <GrAnnounce />
           Announcements
-        </Button>
+        </Button> */}
         {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "

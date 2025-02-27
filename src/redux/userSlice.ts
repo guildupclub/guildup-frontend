@@ -1,13 +1,22 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
+
+
+interface Community {
+  id: string;
+  name: string;
+}
 interface UserState {
   user: Session["user"] | null; 
   sessionId: string | null;
+  userFollowedCommunities: Community[]; 
 }
 const initialState: UserState = {
   user: null,
-  sessionId: null, // Initialize sessionId as null
+  sessionId: null, 
+  userFollowedCommunities: [], 
 };
+
 
 export const userSlice = createSlice({
   name: "user",
@@ -19,12 +28,16 @@ export const userSlice = createSlice({
     setSessionId: (state, action: PayloadAction<string | null>) => {
       state.sessionId = action.payload; // Add sessionId to the state
     },
+    setUserFollowedCommunities: (state, action: PayloadAction<Community[]>) => {
+      state.userFollowedCommunities = action.payload; // Store user-followed communities
+    },
     clearUser: (state) => {
       state.user = null;
       state.sessionId = null; // Clear sessionId when the user is cleared
+      state.userFollowedCommunities = [];
     },
   },
 });
 
-export const { setUser, setSessionId, clearUser } = userSlice.actions;
+export const { setUser, setSessionId, setUserFollowedCommunities, clearUser } = userSlice.actions;
 export default userSlice.reducer;
