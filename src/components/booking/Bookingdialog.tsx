@@ -32,7 +32,6 @@ import axios from "axios";
 import { GoDotFill } from "react-icons/go";
 import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Clock, CalendarIcon, DollarSign } from "lucide-react"
 interface BookingDialogProps {
   offering: {
     _id: string;

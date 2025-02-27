@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +15,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface User {
   _id: string;
@@ -35,10 +44,20 @@ interface MembersResponse {
   data: Member[];
 }
 
-export default function Members({ communityId }: { communityId: string }) {
+export default function Members() {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  const { user } = useSelector((state: RootState) => state.user);
+  const removerUserId = user?._id;
+
+  const activeCommunity = useSelector(
+    (state: any) => state.channel.activeCommunity
+  );
+  const communityId = activeCommunity?.id;
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -47,16 +66,12 @@ export default function Members({ communityId }: { communityId: string }) {
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/members`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ communityId }),
           }
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch members");
-        }
+        if (!response.ok) throw new Error("Failed to fetch members");
 
         const data: MembersResponse = await response.json();
         setMembers(data.data);
@@ -67,8 +82,43 @@ export default function Members({ communityId }: { communityId: string }) {
       }
     };
 
-    fetchMembers();
+    if (communityId) fetchMembers();
   }, [communityId]);
+
+  const handleRemoveClick = (userId: string) => {
+    setSelectedUserId(userId);
+    setShowConfirmModal(true);
+  };
+
+  const confirmRemoveUser = async () => {
+    if (!selectedUserId || !removerUserId || !communityId) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:8000/v1/community/removeUser`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: selectedUserId,
+            communityId,
+            removerUserId,
+          }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to remove user");
+
+      setMembers(
+        members.filter((member) => member.user_id._id !== selectedUserId)
+      );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setShowConfirmModal(false);
+      setSelectedUserId(null);
+    }
+  };
 
   if (error) {
     return (
@@ -81,7 +131,7 @@ export default function Members({ communityId }: { communityId: string }) {
   }
 
   return (
-    <Card className="bg-card border-zinc-800 text-muted-foreground m-4">
+    <Card className="bg-card border-background text-muted-foreground m-4">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-muted">
           <UserCircle className="h-5 w-5 text-accent" />
@@ -142,32 +192,51 @@ export default function Members({ communityId }: { communityId: string }) {
                       </p>
                     </div>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <button
-                        aria-label="Options"
-                        className="text-muted-foreground"
-                      >
-                        <MoreHorizontal className="h-5 w-5" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-card border-zinc-700 hover:bg-background">
-                      <DropdownMenuItem
-                        onClick={() => console.log("Block User")}
-                      >
-                        Block User
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => console.log("See Profile")}
-                      >
-                        See Profile
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {!member.is_owner && (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger>
+                        <button
+                          aria-label="Options"
+                          className="text-muted-foreground"
+                        >
+                          <MoreHorizontal className="h-5 w-5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-card border-zinc-700 hover:bg-background cursor-pointer">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleRemoveClick(member.user_id._id)}
+                        >
+                          Remove User
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </div>
               ))}
         </div>
       </CardContent>
+
+      {/* Confirmation Modal */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent>
+          <DialogHeader>
+            <h2 className="text-lg font-semibold">Confirm Removal</h2>
+          </DialogHeader>
+          <p>Are you sure you want to remove this user?</p>
+          <DialogFooter>
+            <Button
+              variant="secondary"
+              onClick={() => setShowConfirmModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmRemoveUser}>
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
