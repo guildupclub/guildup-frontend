@@ -14,6 +14,8 @@ import { IoVideocam } from "react-icons/io5";
 import { signIn, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { HiMiniUserGroup } from "react-icons/hi2";
+import { FiEdit } from "react-icons/fi";
+import { EditCommunityModal } from "../form/editCommunity";
 
 // Add this state in ProfileCard component
 
@@ -70,6 +72,7 @@ export function ProfileCard() {
     null
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const activeCommunityId = community?.communityId;
   console.log(activeCommunityId);
@@ -226,9 +229,21 @@ export function ProfileCard() {
         <div className="pt-16 pb-4 px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-foreground tracking-tight">
-                {profile.community.name}
+              <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                {profile?.community?.name}
+                {memberDetails?.is_owner && (
+                  <button
+                    className="p-1 rounded-md hover:bg-background transition"
+                    onClick={() => setIsEditOpen(true)}
+                  >
+                    <FiEdit
+                      size={18}
+                      className="text-muted hover:text-primary"
+                    />
+                  </button>
+                )}
               </h1>
+
               <p className="text-muted-foreground text-lg">
                 Created by{" "}
                 <span className="text-foreground">
@@ -396,6 +411,12 @@ export function ProfileCard() {
           )}
         </div>
       </div>
+      {isEditOpen && (
+        <EditCommunityModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

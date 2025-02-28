@@ -208,17 +208,20 @@ export function Sidebar() {
   return (
     <div className="fixed h-screen w-80 bg-card p-4 py-24">
       <div className="flex items-center justify-between px-2">
-        <h2 className="text-lg text-muted font-semibold">
+        <h2 className="text-lg text-muted-foreground font-semibold">
           {activeCommunityName}
         </h2>
-  
-        <button
-          className="p-1 rounded-md hover:bg-background transition"
-          onClick={() => setIsEditOpen(true)}
-        >
-          <FiEdit size={18} className="text-muted hover:text-primary" />
-        </button>
+
+        {isAdmin && (
+          <button
+            className="p-1 rounded-md hover:bg-background transition"
+            onClick={() => setIsEditOpen(true)}
+          >
+            <FiEdit size={18} className="text-muted hover:text-primary" />
+          </button>
+        )}
       </div>
+
       <Separator />
       <div className="space-y-2">
         <div className="border-b border-background py-2">

@@ -172,12 +172,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <DropdownMenuItem className="hover:bg-primary-gradient">
                     {user?.email}
                   </DropdownMenuItem>
-                  <DropdownMenuItem
+                  {/* <DropdownMenuItem
                     className="hover:bg-primary-gradient"
                     onClick={handleEditClick}
                   >
                     Edit Community
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                   <DropdownMenuItem
                     className="hover:bg-primary-gradient"
                     onClick={handleSignOut}
