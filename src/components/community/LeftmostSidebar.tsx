@@ -56,9 +56,9 @@ export function LeftmostSidebar() {
 
   const activeCommunityId = activeCommunity?.id;
 
-  // useEffect(() => {
-  //   fetchCommunities();
-  // }, []);
+  useEffect(() => {
+    fetchCommunities();
+  }, []);
 
   // const fetchCommunities = async () => {
   //   try {
@@ -124,8 +124,25 @@ const fetchCommunities = async (): Promise<Community[]> => {
   if (!response.ok) {
     throw new Error("Failed to fetch communities");
   }
-
   const result = await response.json();
+      console.log("comm", result);
+      const validCommunities = result.data.filter(
+        (community: Community | null) => community !== null
+      );
+      // setCommunitie(validCommunities);
+
+      dispatch(setUserFollowedCommunities(validCommunities));
+
+
+      if (validCommunities.length > 0 && !activeCommunityId) {
+        dispatch(
+          setActiveCommunity({
+            id: validCommunities[0]._id,
+            name: validCommunities[0].name, // Include name
+          })
+        );
+      }
+  // const result = await response.json();
   return result.data.filter((community: Community | null) => community !== null);
 };
 
