@@ -154,7 +154,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 {user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
                         <Avatar className="h-10 w-10">
                           <AvatarImage
                             src={user?.avatar || "/placeholder.svg"}
