@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 
@@ -85,26 +86,35 @@ const trendingPosts = [
 // ];
 
 export function RightSidebar() {
-  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-  const handleOpenForm = () => {
-    setShowCreatorForm((prev) => !prev);
-  };
+  // const handleOpenForm = () => {
+  //   setShowCreatorForm((prev) => !prev);
+  // };
 
-  const handleCloseForm = () => {
-    setShowCreatorForm(false);
-  };
+  // const handleCloseForm = () => {
+  //   setShowCreatorForm(false);
+  // };
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-2">
       {/* Trending Posts Box */}
 
-      <div className="bg-card rounded-xl p-4 w-full space-y-4">
+      {/* <div className="bg-card rounded-xl p-4 w-full space-y-4">
         <h1 className="">Ready to start making money?</h1>
-        <Button className="w-full text-white" onClick={handleOpenForm}>
+        <Button className="w-full text-white" onClick={()=> setAvc((prev) => !prev)}>
           Become a Creator
         </Button>
 
-        {showCreatorForm && <CreatorForm />}
+        {avc && <CreatorForm />}
+      </div> */}
+      <div className="bg-card rounded-xl p-4 w-full space-y-4">
+        <h1>Ready to start making money?</h1>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Button className="w-full text-white" asChild>
+            <DialogTrigger>Become a Creator</DialogTrigger>
+          </Button>
+          <CreatorForm onClose={() => setIsDialogOpen(false)} />
+        </Dialog>
       </div>
 
       <div className="bg-card rounded-xl p-4">

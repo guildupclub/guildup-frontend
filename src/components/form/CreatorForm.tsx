@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,18 +14,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { categories } from "./Categories";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
-export default function CreatorForm() {
+interface CreatorFormProps {
+  onClose: () => void;
+}
+
+export default function CreatorForm({ onClose }: CreatorFormProps) {
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
@@ -37,7 +37,6 @@ export default function CreatorForm() {
     topic: "",
   });
   const [categoryId, setCategoryId] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [additionalTags] = useState(["first_community", "abhishek"]);
 
   const handleInputChange = (
@@ -74,7 +73,7 @@ export default function CreatorForm() {
       const data = await response.json();
       if (data.r === "s") {
         toast.success("Community created successfully! 🎉");
-        setIsDialogOpen(false);
+        onClose();
       } else if (data.r === "e") {
         throw new Error(data.e || "Failed to create community");
       } else {
@@ -86,82 +85,72 @@ export default function CreatorForm() {
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
+    <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
+      <DialogHeader className="flex items-center justify-between">
+        <DialogTitle className="text-xl font-normal">
+          Fill to become a creator
+        </DialogTitle>
+        {/* <X className="h-6 w-6 cursor-pointer" onClick={onClose} /> */}
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label>Community Name</Label>
+          <Input
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter name"
+            className="bg-background border-none"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Select Topic</Label>
+          <Select onValueChange={handleCategoryChange}>
+            <SelectTrigger className="bg-background border-none">
+              <SelectValue placeholder="Select your topic" />
+            </SelectTrigger>
+            <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
+              {categories.map((category) => (
+                <SelectItem key={category._id} value={category._id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Tags</Label>
+          <Input
+            name="tags"
+            value={formData.tags}
+            onChange={handleInputChange}
+            placeholder="Enter Tags"
+            className="bg-background border-none"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Community Description</Label>
+          <Textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Type anything"
+            className="bg-background border-none min-h-[30px]"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end gap-4 mt-2">
         <Button
-          variant="ghost"
-          size="icon"
-          className="w-8 h-8 rounded-lg bg-card hover:bg-background text-accent"
+          variant="outline"
+          onClick={onClose}
+          className="text-muted bg-transparent border-gray-600 hover:bg-background"
         >
-          <Plus className="h-6 w-6" />
+          Cancel
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
-        <DialogHeader className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-normal">
-            Fill to become a creator
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>Community Name</Label>
-            <Input
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter name"
-              className="bg-background border-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Select Topic</Label>
-            <Select onValueChange={handleCategoryChange}>
-              <SelectTrigger className="bg-background border-none">
-                <SelectValue placeholder="Select your topic" />
-              </SelectTrigger>
-              <SelectContent className="bg-background  text-accent border-none h-64 cursor-pointer">
-                {categories.map((category) => (
-                  <SelectItem key={category._id} value={category._id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Tags</Label>
-            <Input
-              name="tags"
-              value={formData.tags}
-              onChange={handleInputChange}
-              placeholder="Enter Tags"
-              className="bg-background  border-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Community Description</Label>
-            <Textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Type anything"
-              className="bg-background  border-none min-h-[30px]"
-            />
-          </div>
-        </div>
-        <div className="flex justify-end gap-4 mt-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsDialogOpen(false)}
-            className="text-muted bg-transparent border-gray-600 hover:bg-background  "
-          >
-            Cancel
-          </Button>
-          <Button className="text-white" onClick={handleSubmit}>
-            Create
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+        <Button className="text-white" onClick={handleSubmit}>
+          Create
+        </Button>
+      </div>
+    </DialogContent>
   );
 }

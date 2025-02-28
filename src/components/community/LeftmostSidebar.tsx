@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,7 +20,6 @@ import Link from "next/link";
 import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
 
-// Type for community data
 interface Community {
   _id: string;
   title: string;
@@ -41,23 +38,19 @@ export function LeftmostSidebar() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreatorForm, setShowCreatorForm] = React.useState(false);
-
+  const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
+  
   const handleOpenForm = () => {
-    setShowCreatorForm((prev) => !prev);
-  };
+        setShowCreatorForm((prev) => !prev);
+      };
 
   const dispatch = useDispatch();
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
-  const user = useSelector(
-    (state: RootState) => state.user.user
-  );
-
-  const activeCommunityId = activeCommunity?.id;
-
-
-  useEffect(() => {
+  const user = useSelector((state: RootState) => state.user.user);
+const activeCommunityId = activeCommunity?.id;
+    useEffect(() => {
     fetchCommunities();
   }, []);
 
@@ -132,10 +125,9 @@ export function LeftmostSidebar() {
 
   return (
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
-
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
-          {isLoading ? (
+        {isLoading ? (
             // Loading skeleton
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
@@ -151,13 +143,11 @@ export function LeftmostSidebar() {
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative w-12 h-12 rounded-full  ${
-                  activeCommunityId === community._id
+                className={`relative w-12 h-12 rounded-full  ${activeCommunityId === community._id
                     ? "bg-blue-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
-                }`}
-                onClick={() =>
-                {
+                  }`}
+                onClick={() => {
 
                   dispatch(
                     setActiveCommunity({
@@ -165,12 +155,12 @@ export function LeftmostSidebar() {
                       name: community.name,
                     })
                   )
-                 dispatch(
-                        setCommunityData({
-                          communityId: community._id,
-                          userId: user._id,
-                        })
-                      ); 
+                  dispatch(
+                    setCommunityData({
+                      communityId: community._id,
+                      userId: user._id,
+                    })
+                  );
                 }
                 }
               >
@@ -190,19 +180,28 @@ export function LeftmostSidebar() {
             ))
           )}
 
-          <Dialog>
-            <CreatorForm />
-            <Link href="/explore">
+          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+            <DialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
               >
-                <FaCompass />
+                <Plus className="h-6 w-6" />
               </Button>
-            </Link>
-            {showCreatorForm && <CreatorForm />}
+            </DialogTrigger>
+            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
           </Dialog>
+
+          <Link href="/explore">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+            >
+              <FaCompass />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
