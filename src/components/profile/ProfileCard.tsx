@@ -13,6 +13,9 @@ import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
 import { signIn, useSession } from "next-auth/react";
 import { toast } from "sonner";
+import { HiMiniUserGroup } from "react-icons/hi2";
+import { FiEdit } from "react-icons/fi";
+import { EditCommunityModal } from "../form/editCommunity";
 
 // Add this state in ProfileCard component
 
@@ -51,6 +54,14 @@ interface Offering {
 }
 
 export function ProfileCard() {
+  const userFollowedCommunities = useSelector(
+    (state: RootState) => state.user.userFollowedCommunities
+  );
+  const user = useSelector((state: RootState) => state.user.user);
+  const community = useSelector((state: RootState) => state.community);
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
   const { data: session, status } = useSession();
   const [profile, setProfile] = useState<CommunityProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,8 +72,18 @@ export function ProfileCard() {
     null
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
-  // Update the Book Now button in the offering card
+  const activeCommunityId = community?.communityId;
+  console.log(activeCommunityId);
+
+  const isCommunityFollowed = userFollowedCommunities.some(
+    (c) => c?._id === activeCommunityId
+  );
+  console.log(isCommunityFollowed);
+  console.log(userFollowedCommunities);
+
+  // Now button in the offering card
 
   // First, add the Offering interface
 
@@ -91,9 +112,28 @@ export function ProfileCard() {
 
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
-  const user = useSelector((state: RootState) => state.user.user);
 
-  const community = useSelector((state: RootState) => state.community);
+  const handleLeaveCommunity = async () => {
+    if (!user?._id || !community.communityId) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
+        {
+          userId: user._id,
+          communityId: community.communityId,
+        }
+      );
+
+      if (response.data.r === "s") {
+        toast.success("Successfully left the community!");
+      }
+    } catch (err) {
+      console.error("Error leaving community:", err);
+      toast.error("Failed to leave the community. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchOfferings();
   }, [community.communityId]);
@@ -189,9 +229,21 @@ export function ProfileCard() {
         <div className="pt-16 pb-4 px-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-foreground tracking-tight">
-                {profile.community.name}
+              <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                {profile?.community?.name}
+                {memberDetails?.is_owner && (
+                  <button
+                    className="p-1 rounded-md hover:bg-background transition"
+                    onClick={() => setIsEditOpen(true)}
+                  >
+                    <FiEdit
+                      size={18}
+                      className="text-muted hover:text-primary"
+                    />
+                  </button>
+                )}
               </h1>
+
               <p className="text-muted-foreground text-lg">
                 Created by{" "}
                 <span className="text-foreground">
@@ -214,15 +266,29 @@ export function ProfileCard() {
                 </div>
               </div>
             </div>
-            <Button
-              variant="default"
-              size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
-              onClick={handleJoinCommunity}
-            >
-              Join Community
-            </Button>
-            
+            {memberDetails?.is_owner ? (
+              ""
+            ) : isCommunityFollowed ? (
+              <Button
+                variant="destructive"
+                size="lg"
+                className="bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                onClick={handleLeaveCommunity}
+              >
+                <HiMiniUserGroup className="h-8 w-8" />
+                Leave Community
+              </Button>
+            ) : (
+              <Button
+                variant="default"
+                size="lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                onClick={handleJoinCommunity}
+              >
+                <HiMiniUserGroup className="h-8 w-8" />
+                Join Community
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -346,6 +412,12 @@ export function ProfileCard() {
           )}
         </div>
       </div>
+      {isEditOpen && (
+        <EditCommunityModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

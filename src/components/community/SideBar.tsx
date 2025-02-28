@@ -30,6 +30,8 @@ import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { setMemberDetails } from "@/redux/memberSlice";
+import { FiEdit } from "react-icons/fi";
+import { EditCommunityModal } from "../form/editCommunity";
 
 export function Sidebar() {
   const dispatch = useDispatch();
@@ -57,6 +59,7 @@ export function Sidebar() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pathname = usePathname();
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "discussion",
@@ -204,11 +207,24 @@ export function Sidebar() {
 
   return (
     <div className="fixed h-screen w-80 bg-card p-4 py-24">
-      <div>
-        <h2 className="px-2 text-lg text-muted">{activeCommunityName}</h2>
+      <div className="flex items-center justify-between px-2">
+        <h2 className="text-lg text-muted-foreground font-semibold">
+          {activeCommunityName}
+        </h2>
+
+        {isAdmin && (
+          <button
+            className="p-1 rounded-md hover:bg-background transition"
+            onClick={() => setIsEditOpen(true)}
+          >
+            <FiEdit size={18} className="text-muted hover:text-primary" />
+          </button>
+        )}
       </div>
+
+      <Separator />
       <div className="space-y-2">
-        <div className="border-b border-background p-2">
+        <div className="border-b border-background py-2">
           <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
             <PostDialog />
           </div>
@@ -257,7 +273,7 @@ export function Sidebar() {
         </Button>
 
         {/* Announcements */}
-        <Button
+        {/* <Button
           variant="ghost"
           className={`w-full justify-start gap-2 ${
             pathname === "/community/announcements"
@@ -268,7 +284,7 @@ export function Sidebar() {
         >
           <GrAnnounce />
           Announcements
-        </Button>
+        </Button> */}
         {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
@@ -291,6 +307,7 @@ export function Sidebar() {
           className={`w-full text-white ${
             isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
           }`}
+          onClick={() => handleNavigation("/creator-studio")}
         >
           Creator Studio
         </Button>
@@ -432,6 +449,12 @@ export function Sidebar() {
           </div>
         </div>
       </div>
+      {isEditOpen && (
+        <EditCommunityModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

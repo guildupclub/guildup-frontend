@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,23 +26,21 @@ import {
 } from "@/components/ui/dialog";
 
 import { categories } from "./Categories";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 
 export default function CreatorForm() {
+  const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
-  const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     tags: "",
-    topic: "",
   });
   const [categoryId, setCategoryId] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [additionalTags] = useState(["first_community", "abhishek"]);
 
+  // Handle input change
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -47,19 +48,19 @@ export default function CreatorForm() {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle category change
   const handleCategoryChange = (value: string) => {
     setCategoryId(value);
   };
 
-  const handleSubmit = async () => {
-    try {
+  // Mutation for creating community
+  const createCommunity = useMutation({
+    mutationFn: async () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/create`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: userId,
             name: formData.name,
@@ -72,17 +73,29 @@ export default function CreatorForm() {
       );
 
       const data = await response.json();
-      if (data.r === "s") {
-        toast.success("Community created successfully! 🎉");
-        setIsDialogOpen(false);
-      } else if (data.r === "e") {
+      if (data.r !== "s")
         throw new Error(data.e || "Failed to create community");
-      } else {
-        throw new Error("Unexpected response from the server");
-      }
-    } catch (error: any) {
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Community created successfully! 🎉");
+      setIsDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["communities"] }); // Refresh data
+      setFormData({ name: "", description: "", tags: "" });
+      setCategoryId("");
+    },
+    onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
+    },
+  });
+
+  // Handle submit action
+  const handleSubmit = () => {
+    if (!formData.name || !formData.description || !categoryId) {
+      toast.error("Please fill in all required fields.");
+      return;
     }
+    createCommunity.mutate();
   };
 
   return (
@@ -115,11 +128,11 @@ export default function CreatorForm() {
           </div>
           <div className="space-y-2">
             <Label>Select Topic</Label>
-            <Select onValueChange={handleCategoryChange}>
+            <Select onValueChange={handleCategoryChange} value={categoryId}>
               <SelectTrigger className="bg-background border-none">
                 <SelectValue placeholder="Select your topic" />
               </SelectTrigger>
-              <SelectContent className="bg-background  text-accent border-none h-64 cursor-pointer">
+              <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
                 {categories.map((category) => (
                   <SelectItem key={category._id} value={category._id}>
                     {category.name}
@@ -135,7 +148,7 @@ export default function CreatorForm() {
               value={formData.tags}
               onChange={handleInputChange}
               placeholder="Enter Tags"
-              className="bg-background  border-none"
+              className="bg-background border-none"
             />
           </div>
           <div className="space-y-2">
@@ -145,7 +158,7 @@ export default function CreatorForm() {
               value={formData.description}
               onChange={handleInputChange}
               placeholder="Type anything"
-              className="bg-background  border-none min-h-[30px]"
+              className="bg-background border-none min-h-[30px]"
             />
           </div>
         </div>
@@ -153,12 +166,16 @@ export default function CreatorForm() {
           <Button
             variant="outline"
             onClick={() => setIsDialogOpen(false)}
-            className="text-muted bg-transparent border-gray-600 hover:bg-background  "
+            className="text-muted bg-transparent border-gray-600 hover:bg-background"
           >
             Cancel
           </Button>
-          <Button className="text-white" onClick={handleSubmit}>
-            Create
+          <Button
+            className="text-white"
+            onClick={handleSubmit}
+            disabled={createCommunity.isLoading}
+          >
+            {createCommunity.isLoading ? "Creating..." : "Create"}
           </Button>
         </div>
       </DialogContent>
