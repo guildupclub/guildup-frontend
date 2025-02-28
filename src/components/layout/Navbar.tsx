@@ -155,7 +155,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage
-                        src={user?.avatar || "/placeholder.svg"}
+                        src={user?.image || "/placeholder.svg"}
                         alt="User"
                       />
                       <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>

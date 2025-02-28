@@ -7,8 +7,7 @@ import MemoizedCommunityCard from "./MemoizedCommunityCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setCommunityData } from "@/redux/communitySlice";
-import { setActiveCommunity } from "@/redux/channelSlice";
-import Loader from "../Loader"; 
+import Loader from "../Loader";
 
 interface Community {
   _id: string;
@@ -33,11 +32,11 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
-  const [clickLoading, setClickLoading] = useState(false); 
+  const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
     const fetchTopCommunity = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
@@ -47,7 +46,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
       } catch (error) {
         console.error("Error fetching communities", error);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
 
@@ -56,16 +55,16 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     }
   }, [activeCategory]);
 
-  // Handle Community Click
   const handleClickCommunity = useCallback(
-    (community: Community) => {
+    (communityWrapper: { community: Community }) => {
+      const community = communityWrapper.community; // Extract the actual community object
+
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
         return;
       }
 
-      console.log("Clicked community:", community);
-      setClickLoading(true); // Show loader on click
+      setClickLoading(true);
 
       dispatch(
         setCommunityData({
@@ -81,25 +80,23 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
 
   return (
     <div className="bg-background min-h-screen lg:p-4">
-      {loading ? ( // Show loader while fetching communities
-        <Loader />
+      {loading ? (
+        <p className="text-center mt-4">Loading...</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
           {communities.length > 0 ? (
-            communities.map((community) => (
+            communities.map((communityWrapper) => (
               <MemoizedCommunityCard
-                key={community._id}
-                community={community}
-                onClick={() => handleClickCommunity(community)}
+                key={communityWrapper.community._id}
+                community={communityWrapper}
+                onClick={() => handleClickCommunity(communityWrapper)}
               />
             ))
           ) : (
-            <div className="text-center text-gray-400">No community found</div>
+            <p className="text-center col-span-3">No communities found</p>
           )}
         </div>
       )}
-      {clickLoading && <p className="text-center mt-4">Loading...</p>}{" "}
-      {/* Loader when clicking */}
     </div>
   );
 };
