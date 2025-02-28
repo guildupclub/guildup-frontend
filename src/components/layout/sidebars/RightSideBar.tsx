@@ -97,16 +97,6 @@ export function RightSidebar() {
   // };
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-2">
-      {/* Trending Posts Box */}
-
-      {/* <div className="bg-card rounded-xl p-4 w-full space-y-4">
-        <h1 className="">Ready to start making money?</h1>
-        <Button className="w-full text-white" onClick={()=> setAvc((prev) => !prev)}>
-          Become a Creator
-        </Button>
-
-        {avc && <CreatorForm />}
-      </div> */}
       <div className="bg-card rounded-xl p-4 w-full space-y-4">
         <h1>Ready to start making money?</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -117,6 +107,7 @@ export function RightSidebar() {
         </Dialog>
       </div>
 
+      {/* Trending Posts Box */}
       <div className="bg-card rounded-xl p-4">
         <h2 className="text-lg font-semibold mb-2 border-b border-zinc-300 pb-2">
           Trending Posts

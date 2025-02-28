@@ -90,7 +90,6 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
         <DialogTitle className="text-xl font-normal">
           Fill to become a creator
         </DialogTitle>
-        {/* <X className="h-6 w-6 cursor-pointer" onClick={onClose} /> */}
       </DialogHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-2">
