@@ -110,6 +110,27 @@ export function ProfileCard() {
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
 
+  const handleLeaveCommunity = async () => {
+    if (!user?._id || !community.communityId) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
+        {
+          userId: user._id,
+          communityId: community.communityId,
+        }
+      );
+
+      if (response.data.r === "s") {
+        toast.success("Successfully left the community!");
+      }
+    } catch (err) {
+      console.error("Error leaving community:", err);
+      toast.error("Failed to leave the community. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchOfferings();
   }, [community.communityId]);
@@ -232,6 +253,16 @@ export function ProfileCard() {
             </div>
             {memberDetails?.is_owner ? (
               ""
+            ) : isCommunityFollowed ? (
+              <Button
+                variant="destructive"
+                size="lg"
+                className="bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                onClick={handleLeaveCommunity}
+              >
+                <HiMiniUserGroup className="h-8 w-8" />
+                Leave Community
+              </Button>
             ) : (
               <Button
                 variant="default"
@@ -240,8 +271,7 @@ export function ProfileCard() {
                 onClick={handleJoinCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                {/* { console.log(isCommunityFollowed)} */}
-                {isCommunityFollowed ? "Joined" : "Join Community"}
+                Join Community
               </Button>
             )}
           </div>
