@@ -204,7 +204,7 @@ export function ProfileCard() {
   const handleDeleteOffering = async (offeringId: string) => {
     try {
       await axios.delete(
-        `http://localhost:8000/v1/offering/delete/${offeringId}`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/delete/${offeringId}`,
         {
           data: {
             userId: user._id,
