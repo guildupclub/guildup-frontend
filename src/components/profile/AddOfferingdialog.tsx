@@ -54,13 +54,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     console.log("in handle submit");
     e.preventDefault();
     if (!user?._id || !communityId) return;
-  
+
     setLoading(true);
     let newTab: Window | null = null;
     try {
       // Open a new tab before making the API call
       //newTab = window.open("", "_blank");
-  
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/create`,
         {
@@ -80,7 +80,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         }
         return;
       }
-  
+
       if (response.data.r === "s") {
         setOpen(false);
         onOfferingAdded();
@@ -227,11 +227,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              className="bg-primary-gradient"
-              disabled={loading}
-            >
+            <Button type="submit" className="text-white" disabled={loading}>
               {loading ? "Creating..." : "Create Offering"}
             </Button>
           </div>
