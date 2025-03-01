@@ -4,9 +4,16 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageSquare, Share2 } from "lucide-react";
+import {
+  Heart,
+  MessageCircleMore,
+  MessageSquare,
+  Send,
+  Share2,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CommentSection } from "./CommentSection";
+import { FaShare } from "react-icons/fa";
 
 interface PostCardProps {
   post: {
@@ -92,7 +99,7 @@ export function PostCard({ post }: PostCardProps) {
             <Heart
               className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : ""}`}
             />
-            <span>{post.up_votes}</span>
+            <span>{post.up_votes} Like</span>
           </Button>
 
           <Button
@@ -101,15 +108,15 @@ export function PostCard({ post }: PostCardProps) {
             className="hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setIsCommenting(!isCommenting)}
           >
-            <MessageSquare className="w-5 h-5" />
-            <span>{post.reply_count}</span>
+            <MessageCircleMore className="h-5 w-5" />
+            <span>{post.reply_count} Comment</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             className="hover:text-purple-400 gap-2 hover:bg-transparent"
           >
-            <Share2 className="w-5 h-5" />
+            <Send classNameh-5 w-5 />
             <span>Share</span>
           </Button>
         </div>
