@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setCommunityData } from "@/redux/communitySlice";
 import Loader from "../Loader";
+import { setActiveCommunity } from "@/redux/channelSlice";
 
 interface Community {
   _id: string;
@@ -70,6 +71,13 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setCommunityData({
           communityId: community._id,
           userId: community.user_id,
+        })
+      );
+
+      dispatch(
+        setActiveCommunity({
+          id: community._id,
+          name: community.name, // Include name
         })
       );
 
