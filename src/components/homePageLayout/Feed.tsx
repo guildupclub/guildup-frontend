@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react";
 import { PostCard } from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
 import Loader from "../Loader";
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 interface Post {
   community_id: string;
@@ -27,6 +29,7 @@ interface ApiResponse {
 }
 
 export function Feed() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const [posts, setPosts] = useState<Post[]>([]);
   const data = useSession();
   const [page, setPage] = useState(1);
@@ -58,8 +61,8 @@ export function Feed() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: "678ce60732c37c1222f913e0",
-          page: page,
+          userId: userId,
+          page: 1,
         }),
       });
 

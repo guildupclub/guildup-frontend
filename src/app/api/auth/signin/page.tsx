@@ -56,7 +56,7 @@ export default function SignIn() {
         setError(result.data.data);
       } else {
         toast.success("Signed in successfully!");
-        router.push("/");
+        router.push("/explore");
         router.refresh();
       }
     } catch (error) {
@@ -128,7 +128,7 @@ export default function SignIn() {
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: "/explore" })}
           disabled={isLoading}
         >
           <svg

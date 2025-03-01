@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,12 +20,23 @@ interface PostCardProps {
     created_At: string;
     is_locked: boolean;
     post_type: string;
+    media?: {
+      publicUrl: string;
+      fileType: string;
+    };
   };
 }
 
 export function PostCard({ post }: PostCardProps) {
   const [isCommenting, setIsCommenting] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [relativeTime, setRelativeTime] = useState("");
+
+  useEffect(() => {
+    setRelativeTime(
+      formatDistanceToNow(new Date(post.created_At), { addSuffix: true })
+    );
+  }, [post.created_At]);
 
   return (
     <div className="bg-card rounded-lg overflow-hidden">
@@ -34,33 +45,39 @@ export function PostCard({ post }: PostCardProps) {
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
             <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback className="">UN</AvatarFallback>
+            <AvatarFallback>UN</AvatarFallback>
           </Avatar>
           <div className="flex-1 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="font-medium ">User Name</span>
-              <Badge variant="outline" className="text-xs bg-transparent ">
+              <span className="font-medium">User Name</span>
+              <Badge variant="outline" className="text-xs bg-transparent">
                 Host
               </Badge>
-              <span className="text-sm">
-                {formatDistanceToNow(new Date(post.created_At), {
-                  addSuffix: true,
-                })}
-              </span>
+              <span className="text-sm">{relativeTime}</span>
             </div>
           </div>
         </div>
 
         {/* Content */}
         <div className="mt-3 text-muted-foreground">
-          <p className="">{post.body}</p>
-          {post.post_type === "video" && (
-            <div className="mt-4 aspect-video bg-background rounded-lg overflow-hidden">
-              {/* Video player would go here */}
-              <div className="w-full h-full flex items-center justify-center ">
-                Video Content
-              </div>
-            </div>
+          <p>{post.body}</p>
+
+          {post?.media?.publicUrl && post?.media?.fileType === "image" && (
+            <img
+              src={post.media.publicUrl}
+              alt="Post Image"
+              className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+            />
+          )}
+
+          {/* Video Placeholder */}
+          {post?.media?.publicUrl && post?.media?.fileType === "video" && (
+            <video
+              controls
+              className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+            >
+              <source src={post?.media?.publicUrl} type="video/mp4" />
+            </video>
           )}
         </div>
 
@@ -69,7 +86,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className=" hover:text-purple-400 gap-2 hover:bg-transparent"
+            className="hover:text-purple-400 gap-2 hover:bg-transparent"
             onClick={() => setLiked(!liked)}
           >
             <Heart
@@ -90,7 +107,7 @@ export function PostCard({ post }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className=" hover:text-purple-400 gap-2 hover:bg-transparent"
+            className="hover:text-purple-400 gap-2 hover:bg-transparent"
           >
             <Share2 className="w-5 h-5" />
             <span>Share</span>

@@ -44,7 +44,7 @@ export default function SignUp() {
         setError(result.error);
       } else {
         toast.success("Account created and signed in successfully!");
-        router.push("/");
+        router.push("/explore");
         router.refresh();
       }
     } catch (error: any) {
@@ -109,7 +109,11 @@ export default function SignUp() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
 
-          <Button type="submit" className="w-full text-white" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full text-white"
+            disabled={isLoading}
+          >
             {isLoading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
@@ -128,7 +132,7 @@ export default function SignUp() {
         <Button
           variant="outline"
           className="w-full bg-slate-200 hover:bg-background"
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: "/explore" })}
           disabled={isLoading}
         >
           <svg
