@@ -2,14 +2,7 @@
 
 import type * as React from "react";
 import Link from "next/link";
-import {
-  Bell,
-  Home,
-  Compass,
-  Users,
-  ChevronDown,
-  Search,
-} from "lucide-react";
+import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,7 +42,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: any) => state.channel.activeCommunity
   );
   const activeCommunityId = activeCommunity?.id;
-  console.log("khbjkn", activeCommunityId)
+  console.log("khbjkn", activeCommunityId);
+
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
@@ -208,7 +202,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <Home className="w-6 h-6" />
             <span className="text-xs mt-1">Home</span>
           </Link>
-          <Link href="/explore" className="flex flex-col items-center justify-center">
+          <Link
+            href="/explore"
+            className="flex flex-col items-center justify-center"
+          >
             <Compass className="w-6 h-6" />
             <span className="text-xs mt-1">Explore</span>
           </Link>
@@ -219,17 +216,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <Video className="w-6 h-6" />
             <span className="text-xs mt-1">Snips</span>
           </Link> */}
-          <Link
-            href={
-              activeCommunityId
-                ? `/community/${activeCommunityId}/feed`
-                : "/community/feed"
-            }
-            className="flex flex-col items-center justify-center"
-          >
-            <Users className="w-6 h-6" />
-            <span className="text-xs mt-1">Community</span>
-          </Link>
+          {activeCommunityId ? (
+            <Link
+              href={`/community/${activeCommunityId}/feed`}
+              className="flex flex-col items-center justify-center"
+            >
+              <Users className="w-6 h-6" />
+            </Link>
+          ) : (
+            <Link
+              href="/no-community"
+              className="flex flex-col items-center justify-center"
+            >
+              <Users className="w-6 h-6" />
+
+              <span className="text-xs mt-1">Community</span>
+            </Link>
+          )}
 
           {user?._id ? (
             <button
@@ -237,7 +240,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               onClick={handleSignOut}
             >
               <Avatar className="h-6 w-6">
-                <AvatarImage src={user.image || "/placeholder.svg"} alt="User" />
+                <AvatarImage
+                  src={user.image || "/placeholder.svg"}
+                  alt="User"
+                />
                 <AvatarFallback>HHH</AvatarFallback>
               </Avatar>
               <span className="text-xs mt-1">Sign out</span>

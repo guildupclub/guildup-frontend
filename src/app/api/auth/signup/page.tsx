@@ -59,17 +59,15 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 bg-card rounded-lg shadow-lg bg-zinc-800">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-zinc-200">
-            Create an account
-          </h1>
+          <h1 className="text-3xl font-bold text-accent">Create an account</h1>
           <p className="text-muted-foreground">
             Enter your information to get started
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-zinc-300">
+        <form onSubmit={handleSubmit} className="space-y-4 text-accent">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -79,7 +77,7 @@ export default function SignUp() {
               placeholder="Enter your name"
               required
               disabled={isLoading}
-              className="border-gray-700"
+              className="border-background"
             />
           </div>
           <div className="space-y-2">
@@ -91,7 +89,7 @@ export default function SignUp() {
               placeholder="Enter your email"
               required
               disabled={isLoading}
-              className="border-gray-700"
+              className="border-background"
             />
           </div>
           <div className="space-y-2">
@@ -103,7 +101,7 @@ export default function SignUp() {
               placeholder="Create a password"
               required
               disabled={isLoading}
-              className="border-gray-700"
+              className="border-background"
             />
           </div>
 
@@ -111,7 +109,7 @@ export default function SignUp() {
             <p className="text-sm text-destructive text-center">{error}</p>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
+          <Button type="submit" className="w-full text-white" disabled={isLoading}>
             {isLoading ? "Creating account..." : "Sign up"}
           </Button>
         </form>
@@ -129,7 +127,7 @@ export default function SignUp() {
 
         <Button
           variant="outline"
-          className="w-full bg-slate-200"
+          className="w-full bg-slate-200 hover:bg-background"
           onClick={() => signIn("google", { callbackUrl: "/" })}
           disabled={isLoading}
         >

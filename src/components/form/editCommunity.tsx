@@ -16,6 +16,7 @@ import {
 import { X, Upload } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/constants";
 import Image from "next/image";
+import { RootState } from "@/redux/store";
 
 interface Category {
   _id: string;
@@ -29,8 +30,7 @@ interface EditCommunityModalProps {
 
 export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps) {
   const dispatch = useDispatch();
-  const { communityId, userId } = useSelector((state: any) => state.community);
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -48,6 +48,12 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
     profile: false,
     background: false,
   });
+
+   const user = useSelector((state: RootState) => state.user.user);
+    const community = useSelector((state: RootState) => state.community);
+    const  communityId = community?.communityId;
+    const userId = user?._id;
+
 
   // Fetch categories
   useEffect(() => {

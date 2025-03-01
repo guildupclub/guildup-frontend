@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PostCreator } from "./PostCreator";
-import { useSession } from 'next-auth/react';
-import  {PostCard}  from "./PostCard";
+import { useSession } from "next-auth/react";
+import { PostCard } from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
+import Loader from "../Loader";
 
 interface Post {
   community_id: string;
@@ -32,9 +33,9 @@ export function Feed() {
   const [loading, setLoading] = useState(false);
   const observer = useRef<any>(null);
 
-  console.log("@session",data)
+  console.log("@session", data);
   const lastPostElementRef = useCallback(
-    (node:any) => {
+    (node: any) => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
 
@@ -49,16 +50,16 @@ export function Feed() {
     [loading]
   );
 
-  const fetchPosts = async (page:any,num:any) => {
+  const fetchPosts = async (page: any, num: any) => {
     try {
-      const response:any = await fetch(API_ENDPOINTS.getPosts, {
+      const response: any = await fetch(API_ENDPOINTS.getPosts, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: "678ce60732c37c1222f913e0",
-          page:page
+          page: page,
         }),
       });
 
@@ -66,8 +67,8 @@ export function Feed() {
 
       const data: ApiResponse = await response.json();
       if (data.r === "s" && Array.isArray(data.data)) {
-        console.log("@Reponse",data)
-        return data.data
+        console.log("@Reponse", data);
+        return data.data;
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch posts");
@@ -78,14 +79,14 @@ export function Feed() {
 
   const loadMorePosts = async () => {
     setLoading(true);
-    console.log("Getting mroe post")
+    console.log("Getting mroe post");
     const newPosts = await fetchPosts(page, 10);
-    console.log("@newPost",newPosts)
+    console.log("@newPost", newPosts);
     setPosts((prevPosts) => {
       if (prevPosts) {
-        return [...prevPosts, ...newPosts || []];
+        return [...prevPosts, ...(newPosts || [])];
       } else {
-        return [...newPosts || []]; // Or return newPosts; if you want to replace previous posts entirely.
+        return [...(newPosts || [])]; // Or return newPosts; if you want to replace previous posts entirely.
       }
     });
     setLoading(false);
@@ -146,17 +147,24 @@ export function Feed() {
         </TabsList> */}
 
         <TabsContent value="feed" className="mt-0 p-4">
-          {/* <PostCreator /> */}
-
-          {isLoading ? (
-            <div className="text-center text-zinc-400">Loading posts...</div>
+          {isLoading || loading ? (
+            <Loader />
           ) : error ? (
             <div className="text-center text-red-400">{error}</div>
           ) : posts.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post,index) => <PostCard key={post._id} post={{...post, community_id: post.community_id || 'default', upvote_userId: post.upvote_userId}} ref={posts.length === index + 1 ? lastPostElementRef : null}
-            />)
+            posts.map((post, index) => (
+              <PostCard
+                key={post._id}
+                post={{
+                  ...post,
+                  community_id: post.community_id || "default",
+                  upvote_userId: post.upvote_userId,
+                }}
+                ref={posts.length === index + 1 ? lastPostElementRef : null}
+              />
+            ))
           )}
         </TabsContent>
 
