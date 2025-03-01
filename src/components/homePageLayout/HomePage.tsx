@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="flex">
       {/* Left sidebar hidden on small screens */}
-      <div className="hidden md:block">
+      <div className="hidden md:block ps-20">
         <LeftSidebar />
       </div>
       
@@ -17,7 +17,7 @@ export default function HomePage() {
       </div>
       
       {/* Right sidebar hidden on small screens */}
-      <div className="hidden md:block">
+      <div className="hidden md:block pe-20">
         <RightSidebar />
       </div>
     </div>

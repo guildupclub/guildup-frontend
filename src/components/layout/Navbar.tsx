@@ -44,6 +44,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const activeCommunityId = activeCommunity?.id;
   console.log("khbjkn", activeCommunityId);
 
+
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
@@ -70,12 +71,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 w-full bg-card py-2 px-4 lg:px-20",
+          "fixed top-0 z-50 bg-card pt-2 px-4 lg:px-20 w-full flex",
           props.className
         )}
         {...props}
       >
-        <div className="container flex h-14 items-center justify-between mx-auto">
+        <div className="container flex h-14 items-center px-5">
           <Link href="/" className="flex items-center space-x-2 mr-6">
             <Image
               src={guildup_logo || "/placeholder.svg"}
@@ -84,113 +85,112 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             />
           </Link>
 
-          <div className="flex flex-1 items-center justify-center lg:max-w-2xl">
-            <div className="relative w-full max-w-lg">
-              <div className="flex border-none">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="w-full bg-background border-none pr-24 text-muted"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                />
+          <div className="flex grow items-center justify-between">
+            {/* Searchbar */}
+            <div className="flex flex-1 items-center">
+              <div className="relative w-full max-w-xl">
+                <div className="flex border-none">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="w-full bg-background border-none pr-24 text-muted"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
 
-                <div
-                  className="absolute right-0 top-0 flex h-full w-12 items-center justify-center bg-[#334bff] rounded-tr-lg rounded-br-lg cursor-pointer"
-                  onClick={handleSearch}
-                >
-                  <Search className="h-4 w-4 text-white" />
+                  <div
+                    className="absolute right-0 top-0 flex h-full w-12 items-center justify-center bg-[#334bff] rounded-tr-lg rounded-br-lg cursor-pointer"
+                    onClick={handleSearch}
+                  >
+                    <Search className="h-4 w-4 text-white" />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="hidden md:flex items-center justify-center space-x-4">
-            <ul className="flex items-center space-x-12 text-muted">
-              <li>
-                <Link href="/">
-                  <Home className="h-6 w-6" />
-                  <span className="sr-only">Home</span>
-                </Link>
-              </li>
-              <li>
-                <Link href="/explore">
-                  <Compass className="h-6 w-6" />
-                  <span className="sr-only">Explore</span>
-                </Link>
-              </li>
-              <li>
-                {activeCommunityId ? (
-                  <Link
-                    href={`/community/${activeCommunityId}/feed`}
-                    className="flex flex-col items-center justify-center"
-                  >
-                    <Users className="w-6 h-6" />
-                  </Link>
+            <div className="hidden md:flex space-x-8 items-center justify-center">
+              <div className="hidden md:flex items-center justify-center">
+                <ul className="flex items-center space-x-2 text-muted">
+                  <li className="w-18 px-3 rounded-xl">
+                    <Link href="/" className="flex flex-col items-center px-3 py-1.5">
+                      <Home className="h-6 w-6" />
+                      <span className="h-6">Home</span>
+                    </Link>
+                  </li>
+                  <li className="w-18  px-3 rounded-xl">
+                    <Link href="/explore" className="flex flex-col items-center">
+                      <Compass className="h-6 w-6" />
+                      <span className="">Explore</span>
+                    </Link>
+                  </li>
+                  <li className="w-18 px-3 rounded-xl">
+                    <Link
+                      href={
+                        activeCommunityId
+                          ? `/community/${activeCommunityId}/feed`
+                          : "/community/feed"
+                      }
+                      className="flex flex-col items-center justify-center"
+                    >
+                      <Users className="w-6 h-6" />
+                      <span>Experts</span>
+                    </Link>
+                  </li>
+                  <li className="flex flex-col items-center w-18  px-3 rounded-xl">
+                    <Bell className="h-6 w-6" />
+                    <span className="">Notifications</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="hidden md:block">
+                {user?._id ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage
+                            src={user?.avatar || "/placeholder.svg"}
+                            alt="User"
+                          />
+                          <AvatarFallback>
+                            {user?.email?.[0] || "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
+                      align="end"
+                    >
+                      <DropdownMenuItem className="hover:bg-primary-gradient">
+                        {user?.name}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-primary-gradient">
+                        {user?.email}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="hover:bg-primary-gradient"
+                        onClick={handleEditClick}
+                      >
+                        Edit Community
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="hover:bg-primary-gradient"
+                        onClick={handleSignOut}
+                      >
+                        Sign out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ) : (
-                  <Link
-                    href="/no-community"
-                    className="flex flex-col items-center justify-center"
-                  >
-                    <Users className="w-6 h-6" />
-                  </Link>
-                )}
-              </li>
-
-              <li>
-                <Bell className="h-6 w-6" />
-                <span className="sr-only">Notifications</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="hidden md:block">
-            {user?._id ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
-                  >
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage
-                        src={user?.image || "/placeholder.svg"}
-                        alt="User"
-                      />
-                      <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>
-                    </Avatar>
+                  <Button className="bg-primary-gradient" onClick={() => signIn()}>
+                    Sign in
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
-                  align="end"
-                >
-                  <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {user?.name}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="hover:bg-primary-gradient">
-                    {user?.email}
-                  </DropdownMenuItem>
-                  {/* <DropdownMenuItem
-                    className="hover:bg-primary-gradient"
-                    onClick={handleEditClick}
-                  >
-                    Edit Community
-                  </DropdownMenuItem> */}
-                  <DropdownMenuItem
-                    className="hover:bg-primary-gradient"
-                    onClick={handleSignOut}
-                  >
-                    Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button className="text-white" onClick={() => signIn()}>
-                Sign in
-              </Button>
-            )}
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </nav>

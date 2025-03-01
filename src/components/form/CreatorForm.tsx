@@ -18,16 +18,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-
 import { categories } from "./Categories";
 
-export default function CreatorForm() {
+
+interface CreatorFormProps {
+  onClose: () => void;
+}
+
+export default function CreatorForm({ onClose }: CreatorFormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
 
@@ -37,7 +39,6 @@ export default function CreatorForm() {
     tags: "",
   });
   const [categoryId, setCategoryId] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [additionalTags] = useState(["first_community", "abhishek"]);
 
   // Handle input change
@@ -99,86 +100,72 @@ export default function CreatorForm() {
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
+    <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
+      <DialogHeader className="flex items-center justify-between">
+        <DialogTitle className="text-xl font-normal">
+          Fill to become a creator
+        </DialogTitle>
+      </DialogHeader>
+      <div className="space-y-4 py-4">
+        <div className="space-y-2">
+          <Label>Community Name</Label>
+          <Input
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            placeholder="Enter name"
+            className="bg-background border-none"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Select Topic</Label>
+          <Select onValueChange={handleCategoryChange}>
+            <SelectTrigger className="bg-background border-none">
+              <SelectValue placeholder="Select your topic" />
+            </SelectTrigger>
+            <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
+              {categories.map((category) => (
+                <SelectItem key={category._id} value={category._id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label>Tags</Label>
+          <Input
+            name="tags"
+            value={formData.tags}
+            onChange={handleInputChange}
+            placeholder="Enter Tags"
+            className="bg-background border-none"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Community Description</Label>
+          <Textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="Type anything"
+            className="bg-background border-none min-h-[30px]"
+          />
+        </div>
+      </div>
+      <div className="flex justify-end gap-4 mt-2">
         <Button
-          variant="ghost"
-          size="icon"
-          className="w-8 h-8 rounded-lg bg-card hover:bg-background text-accent"
+          variant="outline"
+          onClick={onClose}
+          className="text-muted bg-transparent border-gray-600 hover:bg-background"
         >
-          <Plus className="h-6 w-6" />
+          Cancel
         </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
-        <DialogHeader className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-normal">
-            Fill to become a creator
-          </DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>Community Name</Label>
-            <Input
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter name"
-              className="bg-background border-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Select Topic</Label>
-            <Select onValueChange={handleCategoryChange} value={categoryId}>
-              <SelectTrigger className="bg-background border-none">
-                <SelectValue placeholder="Select your topic" />
-              </SelectTrigger>
-              <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
-                {categories.map((category) => (
-                  <SelectItem key={category._id} value={category._id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Tags</Label>
-            <Input
-              name="tags"
-              value={formData.tags}
-              onChange={handleInputChange}
-              placeholder="Enter Tags"
-              className="bg-background border-none"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Community Description</Label>
-            <Textarea
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              placeholder="Type anything"
-              className="bg-background border-none min-h-[30px]"
-            />
-          </div>
-        </div>
-        <div className="flex justify-end gap-4 mt-2">
-          <Button
-            variant="outline"
-            onClick={() => setIsDialogOpen(false)}
-            className="text-muted bg-transparent border-gray-600 hover:bg-background"
-          >
-            Cancel
-          </Button>
-          <Button
-            className="text-white"
-            onClick={handleSubmit}
-            disabled={createCommunity.isLoading}
-          >
-            {createCommunity.isLoading ? "Creating..." : "Create"}
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+
+        <Button className="text-white" onClick={handleSubmit}>
+          Create
+        </Button>
+      </div>
+    </DialogContent>
   );
 }
