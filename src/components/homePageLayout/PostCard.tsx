@@ -153,6 +153,24 @@ export function PostCard({ post, ref }: PostCardProps) {
             <p className="text-sm text-accent mt-2">
               {renderBodyWithHashtags(post.body)}
             </p>
+
+            {post?.media?.publicUrl && post?.media?.fileType === "image" && (
+              <img
+                src={post.media.publicUrl}
+                alt="Post Image"
+                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+              />
+            )}
+
+            {/* Video Placeholder */}
+            {post?.media?.publicUrl && post?.media?.fileType === "video" && (
+              <video
+                controls
+                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+              >
+                <source src={post?.media?.publicUrl} type="video/mp4" />
+              </video>
+            )}
           </div>
         </div>
       </div>
@@ -174,7 +192,9 @@ export function PostCard({ post, ref }: PostCardProps) {
           onClick={() => setShowComments(!showComments)}
         >
           <MessageCircleMore className="h-5 w-5" />
-          <span className="text-sm">{formatNumber(post?.replies?.length)} Comment</span>
+          <span className="text-sm">
+            {formatNumber(post?.replies?.length)} Comment
+          </span>
         </button>
 
         {/* Right Icon */}
