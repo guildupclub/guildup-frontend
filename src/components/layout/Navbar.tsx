@@ -2,8 +2,20 @@
 
 import type * as React from "react";
 import Link from "next/link";
+<<<<<<< HEAD
+import {
+  Bell,
+  Home,
+  Compass,
+  Users,
+  ChevronDown,
+  Search,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+=======
 import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
 import { useState } from "react";
+>>>>>>> a766bcffd1c05adf6742f4c236e47dd27fece438
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +38,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.user);
+  const [isUser, setIsUser] = useState(true)
+  // useEffect(() => {
+  //   if ('isNewUser' in user) {
+  //     setIsUser(false);
+  //     console.info("this is user: ", user);
+  //   }
+  // }, [user]);
   // Assume communities are stored in state.community.communities (an array of Community)
   // const communities = useSelector((state: RootState) => state?.community?.communities);
 
@@ -148,34 +167,37 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 {user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage
-                            src={user?.avatar || "/placeholder.svg"}
-                            alt="User"
-                          />
-                          <AvatarFallback>
-                            {user?.email?.[0] || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                      </Button>
+                      <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
+                        <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={user?.avatar || "/placeholder.svg"}
+                              alt="User"
+                            />
+                            <AvatarFallback>
+                              {user?.email?.[0] || "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Button>
+                        <ChevronDown size={25} className="pt-2" />
+                      </div>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                      <DropdownMenuItem className="hover:bg-primary-gradient">
-                        {user?.name}
+                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
+                        <Link href='/profile'>Profile</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-primary-gradient">
-                        {user?.email}
+                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
+                      <Link href='/bookings'>Bookings</Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="hover:bg-primary-gradient"
-                        onClick={handleEditClick}
-                      >
-                        Edit Community
-                      </DropdownMenuItem>
+                      {isUser &&
+                        <DropdownMenuItem
+                          className="hover:bg-primary-gradient border-b border-zinc-300"
+                        >
+                          <Link href='/payments'>Payments</Link>
+                        </DropdownMenuItem>}
                       <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
