@@ -2,20 +2,8 @@
 
 import type * as React from "react";
 import Link from "next/link";
-<<<<<<< HEAD
-import {
-  Bell,
-  Home,
-  Compass,
-  Users,
-  ChevronDown,
-  Search,
-} from "lucide-react";
 import { useState, useEffect } from "react";
-=======
 import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
-import { useState } from "react";
->>>>>>> a766bcffd1c05adf6742f4c236e47dd27fece438
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
