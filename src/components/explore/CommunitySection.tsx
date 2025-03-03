@@ -1,4 +1,3 @@
-// CommunitySection.tsx
 "use client";
 
 import axios from "axios";
@@ -8,7 +7,7 @@ import MemoizedCommunityCard from "./MemoizedCommunityCard";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setCommunityData } from "@/redux/communitySlice";
-import { setActiveCommunity } from "@/redux/channelSlice";
+import Loader from "../Loader";
 
 interface Community {
   _id: string;
@@ -30,11 +29,14 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   );
   const dispatch = useDispatch();
   const router = useRouter();
+
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
+  const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
     const fetchTopCommunity = async () => {
+      setLoading(true);
       try {
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
@@ -43,6 +45,8 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setCommunities(response.data.data);
       } catch (error) {
         console.error("Error fetching communities", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -51,17 +55,16 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     }
   }, [activeCategory]);
 
-  // const communityDetails = communities?.community;
   const handleClickCommunity = useCallback(
-    (community: Community) => {
+    (communityWrapper: { community: Community }) => {
+      const community = communityWrapper.community; // Extract the actual community object
+
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
         return;
       }
 
-      console.log("Clicked community:", community); // ✅ Check if this appears in the console
-
-      setLoading(true);
+      setClickLoading(true);
 
       dispatch(
         setCommunityData({
@@ -70,29 +73,30 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         })
       );
 
-      console.log("Navigating to /community/profile"); // ✅ Check if this appears
-
       router.push("/community/profile");
     },
     [dispatch, router]
   );
 
   return (
-    <div className="bg-background min-h-screen  lg:p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
-        {communities.length > 0 ? (
-          communities.map((community: any) => (
-            <MemoizedCommunityCard
-              key={community._id}
-              community={community}
-              onClick={() => handleClickCommunity(community.community)}
-            />
-          ))
-        ) : (
-          <div>No community found</div>
-        )}
-      </div>
-      {loading && <p className="text-center mt-4">Loading...</p>}
+    <div className="bg-background min-h-screen lg:p-4">
+      {loading ? (
+        <p className="text-center mt-4">Loading...</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pb-8 lg:pb-0">
+          {communities.length > 0 ? (
+            communities.map((communityWrapper) => (
+              <MemoizedCommunityCard
+                key={communityWrapper.community._id}
+                community={communityWrapper}
+                onClick={() => handleClickCommunity(communityWrapper)}
+              />
+            ))
+          ) : (
+            <p className="text-center col-span-3">No communities found</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

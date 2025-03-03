@@ -6,7 +6,7 @@ import { Hash, Plus, Rss, Crown, Lock, Info } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { setActiveChannel } from "@/redux/channelSlice";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,8 @@ import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { setMemberDetails } from "@/redux/memberSlice";
+import { FiEdit } from "react-icons/fi";
+import { EditCommunityModal } from "../form/editCommunity";
 
 export function Sidebar() {
   const dispatch = useDispatch();
@@ -56,6 +58,8 @@ export function Sidebar() {
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pathname = usePathname();
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     type: "discussion",
@@ -203,26 +207,49 @@ export function Sidebar() {
 
   return (
     <div className="fixed h-screen w-80 bg-card p-4 py-24">
-      <div>
-        <h2 className="px-2 text-lg text-muted">{activeCommunityName}</h2>
+      <div className="flex items-center justify-between px-2">
+        <h2 className="text-lg text-muted-foreground font-semibold">
+          {activeCommunityName}
+        </h2>
+
+        {isAdmin && (
+          <button
+            className="p-1 rounded-md hover:bg-background transition"
+            onClick={() => setIsEditOpen(true)}
+          >
+            <FiEdit size={18} className="text-muted hover:text-primary" />
+          </button>
+        )}
       </div>
+
+      <Separator />
       <div className="space-y-2">
-        <div className="border-b border-background p-2">
+        <div className="border-b border-background py-2">
           <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
             <PostDialog />
           </div>
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2  text-muted-foreground  hover:bg-background "
+          className={`w-full justify-start gap-2 ${
+            pathname === "/community/profile"
+              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+              : "hover:bg-background text-muted-foreground"
+          }`}
           onClick={() => handleNavigation("/community/profile")}
         >
           <FaUserAlt />
           Profile
         </Button>
+
+        {/* Feed */}
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-muted-foreground hover:bg-background"
+          className={`w-full justify-start gap-2 ${
+            pathname === `/community/${activeCommunityId}/feed`
+              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+              : "hover:bg-background text-muted-foreground"
+          }`}
           onClick={() =>
             handleNavigation(`/community/${activeCommunityId}/feed`)
           }
@@ -231,14 +258,33 @@ export function Sidebar() {
           Feed
         </Button>
 
+        {/* Members */}
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2  text-muted-foreground  hover:bg-background  "
+          className={`w-full justify-start gap-2 ${
+            pathname === "/community/members"
+              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+              : "hover:bg-background text-muted-foreground"
+          }`}
           onClick={() => handleNavigation("/community/members")}
         >
           <FaUserGroup />
           Members
         </Button>
+
+        {/* Announcements */}
+        {/* <Button
+          variant="ghost"
+          className={`w-full justify-start gap-2 ${
+            pathname === "/community/announcements"
+              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+              : "hover:bg-background text-muted-foreground"
+          }`}
+          onClick={() => handleNavigation("/community/announcements")}
+        >
+          <GrAnnounce />
+          Announcements
+        </Button> */}
         {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
@@ -247,20 +293,21 @@ export function Sidebar() {
           <FaCalendarAlt />
           Events
         </Button> */}
-        <Button
+        {/* <Button
           variant="ghost"
           className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/announcements")}
         >
           <GrAnnounce />
           Announcements
-        </Button>
+        </Button> */}
 
         {/* {isAdmin && ( */}
         <Button
           className={`w-full text-white ${
             isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
           }`}
+          onClick={() => handleNavigation("/creator-studio")}
         >
           Creator Studio
         </Button>
@@ -378,7 +425,7 @@ export function Sidebar() {
                   variant="ghost"
                   className={`w-full justify-start gap-2 ${
                     activeChannel.id === channel.id
-                      ? "bg-[#334BFF]/20 text-purple-500 hover:bg-[#334BFF]/30 "
+                      ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
                       : " hover:bg-background text-muted-foreground"
                   }`}
                   onClick={() => {
@@ -402,6 +449,12 @@ export function Sidebar() {
           </div>
         </div>
       </div>
+      {isEditOpen && (
+        <EditCommunityModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

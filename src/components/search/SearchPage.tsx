@@ -9,6 +9,16 @@ import CommunityCard from "./CommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/constants";
 
+interface Community {
+  community: {
+    _id: string;
+    user_id: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+  };
+}
+
 function SearchPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -33,7 +43,7 @@ function SearchPageContent() {
       setError("");
 
       try {
-        const endpoint = `${API_BASE_URL}/v1/community/relook`;
+        const endpoint = `${API_BASE_URL}/v1/community/look`;
 
         const response = await fetch(endpoint, {
           method: "POST",
@@ -64,12 +74,12 @@ function SearchPageContent() {
   }, [query, type]);
 
   // Handle search trigger
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-    router.push(
-      `/search?type=${searchType}&q=${encodeURIComponent(searchQuery)}`
-    );
-  };
+  // const handleSearch = () => {
+  //   if (!searchQuery.trim()) return;
+  //   router.push(
+  //     `${API_BASE_URL}/v1/community/relook?q=${encodeURIComponent(searchQuery)}`
+  //   );
+  // };
 
   // Handle card click navigation
   const handleCardClick = (id: string) => {
@@ -78,14 +88,24 @@ function SearchPageContent() {
 
   // Handle community click with Redux
   const handleClickCommunity = useCallback(
-    (community: any) => {
+    (community: Community) => {
+      if (!community.community || !community.community._id) {
+        console.error("Invalid community data:", community);
+        return;
+      }
+
+      console.log("Clicked community:", community); // ✅ Check if this appears in the console
+
       setLoading(true);
+
       dispatch(
         setCommunityData({
-          communityId: community._id,
-          userId: community.user_id,
+          communityId: community.community._id,
+          userId: community.community.user_id,
         })
       );
+
+      console.log("Navigating to /community/profile"); // ✅ Check if this appears
 
       router.push("/community/profile");
     },

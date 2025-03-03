@@ -19,6 +19,8 @@ import { FaCompass } from "react-icons/fa";
 import Link from "next/link";
 import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
+import { setUserFollowedCommunities } from "@/redux/userSlice";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Community {
   _id: string;
@@ -33,10 +35,10 @@ interface Community {
 export function LeftmostSidebar() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
-  const [communities, setCommunities] = useState<Community[]>([]);
+  // const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [error, setError] = useState<string | null>(null);
   const [showCreatorForm, setShowCreatorForm] = React.useState(false);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   
@@ -49,38 +51,87 @@ export function LeftmostSidebar() {
     (state: RootState) => state.channel.activeCommunity
   );
   const user = useSelector((state: RootState) => state.user.user);
+
 const activeCommunityId = activeCommunity?.id;
     useEffect(() => {
+
     fetchCommunities();
   }, []);
 
-  const fetchCommunities = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: userId,
-          }),
-        }
-      );
+  // const fetchCommunities = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           userId: userId,
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch communities");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch communities");
+  //     }
 
-      const result = await response.json();
-      console.log(result);
+  //     const result = await response.json();
+  //     console.log("comm", result);
+  //     const validCommunities = result.data.filter(
+  //       (community: Community | null) => community !== null
+  //     );
+  //     setCommunities(validCommunities);
+
+  //     dispatch(setUserFollowedCommunities(validCommunities));
+  //     // Set the first community as active if none is selected
+  //     if (validCommunities.length > 0 && !activeCommunityId) {
+  //       dispatch(
+  //         setActiveCommunity({
+  //           id: validCommunities[0]._id,
+  //           name: validCommunities[0].name, // Include name
+  //         })
+  //       );
+  //     }
+  //   } catch (err) {
+  //     setError(
+  //       err instanceof Error ? err.message : "Failed to fetch communities"
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+
+
+// Fetch communities function
+const fetchCommunities = async (): Promise<Community[]> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch communities");
+  }
+  const result = await response.json();
+      console.log("comm", result);
       const validCommunities = result.data.filter(
         (community: Community | null) => community !== null
       );
-      setCommunities(validCommunities);
+      // setCommunitie(validCommunities);
 
-      // Set the first community as active if none is selected
+      dispatch(setUserFollowedCommunities(validCommunities));
+
+
       if (validCommunities.length > 0 && !activeCommunityId) {
         dispatch(
           setActiveCommunity({
@@ -89,14 +140,18 @@ const activeCommunityId = activeCommunity?.id;
           })
         );
       }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch communities"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const result = await response.json();
+  return result.data.filter((community: Community | null) => community !== null);
+};
+
+// Use React Query to fetch communities
+const { data: communities = [], isLoading, error } = useQuery({
+  queryKey: ["communities", userId], 
+  queryFn: fetchCommunities,
+});
+
+
+
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
@@ -149,20 +204,22 @@ const activeCommunityId = activeCommunity?.id;
                   }`}
                 onClick={() => {
 
+
                   dispatch(
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
                     })
-                  )
+
+                  );
                   dispatch(
                     setCommunityData({
                       communityId: community._id,
                       userId: user._id,
                     })
                   );
-                }
-                }
+
+                }}
               >
                 <Avatar className="w-full h-full ">
                   <AvatarImage

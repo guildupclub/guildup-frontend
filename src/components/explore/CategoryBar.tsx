@@ -23,6 +23,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
     }
   }, [categorys, selectCategory]);
 
+
   const handleCategorySelect = (id: string) => {
     setSelectedCategory(id); // Update the selected category state
     selectCategory(id); // Call the parent function

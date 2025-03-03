@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,26 +23,25 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { categories } from "./Categories";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+
 
 interface CreatorFormProps {
   onClose: () => void;
 }
 
 export default function CreatorForm({ onClose }: CreatorFormProps) {
+  const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
-  const sessionId = useSelector((state: RootState) => state.user.sessionId);
 
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     tags: "",
-    topic: "",
   });
   const [categoryId, setCategoryId] = useState("");
   const [additionalTags] = useState(["first_community", "abhishek"]);
 
+  // Handle input change
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -46,19 +49,19 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle category change
   const handleCategoryChange = (value: string) => {
     setCategoryId(value);
   };
 
-  const handleSubmit = async () => {
-    try {
+  // Mutation for creating community
+  const createCommunity = useMutation({
+    mutationFn: async () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/create`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             user_id: userId,
             name: formData.name,
@@ -71,17 +74,29 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
       );
 
       const data = await response.json();
-      if (data.r === "s") {
-        toast.success("Community created successfully! 🎉");
-        onClose();
-      } else if (data.r === "e") {
+      if (data.r !== "s")
         throw new Error(data.e || "Failed to create community");
-      } else {
-        throw new Error("Unexpected response from the server");
-      }
-    } catch (error: any) {
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Community created successfully! 🎉");
+      setIsDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["communities"] }); // Refresh data
+      setFormData({ name: "", description: "", tags: "" });
+      setCategoryId("");
+    },
+    onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
+    },
+  });
+
+  // Handle submit action
+  const handleSubmit = () => {
+    if (!formData.name || !formData.description || !categoryId) {
+      toast.error("Please fill in all required fields.");
+      return;
     }
+    createCommunity.mutate();
   };
 
   return (
@@ -146,6 +161,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
         >
           Cancel
         </Button>
+
         <Button className="text-white" onClick={handleSubmit}>
           Create
         </Button>
