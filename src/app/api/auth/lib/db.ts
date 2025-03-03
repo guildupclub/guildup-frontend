@@ -1,10 +1,12 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-if (!process.env.NEXT_PUBLIC_MONGO_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGO_URI"');
-}
+//adding here to test - will remove later
+const uri = process.env.MONGO_URI || 'mongodb+srv://abhiseknaulae:pCT6YNivNyIhmCcS@guildupcluster.fgdgx.mongodb.net/?retryWrites=true&w=majority&appName=guildUpCluster' ;
 
-const uri = process.env.NEXT_PUBLIC_MONGO_URI;
+
+if (!process.env.MONGO_URI) {
+  console.error('Invalid/Missing environment variable: "MONGO_URI"');
+}
 // console.log("URL ", uri);
 const options = {
   serverApi: {
@@ -16,7 +18,7 @@ const options = {
 
 let client: MongoClient;
 
-if (process.env.NEXT_PUBLIC_NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
   // is preserved across module reloads caused by HMR (Hot Module Replacement).
   const globalWithMongo = global as typeof globalThis & {
