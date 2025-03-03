@@ -79,9 +79,7 @@ export function Feed() {
   useEffect(() => {
     const loadMorePosts = async () => {
       const newPosts = await fetchPosts(page);
-      if(newProsts){
-
-   
+      if(newPosts){   
       setPosts((prevPosts) => {
         const uniquePosts = [...prevPosts, ...newPosts].filter(
           (post, index, self) =>
