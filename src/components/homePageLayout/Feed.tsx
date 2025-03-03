@@ -79,7 +79,9 @@ export function Feed() {
   useEffect(() => {
     const loadMorePosts = async () => {
       const newPosts = await fetchPosts(page);
+      if(newProsts){
 
+   
       setPosts((prevPosts) => {
         const uniquePosts = [...prevPosts, ...newPosts].filter(
           (post, index, self) =>
@@ -88,7 +90,8 @@ export function Feed() {
         return uniquePosts;
       });
 
-      setHasMore(newPosts.length > 0);
+      setHasMore(newPosts?.length > 0);
+    }
     };
 
     loadMorePosts();
@@ -98,16 +101,16 @@ export function Feed() {
     <div className="max-w-4xl mx-auto">
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
-          {loading && posts.length === 0 ? (
+          {loading && posts?.length === 0 ? (
             <Loader />
-          ) : posts.length === 0 ? (
+          ) : posts?.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post, index) => (
+            posts?.map((post, index) => (
               <PostCard
                 key={post._id}
                 post={post}
-                ref={index === posts.length - 1 ? lastPostElementRef : null}
+                ref={index === posts?.length - 1 ? lastPostElementRef : null}
               />
             ))
           )}

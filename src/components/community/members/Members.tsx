@@ -95,7 +95,7 @@ export default function Members() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/v1/community/removeUser`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/removeUser`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
