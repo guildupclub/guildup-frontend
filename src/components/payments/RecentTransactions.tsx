@@ -62,9 +62,10 @@ const RecentTransactions: FC = () => {
           <TableHeadings heading={"Time"} />
           <TableHeadings heading={"Status"} />
         </div>
-        {data.map((transaction) => {
+        {data.map((transaction: any) => {
           return (
-            <div className='grid grid-cols-6 justify-between w-full h-10 border border-white px-5 py-3'>
+            <div key={transaction.transaction_id} 
+            className='grid grid-cols-6 justify-between w-full h-10 border border-white px-5 py-3'>
               <div>
                 <p className='font-semibold text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>{transaction.transaction_id}</p>
               </div>
