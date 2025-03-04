@@ -46,7 +46,7 @@ const trendingPosts = [
     shares: "12k",
   },
   {
-    id: 2,
+    id: 4,
     title: "The Financier's Forum",
     description:
       "A platform for financial professionals, investors, and enthusiasts to discuss market trends, investment...",
