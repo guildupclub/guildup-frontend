@@ -69,7 +69,7 @@ export function PostDialog() {
     setIsUploading(true);
     try {
       const signUrlResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/getSignUrl`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/getGCPSignUrl`,
         {
           fileName: file?.name || "",
           fileType,

@@ -7,7 +7,14 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { ArrowRight, Badge, Instagram, Video } from "lucide-react";
+import {
+  ArrowRight,
+  Badge,
+  Edit,
+  Instagram,
+  Trash2,
+  Video,
+} from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
@@ -16,6 +23,7 @@ import { toast } from "sonner";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
+import EditOfferingModal from "./UpdateOffering";
 
 // Add this state in ProfileCard component
 
@@ -68,12 +76,14 @@ export function ProfileCard() {
   const [error, setError] = useState<string | null>(null);
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setBgImgUrl] = useState("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedOfferingModal, setSelectedOfferingModal] = useState(null);
+
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-
   const activeCommunityId = community?.communityId;
   console.log(activeCommunityId);
 
@@ -189,6 +199,30 @@ export function ProfileCard() {
       console.error("Error joining community:", err);
       toast.error("Failed to join the community. Please try again.");
     }
+  };
+
+  const handleDeleteOffering = async (offeringId: string) => {
+    try {
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/delete/${offeringId}`,
+        {
+          data: {
+            userId: user._id,
+            communityId: activeCommunityId,
+          },
+        }
+      );
+      toast.success("Offering deleted successfully");
+      setOfferings(offerings.filter((offering) => offering._id !== offeringId));
+    } catch (error) {
+      console.error("Error deleting offering:", error);
+      toast.error("Failed to delete offering");
+    }
+  };
+
+  const handleEditClick = (offering: any) => {
+    setSelectedOfferingModal(offering);
+    setIsEditModalOpen(true);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -361,9 +395,13 @@ export function ProfileCard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-              {offerings.map((offering: any) => (
-                // eslint-disable-next-line react/jsx-key
-                <div className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300">
+
+              {offerings.map((offering) => (
+                <div
+                  key={offering._id || Math.random()}
+                  className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
+                >
+
                   {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 rounded-lg">
@@ -379,24 +417,56 @@ export function ProfileCard() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mt-4 px-2">
-                    <span className="text-xl font-semibold text-gray-900 pl-12">
+                  <div className="mt-4 px-2">
+                    {/* <span className="text-xl font-semibold text-gray-900 pl-12">
                       ₹{offering.price.amount}
-                    </span>
-                    <Button
-                      size="sm"
-                      className="text-white px-6 py-2 rounded-lg flex items-center gap-2"
-                      onClick={() => {
-                        if (!session) {
-                          signIn("google");
-                          return;
-                        }
-                        setSelectedOffering(offering);
-                      }}
-                    >
-                      <span>Book Now</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    </span> */}
+                    <div className="flex items-center justify-between gap-2">
+                      {memberDetails?.is_owner && (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="px-3 py-2 rounded-lg flex items-center gap-1"
+                            onClick={() => handleEditClick(offering)}
+                          >
+                            <Edit className="w-4 h-4" />
+                            <span>Edit</span>
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            onClick={() => handleDeleteOffering(offering._id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Delete</span>
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Book Now button */}
+                      <Button
+                        size="sm"
+                        className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                          !memberDetails?.is_owner ? "ml-auto" : ""
+                        }`}
+                        onClick={() => {
+                          if (!session) {
+                            signIn("google");
+                            return;
+                          }
+                          setSelectedOffering(offering);
+                        }}
+                      >
+                        <span className="line-through text-xs opacity-60">
+                          ₹{offering.price.amount + 1000}
+                        </span>
+                        <span>₹{offering.price.amount}</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -416,6 +486,16 @@ export function ProfileCard() {
         <EditCommunityModal
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
+        />
+      )}
+
+      {isEditModalOpen && selectedOfferingModal && (
+        <EditOfferingModal
+          offering={selectedOfferingModal}
+          userId={user?._id}
+          communityId={activeCommunityId}
+          onClose={() => setIsEditModalOpen(false)}
+          onUpdate={fetchOfferings}
         />
       )}
     </div>

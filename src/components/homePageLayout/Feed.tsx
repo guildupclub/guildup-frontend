@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PostCreator } from "./PostCreator";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import Loader from "../Loader";
 import { PostCard } from "./PostCard";
 import { API_ENDPOINTS } from "@/config/constants";
-import Loader from "../Loader";
 
 interface Post {
   community_id: string;
@@ -27,152 +28,92 @@ interface ApiResponse {
 }
 
 export function Feed() {
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   const [posts, setPosts] = useState<Post[]>([]);
-  const data = useSession();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
-  const observer = useRef<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  console.log("@session", data);
   const lastPostElementRef = useCallback(
-    (node: any) => {
-      if (loading) return;
+    (node: HTMLElement | null) => {
+      if (loading || !hasMore) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
-          setPage((prevPage) => prevPage + 1); // trigger loading of new posts by chaging page no
+          setPage((prevPage) => prevPage + 1);
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading]
+    [loading, hasMore]
   );
 
-  const fetchPosts = async (page: any, num: any) => {
+  const fetchPosts = async (page: number) => {
     try {
-      const response: any = await fetch(API_ENDPOINTS.getPosts, {
+      setLoading(true);
+      const response = await fetch(API_ENDPOINTS.getPosts, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId: "678ce60732c37c1222f913e0",
-          page: page,
-        }),
+        body: JSON.stringify({ userId, page }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch posts");
 
       const data: ApiResponse = await response.json();
       if (data.r === "s" && Array.isArray(data.data)) {
-        console.log("@Reponse", data);
         return data.data;
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch posts");
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+      return [];
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const loadMorePosts = async () => {
-    setLoading(true);
-    console.log("Getting mroe post");
-    const newPosts = await fetchPosts(page, 10);
-    console.log("@newPost", newPosts);
-    setPosts((prevPosts) => {
-      if (prevPosts) {
-        return [...prevPosts, ...(newPosts || [])];
-      } else {
-        return [...(newPosts || [])]; // Or return newPosts; if you want to replace previous posts entirely.
-      }
-    });
-    setLoading(false);
-  };
-
   useEffect(() => {
+    const loadMorePosts = async () => {
+      const newPosts = await fetchPosts(page);
+      if(newPosts){   
+      setPosts((prevPosts) => {
+        const uniquePosts = [...prevPosts, ...newPosts].filter(
+          (post, index, self) =>
+            index === self.findIndex((p) => p._id === post._id)
+        );
+        return uniquePosts;
+      });
+
+      setHasMore(newPosts?.length > 0);
+    }
+    };
+
     loadMorePosts();
   }, [page]);
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // useEffect(() => {
-  //   const fetchPosts = async () => {
-  //     try {
-  //       const response = await fetch(API_ENDPOINTS.getPosts, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           userId: "678ce60732c37c1222f913e0",
-  //         }),
-  //       });
-
-  //       if (!response.ok) throw new Error("Failed to fetch posts");
-
-  //       const data: ApiResponse = await response.json();
-  //       if (data.r === "s" && Array.isArray(data.data)) {
-  //         setPosts(data.data);
-  //       }
-  //     } catch (err) {
-  //       setError(err instanceof Error ? err.message : "Failed to fetch posts");
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchPosts();
-  // }, []);
 
   return (
     <div className="max-w-4xl mx-auto">
       <Tabs defaultValue="feed" className="w-full">
-        {/* <TabsList className="w-full justify-start h-14 bg-transparent border-b border-zinc-800 rounded-none p-0">
-          <TabsTrigger
-            value="feed"
-            className="data-[state=active]:bg-transparent data-[state=active]:text-purple-500 rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 px-8 h-14"
-          >
-            Feed
-          </TabsTrigger>
-          <TabsTrigger
-            value="snipz"
-            className="data-[state=active]:bg-transparent data-[state=active]:text-purple-500 rounded-none border-b-2 border-transparent data-[state=active]:border-purple-500 px-8 h-14"
-          >
-            Snipz
-          </TabsTrigger>
-        </TabsList> */}
-
         <TabsContent value="feed" className="mt-0 p-4">
-          {isLoading || loading ? (
+          {loading && posts?.length === 0 ? (
             <Loader />
-          ) : error ? (
-            <div className="text-center text-red-400">{error}</div>
-          ) : posts.length === 0 ? (
+          ) : posts?.length === 0 ? (
             <div className="text-center text-zinc-400">No posts available</div>
           ) : (
-            posts.map((post, index) => (
+            posts?.map((post, index) => (
               <PostCard
                 key={post._id}
-                post={{
-                  ...post,
-                  community_id: post.community_id || "default",
-                  upvote_userId: post.upvote_userId,
-                }}
-                ref={posts.length === index + 1 ? lastPostElementRef : null}
+                post={post}
+                ref={index === posts?.length - 1 ? lastPostElementRef : null}
               />
             ))
           )}
+          {loading && <Loader />}
         </TabsContent>
-
-        {/* <TabsContent value="snipz">
-          <div className="p-4 text-center text-zinc-400">
-            Launching soon !!
-          </div>
-        </TabsContent> */}
       </Tabs>
     </div>
   );

@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    turbo: false, // Disable Turbopack
+  },
 };
 
 export default nextConfig;

@@ -112,7 +112,7 @@ export function LeftSidebar() {
     async function fetchCommunities() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/community/user",
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
           {
             userId: userId,
           }
@@ -157,7 +157,7 @@ export function LeftSidebar() {
     async function fetchTopics() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/category/interest",
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/interest`,
           { userId: userId }
         );
 
@@ -239,7 +239,7 @@ export function LeftSidebar() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/v1/feed/custom/create",
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/feed/custom/create`,
         {
           userId: userId,
           communityIds: selectedCommunities,

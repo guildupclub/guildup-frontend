@@ -11,11 +11,13 @@ import {
   Eye,
   Plus,
   Send,
+  MessageCircleMore,
 } from "lucide-react";
 import { Comment } from "./Comment";
 import CommentSection from "./CommentSection/CommentSection";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { FaRegCommentDots, FaShare } from "react-icons/fa";
 
 interface PostCardProps {
   post: {
@@ -151,43 +153,57 @@ export function PostCard({ post, ref }: PostCardProps) {
             <p className="text-sm text-accent mt-2">
               {renderBodyWithHashtags(post.body)}
             </p>
+
+            {post?.media?.publicUrl && post?.media?.fileType === "image" && (
+              <img
+                src={post.media.publicUrl}
+                alt="Post Image"
+                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+              />
+            )}
+
+            {/* Video Placeholder */}
+            {post?.media?.publicUrl && post?.media?.fileType === "video" && (
+              <video
+                controls
+                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+              >
+                <source src={post?.media?.publicUrl} type="video/mp4" />
+              </video>
+            )}
           </div>
         </div>
       </div>
-      <div className="flex items-center px-4 py-3 border-t border-zinc-300/50 mx-2">
-        <div className="flex items-center gap-6 ">
-          <button
-            className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
-            onClick={handleLikeClick}
-          >
-            <Heart
-              className={`h-5 w-5 ${
-                isLiked ? "text-red-500 fill-red-500" : ""
-              }`}
-            />
-            <span className="text-sm">{formatNumber(post.up_votes)} </span>
-          </button>
-          <button
-            className="flex items-center gap-2 text-muted-foreground"
-            onClick={() => setShowComments(!showComments)}
-          >
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-sm">
-              {formatNumber(post?.replies?.length)}
-            </span>
-          </button>
-          <button
-            className="flex items-center gap-2 text-muted-foreground"
-            onClick={handleShareClick}
-          >
-            <Share2 className="h-5 w-5" />
-            {/* <span className="text-sm">Share</span> */}
-          </button>
-        </div>
-        <div className="ml-auto flex items-center gap-2 text-muted-foreground">
-          <Eye className="h-5 w-5" />
-          <span className="text-sm">25k </span>
-        </div>
+      <div className="flex items-center px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
+        {/* Left Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
+          onClick={handleLikeClick}
+        >
+          <Heart
+            className={`h-5 w-5 ${isLiked ? "text-red-500 fill-red-500" : ""}`}
+          />
+          <span className="text-sm">{formatNumber(post.up_votes)} Like</span>
+        </button>
+
+        {/* Middle Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground"
+          onClick={() => setShowComments(!showComments)}
+        >
+          <MessageCircleMore className="h-5 w-5" />
+          <span className="text-sm">
+            {formatNumber(post?.replies?.length)} Comment
+          </span>
+        </button>
+
+        {/* Right Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground"
+          onClick={handleShareClick}
+        >
+          <Send className="h-5 w-5" /> Share
+        </button>
       </div>
 
       {showComments && (
