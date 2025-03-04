@@ -3,6 +3,7 @@ import { Session } from "next-auth";
 
 
 interface Community {
+  [x: string]: string | null;
   id: string;
   name: string;
 }

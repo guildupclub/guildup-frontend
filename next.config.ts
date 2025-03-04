@@ -21,10 +21,7 @@ const nextConfig: NextConfig = {
         hostname: "api.dicebear.com",
       },
     ],
-  },
-  experimental: {
-    turbo: false, // Disable Turbopack
-  },
+  }
 };
 
 export default nextConfig;
