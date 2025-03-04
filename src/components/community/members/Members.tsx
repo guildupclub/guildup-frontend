@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,6 +21,7 @@ import {
   DialogHeader,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { RootState } from "@/redux/store";
 
 interface User {
   _id: string;
@@ -50,6 +50,7 @@ export default function Members() {
   const [error, setError] = useState("");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const baseUrlBackend = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
   const { user } = useSelector((state: RootState) => state.user);
   const removerUserId = user?._id;
@@ -95,7 +96,7 @@ export default function Members() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/removeUser`,
+        `${baseUrlBackend}/v1/community/removeUser`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
