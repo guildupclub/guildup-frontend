@@ -1,7 +1,8 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
-//adding here to test - will remove later
+
 const uri = process.env.MONGO_URI || 'mongodb+srv://guildup:FDDsWVsD39abgdRm@cluster0.tks5q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0' ;
+
 
 
 if (!process.env.MONGO_URI) {

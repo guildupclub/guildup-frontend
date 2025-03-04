@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Pin } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -171,6 +172,19 @@ export function LeftSidebar() {
     fetchTopics();
   }, []);
 
+  const toggleBodyScroll = (lockScroll: boolean) => {
+    if (lockScroll) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  };
+
+  useEffect(() => {
+    toggleBodyScroll(showTopicsModal);
+    return () => toggleBodyScroll(false);
+  }, [showTopicsModal]);
+
   const handleTopicSelectChange = (topicId: string) => {
     setSelectedTopics((prev) =>
       prev.includes(topicId)
@@ -248,19 +262,21 @@ export function LeftSidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-80  pt-20 pb-3 px-4 space-y-3">
+    <aside className="left-0 h-screen w-80 pl-5 pr-2 py-4 pb-3 space-y-3 ">
       <div className="bg-card rounded-xl p-3 space-y-1">
+
+        {/* Home Feed */}
         <div>
           <button
             onClick={() => handleItemClick("home", "feed")}
-            className={`w-full flex items-center text-sm font-medium border-b border-zinc-300 py-2 bg ${
-              isItemSelected("home", "feed") ? "text-purple-500" : ""
-            }`}
+            className={`w-full flex items-center text-sm font-medium border-b border-zinc-300 py-2 bg ${isItemSelected("home", "feed") ? "text-purple-500" : ""
+              }`}
           >
             Home Feed
           </button>
         </div>
 
+        {/* Custom Feed */}
         <Collapsible
           open={openSections.customFeed}
           onOpenChange={() => toggleSection("customFeed")}
@@ -418,7 +434,9 @@ export function LeftSidebar() {
             ))}
           </CollapsibleContent>
           {showTopicsModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-background/50">
+               <div className={ cn(
+                  "fixed  inset-0 z-50 flex items-center justify-center bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 m-0 !important size-full overflow-y-hidden",
+                )}>  
               <div className="bg-card p-4 rounded space-y-2 w-[300px]">
                 <div className="flex justify-between items-center">
                   <h2 className="">Create Custom Topic Feed</h2>
@@ -473,6 +491,7 @@ export function LeftSidebar() {
         )} */}
       </div>
 
+      {/* My Communities */}
       <div className="bg-card rounded-xl p-4 space-y-2">
         <Collapsible
           open={openSections.communities}

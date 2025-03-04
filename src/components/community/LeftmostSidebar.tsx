@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -24,7 +22,6 @@ import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Type for community data
 interface Community {
   _id: string;
   title: string;
@@ -43,10 +40,11 @@ export function LeftmostSidebar() {
   // const [isLoading, setIsLoading] = useState(true);
   // const [error, setError] = useState<string | null>(null);
   const [showCreatorForm, setShowCreatorForm] = React.useState(false);
-
+  const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
+  
   const handleOpenForm = () => {
-    setShowCreatorForm((prev) => !prev);
-  };
+        setShowCreatorForm((prev) => !prev);
+      };
 
   const dispatch = useDispatch();
   const activeCommunity = useSelector(
@@ -54,9 +52,9 @@ export function LeftmostSidebar() {
   );
   const user = useSelector((state: RootState) => state.user.user);
 
-  const activeCommunityId = activeCommunity?.id;
+const activeCommunityId = activeCommunity?.id;
+    useEffect(() => {
 
-  useEffect(() => {
     fetchCommunities();
   }, []);
 
@@ -184,7 +182,7 @@ const { data: communities = [], isLoading, error } = useQuery({
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
-          {isLoading ? (
+        {isLoading ? (
             // Loading skeleton
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
@@ -200,17 +198,19 @@ const { data: communities = [], isLoading, error } = useQuery({
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative w-12 h-12 rounded-full  ${
-                  activeCommunityId === community._id
+                className={`relative w-12 h-12 rounded-full  ${activeCommunityId === community._id
                     ? "bg-blue-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
-                }`}
+                  }`}
                 onClick={() => {
+
+
                   dispatch(
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
                     })
+
                   );
                   dispatch(
                     setCommunityData({
@@ -218,6 +218,7 @@ const { data: communities = [], isLoading, error } = useQuery({
                       userId: user._id,
                     })
                   );
+
                 }}
               >
                 <Avatar className="w-full h-full ">
@@ -236,19 +237,28 @@ const { data: communities = [], isLoading, error } = useQuery({
             ))
           )}
 
-          <Dialog>
-            <CreatorForm />
-            <Link href="/explore">
+          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+            <DialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
               >
-                <FaCompass />
+                <Plus className="h-6 w-6" />
               </Button>
-            </Link>
-            {showCreatorForm && <CreatorForm />}
+            </DialogTrigger>
+            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
           </Dialog>
+
+          <Link href="/explore">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+            >
+              <FaCompass />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
