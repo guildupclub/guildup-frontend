@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
+import FooterLinks from "./FootLinks";
 
 // Sample data structure
 const trendingPosts = [
@@ -184,6 +185,7 @@ export function RightSidebar() {
           ))}
         </div>
       </div> */}
+      <FooterLinks />
     </aside>
   );
 }

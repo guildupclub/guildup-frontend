@@ -155,7 +155,7 @@ const EditOfferingModal = ({
             />
           </div>
           <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit" className="text-white" disabled={loading}>

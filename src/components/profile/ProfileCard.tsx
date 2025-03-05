@@ -4,7 +4,7 @@ import { RootState } from "@/redux/store";
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import axios from "axios";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import {
@@ -24,6 +24,7 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
+
 
 // Add this state in ProfileCard component
 
@@ -100,7 +101,7 @@ export function ProfileCard() {
   // Add offerings state to existing states
 
   // Add fetchOfferings function
-  const fetchOfferings = async () => {
+  const fetchOfferings = useCallback(async () => {
     if (!community.communityId) return;
 
     try {
@@ -118,7 +119,7 @@ export function ProfileCard() {
     } catch (error) {
       console.error("Error fetching offerings:", error);
     }
-  };
+  }, [community]);
 
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
@@ -146,7 +147,7 @@ export function ProfileCard() {
 
   useEffect(() => {
     fetchOfferings();
-  }, [community.communityId]);
+  }, [community.communityId, fetchOfferings]);
 
   useEffect(() => {
     if (!community?.communityId) return; // Ensure communityId is set before fetching
@@ -234,7 +235,7 @@ export function ProfileCard() {
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
           <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
-            <img
+            <Image
               src={bgImgUrl || "/placeholder.svg"}
               alt="Profile banner"
               width={1200}

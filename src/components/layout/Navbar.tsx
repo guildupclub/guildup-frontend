@@ -39,6 +39,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
@@ -73,6 +74,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     setShowCommunityList(false);
     setShowEditCommunity(true);
   };
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [],)
 
   return (
     <>
@@ -152,19 +157,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </div>
 
               <div className="hidden md:block">
-                {user?._id ? (
+                {isMounted && user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage
-                              src={user?.avatar || "/placeholder.svg"}
-                              alt="User"
-                            />
-                            <AvatarFallback>
-                              {user?.email?.[0] || "U"}
-                            </AvatarFallback>
+                            {user?.avatar ? (
+                              <AvatarImage src={user.avatar} alt="User" />
+                            ) : (
+                              <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>
+                            )}
                           </Avatar>
                         </Button>
                         <ChevronDown size={25} className="pt-2" />
@@ -174,24 +177,25 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
-                        <Link href='/profile'>Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
-                      <Link href='/bookings'>Bookings</Link>
-                      </DropdownMenuItem>
-                      {isUser &&
-                        <DropdownMenuItem
-                          className="hover:bg-primary-gradient border-b border-zinc-300"
-                        >
-                          <Link href='/payments'>Payments</Link>
-                        </DropdownMenuItem>}
-                      <DropdownMenuItem
+                       <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
                       >
                         Sign out
                       </DropdownMenuItem>
+                      {/* <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
+                        <Link href='/profile'>Profile</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
+                      <Link href='/bookings'>Bookings</Link>
+                      </DropdownMenuItem> */}
+                      {/* {isMounted && isUser &&
+                        <DropdownMenuItem
+                          className="hover:bg-primary-gradient border-b border-zinc-300"
+                        >
+                          <Link href='/payments'>Payments</Link>
+                        </DropdownMenuItem>} */}
+                     
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (

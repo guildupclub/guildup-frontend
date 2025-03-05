@@ -18,6 +18,8 @@ import CommentSection from "./CommentSection/CommentSection";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
+import Image from 'next/image';
+
 
 interface PostCardProps {
   post: {
@@ -32,6 +34,7 @@ interface PostCardProps {
     community_id: string;
     upvote_userId: any;
     replies?: any;
+    media?: any;
   };
   ref: any;
 }
@@ -155,9 +158,12 @@ export function PostCard({ post, ref }: PostCardProps) {
             </p>
 
             {post?.media?.publicUrl && post?.media?.fileType === "image" && (
-              <img
+
+              <Image
                 src={post.media.publicUrl}
                 alt="Post Image"
+                width={500} // Specify the width
+                height={400} // Specify the height
                 className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
               />
             )}

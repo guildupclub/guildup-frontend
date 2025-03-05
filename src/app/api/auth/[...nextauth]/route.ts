@@ -52,12 +52,13 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: "/auth/signin",
-    //signUp: "/auth/signup", // Customize the sign-up page for new users
+    newUser: "/auth/signup", // Customize the sign-up page for new users
   },
   session: {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true
 });
 
 export { handler as GET, handler as POST };

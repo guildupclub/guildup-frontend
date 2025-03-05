@@ -221,7 +221,6 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
           <div className="flex justify-end gap-4">
             <Button
-              type="button"
               variant="outline"
               onClick={() => setOpen(false)}
             >
