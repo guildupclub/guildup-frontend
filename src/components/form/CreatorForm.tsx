@@ -66,7 +66,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
             user_id: userId,
             name: formData.name,
             description: formData.description,
-            additional_tags: additionalTags,
+            additional_tags: formData.tags.split(','),
             categoryId: categoryId,
             is_locked: false,
           }),
