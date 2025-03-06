@@ -1,12 +1,12 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 
-const uri = process.env.MONGO_URI || 'mongodb+srv://guildup:FDDsWVsD39abgdRm@cluster0.tks5q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0' ;
+ const uri = process.env.MONGO_URI;
 
 
 
 if (!process.env.MONGO_URI) {
-  console.error('Invalid/Missing environment variable: "MONGO_URI"');
+  console.error('Invalid/Missing environment variable: "MONGO_URI" ');
 }
 // console.log("URL ", uri);
 const options = {

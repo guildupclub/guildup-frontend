@@ -87,7 +87,7 @@ export function Feed({ communityId }: FeedProps) {
         </div>
 
         {/* Filter Bar */}
-        <div className="flex items-center gap-4 py-4 text-sm text-muted-foreground">
+        {/* <div className="flex items-center gap-4 py-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <span className="">Showing:</span>
             <Select value={filter} onValueChange={setFilter}>
@@ -129,7 +129,7 @@ export function Feed({ communityId }: FeedProps) {
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </div> */}
 
         {/* Posts */}
         <div className="space-y-6 py-4">
