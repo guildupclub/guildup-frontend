@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient  , useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
@@ -53,6 +53,18 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
   const handleCategoryChange = (value: string) => {
     setCategoryId(value);
   };
+
+  const { data: categoriesData, isLoading: isCategoriesLoading } = useQuery<ApiResponse>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/categories`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+      return response.json();
+    }
+  });
+
 
   // Mutation for creating community
   const createCommunity = useMutation({
@@ -126,7 +138,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
               <SelectValue placeholder="Select your topic" />
             </SelectTrigger>
             <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
-              {categories.map((category) => (
+              {categoriesData?.data.map((category) => (
                 <SelectItem key={category._id} value={category._id}>
                   {category.name}
                 </SelectItem>
