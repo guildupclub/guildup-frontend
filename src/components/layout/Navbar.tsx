@@ -91,8 +91,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         <div className="container flex h-14 items-center px-5">
           <Link href="/" className="flex items-center space-x-2 mr-6">
             <Image
-              src={guildup_logo || "/placeholder.svg"}
-              alt="GuildUp"
+              src={guildup_logo}
+              alt="GuildUp logo"
               className="h-8 w-auto"
             />
           </Link>
@@ -141,7 +141,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       href={
                         activeCommunityId
                           ? `/community/${activeCommunityId}/feed`
-                          : "/community/feed"
+                          : `/`
                       }
                       className="flex flex-col items-center justify-center"
                     >
@@ -164,7 +164,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
                           <Avatar className="h-10 w-10">
                             {user?.avatar ? (
-                              <AvatarImage src={user.avatar} alt="User" />
+                              <AvatarImage src={user?.avatar} alt="User" />
                             ) : (
                               <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>
                             )}

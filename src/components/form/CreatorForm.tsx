@@ -75,18 +75,20 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
 
       const data = await response.json();
       if (data.r !== "s")
-        throw new Error(data.e || "Failed to create community");
+        console.log(data.e || "Failed to create community");
+      
       return data;
     },
     onSuccess: () => {
       toast.success("Community created successfully! 🎉");
-      setIsDialogOpen(false);
       queryClient.invalidateQueries({ queryKey: ["communities"] }); // Refresh data
       setFormData({ name: "", description: "", tags: "" });
       setCategoryId("");
+      onClose();
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
+      onClose();
     },
   });
 
