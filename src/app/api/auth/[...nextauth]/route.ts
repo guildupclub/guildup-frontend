@@ -12,7 +12,7 @@ const handler = NextAuth({
 
       if (user) {
         const userExists = await client
-          .db("your-database-name") 
+          .db("Cluster0") 
           .collection("users")
           .findOne({ email: user.email });
 
