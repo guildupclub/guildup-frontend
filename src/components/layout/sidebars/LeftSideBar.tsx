@@ -263,10 +263,10 @@ export function LeftSidebar() {
 
   return (
     <aside className="left-0 h-screen w-80 pl-5 pr-2 py-4 pb-3 space-y-3 ">
-      <div className="bg-card rounded-xl p-3 space-y-1">
+      {/* <div className="bg-card rounded-xl p-3 space-y-1"> */}
 
         {/* Home Feed */}
-        <div>
+        {/* <div>
           <button
             onClick={() => handleItemClick("home", "feed")}
             className={`w-full flex items-center text-sm font-medium border-b border-zinc-300 py-2 bg ${isItemSelected("home", "feed") ? "text-purple-500" : ""
@@ -274,10 +274,10 @@ export function LeftSidebar() {
           >
             Home Feed
           </button>
-        </div>
+        </div> */}
 
         {/* Custom Feed */}
-        <Collapsible
+        {/* <Collapsible
           open={openSections.customFeed}
           onOpenChange={() => toggleSection("customFeed")}
           className="space-y-2"
@@ -324,21 +324,21 @@ export function LeftSidebar() {
                       key={cid}
                       className=" mt-1 border-l border-zinc-700 pl-4 text-sm"
                     >
-                      <div className="font-semibold ">{community?.name}</div>
+                      <div className="font-semibold ">{community?.name}</div> */}
                       {/* {community?.description && (
                         <div className="text-zinc-400">{community.description}</div>
                       )}
                       {community?.membersCount && (
                         <div className="text-zinc-500">Members: {community.membersCount}</div>
                       )} */}
-                    </div>
+                    {/* </div>
                   );
                 })}
               </div>
             ))}
-          </CollapsibleContent>
+          </CollapsibleContent> */}
 
-          {showSelectModal && (
+          {/* {showSelectModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-card/50">
               <div className="bg-card p-4 rounded space-y-2 w-[300px]">
                 <div className="flex justify-between items-center">
@@ -377,11 +377,11 @@ export function LeftSidebar() {
               </div>
             </div>
           )}
-        </Collapsible>
+        </Collapsible> */}
 
         {/* Followed Topics */}
 
-        <Collapsible
+        {/* <Collapsible
           open={openSections.customTopics}
           onOpenChange={() => toggleSection("customTopics")}
           className="space-y-2 border-t border-zinc-300 py-2"
@@ -474,7 +474,7 @@ export function LeftSidebar() {
               </div>
             </div>
           )}
-        </Collapsible>
+        </Collapsible> */}
 
         {/* {myTopics?.user_interests && (
           <div className="mt-4 p-4 bg-zinc-800 rounded-lg text-zinc-300 shadow-lg">
@@ -489,7 +489,7 @@ export function LeftSidebar() {
             ))}
           </div>
         )} */}
-      </div>
+      {/* </div> */}
 
       {/* My Communities */}
       <div className="bg-card rounded-xl p-4 space-y-2">
