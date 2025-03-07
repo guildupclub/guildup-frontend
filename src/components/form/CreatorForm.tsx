@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
@@ -22,16 +22,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { categories } from "./Categories";
+import { useSession } from "next-auth/react";
+// import { categories } from "./Categories";
 
 
 interface CreatorFormProps {
   onClose: () => void;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+}
+
 export default function CreatorForm({ onClose }: CreatorFormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
+  const { data: session } = useSession();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -39,7 +46,23 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
     tags: "",
   });
   const [categoryId, setCategoryId] = useState("");
-  const [additionalTags] = useState(["first_community", "abhishek"]);
+  const [additionalTags] = useState([]);
+
+   // Fetch categories dynamically
+   const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      console.log(data);
+      return data.data || [];
+    },
+  });
+
+  // console.log(categories.data);
 
   // Handle input change
   const handleInputChange = (
@@ -51,8 +74,11 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
 
   // Handle category change
   const handleCategoryChange = (value: string) => {
+    console.log("Category changed to:", value);
     setCategoryId(value);
   };
+
+  console.log("Categories", categoryId);
 
   // Mutation for creating community
   const createCommunity = useMutation({
@@ -66,14 +92,17 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
             user_id: userId,
             name: formData.name,
             description: formData.description,
-            additional_tags: additionalTags,
-            categoryId: categoryId,
+            additional_tags: formData.tags.split(","),  
+            category_id: categoryId,
             is_locked: false,
           }),
         }
       );
 
       const data = await response.json();
+
+      console.log(data);
+
       if (data.r !== "s")
         console.log(data.e || "Failed to create community");
       
@@ -98,11 +127,17 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
       toast.error("Please fill in all required fields.");
       return;
     }
+
+    if (!categoryId) {
+      toast.error("Please select a topic.");
+      return;
+    }
+
     createCommunity.mutate();
   };
 
   return (
-    <DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
+    (session && (<DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
       <DialogHeader className="flex items-center justify-between">
         <DialogTitle className="text-xl font-normal">
           Fill to become a creator
@@ -126,7 +161,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
               <SelectValue placeholder="Select your topic" />
             </SelectTrigger>
             <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
-              {categories.map((category) => (
+              {categories.map((category: Category) => (
                 <SelectItem key={category._id} value={category._id}>
                   {category.name}
                 </SelectItem>
@@ -168,6 +203,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
           Create
         </Button>
       </div>
-    </DialogContent>
+    </DialogContent>) 
+    )
   );
 }
