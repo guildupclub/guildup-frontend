@@ -149,10 +149,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       <span>Experts</span>
                     </Link>
                   </li>
-                  <li className="flex flex-col items-center w-18  px-3 rounded-xl">
-                    <Bell className="h-6 w-6" />
-                    <span className="">Notifications</span>
-                  </li>
+                  {/* ss */}
                 </ul>
               </div>
 
