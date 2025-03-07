@@ -1,12 +1,12 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 
- const uri = process.env.MONGO_URI || '';
+ const uri = process.env.MONGO_URI || ' ';
 
 
 
 if (!process.env.MONGO_URI) {
-  console.error('Invalid/Missing environment variable: "MONGO_URI" ');
+  console.log('Invalid/Missing environment variable: "MONGO_URI" ');
 }
 // console.log("URL ", uri);
 const options = {
