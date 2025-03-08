@@ -23,7 +23,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
-// import { categories } from "./Categories";
 
 
 interface CreatorFormProps {
@@ -57,12 +56,9 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
         throw new Error("Failed to fetch categories");
       }
       const data = await response.json();
-      console.log(data);
       return data.data || [];
     },
   });
-
-  // console.log(categories.data);
 
   // Handle input change
   const handleInputChange = (

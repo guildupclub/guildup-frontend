@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  compiler: {
+    removeConsole: true,
+  },
   images: {
     domains: [
       "target.scene7.com",

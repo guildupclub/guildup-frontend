@@ -46,7 +46,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setCommunities(response.data);
         console.log("Here in CommunitySection.tsx", response.data.data);
 
-        if (response.data && response.data.r === "s" && Array.isArray(response.data.data)) {
+        if (response && response.data && response.data.r === "s" && Array.isArray(response.data.data)) {
           setCommunities(response.data.data);
         } else {
           console.error("Invalid response format:", response.data);
