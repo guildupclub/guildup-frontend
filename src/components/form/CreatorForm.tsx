@@ -52,7 +52,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
     queryKey: ["categories"],
     queryFn: async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/`);
-      if (!response.ok) {
+      if (!response && !response.ok) {
         throw new Error("Failed to fetch categories");
       }
       const data = await response.json();
@@ -99,7 +99,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
 
       console.log(data);
 
-      if (data.r !== "s")
+      if (!data && data.r !== "s")
         console.log(data.e || "Failed to create community");
       
       return data;
