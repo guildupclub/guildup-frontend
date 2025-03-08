@@ -19,7 +19,7 @@ function TrendingSection() {
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/trending`
         );
         
-        if (response.data && response.data.r === "s") {
+        if (response && response.data && response.data.r === "s") {
           setTrendingCategories(response.data.data);
         } else {
           console.error("Failed to fetch trending categories", response.data);
