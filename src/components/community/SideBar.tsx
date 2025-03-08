@@ -438,7 +438,7 @@ export function Sidebar() {
     </div>
     
     {/* Mobile View */}
-      <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-20 gap-2">
+      <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
         <button
           className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/profile" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
           onClick={() => handleNavigation("/community/profile")}

@@ -179,7 +179,7 @@ export function LeftmostSidebar() {
   }
 
   return (
-    <div className="flex fixed left-0 h-screen w-20 bg-card flex-col items-center border-r border-background py-20 gap-3">
+    <div className="hidden md:flex fixed left-0 h-screen w-20 bg-card flex-col items-center border-r border-background py-20 gap-3">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
