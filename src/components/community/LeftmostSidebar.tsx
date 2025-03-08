@@ -119,7 +119,7 @@ const fetchCommunities = async (): Promise<Community[]> => {
     }
   );
 
-  console.log("response in leftSideBAr ", response);
+  // console.log("response in leftSideBAr ", response);
 
   if (!response.ok) {
     throw new Error("Failed to fetch communities");

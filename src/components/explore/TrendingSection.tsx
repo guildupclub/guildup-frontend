@@ -1,104 +1,76 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-// Mock data for events (as shown in the image)
-const TRENDING_EVENTS = [
-  {
-    id: 1,
-    title: "Technology Workshop Series",
-    date: "Fri, Jan 31 • 5:00 PM",
-    type: "Online",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd-M_r7bEyuBQzUODeKwobumjZ2bnoB_uelw&s",
-  },
-  {
-    id: 2,
-    title: "Monthly Tech Meetup",
-    date: "Sat, Jan 25 • 12:00 PM",
-    type: "Offline",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUg3x8Vt2KKU7EGJ-9avOH6HFMx58MyHa2b-_Kt7nAiX9qetolQl309uqHga0uuwXWNiw&usqp=CAU",
-  },
-  {
-    id: 3,
-    title: "AI Workshop: Practical Applications",
-    date: "Sun, Jan 28 • 2:00 PM",
-    type: "Offline",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRd-M_r7bEyuBQzUODeKwobumjZ2bnoB_uelw&s",
-  },
-  {
-    id: 4,
-    title: "Cyber Tech Workshop",
-    date: "Mon, Jan 29 • 3:00 PM",
-    type: "Online",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSUg3x8Vt2KKU7EGJ-9avOH6HFMx58MyHa2b-_Kt7nAiX9qetolQl309uqHga0uuwXWNiw&usqp=CAU",
-  },
-];
+interface TrendingCategory {
+  _id: string;
+  name: string;
+  num_communities: number;
+}
 
 function TrendingSection() {
-  const [trendingPost, setTrendingPost] = useState([]);
+  const [trendingCategories, setTrendingCategories] = useState<TrendingCategory[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTrendingPost = async () => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/trending`
-      );
-      setTrendingPost(response.data.data);
+    const fetchTrendingCategories = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/trending`
+        );
+        
+        if (response.data && response.data.r === "s") {
+          setTrendingCategories(response.data.data);
+        } else {
+          console.error("Failed to fetch trending categories", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching trending categories:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchTrendingPost();
+    
+    fetchTrendingCategories();
   }, []);
 
   return (
     <div className="flex flex-col gap-4">
       {/* Trending Tags Section */}
-      <div className="bg-card p-4 rounded-lg h-[500px] overflow-auto scrollbar-none">
-        <h2 className="text-lg font-semibold mb-3">Trending Tags</h2>
-        {trendingPost.length > 0 && (
-          <div className="space-y-3">
-            {trendingPost.map((post: any, index: number) => (
-              <div
-                key={post.id || index}
-                className="p-2 border-b border-background hover:bg-background transition-colors"
-              >
+      <div className="bg-card p-4 rounded-lg h-[500px] overflow-auto scrollbar-none border border-zinc-200/30">
+        <h2 className="text-lg font-semibold mb-3 border-b pb-2 border-zinc-200/50">Trending Tags</h2>
+        
+        {isLoading ? (
+          <div className="space-y-3 animate-pulse">
+            {[1, 2, 3, 4, 5].map((item) => (
+              <div key={item} className="p-2 border-b border-background">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm">#{post.title}</span>
-                  <span className="text-xs ">{post.up_votes} posts</span>
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  <div className="h-3 bg-gray-200 rounded w-12"></div>
                 </div>
               </div>
             ))}
           </div>
+        ) : trendingCategories.length > 0 ? (
+          <div className="space-y-3">
+            {trendingCategories.map((category) => (
+              <div
+                key={category._id}
+                className="p-2 border-b border-zinc-200/30 hover:bg-muted/10 transition-colors rounded-md"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">#{category.name}</span>
+                  <span className="text-xs text-muted-foreground">{category.num_communities} creator</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-32 text-muted-foreground">
+            No trending categories found
+          </div>
         )}
       </div>
-
-      {/* Trending Events Section */}
-      {/* <div className="bg-zinc-900 p-4 text-white rounded-lg h-[30ch] overflow-auto scrollbar-none cursor-pointer">
-        <h2 className="text-lg font-semibold mb-3">Trending Events</h2>
-        <div className="space-y-3">
-          {TRENDING_EVENTS.map((event) => (
-            <div
-              key={event.id}
-              className="flex gap-3 p-2 border-b border-zinc-800 hover:bg-zinc-800 transition-colors"
-            >
-              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-zinc-800">
-                <img
-                  src={event.image || "/placeholder.svg"}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex flex-col">
-                <h3 className="text-sm font-medium">{event.title}</h3>
-                <p className="text-xs text-gray-400 mt-1">{event.date}</p>
-                <span className="text-xs text-gradient mt-1">
-                  {event.type}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div> */}
     </div>
   );
 }

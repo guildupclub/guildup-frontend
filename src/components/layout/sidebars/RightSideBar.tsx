@@ -43,7 +43,7 @@ export function RightSidebar() {
           { page: 0, limit: 5 }
         );
 
-        if (response.data && response.data.r === "s") {
+        if (response && response.data && response.data.r === "s") {
           console.log("API response data:", response.data.data);
           setTrendingPosts(response.data.data);
         } else {

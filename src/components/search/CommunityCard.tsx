@@ -50,9 +50,6 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   // Get tags from the first offering if it exists
   const tags = firstOffering?.tags || [];
   
-  console.log("offerings array:", offerings);
-  console.log("first offering:", firstOffering);
-  console.log("tags:", tags);
   return (
     <Card
       onClick={() => onClick(community.community._id)}
