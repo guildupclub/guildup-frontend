@@ -10,13 +10,12 @@ import { ArrowRight } from "lucide-react";
 import { BookingDialog } from "../booking/Bookingdialog"; // Ensure correct import path
 import { useSession, signIn } from "next-auth/react";
 
-function CommunityCard({
-  community,
-  onClick,
-}: {
-  community: any;
-  onClick: (id: string) => void;
-}) {
+interface CommunityCardProps {
+  community: any; 
+  onClick: () => void;
+}
+
+function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
 
@@ -26,14 +25,15 @@ function CommunityCard({
         Array.isArray(offering.tags) ? offering.tags : []
       )
     ),
-  ] as string[];
+  ];
 
+  // Here, assuming that the passed community is a wrapper and the actual details are in community.community
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
 
   return (
     <Card
-      onClick={() => onClick(community._id)}
+      onClick={onClick}
       className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
@@ -105,6 +105,8 @@ function CommunityCard({
             size="sm"
             className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
             onClick={(e) => {
+              // Prevent card onClick from triggering
+              e.stopPropagation();
               if (!session) {
                 signIn("google");
                 return;
@@ -125,6 +127,7 @@ function CommunityCard({
           </Button>
         )}
       </div>
+      
       {/* {selectedOffering && (
         <BookingDialog
           offering={selectedOffering}
@@ -137,6 +140,7 @@ function CommunityCard({
 }
 
 export default React.memo(CommunityCard);
+
 
 {
   /* <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">

@@ -206,7 +206,9 @@ export function Sidebar() {
   };
 
   return (
-    <div className="fixed h-screen w-80 bg-card p-4 py-24">
+    <>
+    {/* Desktop View */}
+    <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
       <div className="flex items-center justify-between px-2">
         <h2 className="text-lg text-muted-foreground font-semibold">
           {activeCommunityName}
@@ -231,11 +233,9 @@ export function Sidebar() {
         </div>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === "/community/profile"
-              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
+          className={`w-full justify-start gap-2 ${pathname === "/community/profile"
+            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+            : "hover:bg-background text-muted-foreground"}`}
           onClick={() => handleNavigation("/community/profile")}
         >
           <FaUserAlt />
@@ -245,14 +245,10 @@ export function Sidebar() {
         {/* Feed */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === `/community/${activeCommunityId}/feed`
-              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
-          onClick={() =>
-            handleNavigation(`/community/${activeCommunityId}/feed`)
-          }
+          className={`w-full justify-start gap-2 ${pathname === `/community/${activeCommunityId}/feed`
+            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+            : "hover:bg-background text-muted-foreground"}`}
+          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
         >
           <Rss className="h-4 w-4" />
           Feed
@@ -261,11 +257,9 @@ export function Sidebar() {
         {/* Members */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === "/community/members"
-              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
+          className={`w-full justify-start gap-2 ${pathname === "/community/members"
+            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+            : "hover:bg-background text-muted-foreground"}`}
           onClick={() => handleNavigation("/community/members")}
         >
           <FaUserGroup />
@@ -274,39 +268,37 @@ export function Sidebar() {
 
         {/* Announcements */}
         {/* <Button
-          variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === "/community/announcements"
-              ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
-          onClick={() => handleNavigation("/community/announcements")}
-        >
-          <GrAnnounce />
-          Announcements
-        </Button> */}
+      variant="ghost"
+      className={`w-full justify-start gap-2 ${
+        pathname === "/community/announcements"
+          ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+          : "hover:bg-background text-muted-foreground"
+      }`}
+      onClick={() => handleNavigation("/community/announcements")}
+    >
+      <GrAnnounce />
+      Announcements
+    </Button> */}
         {/* <Button
-          variant="ghost"
-          className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
-          onClick={() => handleNavigation("/community/event")}
-        >
-          <FaCalendarAlt />
-          Events
-        </Button> */}
+      variant="ghost"
+      className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
+      onClick={() => handleNavigation("/community/event")}
+    >
+      <FaCalendarAlt />
+      Events
+    </Button> */}
         {/* <Button
-          variant="ghost"
-          className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
-          onClick={() => handleNavigation("/community/announcements")}
-        >
-          <GrAnnounce />
-          Announcements
-        </Button> */}
+      variant="ghost"
+      className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
+      onClick={() => handleNavigation("/community/announcements")}
+    >
+      <GrAnnounce />
+      Announcements
+    </Button> */}
 
         {/* {isAdmin && ( */}
         <Button
-          className={`w-full text-white ${
-            isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
-          }`}
+          className={`w-full text-white ${isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"}`}
           onClick={() => handleNavigation("/creator-studio")}
         >
           Creator Studio
@@ -319,15 +311,13 @@ export function Sidebar() {
             <h2 className="text-lg font-semibold text-muted ">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
               {/* {
-                isAdmin && ( */}
+      isAdmin && ( */}
 
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-8 w-8 hover:bg-background ${
-                    isAdmin ? "" : "cursor-not-allowed opacity-50"
-                  }`}
+                  className={`h-8 w-8 hover:bg-background ${isAdmin ? "" : "cursor-not-allowed opacity-50"}`}
                   disabled={!isAdmin}
                 >
                   <Plus className="h-4 w-4 text-muted-foreground" />
@@ -344,19 +334,14 @@ export function Sidebar() {
                       id="name"
                       placeholder="Enter name"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="bg-card border-background "
-                    />
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="bg-card border-background " />
                   </div>
                   <div className="grid gap-2">
                     <Label>Channel Type</Label>
                     <Select
                       value={formData.type}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, type: value })
-                      }
+                      onValueChange={(value) => setFormData({ ...formData, type: value })}
                     >
                       <SelectTrigger className="bg-card border-background text-muted">
                         <SelectValue placeholder="Select your topics" />
@@ -379,12 +364,10 @@ export function Sidebar() {
                     </Label>
                     <RadioGroup
                       value={formData.is_locked.toString()}
-                      onValueChange={(value) =>
-                        setFormData({
-                          ...formData,
-                          is_locked: value === "true",
-                        })
-                      }
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        is_locked: value === "true",
+                      })}
                       className="flex gap-4"
                     >
                       <div className="flex items-center space-x-2">
@@ -423,11 +406,9 @@ export function Sidebar() {
                 <Button
                   key={channel?.id}
                   variant="ghost"
-                  className={`w-full justify-start gap-2 ${
-                    activeChannel.id === channel.id
-                      ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                      : " hover:bg-background text-muted-foreground"
-                  }`}
+                  className={`w-full justify-start gap-2 ${activeChannel.id === channel.id
+                    ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
+                    : " hover:bg-background text-muted-foreground"}`}
                   onClick={() => {
                     dispatch(
                       setActiveChannel({
@@ -452,9 +433,46 @@ export function Sidebar() {
       {isEditOpen && (
         <EditCommunityModal
           isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-        />
+          onClose={() => setIsEditOpen(false)} />
       )}
     </div>
+    
+    {/* Mobile View */}
+      <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-20 gap-2">
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/profile" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation("/community/profile")}
+        >
+          Profile
+        </button>
+
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `/community/${activeCommunityId}/feed` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
+        >
+          Feed
+        </button>
+
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/members" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation("/community/members")}
+        >
+          Members
+        </button>
+
+        {/* Scrollable Channels */}
+        {channels.map((channel :any) => (
+          <button
+            key={channel?.id}
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+            onClick={() => {
+              dispatch(setActiveChannel(channel));
+              handleNavigation(`/community/channel/${channel.name}`);
+            }}
+          >
+            {channel.name}
+          </button>
+        ))}
+      </div></>
   );
 }

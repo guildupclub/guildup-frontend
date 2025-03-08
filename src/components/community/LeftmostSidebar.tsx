@@ -41,10 +41,10 @@ export function LeftmostSidebar() {
   // const [error, setError] = useState<string | null>(null);
   const [showCreatorForm, setShowCreatorForm] = React.useState(false);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
-  
+
   const handleOpenForm = () => {
-        setShowCreatorForm((prev) => !prev);
-      };
+    setShowCreatorForm((prev) => !prev);
+  };
 
   const dispatch = useDispatch();
   const activeCommunity = useSelector(
@@ -52,8 +52,8 @@ export function LeftmostSidebar() {
   );
   const user = useSelector((state: RootState) => state.user.user);
 
-const activeCommunityId = activeCommunity?.id;
-    useEffect(() => {
+  const activeCommunityId = activeCommunity?.id;
+  useEffect(() => {
 
     fetchCommunities();
   }, []);
@@ -106,49 +106,49 @@ const activeCommunityId = activeCommunity?.id;
 
 
 
-// Fetch communities function
-const fetchCommunities = async (): Promise<Community[]> => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId }),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch communities");
-  }
-  const result = await response.json();
-      console.log("comm", result);
-      const validCommunities = result.data.filter(
-        (community: Community | null) => community !== null
-      );
-      // setCommunitie(validCommunities);
-
-      dispatch(setUserFollowedCommunities(validCommunities));
-
-
-      if (validCommunities.length > 0 && !activeCommunityId) {
-        dispatch(
-          setActiveCommunity({
-            id: validCommunities[0]._id,
-            name: validCommunities[0].name, // Include name
-          })
-        );
+  // Fetch communities function
+  const fetchCommunities = async (): Promise<Community[]> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
       }
-  // const result = await response.json();
-  return result.data.filter((community: Community | null) => community !== null);
-};
+    );
 
-// Use React Query to fetch communities
-const { data: communities = [], isLoading, error } = useQuery({
-  queryKey: ["communities", userId], 
-  queryFn: fetchCommunities,
-});
+    if (!response.ok) {
+      throw new Error("Failed to fetch communities");
+    }
+    const result = await response.json();
+    console.log("comm", result);
+    const validCommunities = result.data.filter(
+      (community: Community | null) => community !== null
+    );
+    // setCommunitie(validCommunities);
+
+    dispatch(setUserFollowedCommunities(validCommunities));
+
+
+    if (validCommunities.length > 0 && !activeCommunityId) {
+      dispatch(
+        setActiveCommunity({
+          id: validCommunities[0]._id,
+          name: validCommunities[0].name, // Include name
+        })
+      );
+    }
+    // const result = await response.json();
+    return result.data.filter((community: Community | null) => community !== null);
+  };
+
+  // Use React Query to fetch communities
+  const { data: communities = [], isLoading, error } = useQuery({
+    queryKey: ["communities", userId],
+    queryFn: fetchCommunities,
+  });
 
 
 
@@ -163,6 +163,7 @@ const { data: communities = [], isLoading, error } = useQuery({
   // Function to get initials from community name
   const getInitials = (name: string) => {
     return name
+      // [0].toUpperCase();
       .split(" ")
       .map((word) => word[0])
       .join("")
@@ -179,16 +180,16 @@ const { data: communities = [], isLoading, error } = useQuery({
   }
 
   return (
-    <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
+    <div className="flex fixed left-0 h-screen w-20 bg-card flex-col items-center border-r border-background py-20 gap-3">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
-        {isLoading ? (
+          {isLoading ? (
             // Loading skeleton
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
                 <div
                   key={n}
-                  className="w-12 h-12 rounded-full bg-background animate-pulse"
+                  className="w-12 h-12 rounded-lg bg-background animate-pulse"
                 />
               ))}
             </div>
@@ -198,9 +199,9 @@ const { data: communities = [], isLoading, error } = useQuery({
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative w-12 h-12 rounded-full  ${activeCommunityId === community._id
-                    ? "bg-blue-500/20 ring-2 ring-purple-500"
-                    : "hover:bg-zinc-800"
+                className={`relative rounded-lg  ${activeCommunityId === community._id
+                  ? "bg-blue-500/20 ring-2 ring-purple-500"
+                  : "hover:bg-zinc-800"
                   }`}
                 onClick={() => {
 
@@ -221,12 +222,13 @@ const { data: communities = [], isLoading, error } = useQuery({
 
                 }}
               >
-                <Avatar className="w-full h-full ">
+                <Avatar className="w-full h-full !rounded-lg">
                   <AvatarImage
                     src={`/placeholder.svg?text=${getInitials(community.name)}`}
                     alt={community.name}
+                    className="!rounded-lg"
                   />
-                  <AvatarFallback>{getInitials(community.name)}</AvatarFallback>
+                  <AvatarFallback className="!rounded-lg">{getInitials(community.name)}</AvatarFallback>
                 </Avatar>
                 {community.subscription && (
                   <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">

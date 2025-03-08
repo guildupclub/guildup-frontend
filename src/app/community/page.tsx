@@ -4,7 +4,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="py-16">
+    <div className="md:py-16">
       <CommunityChat />
     </div>
   );
