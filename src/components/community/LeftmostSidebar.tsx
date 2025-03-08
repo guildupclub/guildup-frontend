@@ -163,7 +163,6 @@ export function LeftmostSidebar() {
   // Function to get initials from community name
   const getInitials = (name: string) => {
     return name
-      // [0].toUpperCase();
       .split(" ")
       .map((word) => word[0])
       .join("")

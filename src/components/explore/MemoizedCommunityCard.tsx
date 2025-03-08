@@ -27,7 +27,6 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     ),
   ];
 
-  // Here, assuming that the passed community is a wrapper and the actual details are in community.community
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
 

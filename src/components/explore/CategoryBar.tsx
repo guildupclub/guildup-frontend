@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "../ui/button";
 
 interface Category {
   name: string;
