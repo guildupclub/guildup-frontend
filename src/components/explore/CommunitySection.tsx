@@ -15,7 +15,7 @@ interface Community {
   user_id: string;
   name: string;
   description: string;
-  imageUrl: string;
+  imageUrl?: string;
 }
 
 interface CommunitySectionProps {
@@ -43,7 +43,14 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
           { categoryId: activeCategory }
         );
-        setCommunities(response.data.data);
+        setCommunities(response.data);
+        console.log("Here in CommunitySection.tsx", response.data.data);
+
+        if (response && response.data && response.data.r === "s" && Array.isArray(response.data.data)) {
+          setCommunities(response.data.data);
+        } else {
+          console.error("Invalid response format:", response.data);
+        }
       } catch (error) {
         console.error("Error fetching communities", error);
       } finally {
@@ -86,6 +93,8 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     [dispatch, router]
   );
 
+  // console.log("Here in CommunitySection.tsx ", communities);
+
   return (
     <div className="bg-background min-h-screen lg:p-4">
       {loading ? (
@@ -101,7 +110,9 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
               />
             ))
           ) : (
-            <p className="text-center col-span-3">No communities found</p>
+            <p className="text-center col-span-3 py-8 text-muted-foreground">
+            No communities found for this category
+          </p>
           )}
         </div>
       )}

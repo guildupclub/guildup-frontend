@@ -68,9 +68,9 @@ function CommunityCard({
             <ImUsers className="text-blue-600 h-4 w-4" />{" "}
             {communityDetails?.num_member}+
           </span>
-          <span className="flex items-center gap-1 mx-2">
+          {/* <span className="flex items-center gap-1 mx-2">
             <FaYoutube className="text-red-600 h-4 w-4" /> 4K+
-          </span>
+          </span> */}
         </div>
 
         {/* Tags */}

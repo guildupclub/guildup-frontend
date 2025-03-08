@@ -31,7 +31,7 @@ interface Community {
 interface CommunityCardProps {
   community: {
     community: Community;
-    offering: Offering;
+    offerings: Offering[];
   };
   onClick: (id: string) => void;
 }
@@ -42,13 +42,14 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     null
   );
 
-  // Fix: Access the tags from the offering object correctly
-  const tags = community?.offering?.tags || [];
-  const firstOffering = community?.offering || null;
-
-  console.log("community object:", community);
-  console.log("community.offering:", firstOffering);
-
+  const offerings = Array.isArray(community.offerings) ? community.offerings : [];
+  
+  // Get the first offering from the array if it exists
+  const firstOffering = offerings.length > 0 ? offerings[0] : null;
+  
+  // Get tags from the first offering if it exists
+  const tags = firstOffering?.tags || [];
+  
   return (
     <Card
       onClick={() => onClick(community.community._id)}
@@ -80,9 +81,9 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             <ImUsers className="text-blue-600 h-4 w-4" />{" "}
             {community.community.num_member}+
           </span>
-          <span className="flex items-center gap-1 mx-2">
+          {/* <span className="flex items-center gap-1 mx-2">
             <FaYoutube className="text-red-600 h-4 w-4" /> 4K+
-          </span>
+          </span> */}
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
           {tags.map((tag, index) => (

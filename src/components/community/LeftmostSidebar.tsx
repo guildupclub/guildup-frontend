@@ -119,6 +119,8 @@ const fetchCommunities = async (): Promise<Community[]> => {
     }
   );
 
+  // console.log("response in leftSideBAr ", response);
+
   if (!response.ok) {
     throw new Error("Failed to fetch communities");
   }
@@ -169,6 +171,8 @@ const { data: communities = [], isLoading, error } = useQuery({
       .toUpperCase()
       .slice(0, 2);
   };
+
+
 
   if (error) {
     return (

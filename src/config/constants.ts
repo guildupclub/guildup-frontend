@@ -4,7 +4,7 @@ export const API_ENDPOINTS = {
   getPosts: `${API_BASE_URL}/v1/post/getPosts`,
   getUserCommunity: `${API_BASE_URL}/v1/community/user`,
   getCategories: `${API_BASE_URL}/v1/category/`,
-  getSignUrl: `${API_BASE_URL}/v1/post/getSignUrl`,
+  getSignUrl: `${API_BASE_URL}/v1/post/getGCPSignUrl`,
   editCommunity: `${API_BASE_URL}/v1/community/edit`,
 }
 
