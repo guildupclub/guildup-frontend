@@ -87,7 +87,9 @@ function ChatContent() {
       return response.json();
     },
     onSuccess: (newPost) => {
-      queryClient.invalidateQueries(["channelPosts", activeChannelId]);
+      queryClient.invalidateQueries({
+        queryKey: ["channelPosts", activeChannelId]
+      });
       setPostBody("");
     },
   });
@@ -124,7 +126,7 @@ function ChatContent() {
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
-              posts.map((post) => <PostCard key={post.id} {...post} />)
+              posts.map((post:any) => <PostCard key={post.id} {...post} />)
             ) : (
               <div className="text-center text-muted">No posts yet</div>
             )}
@@ -146,7 +148,7 @@ function ChatContent() {
             <Button
               onClick={() => sendPostMutation.mutate()}
               className="px-6"
-              disabled={!postBody.trim() || sendPostMutation.isLoading}
+              disabled={!postBody.trim() || sendPostMutation.isPending}
             >
               <Send className="h-4 w-4 text-white" aria-hidden="true" />
             </Button>

@@ -27,6 +27,7 @@ import { useSession } from "next-auth/react";
 
 interface CreatorFormProps {
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 interface Category {
@@ -34,7 +35,7 @@ interface Category {
   name: string;
 }
 
-export default function CreatorForm({ onClose }: CreatorFormProps) {
+export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
@@ -106,10 +107,11 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
     },
     onSuccess: () => {
       toast.success("Community created successfully! 🎉");
-      queryClient.invalidateQueries({ queryKey: ["communities"] }); // Refresh data
+      queryClient.invalidateQueries({ queryKey: ["communities"] });
       setFormData({ name: "", description: "", tags: "" });
       setCategoryId("");
       onClose();
+      onSuccess?.();
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);

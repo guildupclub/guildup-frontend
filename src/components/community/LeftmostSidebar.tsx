@@ -21,7 +21,7 @@ import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLeaveCommunity } from "@/hook/queries/useCommunityMutations";
+import { useLeaveCommunity, useJoinCommunity } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
 
 interface Community {
@@ -160,8 +160,27 @@ const { data: communities = [], isLoading, error } = useQuery({
   staleTime: 0,
 });
 
+// Add this near the top of your component function
+const queryClient = useQueryClient();
 
+// Join community mutation
+const joinCommunityMutation = useJoinCommunity();
 
+const handleJoinCommunity = async (communityId: string) => {
+  try {
+    await joinCommunityMutation.mutateAsync({
+      userId: userId!,
+      communityId,
+    });
+    
+    toast.success("Successfully joined the community");
+    
+    // The cache invalidation is handled in the mutation's onSuccess callback
+  } catch (error) {
+    toast.error("Failed to join community");
+    console.error("Error joining community:", error);
+  }
+};
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
@@ -180,24 +199,26 @@ const { data: communities = [], isLoading, error } = useQuery({
       .slice(0, 2);
   };
 
-  const handleLeaveCommunity = async (communityId: string) => {
-    try {
-      await leaveCommunityMutation.mutateAsync({
-        userId: userId!,
-        communityId,
-      });
+  // const handleLeaveCommunity = async (communityId: string) => {
+  //   try {
+  //     await leaveCommunityMutation.mutateAsync({
+  //       userId: userId!,
+  //       communityId,
+  //     });
       
-      toast.success("Successfully left the community");
+  //     toast.success("Successfully left the community");
       
-      // If the active community is the one being left, clear it
-      if (activeCommunityId === communityId) {
-        dispatch(setActiveCommunity(null));
-      }
-    } catch (error) {
-      toast.error("Failed to leave community");
-      console.error("Error leaving community:", error);
-    }
-  };
+  //     // If the active community is the one being left, clear it
+  //     if (activeCommunityId === communityId) {
+  //       dispatch(setActiveCommunity(null));
+  //     }
+      
+  //     // The cache invalidation is handled in the mutation's onSuccess callback
+  //   } catch (error) {
+  //     toast.error("Failed to leave community");
+  //     console.error("Error leaving community:", error);
+  //   }
+  // };
 
   if (error) {
     return (
@@ -207,6 +228,7 @@ const { data: communities = [], isLoading, error } = useQuery({
     );
   }
 
+  console.log("@communities",communities)
   return (
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
@@ -276,7 +298,13 @@ const { data: communities = [], isLoading, error } = useQuery({
                 <Plus className="h-6 w-6" />
               </Button>
             </DialogTrigger>
-            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+            <CreatorForm 
+              onClose={() => setIsCreatorFormOpen(false)} 
+              onSuccess={() => {
+                // Invalidate the cache when a new community is created
+                queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+              }}
+            />
           </Dialog>
 
           <Link href="/explore">
