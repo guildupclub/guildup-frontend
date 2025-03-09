@@ -84,7 +84,7 @@ export function PostDialog() {
 
       // Step 2: Upload to S3 if it's a file (not a link)
       if (fileType !== "link" && file) {
-        await axios.put(responseData.signedUrl, file, {
+        await axios.put(responseData.publicUrl, file, {
           headers: { "Content-Type": file.type },
         });
         console.log("File uploaded to S3 successfully");
