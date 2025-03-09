@@ -156,6 +156,8 @@ const { data: communities = [], isLoading, error } = useQuery({
   queryKey: ["userCommunities", userId],
   queryFn: fetchCommunities,
   enabled: !!userId,
+  // Add this to ensure the component re-renders when the data changes
+  staleTime: 0,
 });
 
 

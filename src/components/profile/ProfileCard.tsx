@@ -86,10 +86,14 @@ export function ProfileCard() {
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = community?.communityId;
- 
+
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
   );
+
+  const isOwner = memberDetails && 
+                  memberDetails.is_owner === true && 
+                  memberDetails.community_id === community.communityId;
 
 
   // Now button in the offering card
@@ -264,7 +268,7 @@ export function ProfileCard() {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
                 {profile?.community?.name}
-                {memberDetails?.is_owner && (
+                {isOwner && (
                   <button
                     className="p-1 rounded-md hover:bg-background transition"
                     onClick={() => setIsEditOpen(true)}
@@ -299,7 +303,7 @@ export function ProfileCard() {
                 </div>
               </div>
             </div>
-            {memberDetails?.is_owner ? (
+            {isOwner ? (
               ""
             ) : isCommunityFollowed ? (
               <Button
@@ -421,7 +425,7 @@ export function ProfileCard() {
                       ₹{offering.price.amount}
                     </span> */}
                     <div className="flex items-center justify-between gap-2">
-                      {memberDetails?.is_owner && (
+                      {isOwner && (
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -449,7 +453,7 @@ export function ProfileCard() {
                       <Button
                         size="sm"
                         className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                          !memberDetails?.is_owner ? "ml-auto" : ""
+                          !isOwner ? "ml-auto" : ""
                         }`}
                         onClick={() => {
                           if (!session) {
