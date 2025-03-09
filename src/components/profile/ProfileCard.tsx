@@ -86,13 +86,11 @@ export function ProfileCard() {
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = community?.communityId;
-  console.log(activeCommunityId);
-
+ 
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
   );
-  console.log(isCommunityFollowed);
-  console.log(userFollowedCommunities);
+
 
   // Now button in the offering card
 
@@ -485,6 +483,7 @@ export function ProfileCard() {
       </div>
       {isEditOpen && (
         <EditCommunityModal
+        profile={profile}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
         />

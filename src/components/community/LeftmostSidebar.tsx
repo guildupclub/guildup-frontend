@@ -119,6 +119,7 @@ export function LeftmostSidebar() {
       }
     );
 
+
     if (!response.ok) {
       throw new Error("Failed to fetch communities");
     }
@@ -128,6 +129,7 @@ export function LeftmostSidebar() {
       (community: Community | null) => community !== null
     );
     // setCommunitie(validCommunities);
+
 
     dispatch(setUserFollowedCommunities(validCommunities));
 
@@ -169,6 +171,8 @@ export function LeftmostSidebar() {
       .toUpperCase()
       .slice(0, 2);
   };
+
+
 
   if (error) {
     return (
