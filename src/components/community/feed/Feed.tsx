@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PostCard } from "./PostCard";
 import {
   Select,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { FileText, Settings } from "lucide-react";
+import { useCommunityPosts } from "@/hook/queries/useCommunityQueries";
 
 interface Post {
   _id: string;
@@ -24,58 +25,29 @@ interface Post {
   is_locked: boolean;
   post_type: string;
 }
+
 interface FeedProps {
   communityId: string;
 }
+
 export function Feed({ communityId }: FeedProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState("newest");
   const [filter, setFilter] = useState("Your Activity");
   const [channel, setChannel] = useState("Open Discussion");
 
-  useEffect(() => {
-    if (communityId) fetchPosts();
-  }, [communityId]);
-  console.log(communityId);
-
-  const fetchPosts = async () => {
-    try {
-      console.log("Community ID:", communityId);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/community/post`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            communityId: communityId,
-            // is_locked: true,
-            is_locked: false,
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch posts");
-
-      const result = await response.json();
-      setPosts(result.data);
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (communityId) fetchPosts();
-  }, [communityId]);
+  // Use React Query to fetch posts
+  const { 
+    data: posts = [], 
+    isLoading, 
+    error 
+  } = useCommunityPosts(communityId);
 
   return (
-    <div className="min-h-screen  py-20">
+    <div className="min-h-screen py-20">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between py-4 border-b border-zinc-300">
-          <div className="flex items-center text-muted  gap-2">
+          <div className="flex items-center text-muted gap-2">
             <FileText className="w-5 h-5" />
             <h1 className="text-xl font-semibold">Feed</h1>
           </div>
@@ -130,6 +102,13 @@ export function Feed({ communityId }: FeedProps) {
             </Select>
           </div>
         </div> */}
+
+        {/* Error state */}
+        {error && (
+          <div className="py-8 text-center">
+            <p className="text-red-500">Error loading posts. Please try again.</p>
+          </div>
+        )}
 
         {/* Posts */}
         <div className="space-y-6 py-4">

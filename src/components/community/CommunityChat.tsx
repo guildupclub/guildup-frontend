@@ -45,6 +45,7 @@ function ChatContent() {
   const { mutate: sendPost, isPending: isSending } = usePostToChannel();
 
   const handleSendPost = () => {
+    console.log("Sending post:", postBody, activeChannelId, userId, sessionId);
     if (!postBody.trim() || !activeChannelId || !userId || !sessionId) return;
 
     sendPost(
