@@ -60,7 +60,7 @@ function Page() {
             </div>
 
             <div className="col-span-1  hidden md:block">
-              <h1 className="text-2xl font-bold mb-4">Trending Tags</h1>
+              {/* <h1 className="text-2xl font-bold mb-4">Trending Tags</h1> */}
               <TrendingSection />
             </div>
           </div>

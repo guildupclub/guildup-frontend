@@ -24,13 +24,16 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS } from "@/config/constants";
 
 // Add this state in ProfileCard component
 
 interface CommunityProfile {
   user: {
     user_name: string;
+    user_email: string;
+    user_avatar: string;
     about: string;
   };
   community: {
@@ -40,6 +43,8 @@ interface CommunityProfile {
     description: string;
     is_locked: boolean;
     tags: string[];
+    image: string;
+    background_image: string;
   };
 }
 
@@ -86,10 +91,14 @@ export function ProfileCard() {
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = community?.communityId;
- 
+
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
   );
+
+  const isOwner = memberDetails && 
+                  memberDetails.is_owner === true && 
+                  memberDetails.community_id === community.communityId;
 
 
   // Now button in the offering card
@@ -158,14 +167,26 @@ export function ProfileCard() {
           { communityId: community.communityId }
         );
 
+        console.log("@response",response.data.data)
         if (response.data.r === "s") {
           setProfile(response.data.data);
-          setAvatarImgUrl(
-            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-          );
-          setBgImgUrl(
-            "https://random-image-pepebigotes.vercel.app/api/random-image"
-          );
+          if(response.data.data.community.image){
+            setAvatarImgUrl(response.data.data.community.image)
+          }
+          else{
+
+            setAvatarImgUrl(
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+            );
+          }
+          if(response.data.data.community.background_image){
+            setBgImgUrl(response.data.data.community.background_image)
+          }
+          else{
+            setBgImgUrl(
+              "https://random-image-pepebigotes.vercel.app/api/random-image"
+            );
+          }
         }
       } catch (error) {
         setError("Failed to load community profile");
@@ -228,6 +249,7 @@ export function ProfileCard() {
   if (error) return <div>{error}</div>;
   if (!profile) return <div>No profile data available</div>;
 
+  {console.log("@prifle",profile.user)}
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
@@ -264,7 +286,7 @@ export function ProfileCard() {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
                 {profile?.community?.name}
-                {memberDetails?.is_owner && (
+                {isOwner && (
                   <button
                     className="p-1 rounded-md hover:bg-background transition"
                     onClick={() => setIsEditOpen(true)}
@@ -299,7 +321,7 @@ export function ProfileCard() {
                 </div>
               </div>
             </div>
-            {memberDetails?.is_owner ? (
+            {isOwner ? (
               ""
             ) : isCommunityFollowed ? (
               <Button
@@ -421,7 +443,7 @@ export function ProfileCard() {
                       ₹{offering.price.amount}
                     </span> */}
                     <div className="flex items-center justify-between gap-2">
-                      {memberDetails?.is_owner && (
+                      {isOwner && (
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -449,7 +471,7 @@ export function ProfileCard() {
                       <Button
                         size="sm"
                         className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                          !memberDetails?.is_owner ? "ml-auto" : ""
+                          !isOwner ? "ml-auto" : ""
                         }`}
                         onClick={() => {
                           if (!session) {

@@ -116,7 +116,7 @@ export function PostCard({ post }: PostCardProps) {
             size="sm"
             className="hover:text-purple-400 gap-2 hover:bg-transparent"
           >
-            <Send classNameh-5 w-5 />
+            <Send className="h-5 w-5" />
             <span>Share</span>
           </Button>
         </div>

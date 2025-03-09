@@ -147,7 +147,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       href={
                         activeCommunityId
                           ? `/community/${activeCommunityId}/feed`
-                          : `/`
+                          : `/community/feed`
                       }
                       className="flex flex-col items-center justify-center"
                     >

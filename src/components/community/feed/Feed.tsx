@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PostCard } from "./PostCard";
 import {
   Select,
@@ -11,6 +11,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { FileText, Settings } from "lucide-react";
+import { useCommunityPosts } from "@/hook/queries/useCommunityQueries";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { FaUsers } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import Loader from "@/components/Loader";
 
 interface Post {
   _id: string;
@@ -24,58 +31,68 @@ interface Post {
   is_locked: boolean;
   post_type: string;
 }
+
 interface FeedProps {
   communityId: string;
 }
+
 export function Feed({ communityId }: FeedProps) {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
+  const userFollowedCommunities = useSelector(
+    (state: RootState) => state.user.userFollowedCommunities
+  );
+  
   const [sortBy, setSortBy] = useState("newest");
   const [filter, setFilter] = useState("Your Activity");
   const [channel, setChannel] = useState("Open Discussion");
 
-  useEffect(() => {
-    if (communityId) fetchPosts();
-  }, [communityId]);
-  console.log(communityId);
+  const { 
+    data: posts = [], 
+    isLoading, 
+    error 
+  } = useCommunityPosts(communityId);
 
-  const fetchPosts = async () => {
-    try {
-      console.log("Community ID:", communityId);
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/community/post`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            communityId: communityId,
-            // is_locked: true,
-            is_locked: false,
-          }),
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch posts");
-
-      const result = await response.json();
-      setPosts(result.data);
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    if (communityId) fetchPosts();
-  }, [communityId]);
+  // Show message for non-signed in users or users without communities
+  if (!session || (userFollowedCommunities && userFollowedCommunities.length === 0)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+        <div className="flex flex-col items-center space-y-6 max-w-md text-center">
+          <FaUsers className="w-16 h-16 text-muted-foreground" />
+          <h1 className="text-2xl font-semibold">
+            {!session ? "Sign in to view community posts" : "No Communities Joined"}
+          </h1>
+          <p className="text-muted-foreground">
+            {!session 
+              ? "Please sign in to view and interact with community posts"
+              : "Join some communities to start seeing posts"}
+          </p>
+          <div className="flex gap-4">
+            <Link
+              href="/explore"
+              className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+            >
+              Explore Communities
+            </Link>
+            {!session && (
+              <Link
+                href="/api/auth/signin"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen  py-20">
+    <div className="min-h-screen py-20">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center justify-between py-4 border-b border-zinc-300">
-          <div className="flex items-center text-muted  gap-2">
+          <div className="flex items-center text-muted gap-2">
             <FileText className="w-5 h-5" />
             <h1 className="text-xl font-semibold">Feed</h1>
           </div>
@@ -131,28 +148,24 @@ export function Feed({ communityId }: FeedProps) {
           </div>
         </div> */}
 
+        {/* Error state */}
+        {error && (
+          <div className="py-8 text-center">
+            <p className="text-red-500">Error loading posts. Please try again.</p>
+          </div>
+        )}
+
         {/* Posts */}
         <div className="space-y-6 py-4">
-          {isLoading
-            ? Array.from({ length: 2 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-card rounded-lg p-6 space-y-4 animate-pulse"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-card rounded-full" />
-                    <div className="flex-1">
-                      <div className="h-4 bg-card rounded w-1/4 mb-2" />
-                      <div className="h-3 bg-card rounded w-1/6" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-card rounded w-3/4" />
-                    <div className="h-4 bg-card rounded w-1/2" />
-                  </div>
-                </div>
-              ))
-            : posts.map((post) => <PostCard key={post._id} post={post} />)}
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader />
+            </div>
+          ) : posts.length === 0 ? (
+            <div className="text-center text-zinc-400">No posts available</div>
+          ) : (
+            posts.map((post) => <PostCard key={post._id} post={post} />)
+          )}
         </div>
       </div>
     </div>
