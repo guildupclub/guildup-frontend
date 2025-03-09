@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
+import Guildup_logo_mobile from './../../../public/GuildUp_logo_mobile.svg'
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -158,6 +159,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               />
             </Link>
           </div>
+
 
           <div className="flex grow items-center justify-between">
             {/* Searchbar */}
@@ -303,6 +305,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             >
               <Users className="w-6 h-6" />
               <span className="text-xs mt-1">Expert</span>
+
             </Link>
           ) : (
             <Link
@@ -310,7 +313,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               className="flex flex-col items-center justify-center"
             >
               <Users className="w-6 h-6" />
-
               <span className="text-xs mt-1">Expert</span>
             </Link>
           )}
