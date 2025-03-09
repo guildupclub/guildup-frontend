@@ -163,7 +163,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                             {user?.avatar ? (
                               <AvatarImage src={user?.avatar} alt="User" />
                             ) : (
-                              <AvatarFallback>{user?.email?.[0] || "U"}</AvatarFallback>
+                              <AvatarFallback>{user?.email.length>0 ? user.email[0] : "U"}</AvatarFallback>
                             )}
                           </Avatar>
                         </Button>

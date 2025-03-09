@@ -244,7 +244,7 @@ const handleJoinCommunity = async (communityId: string) => {
               ))}
             </div>
           ) : (
-            communities.map((community) => (
+            communities.map((community:any) => (
               <Button
                 key={community._id}
                 variant="ghost"
@@ -274,7 +274,7 @@ const handleJoinCommunity = async (communityId: string) => {
               >
                 <Avatar className="w-full h-full ">
                   <AvatarImage
-                    src={`/placeholder.svg?text=${getInitials(community.name)}`}
+                    src={community.image && community.image !== "" ? community.image: `/placeholder.svg?text=${getInitials(community.name)}`}
                     alt={community.name}
                   />
                   <AvatarFallback>{getInitials(community.name)}</AvatarFallback>
