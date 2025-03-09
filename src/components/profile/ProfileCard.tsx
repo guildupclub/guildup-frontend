@@ -24,7 +24,8 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS } from "@/config/constants";
 
 // Add this state in ProfileCard component
 
