@@ -7,7 +7,8 @@ import { Settings, Send } from "lucide-react";
 import { PostCard } from "./PostCard";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
-import { useChannelPosts, usePostToChannel } from "@/hook/queries/useChannelQueries";
+import { API_BASE_URL } from "@/config/constants";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Post {
   id: string;
@@ -21,6 +22,7 @@ interface Post {
 }
 
 function ChatContent() {
+  const queryClient = useQueryClient();
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
   );
@@ -31,40 +33,64 @@ function ChatContent() {
 
   const [postBody, setPostBody] = useState<string>("");
 
-  // Use React Query hooks
   const {
     data: posts = [],
     isLoading,
-    error
-  } = useChannelPosts(
-    activeChannelId && userId && sessionId
-      ? { userId, sessionId, channelId: activeChannelId }
-      : null
-  );
+    error,
+  } = useQuery({
+    queryKey: ["channelPosts", activeChannelId],
+    queryFn: async () => {
+      if (!activeChannelId) return [];
+      const response = await fetch(`${API_BASE_URL}/v1/channel/fetch`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          session: sessionId,
+          channelId: activeChannelId,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to fetch channel content");
+      const data = await response.json();
+      return (
+        data?.data?.map((item: any) => {
+          const userData: any = item.user_id || {};
+          return {
+            id: item._id || "",
+            time: item.created_At || "",
+            level: 0,
+            content: item.body || "",
+            likes: item.up_votes || 0,
+            comments: item.reply_count || 0,
+            author: userData.user_name || "Unknown",
+            avatar: userData.image || "",
+          };
+        }) || []
+      );
+    },
+    enabled: !!activeChannelId,
+  });
 
-  const { mutate: sendPost, isPending: isSending } = usePostToChannel();
-
-  const handleSendPost = () => {
-    console.log("Sending post:", postBody, activeChannelId, userId, sessionId);
-    if (!postBody.trim() || !activeChannelId || !userId || !sessionId) return;
-
-    sendPost(
-      {
-        userId,
-        sessionId,
-        channelId: activeChannelId,
-        body: postBody,
-      },
-      {
-        onSuccess: () => {
-          setPostBody("");
-        },
-        onError: (error) => {
-          console.error("Error sending post:", error);
-        },
-      }
-    );
-  };
+  const sendPostMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${API_BASE_URL}/v1/channel/post`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          session: sessionId,
+          channelId: activeChannelId,
+          body: postBody,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to send post");
+      return response.json();
+    },
+    onSuccess: (newPost) => {
+      queryClient.invalidateQueries(["channelPosts", activeChannelId]);
+      setPostBody("");
+    },
+  });
 
   if (!activeChannel) {
     return (
@@ -74,11 +100,12 @@ function ChatContent() {
     );
   }
 
-  if (isLoading) return <div className="text-center py-10">Loading posts...</div>;
+  if (isLoading)
+    return <div className="text-center py-10">Loading posts...</div>;
   if (error)
     return (
       <div className="text-center py-10 text-red-500">
-        Error: {(error as Error).message}. Please try again.
+        Error: {error.message}. Please try again.
       </div>
     );
 
@@ -97,11 +124,7 @@ function ChatContent() {
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
-              posts.map((post) => <PostCard onLike={function (id: string): void {
-                throw new Error("Function not implemented.");
-              }} onComment={function (id: string, comment: string): void {
-                throw new Error("Function not implemented.");
-              }} key={post.id} {...post} />)
+              posts.map((post) => <PostCard key={post.id} {...post} />)
             ) : (
               <div className="text-center text-muted">No posts yet</div>
             )}
@@ -121,9 +144,9 @@ function ChatContent() {
           />
           <div className="flex gap-8 px-2 py-1">
             <Button
-              onClick={handleSendPost}
+              onClick={() => sendPostMutation.mutate()}
               className="px-6"
-              disabled={!postBody.trim() || isSending}
+              disabled={!postBody.trim() || sendPostMutation.isLoading}
             >
               <Send className="h-4 w-4 text-white" aria-hidden="true" />
             </Button>

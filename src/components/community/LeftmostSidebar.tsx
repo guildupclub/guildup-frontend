@@ -21,6 +21,8 @@ import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLeaveCommunity } from "@/hook/queries/useCommunityMutations";
+import { toast } from "sonner";
 
 interface Community {
   _id: string;
@@ -126,7 +128,7 @@ const fetchCommunities = async (): Promise<Community[]> => {
   }
   const result = await response.json();
       console.log("comm", result);
-      const validCommunities = result.data.filter(
+      const validCommunities = result?.data?.filter(
         (community: Community | null) => community !== null
       );
       // setCommunitie(validCommunities);
@@ -146,10 +148,14 @@ const fetchCommunities = async (): Promise<Community[]> => {
   return result.data.filter((community: Community | null) => community !== null);
 };
 
-// Use React Query to fetch communities
+// Leave community mutation
+const leaveCommunityMutation = useLeaveCommunity();
+
+// Use React Query for fetching communities
 const { data: communities = [], isLoading, error } = useQuery({
-  queryKey: ["communities", userId], 
+  queryKey: ["userCommunities", userId],
   queryFn: fetchCommunities,
+  enabled: !!userId,
 });
 
 
@@ -172,7 +178,24 @@ const { data: communities = [], isLoading, error } = useQuery({
       .slice(0, 2);
   };
 
-
+  const handleLeaveCommunity = async (communityId: string) => {
+    try {
+      await leaveCommunityMutation.mutateAsync({
+        userId: userId!,
+        communityId,
+      });
+      
+      toast.success("Successfully left the community");
+      
+      // If the active community is the one being left, clear it
+      if (activeCommunityId === communityId) {
+        dispatch(setActiveCommunity(null));
+      }
+    } catch (error) {
+      toast.error("Failed to leave community");
+      console.error("Error leaving community:", error);
+    }
+  };
 
   if (error) {
     return (

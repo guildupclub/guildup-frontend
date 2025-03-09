@@ -26,11 +26,11 @@ interface SendChatMessageParams {
 
 // Transform API data to our Post interface format
 const transformChatMessages = (data: ChatMessage[]) => {
-  return data.map((item) => ({
+  return data.map((item:any) => ({
     id: item._id || "",
     time: item.createdAt || "",
     content: item.message_content || "",
-    author: item.sender_id?.name || "Unknown",
+    author: item.sender_id?.user_name || "Unknown",
     avatar: item.sender_id?.image || "",
   }));
 };
@@ -112,7 +112,7 @@ export const useSendChatMessage = () => {
         (oldData: ChatMessage[] = []) => {
           const transformedNewMessage = {
             id: newMessage._id || "",
-            author: newMessage.sender_id?.name || "Unknown",
+            author: newMessage.sender_id?.user_name || "Unknown",
             time: newMessage.createdAt || "",
             content: newMessage.message_content || "",
             avatar: newMessage.sender_id?.image || "",

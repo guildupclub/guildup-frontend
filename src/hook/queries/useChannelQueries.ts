@@ -29,14 +29,14 @@ interface PostToChannelParams {
 
 // Transform API data to our Post interface format
 const transformChannelPosts = (data: ChannelPost[]) => {
-  return data.map((item) => ({
+  return data.map((item:any) => ({
     id: item._id || "",
     time: item.created_At || "",
     level: 0,
     content: item.body || "",
     likes: item.up_votes || 0,
     comments: item.reply_count || 0,
-    author: item.user_id?.name || "Unknown",
+    author: item.user_id?.user_name || "Unknown",
     avatar: item.user_id?.image || "",
   }));
 };
@@ -122,7 +122,7 @@ export const usePostToChannel = () => {
         (oldData: ChannelPost[] = []) => {
           const transformedNewPost = {
             id: newPost._id || "",
-            author: newPost.user_id?.name || "Unknown",
+            author: newPost.user_id?.user_name || "Unknown",
             time: newPost.created_At || "",
             level: 0,
             content: newPost.body || "",

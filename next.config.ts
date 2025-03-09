@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   compiler: {
-    removeConsole: true,
+    removeConsole: false,
   },
   images: {
     domains: [

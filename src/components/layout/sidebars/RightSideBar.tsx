@@ -15,7 +15,9 @@ import FooterLinks from "./FootLinks";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface TrendingPost {
   _id: string;
@@ -33,6 +35,12 @@ export function RightSidebar() {
   const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
+  
+  // Get the user data from Redux store
+  const user = useSelector((state: RootState) => state.user);
+  console.log("@user", user);
+  // Check if user is already a creator using the is_creator flag
+  const isCreator = user?.user?.is_creator ? true : false;
 
   useEffect(() => {
     const fetchTrendingPosts = async () => {
@@ -59,21 +67,36 @@ export function RightSidebar() {
     fetchTrendingPosts();
   }, []);
 
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      signIn("google");
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
-      {/* Creator Box */}
-      <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-        <h1 className="font-semibold text-lg">Ready to start making money?</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {/* Creator Box - Only show if user is not already a creator */}
+      {!isCreator && (
+        <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
+          <h1 className="font-semibold text-lg">Ready to start making money?</h1>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Button 
+              className="w-full text-white shadow-md" 
+              onClick={handleCreatorButtonClick}
+            >
+              {session ? (
+                <DialogTrigger className="w-full">Become a Creator</DialogTrigger>
+              ) : (
+                "Become a Creator"
+              )}
+            </Button>
 
-          <Button className="w-full text-white shadow-md" asChild>
-            <DialogTrigger>Become a Creator</DialogTrigger>
-          </Button>
-
-          <CreatorForm onClose={() => setIsDialogOpen(false)} />
-        </Dialog>
-      </div>
+            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+          </Dialog>
+        </div>
+      )}
 
       {/* Trending Posts Box */}
       <div className="bg-card rounded-xl shadow-sm border border-zinc-200/30">
