@@ -1,18 +1,15 @@
-// components/community/EditCommunityModal.tsx
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { X, Upload } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/constants";
 import Image from "next/image";
@@ -23,25 +20,39 @@ interface Category {
   name: string;
 }
 
+interface ProfileData {
+  name?: string;
+  description?: string;
+  category?: string;
+  rules?: string;
+  additional_tags?: string[];
+  image?: string;
+  bgImage?: string;
+  [key: string]: any;
+}
+
 interface EditCommunityModalProps {
   isOpen: boolean;
   onClose: () => void;
+  profile?: ProfileData;
 }
 
-export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps) {
+export function EditCommunityModal({
+  isOpen,
+  onClose,
+  profile,
+}: EditCommunityModalProps) {
   const dispatch = useDispatch();
-
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    category: "",
-    rules: "",
-    tags: [] as string[],
-    image: "",
-    bgImage: "",
+    name: profile?.community?.name || "",
+    description: profile?.communty?.description || "",
+    category: profile?.communty?.category || "",
+    rules: profile?.communty?.rules || "",
+    tags: profile?.communty?.tags || [],
+    image: profile?.communty?.image || "",
+    bgImage: profile?.communty?.bgImage || "",
   });
-  
-  const [categories, setCategories] = useState<Category[]>([]);
+
   const [newTag, setNewTag] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState({
@@ -49,28 +60,41 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
     background: false,
   });
 
-   const user = useSelector((state: RootState) => state.user.user);
-    const community = useSelector((state: RootState) => state.community);
-    const  communityId = community?.communityId;
-    const userId = user?._id;
+  const user = useSelector((state: RootState) => state.user.user);
+  const community = useSelector((state: RootState) => state.community);
+  const communityId = community?.communityId;
+  const communityData = community?.community;
+  const userId = user?._id;
 
-
-  // Fetch categories
+  // Load community data when modal opens, prioritizing profile prop if available
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(`${API_ENDPOINTS.getCategories}`);
-        const data = await response.json();
-        if (data.r === "s") {
-          setCategories(data.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
+    if (isOpen) {
+      // First try to use the profile prop data
+      if (profile) {
+        setFormData({
+          name: profile?.community?.name || "",
+          description: profile?.community?.description || "",
+          category: profile?.community?.category || "",
+          rules: profile?.community?.rules || "",
+          tags: profile?.community?.tags || [],
+          image: profile?.community?.image || "",
+          bgImage: profile?.community?.bgImage || "",
+        });
       }
-    };
-
-    fetchCategories();
-  }, []);
+      // If no profile prop or it's missing data, fall back to communityData from Redux
+      else if (communityData) {
+        setFormData({
+          name: communityData.name || "",
+          description: communityData.description || "",
+          category: communityData.category || "",
+          rules: communityData.rules || "",
+          tags: communityData.additional_tags || [],
+          image: communityData.image || "",
+          bgImage: communityData.bgImage || "",
+        });
+      }
+    }
+  }, [isOpen, profile, communityData]);
 
   // Handle image upload
   const handleImageUpload = async (
@@ -79,11 +103,14 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
   ) => {
     try {
       setImageUploading({ ...imageUploading, [type]: true });
-      
+
       // Get signed URL
       const signUrlResponse = await fetch(API_ENDPOINTS.getSignUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // "Access-Control-Allow-Origin": "*", // Try adding this
+        },
         body: JSON.stringify({
           fileName: file.name,
           fileType: "image",
@@ -91,17 +118,20 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
           communityId,
         }),
       });
-      
+
       const signedData = await signUrlResponse.json();
-      
+
       if (signedData.r === "s") {
         // Upload to S3
         await fetch(signedData.data.signedUrl, {
           method: "PUT",
           body: file,
-          headers: { "Content-Type": file.type },
+          headers: {
+            "Content-Type": file.type,
+            "Access-Control-Allow-Origin": "*",
+          },
         });
-        
+
         // Update form data with public URL
         setFormData({
           ...formData,
@@ -134,22 +164,43 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
-      
+
+      // Prepare request body, merging with existing profile data if available
+      const updateData = {
+        ...(profile || {}),
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        rules: formData.rules,
+        additional_tags: formData.tags,
+        image: formData.image,
+        bgImage: formData.bgImage,
+        userId,
+      };
+
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           communityId,
-          userId,
-          ...formData,
-          additional_tags: formData.tags,
+          ...updateData,
         }),
       });
 
       const data = await response.json();
-      
+
       if (data.r === "s") {
         // Update Redux store if needed
+        dispatch({
+          type: "SET_COMMUNITY",
+          payload: {
+            ...community,
+            community: {
+              ...(communityData || {}),
+              ...updateData,
+            },
+          },
+        });
         onClose();
       }
     } catch (error) {
@@ -190,27 +241,6 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
           </div>
 
           <div className="grid gap-2">
-            <Label>Category</Label>
-            <Select
-              value={formData.category}
-              onValueChange={(value) =>
-                setFormData({ ...formData, category: value })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category._id} value={category._id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="grid gap-2">
             <Label>Tags</Label>
             <div className="flex gap-2">
               <Input
@@ -243,6 +273,8 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
                 <Image
                   src={formData.image}
                   alt="Profile"
+                  width={64}
+                  height={64}
                   className="h-16 w-16 object-cover rounded"
                 />
               )}
@@ -266,6 +298,8 @@ export function EditCommunityModal({ isOpen, onClose }: EditCommunityModalProps)
                 <Image
                   src={formData.bgImage}
                   alt="Background"
+                  width={128}
+                  height={64}
                   className="h-16 w-32 object-cover rounded"
                 />
               )}

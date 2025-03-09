@@ -106,18 +106,20 @@ export function LeftmostSidebar() {
 
 
 
-  // Fetch communities function
-  const fetchCommunities = async (): Promise<Community[]> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      }
-    );
+// Fetch communities function
+const fetchCommunities = async (): Promise<Community[]> => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userId }),
+    }
+  );
+
+  // console.log("response in leftSideBAr ", response);
 
     if (!response.ok) {
       throw new Error("Failed to fetch communities");
@@ -169,6 +171,8 @@ export function LeftmostSidebar() {
       .toUpperCase()
       .slice(0, 2);
   };
+
+
 
   if (error) {
     return (

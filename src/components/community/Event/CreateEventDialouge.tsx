@@ -100,7 +100,6 @@ export function PostDialog() {
           fileType === "link" ? file?.name || "" : responseData.publicUrl,
       };
 
-      console.log("Storing media data:", newMediaData);
       //@ts-nocheck
       mediaRef.current = newMediaData;
 
@@ -119,7 +118,6 @@ export function PostDialog() {
       return;
     }
 
-    console.log("Current media ref:", mediaRef.current);
 
     // Create the media object
     const mediaPayload = mediaRef.current
@@ -132,7 +130,6 @@ export function PostDialog() {
         }
       : null;
 
-    console.log("Media payload:", mediaPayload);
 
     const postPayload = {
       userId,
