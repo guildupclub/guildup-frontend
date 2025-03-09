@@ -79,24 +79,24 @@ export function Feed() {
   useEffect(() => {
     const loadMorePosts = async () => {
       const newPosts = await fetchPosts(page);
-      if(newPosts){   
-      setPosts((prevPosts) => {
-        const uniquePosts = [...prevPosts, ...newPosts].filter(
-          (post, index, self) =>
-            index === self.findIndex((p) => p._id === post._id)
-        );
-        return uniquePosts;
-      });
+      if (newPosts) {
+        setPosts((prevPosts) => {
+          const uniquePosts = [...prevPosts, ...newPosts].filter(
+            (post, index, self) =>
+              index === self.findIndex((p) => p._id === post._id)
+          );
+          return uniquePosts;
+        });
 
-      setHasMore(newPosts?.length > 0);
-    }
+        setHasMore(newPosts?.length > 0);
+      }
     };
 
     loadMorePosts();
   }, [page]);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto h-screen  overflow-auto scrollbar-none ">
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
           {loading && posts?.length === 0 ? (
