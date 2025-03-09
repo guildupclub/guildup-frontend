@@ -16,7 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
-import Giuldup_logo_mobile from './../../../public/GuildUp_logo_mobile.svg'
+import Guildup_logo_mobile from './../../../public/GuildUp_logo_mobile.svg'
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -92,7 +92,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         <div className="container flex h-14 items-center px-5">
           <Link href="/" className="flex items-center space-x-2 mr-6">
             <Image
-              src={Giuldup_logo_mobile}
+              src={Guildup_logo_mobile}
               alt="GuildUp logo"
               className="h-8 w-auto md:hidden"
             />
