@@ -40,7 +40,7 @@ export function Feed() {
   const posts = data?.flattenedPosts || [];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto h-screen overflow-scroll">
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
           {isLoading && posts.length === 0 ? (
