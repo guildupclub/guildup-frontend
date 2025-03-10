@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useCreatePost } from "@/hook/queries/usePostMutations";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface MediaPreview {
   file: File;
@@ -150,8 +151,8 @@ export function PostDialog() {
               </Avatar>
               <span className="text-muted">
                 {session?.user?.name || "User Name"}{" "}
-                <span className="text-maccent">posting in</span>{" "}
-                <span className="font-medium">{activeCommunity?.name || "Community"}</span>
+                <span className="text-maccent">{StringConstants.POSTING_IN}</span>{" "}
+                <span className="font-medium">{activeCommunity?.name}</span>
               </span>
             </div>
           </div>

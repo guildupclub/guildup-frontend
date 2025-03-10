@@ -24,8 +24,7 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { API_ENDPOINTS } from "@/config/constants";
+import { StringConstants } from "../common/CommonText";
 
 // Add this state in ProfileCard component
 
@@ -245,9 +244,9 @@ export function ProfileCard() {
     setIsEditModalOpen(true);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{StringConstants.LOADING}</div>;
   if (error) return <div>{error}</div>;
-  if (!profile) return <div>No profile data available</div>;
+  if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
 
   {console.log("@prifle",profile.user)}
   return (
@@ -300,7 +299,7 @@ export function ProfileCard() {
               </h1>
 
               <p className="text-muted-foreground text-lg">
-                Created by{" "}
+                {StringConstants.CREATED_BY}{" "}
                 <span className="text-foreground">
                   {profile.user.user_name}
                 </span>
@@ -310,14 +309,14 @@ export function ProfileCard() {
                   <span className="font-medium text-foreground">
                     {profile.community.num_member.toLocaleString()}
                   </span>
-                  Members
+                  {StringConstants.MEMBER}
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-1.5">
                   <span className="font-medium text-foreground">
                     {profile.community.post_count}
                   </span>
-                  Posts
+                  {StringConstants.POSTS}
                 </div>
               </div>
             </div>
@@ -331,7 +330,7 @@ export function ProfileCard() {
                 onClick={handleLeaveCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                Leave Community
+                {StringConstants.UNFOLLOW}
               </Button>
             ) : (
               <Button
@@ -341,7 +340,7 @@ export function ProfileCard() {
                 onClick={handleJoinCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                Join Community
+                {StringConstants.FOLLOW}
               </Button>
             )}
           </div>
@@ -350,7 +349,7 @@ export function ProfileCard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <div className="p-4 ">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">About</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-4">{StringConstants.ABOUT}</h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
             <p className="text-muted-foreground leading-relaxed mb-6">
               {profile.community.description}
@@ -403,7 +402,7 @@ export function ProfileCard() {
         <div className="rounded-xl p-4   transition-all duration-300 border border-border/5">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-foreground">
-              Offerings
+              {StringConstants.OFFERINGS}
             </h2>
             <AddOfferingDialog onOfferingAdded={fetchOfferings} />
           </div>
@@ -411,7 +410,7 @@ export function ProfileCard() {
           {offerings.length === 0 ? (
             <div className="text-center py-16 bg-card rounded-xl border border-border/5">
               <p className="text-lg text-muted-foreground">
-                No offerings available yet
+                {StringConstants.NO_OFFERINGS}
               </p>
             </div>
           ) : (
@@ -452,7 +451,7 @@ export function ProfileCard() {
                             onClick={() => handleEditClick(offering)}
                           >
                             <Edit className="w-4 h-4" />
-                            <span>Edit</span>
+                            <span>{StringConstants.EDIT}</span>
                           </Button>
 
                           <Button
@@ -462,7 +461,7 @@ export function ProfileCard() {
                             onClick={() => handleDeleteOffering(offering._id)}
                           >
                             <Trash2 className="w-4 h-4" />
-                            <span>Delete</span>
+                            <span>{StringConstants.DELETE}</span>
                           </Button>
                         </div>
                       )}

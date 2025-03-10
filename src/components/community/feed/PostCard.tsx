@@ -14,6 +14,8 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { CommentSection } from "./CommentSection";
 import { FaShare } from "react-icons/fa";
+import { StringConstants } from "@/components/common/CommonText";
+import { useSession } from "next-auth/react";
 
 interface PostCardProps {
   post: {
@@ -38,6 +40,7 @@ export function PostCard({ post }: PostCardProps) {
   const [isCommenting, setIsCommenting] = useState(false);
   const [liked, setLiked] = useState(false);
   const [relativeTime, setRelativeTime] = useState("");
+  const { data: session } = useSession();
 
   useEffect(() => {
     setRelativeTime(
@@ -51,14 +54,14 @@ export function PostCard({ post }: PostCardProps) {
         {/* Header */}
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
-            <AvatarImage src="/placeholder.svg" />
+            <AvatarImage src={session?.user?.image} />
             <AvatarFallback>UN</AvatarFallback>
           </Avatar>
           <div className="flex-1 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="font-medium">User Name</span>
+              <span className="font-medium">{session?.user?.name}</span>
               <Badge variant="outline" className="text-xs bg-transparent">
-                Host
+                {StringConstants.HOST}
               </Badge>
               <span className="text-sm">{relativeTime}</span>
             </div>
@@ -99,7 +102,7 @@ export function PostCard({ post }: PostCardProps) {
             <Heart
               className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : ""}`}
             />
-            <span>{post.up_votes} Like</span>
+            <span>{post.up_votes} {StringConstants.LIKE}</span>
           </Button>
 
           <Button
@@ -109,14 +112,14 @@ export function PostCard({ post }: PostCardProps) {
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageCircleMore className="h-5 w-5" />
-            <span>{post.reply_count} Comment</span>
+            <span>{post.reply_count} {StringConstants.COMMENT}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             className="hover:text-purple-400 gap-2 hover:bg-transparent"
           >
-            <Send className="h-5 w-5" />
+            <Send className="-5 w-5" />
             <span>Share</span>
           </Button>
         </div>

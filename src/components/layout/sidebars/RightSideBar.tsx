@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface TrendingPost {
   _id: string;
@@ -87,7 +88,7 @@ export function RightSidebar() {
               onClick={handleCreatorButtonClick}
             >
               {session ? (
-                <DialogTrigger className="w-full">Become a Creator</DialogTrigger>
+                <DialogTrigger className="w-full">{StringConstants.CREATE_A_PAGE}</DialogTrigger>
               ) : (
                 "Become a Creator"
               )}
@@ -101,7 +102,7 @@ export function RightSidebar() {
       {/* Trending Posts Box */}
       <div className="bg-card rounded-xl shadow-sm border border-zinc-200/30">
         <h2 className="text-lg font-semibold px-4 py-3 border-b border-zinc-200/50">
-          Trending Posts
+          {StringConstants.TRENDING_POSTS}
         </h2>
         <div className="max-h-[430px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-400 scrollbar-track-transparent">
           {isLoading ? (

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { StringConstants } from "../common/CommonText";
 
 export default function CreatorStudio() {
   const [email, setEmail] = useState("");
@@ -59,8 +60,8 @@ export default function CreatorStudio() {
       <div className="max-w-5xl w-full mx-auto text-center space-y-8">
         <div className="space-y-2">
           <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
-            Creator Studio
-            <span className="text-primary ml-2">Coming Soon</span>
+            {StringConstants.CREATOR_STUDIO}
+            <span className="text-primary ml-2">{StringConstants.COMMING_SOON}</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Your all-in-one platform to create, collaborate, and monetize your

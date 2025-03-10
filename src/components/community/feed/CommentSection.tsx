@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Heart, MessageSquare, ImageIcon, Mic } from "lucide-react";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface CommentSectionProps {
   postId: string;
@@ -73,7 +74,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 className="text-zinc-400 hover:text-purple-400 h-auto py-1"
               >
                 <MessageSquare className="w-4 h-4 mr-1" />
-                <span className="text-xs">Reply</span>
+                <span className="text-xs">{StringConstants.REPLY}</span>
               </Button>
             </div>
 
@@ -105,7 +106,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
                       className="text-zinc-400 hover:text-purple-400 h-auto py-1"
                     >
                       <MessageSquare className="w-4 h-4 mr-1" />
-                      <span className="text-xs">Reply</span>
+                      <span className="text-xs">{StringConstants.REPLY}</span>
                     </Button>
                   </div>
                 </div>

@@ -7,6 +7,7 @@ import { RootState } from "@/redux/store";
 import Loader from "../Loader";
 import { PostCard } from "./PostCard";
 import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
+import { StringConstants } from "../common/CommonText";
 
 export function Feed() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
@@ -52,10 +53,10 @@ export function Feed() {
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
           {posts.length === 0 ? (
-            <div className="text-center text-zinc-400">No posts available</div>
+            <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
           ) : (
             <>
-              {posts.map((post, index) => (
+              {posts.map((post: any, index) => (
                 <PostCard
                   key={post._id}
                   post={post}

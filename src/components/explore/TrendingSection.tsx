@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { StringConstants } from "../common/CommonText";
 
 interface TrendingCategory {
   _id: string;
@@ -67,7 +68,7 @@ function TrendingSection() {
           </div>
         ) : (
           <div className="flex items-center justify-center h-32 text-muted-foreground">
-            No trending categories found
+            {StringConstants.NO_TRENDING_CATEGORIES}
           </div>
         )}
       </div>

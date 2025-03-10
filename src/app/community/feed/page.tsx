@@ -6,6 +6,7 @@ import type { RootState } from "@/redux/store";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { FaUsers } from "react-icons/fa";
+import { StringConstants } from "@/components/common/CommonText";
 
 export default function FeedPage() {
   const { data: session } = useSession();
@@ -37,14 +38,14 @@ export default function FeedPage() {
               href="/explore"
               className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
             >
-              Explore Communities
+              {StringConstants.EXPLORE_CREATOR}
             </Link>
             {!session && (
               <Link
                 href="/api/auth/signin"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Sign In
+               {StringConstants.SIGN_IN}
               </Link>
             )}
           </div>
@@ -58,7 +59,7 @@ export default function FeedPage() {
       {activeCommunityId ? (
         <Feed communityId={activeCommunityId} />
       ) : (
-        <p className="text-center text-muted">Select a community</p>
+        <p className="text-center text-muted">{StringConstants.SELECT_A_PAGE}</p>
       )}
     </div>
   );
