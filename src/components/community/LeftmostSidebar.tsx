@@ -38,6 +38,9 @@ interface Community {
 export function LeftmostSidebar() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
+  const currentUser = useSelector((state: RootState) => state.user);
+    // Check if user is already a creator using the is_creator flag
+  const isCreator = currentUser?.user?.is_creator ? true : false;
   // const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
   // const [isLoading, setIsLoading] = useState(true);
@@ -121,8 +124,6 @@ const fetchCommunities = async (): Promise<Community[]> => {
       body: JSON.stringify({ userId }),
     }
   );
-
-  // console.log("response in leftSideBAr ", response);
 
   if (!response.ok) {
     throw new Error("Failed to fetch communities");
@@ -230,6 +231,7 @@ const handleJoinCommunity = async (communityId: string) => {
   }
 
   return (
+    <>
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
@@ -272,7 +274,6 @@ const handleJoinCommunity = async (communityId: string) => {
 
                 }}
               >
-                  {console.log("@sidemostnar", community.name)}
                 <Avatar className="w-full h-full ">
                   <AvatarImage
                     src={community.image && community.image !== "" ? community.image: `/placeholder.svg?text=${getInitials(community.name)}`}
@@ -288,8 +289,7 @@ const handleJoinCommunity = async (communityId: string) => {
               </Button>
             ))
           )}
-
-          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+          {!isCreator && (<Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
             <DialogTrigger asChild>
               <Button
                 variant="ghost"
@@ -306,7 +306,7 @@ const handleJoinCommunity = async (communityId: string) => {
                 queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
               }}
             />
-          </Dialog>
+          </Dialog>)}
 
           <Link href="/explore">
             <Button
@@ -320,5 +320,6 @@ const handleJoinCommunity = async (communityId: string) => {
         </div>
       </div>
     </div>
+    </>
   );
 }
