@@ -39,7 +39,6 @@ export function RightSidebar() {
   
   // Get the user data from Redux store
   const user = useSelector((state: RootState) => state.user);
-  console.log("@user", user);
   // Check if user is already a creator using the is_creator flag
   const isCreator = user?.user?.is_creator ? true : false;
 
@@ -90,7 +89,7 @@ export function RightSidebar() {
               {session ? (
                 <DialogTrigger className="w-full">{StringConstants.CREATE_A_PAGE}</DialogTrigger>
               ) : (
-                "Become a Creator"
+                <>{StringConstants.CREATE_A_PAGE}</>
               )}
             </Button>
 

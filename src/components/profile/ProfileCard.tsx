@@ -480,9 +480,9 @@ export function ProfileCard() {
                           setSelectedOffering(offering);
                         }}
                       >
-                        <span className="line-through text-xs opacity-60">
-                          ₹{offering.price.amount + 1000}
-                        </span>
+                        {/* <span className="line-through text-xs opacity-60">
+                          ₹{offering.price.amount * 1.5}
+                        </span> */}
                         <span>₹{offering.price.amount}</span>
                         <ArrowRight className="w-4 h-4" />
                       </Button>
