@@ -136,7 +136,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    (session && (<DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
+    (session && (<DialogContent className="p-4 sm:max-w-[425px] bg-card text-muted border-none">
       <DialogHeader className="flex items-center justify-between">
         <DialogTitle className="text-xl font-normal">
           Fill to create your page
@@ -144,7 +144,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       </DialogHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-2">
-          <Label>Page Name</Label>
+          <Label>Page Name<span className="text-red-500">*</span></Label>
           <Input
             name="name"
             value={formData.name}
@@ -154,7 +154,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label>{StringConstants.SELECT_TOPICS}</Label>
+          <Label>{StringConstants.SELECT_TOPICS}<span className="text-red-500">*</span></Label>
           <Select onValueChange={handleCategoryChange}>
             <SelectTrigger className="bg-background border-none">
               <SelectValue placeholder="Select your topic" />
@@ -169,7 +169,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>{StringConstants.TAGS}</Label>
+          <Label>{StringConstants.TAGS}<span className="text-red-500">*</span></Label>
           <Input
             name="tags"
             value={formData.tags}
@@ -179,7 +179,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label>{StringConstants.ABOUT_THE_PAGE}</Label>
+          <Label>{StringConstants.ABOUT_THE_PAGE}<span className="text-red-500">*</span></Label>
           <Textarea
             name="description"
             value={formData.description}

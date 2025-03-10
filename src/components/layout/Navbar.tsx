@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
+import { Bell, Home, Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,8 @@ import { StringConstants } from "../common/CommonText";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { setCommunityData } from "@/redux/communitySlice";
 import React from "react";
-
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import CreatorForm from "../form/CreatorForm";
 interface Community {
   _id: string;
   title: string;
@@ -54,6 +55,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
+  const [showCreatorForm, setShowCreatorForm] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -155,11 +158,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <FaBars className="h-6 w-6" />
             </button>
             <Link href="/" className="flex items-center space-x-2 mr-6">
-            <Image
-              src={Guildup_logo_mobile}
-              alt="GuildUp logo"
-              className="h-8 w-auto md:hidden"
-            />
+              <Image
+                src={Guildup_logo_mobile}
+                alt="GuildUp logo"
+                className="h-8 w-auto md:hidden"
+              />
               <Image
                 src={guildup_logo || "/placeholder.svg"}
                 alt="GuildUp"
@@ -283,7 +286,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         >
                           <Link href='/payments'>Payments</Link>
                         </DropdownMenuItem>} */}
-                     
+
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
@@ -382,53 +385,74 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       >
         <div className="px-1">
           <div className="space-y-3">
-          {communities && communities.length > 0 ? (
-            communities.map((community: any) => {
-              const isActive = activeCommunityId === community._id
-              return (
-                <button
-                  key={community._id}
-                  className={cn(
-                    "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
-                    isActive
-                      ? "bg-blue-500/20"
-                      : "bg-card"
-                  )}
-                  onClick={() => handleSelectCommunity(community)}
-                >
-                  {/* Avatar */}
-                  <Avatar className={`w-10 h-10 rounded-lg ${isActive? "ring-2 ring-purple-500": 'null'}`}>
-                    <AvatarImage
-                      src={`/placeholder.svg?text=${getInitials(community.name)}`}
-                      alt={community.name}
-                      className="!rounded-lg"
-                    />
-                    <AvatarFallback className="!rounded-lg">
-                      {getInitials(community.name)}
-                    </AvatarFallback>
-                  </Avatar>
-    
-                  {/* Community Name */}
-                  <span
+            {communities && communities.length > 0 ? (
+              communities.map((community: any) => {
+                const isActive = activeCommunityId === community._id
+                return (
+                  <button
+                    key={community._id}
                     className={cn(
-                      "font-medium text-sm",
-                      isActive ? "text-blue-600 " : "text-gray-800"
+                      "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
+                      isActive
+                        ? "bg-blue-500/20"
+                        : "bg-card"
                     )}
+                    onClick={() => handleSelectCommunity(community)}
                   >
-                    {community.name}
-                  </span>
-    
-                  {/* Subscription Star (optional) */}
-                  {community.subscription && (
-                    <span className="ml-auto text-yellow-500 text-sm">⭐</span>
-                  )}
-                </button>
-              )
-            })
-          ) : (
-            <p className="text-center">No communities available</p>
-          )}
-        </div>
+                    {/* Avatar */}
+                    <Avatar className={`w-10 h-10 rounded-lg ${isActive ? "ring-2 ring-purple-500" : 'null'}`}>
+                      <AvatarImage
+                        src={`/placeholder.svg?text=${getInitials(community.name)}`}
+                        alt={community.name}
+                        className="!rounded-lg"
+                      />
+                      <AvatarFallback className="!rounded-lg">
+                        {getInitials(community.name)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Community Name */}
+                    <span
+                      className={cn(
+                        "font-medium text-sm",
+                        isActive ? "text-blue-600 " : "text-gray-800"
+                      )}
+                    >
+                      {community.name}
+                    </span>
+
+                    {/* Subscription Star (optional) */}
+                    {community.subscription && (
+                      <span className="ml-auto text-yellow-500 text-sm">⭐</span>
+                    )}
+                  </button>
+                )
+              })
+            ) : (
+              <p className="text-center">No communities available</p>
+            )}
+          </div>
+          <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
+            <h4 className="text-base font-medium">Create a page</h4>
+            <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </DialogTrigger>
+              <CreatorForm
+                onClose={() => setIsCreatorFormOpen(false)}
+              // onSuccess={() => {
+              // Invalidate the cache when a new community is created
+              // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+              // }}
+              />
+            </Dialog>
+          </div>
         </div>
       </div>
 
