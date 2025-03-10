@@ -34,9 +34,11 @@ interface PostCardProps {
     replies?: any;
     media?: any;
     user_id: any;
-    community_id:{
-      name:string
-    }
+    community_id: {
+      name: string;
+      image: string;
+      background_image: string;
+    };
   };
   ref: any;
 }
@@ -110,7 +112,7 @@ export function PostCard({ post, ref }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `https://your-website.com/posts/${post.slug}`;
+    const shareUrl = `https://guildup-frontend-prod.vercel.app/posts/${post.slug}`;
 
     try {
       await navigator.share({
@@ -123,15 +125,20 @@ export function PostCard({ post, ref }: PostCardProps) {
     }
   };
 
-  // Example comments data
+  const communityName = post?.community_id?.name || "Unknown";
+  const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
 
   return (
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
           <Avatar className="h-10 w-10  border-2 border-purple-500">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={post?.community_id?.image} />
+            <AvatarFallback>
+              <AvatarFallback >
+                {fallbackLetter}
+              </AvatarFallback>
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-start justify-between">

@@ -22,7 +22,10 @@ import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { StringConstants } from "../common/CommonText";
-import { useLeaveCommunity, useJoinCommunity } from "@/hook/queries/useCommunityMutations";
+import {
+  useLeaveCommunity,
+  useJoinCommunity,
+} from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
 
 interface Community {
@@ -44,10 +47,10 @@ export function LeftmostSidebar() {
   // const [error, setError] = useState<string | null>(null);
   const [showCreatorForm, setShowCreatorForm] = React.useState(false);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
-  
+
   const handleOpenForm = () => {
-        setShowCreatorForm((prev) => !prev);
-      };
+    setShowCreatorForm((prev) => !prev);
+  };
 
   const dispatch = useDispatch();
   const activeCommunity = useSelector(
@@ -55,9 +58,8 @@ export function LeftmostSidebar() {
   );
   const user = useSelector((state: RootState) => state.user.user);
 
-const activeCommunityId = activeCommunity?.id;
-    useEffect(() => {
-
+  const activeCommunityId = activeCommunity?.id;
+  useEffect(() => {
     fetchCommunities();
   }, []);
 
@@ -106,82 +108,84 @@ const activeCommunityId = activeCommunity?.id;
   //   }
   // };
 
-
-
-
-// Fetch communities function
-const fetchCommunities = async (): Promise<Community[]> => {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId }),
-    }
-  );
-
-  // console.log("response in leftSideBAr ", response);
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch communities");
-  }
-  const result = await response.json();
-      console.log("comm", result);
-      const validCommunities = result?.data?.filter(
-        (community: Community | null) => community !== null
-      );
-      // setCommunitie(validCommunities);
-
-      dispatch(setUserFollowedCommunities(validCommunities));
-
-
-      if (validCommunities.length > 0 && !activeCommunityId) {
-        dispatch(
-          setActiveCommunity({
-            id: validCommunities[0]._id,
-            name: validCommunities[0].name, // Include name
-          })
-        );
+  // Fetch communities function
+  const fetchCommunities = async (): Promise<Community[]> => {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
       }
-  // const result = await response.json();
-  return result.data.filter((community: Community | null) => community !== null);
-};
+    );
 
-// Leave community mutation
-const leaveCommunityMutation = useLeaveCommunity();
+    // console.log("response in leftSideBAr ", response);
 
-// Use React Query for fetching communities
-const { data: communities = [], isLoading, error } = useQuery({
-  queryKey: ["userCommunities", userId],
-  queryFn: fetchCommunities,
-  enabled: !!userId,
-  // Add this to ensure the component re-renders when the data changes
-  staleTime: 0,
-});
+    if (!response.ok) {
+      throw new Error("Failed to fetch communities");
+    }
+    const result = await response.json();
+    console.log("comm", result);
+    const validCommunities = result?.data?.filter(
+      (community: Community | null) => community !== null
+    );
+    // setCommunitie(validCommunities);
 
-// Add this near the top of your component function
-const queryClient = useQueryClient();
+    dispatch(setUserFollowedCommunities(validCommunities));
 
-// Join community mutation
-const joinCommunityMutation = useJoinCommunity();
+    if (validCommunities.length > 0 && !activeCommunityId) {
+      dispatch(
+        setActiveCommunity({
+          id: validCommunities[0]._id,
+          name: validCommunities[0].name, // Include name
+        })
+      );
+    }
+    // const result = await response.json();
+    return result.data.filter(
+      (community: Community | null) => community !== null
+    );
+  };
 
-const handleJoinCommunity = async (communityId: string) => {
-  try {
-    await joinCommunityMutation.mutateAsync({
-      userId: userId!,
-      communityId,
-    });
-    
-    toast.success("Successfully joined the community");
-    
-    // The cache invalidation is handled in the mutation's onSuccess callback
-  } catch (error) {
-    toast.error("Failed to join community");
-    console.error("Error joining community:", error);
-  }
-};
+  // Leave community mutation
+  const leaveCommunityMutation = useLeaveCommunity();
+
+  // Use React Query for fetching communities
+  const {
+    data: communities = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["userCommunities", userId],
+    queryFn: fetchCommunities,
+    enabled: !!userId,
+    // Add this to ensure the component re-renders when the data changes
+    staleTime: 0,
+  });
+
+  // Add this near the top of your component function
+  const queryClient = useQueryClient();
+
+  // Join community mutation
+  const joinCommunityMutation = useJoinCommunity();
+
+  const handleJoinCommunity = async (communityId: string) => {
+    try {
+      await joinCommunityMutation.mutateAsync({
+        userId: userId!,
+        communityId,
+      });
+
+      toast.success("Successfully joined the community");
+
+      // The cache invalidation is handled in the mutation's onSuccess callback
+    } catch (error) {
+      toast.error("Failed to join community");
+      console.error("Error joining community:", error);
+    }
+  };
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
@@ -206,14 +210,14 @@ const handleJoinCommunity = async (communityId: string) => {
   //       userId: userId!,
   //       communityId,
   //     });
-      
+
   //     toast.success("Successfully left the community");
-      
+
   //     // If the active community is the one being left, clear it
   //     if (activeCommunityId === communityId) {
   //       dispatch(setActiveCommunity(null));
   //     }
-      
+
   //     // The cache invalidation is handled in the mutation's onSuccess callback
   //   } catch (error) {
   //     toast.error("Failed to leave community");
@@ -233,7 +237,7 @@ const handleJoinCommunity = async (communityId: string) => {
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
-        {isLoading ? (
+          {isLoading ? (
             // Loading skeleton
             <div className="space-y-4">
               {[1, 2, 3].map((n) => (
@@ -244,24 +248,22 @@ const handleJoinCommunity = async (communityId: string) => {
               ))}
             </div>
           ) : (
-            communities.map((community:any) => (
+            communities.map((community: any) => (
               <Button
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative w-12 h-12 rounded-full  ${activeCommunityId === community._id
+                className={`relative w-12 h-12 rounded-full  ${
+                  activeCommunityId === community._id
                     ? "bg-blue-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
-                  }`}
+                }`}
                 onClick={() => {
-
-
                   dispatch(
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
                     })
-
                   );
                   dispatch(
                     setCommunityData({
@@ -269,13 +271,16 @@ const handleJoinCommunity = async (communityId: string) => {
                       userId: user._id,
                     })
                   );
-
                 }}
               >
-                  {console.log("@sidemostnar", community.name)}
+                {console.log("@sidemostnar", community.name)}
                 <Avatar className="w-full h-full ">
                   <AvatarImage
-                    src={community.image && community.image !== "" ? community.image: `/placeholder.svg?text=${getInitials(community.name)}`}
+                    src={
+                      community.image && community.image !== ""
+                        ? community.image
+                        : `/placeholder.svg?text=${getInitials(community.name)}`
+                    }
                     alt={community.name}
                   />
                   <AvatarFallback>{getInitials(community.name)}</AvatarFallback>
@@ -296,14 +301,16 @@ const handleJoinCommunity = async (communityId: string) => {
                 size="icon"
                 className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
               >
-                <Plus className="h-6 w-6" />
+                <Plus className="h-6 w-6 text-muted" />
               </Button>
             </DialogTrigger>
-            <CreatorForm 
-              onClose={() => setIsCreatorFormOpen(false)} 
+            <CreatorForm
+              onClose={() => setIsCreatorFormOpen(false)}
               onSuccess={() => {
                 // Invalidate the cache when a new community is created
-                queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+                queryClient.invalidateQueries({
+                  queryKey: ["userCommunities"],
+                });
               }}
             />
           </Dialog>
@@ -314,7 +321,7 @@ const handleJoinCommunity = async (communityId: string) => {
               size="icon"
               className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
             >
-              <FaCompass />
+              <FaCompass className="text-muted" />
             </Button>
           </Link>
         </div>
