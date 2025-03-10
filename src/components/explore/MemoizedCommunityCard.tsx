@@ -34,7 +34,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   return (
     <Card
       onClick={onClick}
-      className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
+      className="relative w-full border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
       <div className="relative h-[80px] w-full bg-gray-200">

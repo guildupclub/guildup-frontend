@@ -53,7 +53,7 @@ function Page() {
       <div className="w-full lg:px-[100px] ">
         <div className="p-6 sm:px-0">
           <div className="flex gap-6 md:justify-between">
-            <div className="">
+            <div className="w-full">
               <h1 className="text-xl lg:text-2xl font-bold mb-4">
                 {StringConstants.TOP_PAGES}
               </h1>

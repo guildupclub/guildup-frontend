@@ -11,7 +11,7 @@ export default function FeedPage() {
 
   const activeCommunityId = activeCommunity?.id;
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex grow bg-background">
       {activeCommunityId ? (
         <Feed communityId={activeCommunityId} />
       ) : (
