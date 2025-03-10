@@ -18,8 +18,7 @@ import CommentSection from "./CommentSection/CommentSection";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
-import Image from 'next/image';
-
+import Image from "next/image";
 
 interface PostCardProps {
   post: {
@@ -31,11 +30,13 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
-    community_id: string;
     upvote_userId: any;
     replies?: any;
     media?: any;
-    user_id:any;
+    user_id: any;
+    community_id:{
+      name:string
+    }
   };
   ref: any;
 }
@@ -135,15 +136,17 @@ export function PostCard({ post, ref }: PostCardProps) {
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-muted">{post.title}</h3>
+                <h3 className="font-medium text-muted">
+                  {post?.community_id?.name}
+                </h3>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
                     {formatTimeAgo(post.created_At)}
                   </span>
                   <span className="text-xs  text-muted-foreground">•</span>
-                  <span className="text-xs  text-muted-foreground ">
+                  {/* <span className="text-xs  text-muted-foreground ">
                     Public
-                  </span>
+                  </span> */}
                 </div>
               </div>
               <Button
@@ -159,7 +162,6 @@ export function PostCard({ post, ref }: PostCardProps) {
             </p>
 
             {post?.media?.publicUrl && post?.media?.fileType === "image" && (
-
               <Image
                 src={post.media.publicUrl}
                 alt="Post Image"

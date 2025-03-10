@@ -26,6 +26,7 @@ interface Community {
   num_member: number;
   image?: string;
   icon?: string;
+  tags?: string[];
 }
 
 interface CommunityCardProps {
@@ -42,14 +43,20 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     null
   );
 
-  const offerings = Array.isArray(community.offerings) ? community.offerings : [];
-  
+  const offerings = Array.isArray(community.offerings)
+    ? community.offerings
+    : [];
+  const communityDetails = community.community;
   // Get the first offering from the array if it exists
   const firstOffering = offerings.length > 0 ? offerings[0] : null;
-  
+
+  const tags: string[] = community?.community?.tags?.[0]?.includes(",")
+    ? community?.community?.tags[0]?.split(",").map((tag: string) => tag.trim())
+    : community?.community?.tags || [];
+
   // Get tags from the first offering if it exists
-  const tags = firstOffering?.tags || [];
-  
+  // const tags = firstOffering?.tags || [];
+
   return (
     <Card
       onClick={() => onClick(community.community._id)}
@@ -86,7 +93,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           </span> */}
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
-          {tags.map((tag, index) => (
+          {tags.map((tag: string, index: number) => (
             <Badge
               key={index}
               className="bg-gray-200 text-gray-700 px-3 py-1 text-xs rounded-lg"
