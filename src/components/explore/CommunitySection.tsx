@@ -64,8 +64,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   }, [activeCategory]);
 
   const handleClickCommunity = useCallback(
-    (communityWrapper: { community: Community }) => {
-      const community = communityWrapper.community; // Extract the actual community object
+    ( community: Community ) => {
 
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
@@ -104,7 +103,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
           {communities.length > 0 ? (
             communities.map((communityWrapper) => (
               <MemoizedCommunityCard
-                key={communityWrapper.community._id}
+                key={communityWrapper._id}
                 community={communityWrapper}
                 onClick={() => handleClickCommunity(communityWrapper)}
               />

@@ -32,6 +32,7 @@ import { FaUserGroup } from "react-icons/fa6";
 import { setMemberDetails } from "@/redux/memberSlice";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
+import { StringConstants } from "../common/CommonText";
 
 export function Sidebar() {
   const dispatch = useDispatch();
@@ -214,14 +215,14 @@ export function Sidebar() {
           {activeCommunityName}
         </h2>
 
-        {isAdmin && (
+        {/* {isAdmin && (
           <button
             className="p-1 rounded-md hover:bg-background transition"
             onClick={() => setIsEditOpen(true)}
           >
             <FiEdit size={18} className="text-muted hover:text-primary" />
           </button>
-        )}
+        )} */}
       </div>
 
       <Separator />
@@ -239,7 +240,7 @@ export function Sidebar() {
           onClick={() => handleNavigation("/community/profile")}
         >
           <FaUserAlt />
-          Profile
+          {StringConstants.PROFILE}
         </Button>
 
         {/* Feed */}
@@ -251,7 +252,7 @@ export function Sidebar() {
           onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
         >
           <Rss className="h-4 w-4" />
-          Feed
+          {StringConstants.FEED}
         </Button>
 
         {/* Members */}
@@ -263,7 +264,7 @@ export function Sidebar() {
           onClick={() => handleNavigation("/community/members")}
         >
           <FaUserGroup />
-          Members
+          {StringConstants.MEMBER}
         </Button>
 
         {/* Announcements */}
@@ -301,7 +302,7 @@ export function Sidebar() {
           className={`w-full text-white ${isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"}`}
           onClick={() => handleNavigation("/creator-studio")}
         >
-          Creator Studio
+          {StringConstants.CREATOR_STUDIO}
         </Button>
 
         {/* )} */}
@@ -338,7 +339,7 @@ export function Sidebar() {
                       className="bg-card border-background " />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Channel Type</Label>
+                    <Label>{StringConstants.CHANNEL_TYPE}</Label>
                     <Select
                       value={formData.type}
                       onValueChange={(value) => setFormData({ ...formData, type: value })}
@@ -347,18 +348,18 @@ export function Sidebar() {
                         <SelectValue placeholder="Select your topics" />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-background text-muted">
-                        <SelectItem value="discussion">Discussion</SelectItem>
-                        <SelectItem value="chat">Chat</SelectItem>
+                        <SelectItem value="discussion">{StringConstants.DISCUSSION}</SelectItem>
+                        <SelectItem value="chat">{StringConstants.CHAT}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-2">
                     <Label className="flex items-center gap-2">
-                      Want to lock your channel?
+                      {StringConstants.LOCK_CHANNEL_MESSAGE}
                       <div className="relative group">
                         <Info className="w-4 h-4 text-muted cursor-pointer" />
                         <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
-                          Do you want to make this channel private?
+                          {StringConstants.PVT_CHANNEL_MESSAGE}
                         </span>
                       </div>
                     </Label>
@@ -372,11 +373,11 @@ export function Sidebar() {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="true" id="yes" />
-                        <Label htmlFor="yes">Yes</Label>
+                        <Label htmlFor="yes">{StringConstants.YES}</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="false" id="no" />
-                        <Label htmlFor="no">No</Label>
+                        <Label htmlFor="no">{StringConstants.NO}</Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -387,7 +388,7 @@ export function Sidebar() {
                     onClick={() => setIsChannelOpen(false)}
                     className="bg-transparent border-background hover:bg-background text-muted-foreground"
                   >
-                    Cancel
+                    {StringConstants.CANCEL}
                   </Button>
                   <Button
                     onClick={handleCreateChannel}

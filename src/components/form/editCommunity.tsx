@@ -14,6 +14,9 @@ import { X, Upload } from "lucide-react";
 import { API_ENDPOINTS } from "@/config/constants";
 import Image from "next/image";
 import { RootState } from "@/redux/store";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface Category {
   _id: string;
@@ -43,27 +46,28 @@ export function EditCommunityModal({
   profile,
 }: EditCommunityModalProps) {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: profile?.community?.name || "",
-    description: profile?.communty?.description || "",
-    category: profile?.communty?.category || "",
-    rules: profile?.communty?.rules || "",
-    tags: profile?.communty?.tags || [],
-    image: profile?.communty?.image || "",
-    bgImage: profile?.communty?.bgImage || "",
+    description: profile?.community?.description || "",
+    category: profile?.community?.category || "",
+    rules: profile?.community?.rules || "",
+    tags: profile?.community?.tags || [],
+    image: profile?.community?.image || "",
+    bgImage: profile?.community?.bgImage || "",
   });
+
+  // Add state for file objects
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [bgImageFile, setBgImageFile] = useState<File | null>(null);
 
   const [newTag, setNewTag] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [imageUploading, setImageUploading] = useState({
-    profile: false,
-    background: false,
-  });
 
   const user = useSelector((state: RootState) => state.user.user);
-  const community = useSelector((state: RootState) => state.community);
+  const community: any = useSelector((state: RootState) => state.community);
   const communityId = community?.communityId;
-  const communityData = community?.community;
+  const communityData = community?.communityData;
   const userId = user?._id;
 
   // Load community data when modal opens, prioritizing profile prop if available
@@ -96,52 +100,22 @@ export function EditCommunityModal({
     }
   }, [isOpen, profile, communityData]);
 
-  // Handle image upload
-  const handleImageUpload = async (
-    file: File,
-    type: "profile" | "background"
-  ) => {
-    try {
-      setImageUploading({ ...imageUploading, [type]: true });
-
-      // Get signed URL
-      const signUrlResponse = await fetch(API_ENDPOINTS.getSignUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // "Access-Control-Allow-Origin": "*", // Try adding this
-        },
-        body: JSON.stringify({
-          fileName: file.name,
-          fileType: "image",
-          userId,
-          communityId,
-        }),
+  // Handle image selection
+  const handleImageSelect = (file: File, type: "profile" | "background") => {
+    if (type === "profile") {
+      setImageFile(file);
+      // Create a temporary URL for preview
+      setFormData({
+        ...formData,
+        image: URL.createObjectURL(file),
       });
-
-      const signedData = await signUrlResponse.json();
-
-      if (signedData.r === "s") {
-        // Upload to S3
-        await fetch(signedData.data.signedUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
-
-        // Update form data with public URL
-        setFormData({
-          ...formData,
-          [type === "profile" ? "image" : "bgImage"]: signedData.data.publicUrl,
-        });
-      }
-    } catch (error) {
-      console.error(`Failed to upload ${type} image:`, error);
-    } finally {
-      setImageUploading({ ...imageUploading, [type]: false });
+    } else {
+      setBgImageFile(file);
+      // Create a temporary URL for preview
+      setFormData({
+        ...formData,
+        bgImage: URL.createObjectURL(file),
+      });
     }
   };
 
@@ -156,7 +130,7 @@ export function EditCommunityModal({
   const handleRemoveTag = (tagToRemove: string) => {
     setFormData({
       ...formData,
-      tags: formData.tags.filter((tag) => tag !== tagToRemove),
+      tags: formData.tags.filter((tag: any) => tag !== tagToRemove),
     });
   };
 
@@ -165,26 +139,40 @@ export function EditCommunityModal({
     try {
       setIsLoading(true);
 
-      // Prepare request body, merging with existing profile data if available
-      const updateData = {
-        ...(profile || {}),
-        name: formData.name,
-        description: formData.description,
-        category: formData.category,
-        rules: formData.rules,
-        additional_tags: formData.tags,
-        image: formData.image,
-        bgImage: formData.bgImage,
-        userId,
-      };
+      // Create FormData object for multipart/form-data submission
+      const formDataToSend = new FormData();
+      
+      // Add text fields
+      formDataToSend.append("communityId", communityId);
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("userId", userId);
+      
+      // Add tags as a comma-separated string
+      formDataToSend.append("additional_tags", formData.tags.join(","));
+      
+      // Add rules if available
+      if (formData.rules) {
+        formDataToSend.append("rules", formData.rules);
+      }
+      
+      // Add category if available
+      if (formData.category) {
+        formDataToSend.append("category", formData.category);
+      }
+      
+      // Add image files if selected
+      if (imageFile) {
+        formDataToSend.append("image", imageFile);
+      }
+      
+      if (bgImageFile) {
+        formDataToSend.append("background_image", bgImageFile);
+      }
 
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          communityId,
-          ...updateData,
-        }),
+        body: formDataToSend, // No Content-Type header needed, browser sets it with boundary
       });
 
       const data = await response.json();
@@ -197,14 +185,29 @@ export function EditCommunityModal({
             ...community,
             community: {
               ...(communityData || {}),
-              ...updateData,
+              name: formData.name,
+              description: formData.description,
+              category: formData.category,
+              rules: formData.rules,
+              additional_tags: formData.tags,
+              image: data.data?.image || formData.image,
+              bgImage: data.data?.bgImage || formData.bgImage,
             },
           },
         });
+        
+        // Invalidate relevant queries to refresh data
+        queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+        queryClient.invalidateQueries({ queryKey: ["communityProfile", communityId] });
+        
+        toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
+      } else {
+        toast.error(data.e || StringConstants.PAGE_UPDATION_FAILED);
       }
     } catch (error) {
-      console.error("Failed to update community:", error);
+      console.error(StringConstants.PAGE_UPDATION_FAILED, error);
+      toast.error(StringConstants.PAGE_UPDATION_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -214,12 +217,12 @@ export function EditCommunityModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] bg-white text-black">
         <DialogHeader>
-          <DialogTitle>Edit Community</DialogTitle>
+          <DialogTitle>{StringConstants.EDIT_PAGE}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Community Name</Label>
+            <Label htmlFor="name">{StringConstants.PAGE_NAME}</Label>
             <Input
               id="name"
               value={formData.name}
@@ -230,7 +233,7 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{StringConstants.PAGE_DESCRIPTION}</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -241,17 +244,17 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>Tags</Label>
+            <Label>{StringConstants.TAGS}</Label>
             <div className="flex gap-2">
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add a tag"
               />
-              <Button onClick={handleAddTag}>Add</Button>
+              <Button onClick={handleAddTag}>{StringConstants.ADD}</Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag) => (
+              {formData.tags.map((tag: any) => (
                 <div
                   key={tag}
                   className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded"
@@ -267,7 +270,7 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>Profile Image</Label>
+            <Label>{StringConstants.PROFILE_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.image && (
                 <Image
@@ -283,16 +286,14 @@ export function EditCommunityModal({
                 accept="image/*"
                 onChange={(e) =>
                   e.target.files?.[0] &&
-                  handleImageUpload(e.target.files[0], "profile")
+                  handleImageSelect(e.target.files[0], "profile")
                 }
-                disabled={imageUploading.profile}
               />
-              {imageUploading.profile && <div>Uploading...</div>}
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label>Background Image</Label>
+            <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.bgImage && (
                 <Image
@@ -308,16 +309,15 @@ export function EditCommunityModal({
                 accept="image/*"
                 onChange={(e) =>
                   e.target.files?.[0] &&
-                  handleImageUpload(e.target.files[0], "background")
+                  handleImageSelect(e.target.files[0], "background")
                 }
-                disabled={imageUploading.background}
               />
-              {imageUploading.background && <div>Uploading...</div>}
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="rules">Community Rules</Label>
+{/* removing it for the demo purposes */}
+          {/* <div className="grid gap-2">
+            <Label htmlFor="rules">{StringConstants.PAGE_RULES}</Label>
             <Textarea
               id="rules"
               value={formData.rules}
@@ -325,12 +325,12 @@ export function EditCommunityModal({
                 setFormData({ ...formData, rules: e.target.value })
               }
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="flex justify-end gap-4">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {StringConstants.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}

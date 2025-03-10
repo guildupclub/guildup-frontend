@@ -21,6 +21,9 @@ import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { StringConstants } from "../common/CommonText";
+import { useLeaveCommunity, useJoinCommunity } from "@/hook/queries/useCommunityMutations";
+import { toast } from "sonner";
 
 interface Community {
   _id: string;
@@ -121,15 +124,15 @@ const fetchCommunities = async (): Promise<Community[]> => {
 
   // console.log("response in leftSideBAr ", response);
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch communities");
-    }
-    const result = await response.json();
-    console.log("comm", result);
-    const validCommunities = result.data.filter(
-      (community: Community | null) => community !== null
-    );
-    // setCommunitie(validCommunities);
+  if (!response.ok) {
+    throw new Error("Failed to fetch communities");
+  }
+  const result = await response.json();
+      console.log("comm", result);
+      const validCommunities = result?.data?.filter(
+        (community: Community | null) => community !== null
+      );
+      // setCommunitie(validCommunities);
 
     dispatch(setUserFollowedCommunities(validCommunities));
 
@@ -146,14 +149,39 @@ const fetchCommunities = async (): Promise<Community[]> => {
     return result.data.filter((community: Community | null) => community !== null);
   };
 
-  // Use React Query to fetch communities
-  const { data: communities = [], isLoading, error } = useQuery({
-    queryKey: ["communities", userId],
-    queryFn: fetchCommunities,
-  });
+// Leave community mutation
+const leaveCommunityMutation = useLeaveCommunity();
 
+// Use React Query for fetching communities
+const { data: communities = [], isLoading, error } = useQuery({
+  queryKey: ["userCommunities", userId],
+  queryFn: fetchCommunities,
+  enabled: !!userId,
+  // Add this to ensure the component re-renders when the data changes
+  staleTime: 0,
+});
 
+// Add this near the top of your component function
+const queryClient = useQueryClient();
 
+// Join community mutation
+const joinCommunityMutation = useJoinCommunity();
+
+const handleJoinCommunity = async (communityId: string) => {
+  try {
+    await joinCommunityMutation.mutateAsync({
+      userId: userId!,
+      communityId,
+    });
+    
+    toast.success("Successfully joined the community");
+    
+    // The cache invalidation is handled in the mutation's onSuccess callback
+  } catch (error) {
+    toast.error("Failed to join community");
+    console.error("Error joining community:", error);
+  }
+};
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
@@ -162,7 +190,7 @@ const fetchCommunities = async (): Promise<Community[]> => {
     }
   };
 
-  // Function to get initials from community name
+  // Function to get initials from page name
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -172,12 +200,31 @@ const fetchCommunities = async (): Promise<Community[]> => {
       .slice(0, 2);
   };
 
-
+  // const handleLeaveCommunity = async (communityId: string) => {
+  //   try {
+  //     await leaveCommunityMutation.mutateAsync({
+  //       userId: userId!,
+  //       communityId,
+  //     });
+      
+  //     toast.success("Successfully left the community");
+      
+  //     // If the active community is the one being left, clear it
+  //     if (activeCommunityId === communityId) {
+  //       dispatch(setActiveCommunity(null));
+  //     }
+      
+  //     // The cache invalidation is handled in the mutation's onSuccess callback
+  //   } catch (error) {
+  //     toast.error("Failed to leave community");
+  //     console.error("Error leaving community:", error);
+  //   }
+  // };
 
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
-        Error loading communities
+        {StringConstants.ERROR_LOADING_PAGES}
       </div>
     );
   }
@@ -197,7 +244,7 @@ const fetchCommunities = async (): Promise<Community[]> => {
               ))}
             </div>
           ) : (
-            communities.map((community) => (
+            communities.map((community:any) => (
               <Button
                 key={community._id}
                 variant="ghost"
@@ -227,7 +274,7 @@ const fetchCommunities = async (): Promise<Community[]> => {
               >
                 <Avatar className="w-full h-full !rounded-lg">
                   <AvatarImage
-                    src={`/placeholder.svg?text=${getInitials(community.name)}`}
+                    src={community.image && community.image !== "" ? community.image: `/placeholder.svg?text=${getInitials(community.name)}`}
                     alt={community.name}
                     className="!rounded-lg"
                   />
@@ -252,7 +299,13 @@ const fetchCommunities = async (): Promise<Community[]> => {
                 <Plus className="h-6 w-6" />
               </Button>
             </DialogTrigger>
-            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+            <CreatorForm 
+              onClose={() => setIsCreatorFormOpen(false)} 
+              onSuccess={() => {
+                // Invalidate the cache when a new community is created
+                queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+              }}
+            />
           </Dialog>
 
           <Link href="/explore">

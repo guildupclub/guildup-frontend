@@ -21,6 +21,7 @@ import {
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { OFFERING_TYPES, StringConstants } from "@/components/common/CommonText";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -118,12 +119,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           }`}
           disabled={!isAdmin}
         >
-          Add Offering
+          {StringConstants.ADD_OFFERING}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-card">
         <DialogHeader>
-          <DialogTitle>Create New Offering</DialogTitle>
+          <DialogTitle>{StringConstants.CREATE_NEW_OFFERING}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -164,16 +165,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mentorship">Mentorship</SelectItem>
-                <SelectItem value="course">Course</SelectItem>
-                <SelectItem value="consultation">Consultation</SelectItem>
+                {/* <SelectItem value="mentorship">Mentorship</SelectItem> */}
+                {/* <SelectItem value="course">Course</SelectItem> */}
+                <SelectItem value="consultation">{OFFERING_TYPES.CONSULTATION}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Price (INR)</Label>
+              <Label htmlFor="price">{StringConstants.PRICE} (INR)</Label>
               <Input
                 id="price"
                 type="number"
@@ -193,7 +194,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="duration">Duration (mins)</Label>
+              <Label htmlFor="duration">{StringConstants.DURATION} (Mins)</Label>
               <Input
                 id="duration"
                 type="number"
@@ -208,7 +209,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Label htmlFor="tags">{StringConstants.TAGS} (comma-separated)</Label>
             <Input
               id="tags"
               value={formData.tags}
@@ -224,7 +225,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Cancel
+              {StringConstants.CANCEL}
             </Button>
             <Button type="submit" className="text-white" disabled={loading}>
               {loading ? "Creating..." : "Create Offering"}

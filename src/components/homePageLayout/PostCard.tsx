@@ -35,6 +35,7 @@ interface PostCardProps {
     upvote_userId: any;
     replies?: any;
     media?: any;
+    user_id:any;
   };
   ref: any;
 }

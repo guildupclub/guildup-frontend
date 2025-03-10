@@ -1,4 +1,5 @@
 "use client";
+import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
 import CommunitySection from "@/components/explore/CommunitySection";
 import TrendingSection from "@/components/explore/TrendingSection";
@@ -40,7 +41,7 @@ function Page() {
 
   // Render nothing while loading or redirecting
   if (status === "loading" || !isMounted) {
-    return <div>Loading...</div>; // You can add a loading spinner here
+    return <div>{StringConstants.LOADING}</div>; // You can add a loading spinner here
   }
 
   return (
@@ -54,13 +55,13 @@ function Page() {
           <div className="flex gap-6 md:justify-between">
             <div className="">
               <h1 className="text-xl lg:text-2xl font-bold mb-4">
-                Top Communities
+                {StringConstants.TOP_PAGES}
               </h1>
               <CommunitySection activeCategory={selectedCategory} />
             </div>
 
-            <div className="col-span-1  hidden md:block w-60">
-              <h1 className="text-2xl font-bold mb-4">Trending Tags</h1>
+            <div className="col-span-1  hidden md:block">
+              {/* <h1 className="text-2xl font-bold mb-4">Trending Tags</h1> */}
               <TrendingSection />
             </div>
           </div>

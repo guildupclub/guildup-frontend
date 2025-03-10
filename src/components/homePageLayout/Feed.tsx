@@ -7,6 +7,7 @@ import { RootState } from "@/redux/store";
 import Loader from "../Loader";
 import { PostCard } from "./PostCard";
 import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
+import { StringConstants } from "../common/CommonText";
 
 export function Feed() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
@@ -39,24 +40,36 @@ export function Feed() {
 
   const posts = data?.flattenedPosts || [];
 
+  if (isLoading && posts.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto h-screen overflow-scroll">
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
-          {isLoading && posts.length === 0 ? (
-            <Loader />
-          ) : posts.length === 0 ? (
-            <div className="text-center text-zinc-400">No posts available</div>
+          {posts.length === 0 ? (
+            <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
           ) : (
-            posts.map((post, index) => (
-              <PostCard
-                key={post._id}
-                post={post}
-                ref={index === posts.length - 1 ? lastPostElementRef : null}
-              />
-            ))
+            <>
+              {posts.map((post: any, index) => (
+                <PostCard
+                  key={post._id}
+                  post={post}
+                  ref={index === posts.length - 1 ? lastPostElementRef : null}
+                />
+              ))}
+              {isFetchingNextPage && (
+                <div className="flex justify-center py-4">
+                  <Loader  />
+                </div>
+              )}
+            </>
           )}
-          {isFetchingNextPage && <Loader />}
         </TabsContent>
       </Tabs>
     </div>

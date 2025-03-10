@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { StringConstants } from "./common/CommonText";
 
 const categories = [
   { _id: "6702403bf7b07c3742024dd0", name: "Art and Design", icon: "🎨" },
@@ -109,7 +110,7 @@ export default function TopicSelectionModal({
       <DialogContent className="max-w-4xl text-zinc-200">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
-            Explore your favourite topics
+            {StringConstants.EXPLORE_TOPICS}
           </DialogTitle>
         </DialogHeader>
         <div className="max-h-[400px] px-2 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
@@ -136,7 +137,7 @@ export default function TopicSelectionModal({
             className="bg-primary-gradient px-8"
             disabled={selectedTopics.length === 0}
           >
-            Submit
+            {StringConstants.SUBMIT}
           </Button>
         </div>
       </DialogContent>
