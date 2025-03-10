@@ -8,6 +8,7 @@ import PostCard from "./PostCard";
 import CommunityCard from "./CommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/constants";
+import { StringConstants } from "../common/CommonText";
 
 interface Community {
   community: {
@@ -140,13 +141,13 @@ function SearchPageContent() {
       {!loading && !error && (
         <>
           <h1 className="text-2xl font-bold text-muted mb-6">
-            Search Results for &quot;{query}&quot;
+            {StringConstants.SEARCH_RESULTS_FOR} &quot;{query}&quot;
           </h1>
 
           {results.length === 0 ? (
             <div className="text-center text-gray-400 p-8">
-              <p>No results found</p>
-              <p className="text-sm">Try searching with different keywords</p>
+              <p>{StringConstants.NO_RESULTS_FOUND}</p>
+              <p className="text-sm">{StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
+import { StringConstants } from "../common/CommonText";
 
 
 interface CreatorFormProps {
@@ -53,7 +54,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     queryKey: ["categories"],
     queryFn: async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/`);
-      if (!response && !response.ok) {
+      if (!response || !response.ok) {
         throw new Error("Failed to fetch categories");
       }
       const data = await response.json();
@@ -138,12 +139,12 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     (session && (<DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
       <DialogHeader className="flex items-center justify-between">
         <DialogTitle className="text-xl font-normal">
-          Fill to become a creator
+          Fill to create your page
         </DialogTitle>
       </DialogHeader>
       <div className="space-y-4 py-4">
         <div className="space-y-2">
-          <Label>Community Name</Label>
+          <Label>Page Name</Label>
           <Input
             name="name"
             value={formData.name}
@@ -153,7 +154,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Select Topic</Label>
+          <Label>{StringConstants.SELECT_TOPICS}</Label>
           <Select onValueChange={handleCategoryChange}>
             <SelectTrigger className="bg-background border-none">
               <SelectValue placeholder="Select your topic" />
@@ -168,7 +169,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Tags</Label>
+          <Label>{StringConstants.TAGS}</Label>
           <Input
             name="tags"
             value={formData.tags}
@@ -178,12 +179,12 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Community Description</Label>
+          <Label>{StringConstants.ABOUT_THE_PAGE}</Label>
           <Textarea
             name="description"
             value={formData.description}
             onChange={handleInputChange}
-            placeholder="Type anything"
+            placeholder="Briefly describe your page"
             className="bg-background border-none min-h-[30px]"
           />
         </div>
@@ -194,11 +195,11 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           onClick={onClose}
           className="text-muted bg-transparent border-gray-600 hover:bg-background"
         >
-          Cancel
+          {StringConstants.CANCEL}
         </Button>
 
         <Button className="text-white" onClick={handleSubmit}>
-          Create
+         {StringConstants.CREATE}
         </Button>
       </div>
     </DialogContent>) 

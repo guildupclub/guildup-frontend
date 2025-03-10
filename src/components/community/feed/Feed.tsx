@@ -18,6 +18,7 @@ import { FaUsers } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "@/components/Loader";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface Post {
   _id: string;
@@ -71,14 +72,14 @@ export function Feed({ communityId }: FeedProps) {
               href="/explore"
               className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
             >
-              Explore Communities
+             {StringConstants.EXPLORE_COMMUNITY} 
             </Link>
             {!session && (
               <Link
                 href="/api/auth/signin"
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Sign In
+                {StringConstants.SIGN_IN}
               </Link>
             )}
           </div>
@@ -94,7 +95,7 @@ export function Feed({ communityId }: FeedProps) {
         <div className="flex items-center justify-between py-4 border-b border-zinc-300">
           <div className="flex items-center text-muted gap-2">
             <FileText className="w-5 h-5" />
-            <h1 className="text-xl font-semibold">Feed</h1>
+            <h1 className="text-xl font-semibold">{StringConstants.FEED}</h1>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon">
@@ -151,7 +152,7 @@ export function Feed({ communityId }: FeedProps) {
         {/* Error state */}
         {error && (
           <div className="py-8 text-center">
-            <p className="text-red-500">Error loading posts. Please try again.</p>
+            <p className="text-red-500">`${StringConstants.ERROR_LOADING_POSTS} ${StringConstants.PLEASE_TRY_AGAIN}`</p>
           </div>
         )}
 
@@ -162,7 +163,7 @@ export function Feed({ communityId }: FeedProps) {
               <Loader />
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center text-zinc-400">No posts available</div>
+            <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
           ) : (
             posts.map((post) => <PostCard key={post._id} post={post} />)
           )}

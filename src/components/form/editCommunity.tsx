@@ -16,6 +16,7 @@ import Image from "next/image";
 import { RootState } from "@/redux/store";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface Category {
   _id: string;
@@ -64,7 +65,7 @@ export function EditCommunityModal({
   const [isLoading, setIsLoading] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
-  const community = useSelector((state: RootState) => state.community);
+  const community: any = useSelector((state: RootState) => state.community);
   const communityId = community?.communityId;
   const communityData = community?.communityData;
   const userId = user?._id;
@@ -148,7 +149,7 @@ export function EditCommunityModal({
       formDataToSend.append("userId", userId);
       
       // Add tags as a comma-separated string
-      formDataToSend.append("tags", formData.tags.join(","));
+      formDataToSend.append("additional_tags", formData.tags.join(","));
       
       // Add rules if available
       if (formData.rules) {
@@ -169,7 +170,6 @@ export function EditCommunityModal({
         formDataToSend.append("background_image", bgImageFile);
       }
 
-      console.log("@formDataToSend",formDataToSend)
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
         body: formDataToSend, // No Content-Type header needed, browser sets it with boundary
@@ -200,14 +200,14 @@ export function EditCommunityModal({
         queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
         queryClient.invalidateQueries({ queryKey: ["communityProfile", communityId] });
         
-        toast.success("Community updated successfully");
+        toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
       } else {
-        toast.error(data.e || "Failed to update community");
+        toast.error(data.e || StringConstants.PAGE_UPDATION_FAILED);
       }
     } catch (error) {
-      console.error("Failed to update community:", error);
-      toast.error("Failed to update community");
+      console.error(StringConstants.PAGE_UPDATION_FAILED, error);
+      toast.error(StringConstants.PAGE_UPDATION_FAILED);
     } finally {
       setIsLoading(false);
     }
@@ -217,12 +217,12 @@ export function EditCommunityModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] bg-white text-black">
         <DialogHeader>
-          <DialogTitle>Edit Community</DialogTitle>
+          <DialogTitle>{StringConstants.EDIT_PAGE}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Community Name</Label>
+            <Label htmlFor="name">{StringConstants.PAGE_NAME}</Label>
             <Input
               id="name"
               value={formData.name}
@@ -233,7 +233,7 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{StringConstants.PAGE_DESCRIPTION}</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -244,14 +244,14 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>Tags</Label>
+            <Label>{StringConstants.TAGS}</Label>
             <div className="flex gap-2">
               <Input
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add a tag"
               />
-              <Button onClick={handleAddTag}>Add</Button>
+              <Button onClick={handleAddTag}>{StringConstants.ADD}</Button>
             </div>
             <div className="flex flex-wrap gap-2 mt-2">
               {formData.tags.map((tag: any) => (
@@ -270,7 +270,7 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>Profile Image</Label>
+            <Label>{StringConstants.PROFILE_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.image && (
                 <Image
@@ -293,7 +293,7 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>Background Imagea</Label>
+            <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.bgImage && (
                 <Image
@@ -315,8 +315,9 @@ export function EditCommunityModal({
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="rules">Community Rules</Label>
+{/* removing it for the demo purposes */}
+          {/* <div className="grid gap-2">
+            <Label htmlFor="rules">{StringConstants.PAGE_RULES}</Label>
             <Textarea
               id="rules"
               value={formData.rules}
@@ -324,12 +325,12 @@ export function EditCommunityModal({
                 setFormData({ ...formData, rules: e.target.value })
               }
             />
-          </div>
+          </div> */}
         </div>
 
         <div className="flex justify-end gap-4">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {StringConstants.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}

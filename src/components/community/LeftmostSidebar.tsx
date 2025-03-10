@@ -21,6 +21,7 @@ import CreatorForm from "../form/CreatorForm";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { StringConstants } from "../common/CommonText";
 import { useLeaveCommunity, useJoinCommunity } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
 
@@ -189,7 +190,7 @@ const handleJoinCommunity = async (communityId: string) => {
     }
   };
 
-  // Function to get initials from community name
+  // Function to get initials from page name
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -223,12 +224,11 @@ const handleJoinCommunity = async (communityId: string) => {
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
-        Error loading communities
+        {StringConstants.ERROR_LOADING_PAGES}
       </div>
     );
   }
 
-  console.log("@communities",communities)
   return (
     <div className="fixed left-0 h-screen w-20 bg-card flex flex-col items-center border-r border-background py-20">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
@@ -272,6 +272,7 @@ const handleJoinCommunity = async (communityId: string) => {
 
                 }}
               >
+                  {console.log("@sidemostnar", community.name)}
                 <Avatar className="w-full h-full ">
                   <AvatarImage
                     src={community.image && community.image !== "" ? community.image: `/placeholder.svg?text=${getInitials(community.name)}`}

@@ -22,6 +22,7 @@ import { AppDispatch, RootState } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 import { Button } from "@/components/ui/button";
 import { setActiveCommunity } from "@/redux/channelSlice";
+import { StringConstants } from "@/components/common/CommonText";
 // Optionally, if you're updating selected topics in the topic slice
 // import { setSelectedTopics } from "@/redux/topicSlice";
 
@@ -499,7 +500,7 @@ export function LeftSidebar() {
           className="space-y-2  py-2"
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium border-b border-zinc-300 py-2 ">
-            My Communities
+            {StringConstants.PAGE_FOLLOWED}
             {openSections.communities ? (
               <ChevronUp className="h-4 w-4" />
             ) : (

@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { EditCommunityModal } from "../form/editCommunity";
+import { StringConstants } from "../common/CommonText";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const { data: session } = useSession();
@@ -133,13 +134,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <li className="w-18 px-3 rounded-xl">
                     <Link href="/" className="flex flex-col items-center px-3 py-1.5">
                       <Home className="h-6 w-6" />
-                      <span className="h-6">Home</span>
+                      <span className="h-6">{StringConstants.HOME}</span>
                     </Link>
                   </li>
                   <li className="w-18  px-3 rounded-xl">
                     <Link href="/explore" className="flex flex-col items-center">
                       <Compass className="h-6 w-6" />
-                      <span className="">Explore</span>
+                      <span className="">{StringConstants.EXPLORE}</span>
                     </Link>
                   </li>
                   <li className="w-18 px-3 rounded-xl">
@@ -152,7 +153,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="flex flex-col items-center justify-center"
                     >
                       <Users className="w-6 h-6" />
-                      <span>Experts</span>
+                      <span>{StringConstants.EXPERTS}</span>
                     </Link>
                   </li>
                   {/* ss */}
@@ -166,10 +167,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
                         <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
                           <Avatar className="h-10 w-10">
-                            {user?.avatar ? (
-                              <AvatarImage src={user?.avatar} alt="User" />
+                            {session?.user?.image ? (
+                              <AvatarImage src={session?.user?.image} alt="User" />
                             ) : (
-                              <AvatarFallback>{user?.email.length>0 ? user.email[0] : "U"}</AvatarFallback>
+                              <AvatarFallback>AR</AvatarFallback>
                             )}
                           </Avatar>
                         </Button>
@@ -184,7 +185,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
                       >
-                        Sign out
+                        {StringConstants.SIGN_OUT}
                       </DropdownMenuItem>
                       {/* <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
                         <Link href='/profile'>Profile</Link>
@@ -203,7 +204,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </DropdownMenu>
                 ) : (
                   <Button className="bg-primary-gradient" onClick={() => signIn()}>
-                    Sign in
+                    {StringConstants.SIGN_IN}
                   </Button>
                 )}
               </div>
@@ -217,14 +218,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
           <Link href="/" className="flex flex-col items-center justify-center">
             <Home className="w-6 h-6" />
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs mt-1">{StringConstants.HOME}</span>
           </Link>
           <Link
             href="/explore"
             className="flex flex-col items-center justify-center"
           >
             <Compass className="w-6 h-6" />
-            <span className="text-xs mt-1">Explore</span>
+            <span className="text-xs mt-1">{StringConstants.EXPLORE}</span>
           </Link>
           {/* <Link
             href="/snips"
@@ -258,12 +259,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage
-                  src={user.image || "/placeholder.svg"}
+                  src={session?.user?.image || ""}
                   alt="User"
                 />
                 <AvatarFallback>HHH</AvatarFallback>
               </Avatar>
-              <span className="text-xs mt-1">Sign out</span>
+              <span className="text-xs mt-1">{StringConstants.SIGN_IN}</span>
             </button>
           ) : (
             <button

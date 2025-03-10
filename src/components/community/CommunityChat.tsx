@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { API_BASE_URL } from "@/config/constants";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { StringConstants } from "../common/CommonText";
 
 interface Post {
   id: string;
@@ -97,17 +98,16 @@ function ChatContent() {
   if (!activeChannel) {
     return (
       <div className="flex items-center justify-center h-screen text-muted">
-        Please select a channel to start chatting
+        {StringConstants.SELECT_CHANNEL_TO_START_CHATTING}
       </div>
     );
   }
 
-  if (isLoading)
-    return <div className="text-center py-10">Loading posts...</div>;
+  if (isLoading) return <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>;
   if (error)
     return (
       <div className="text-center py-10 text-red-500">
-        Error: {error.message}. Please try again.
+        {StringConstants.ERROR} {(error as Error).message}. {StringConstants.PLEASE_TRY_AGAIN}
       </div>
     );
 
@@ -116,7 +116,7 @@ function ChatContent() {
       {/* Channel Header */}
       <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
-          # {activeChannel.name || "Unnamed Channel"}
+          {StringConstants.HASHTAG} {activeChannel.name || "Unnamed Channel"}
         </h1>
         <Settings className="h-5 w-5" />
       </div>
@@ -128,7 +128,7 @@ function ChatContent() {
             {posts.length > 0 ? (
               posts.map((post:any) => <PostCard key={post.id} {...post} />)
             ) : (
-              <div className="text-center text-muted">No posts yet</div>
+              <div className="text-center text-muted">{StringConstants.NO_POSTS_YET}</div>
             )}
           </div>
         </ScrollArea>

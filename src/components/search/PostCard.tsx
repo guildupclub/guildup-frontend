@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import guildup_logo from "../../../public/guildup_logo.svg";
+import { StringConstants } from "../common/CommonText";
 interface PostCardProps {
   post: {
     _id: string;
@@ -53,7 +54,7 @@ function PostCard({ post, onClick }: PostCardProps) {
             {formatDistanceToNow(new Date(post.posted_at), { addSuffix: true })}
           </span>
           <span className="text-xs text-gray-500">
-            {post.up_votes - post.down_votes} votes
+            {post.up_votes - post.down_votes} {StringConstants.VOTE}
           </span>
         </div>
       </div>
