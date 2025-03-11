@@ -36,15 +36,20 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTopCommunity = async () => {
+    const fetchCommunities = async () => {
       setLoading(true);
       try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
-          { categoryId: activeCategory }
-        );
-        setCommunities(response.data);
-        console.log("Here in CommunitySection.tsx", response.data.data);
+        let response;
+        if (activeCategory === "all") {
+          response = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?limit=100`
+          );
+        } else {
+          response = await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
+            { categoryId: activeCategory }
+          );
+        }
 
         if (
           response &&
@@ -64,7 +69,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     };
 
     if (activeCategory) {
-      fetchTopCommunity();
+      fetchCommunities();
     }
   }, [activeCategory]);
 
@@ -89,7 +94,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
       dispatch(
         setActiveCommunity({
           id: community._id,
-          name: community.name, 
+          name: community.name,
         })
       );
 
@@ -97,7 +102,6 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     },
     [dispatch, router]
   );
-
 
   return (
     <div className="bg-background min-h-screen lg:p-4">

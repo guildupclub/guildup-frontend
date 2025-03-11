@@ -51,7 +51,7 @@ function CommunityCard({
       </div>
 
       {/* Profile Image */}
-      <div className="absolute left-4 top-[50px] w-14 h-14 rounded-full border-4 border-white">
+      <div className="absolute left-4 top-[50px] rounded-full border border-white">
         <Image
           src={
             community.community.image && community.community.image !== ""
@@ -61,12 +61,12 @@ function CommunityCard({
           alt="Profile"
           width={64}
           height={64}
-          className="rounded-full object-cover"
+          className="rounded-full object-cover h-16 w-16"
         />
       </div>
 
       {/* Card Content */}
-      <div className="p-4 pt-8 flex-1">
+      <div className="p-4 pt-10 flex-1">
         {/* Name & Stats */}
         <h3 className="font-semibold text-gray-800 text-lg">
           {communityDetails?.name}
