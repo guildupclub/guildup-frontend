@@ -234,10 +234,10 @@ export function Sidebar() {
         </div>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === "/community/profile"
+          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation("/community/profile")}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
         >
           <FaUserAlt />
           {StringConstants.PROFILE}
@@ -246,10 +246,16 @@ export function Sidebar() {
         {/* Feed */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === `/community/${activeCommunityId}/feed`
+          className={`w-full justify-start gap-2 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
+            onClick={() => {
+              if (activeCommunityId) {
+                handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+              } else {
+                console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+              }
+            }}            
         >
           <Rss className="h-4 w-4" />
           {StringConstants.FEED}
@@ -258,10 +264,10 @@ export function Sidebar() {
         {/* Members */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === "/community/members"
+          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation("/community/members")}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
         >
           <FaUserGroup />
           {StringConstants.MEMBER}
@@ -418,7 +424,7 @@ export function Sidebar() {
                         type: channel.type,
                       })
                     );
-                    handleNavigation(`/community/channel/${channel.name}`);
+                    handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
                   }}
                 >
                   <Hash />
@@ -441,22 +447,28 @@ export function Sidebar() {
     {/* Mobile View */}
       <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/profile" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation("/community/profile")}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
         >
           Profile
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `/community/${activeCommunityId}/feed` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => {
+            if (activeCommunityId) {
+              handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+            } else {
+              console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+            }
+          }}          
         >
           Feed
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/members" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation("/community/members")}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
         >
           Members
         </button>
@@ -468,7 +480,7 @@ export function Sidebar() {
             className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
             onClick={() => {
               dispatch(setActiveChannel(channel));
-              handleNavigation(`/community/channel/${channel.name}`);
+              handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
             }}
           >
             {channel.name}
