@@ -3,6 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface Community {
   id: string;
   name: string;
+  image:string,
+  background_image:string
 }
 
 interface Channel {

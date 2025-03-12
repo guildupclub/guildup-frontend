@@ -35,7 +35,8 @@ interface Community {
   description: string;
   subscription: boolean;
   subscription_price: number;
-  num_member: number;
+  image: string;
+  background_image: string;
 }
 
 export function LeftmostSidebar() {
@@ -139,7 +140,9 @@ export function LeftmostSidebar() {
       dispatch(
         setActiveCommunity({
           id: validCommunities[0]._id,
-          name: validCommunities[0].name, // Include name
+          name: validCommunities[0].name,
+          image: validCommunities[0].image,
+          background_image: validCommunities[0].background_image,
         })
       );
     }
@@ -263,6 +266,8 @@ export function LeftmostSidebar() {
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
+                      image: community.image,
+                      background_image: community.background_image,
                     })
                   );
                   dispatch(
