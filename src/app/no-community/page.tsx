@@ -15,8 +15,8 @@ const NoCommunitySelected = () => {
 
   const handleCreateCommunity = () => {
     if (!session) {
-      signIn("google");
-    } 
+      signIn("google", { callbackUrl: "/" });
+    }
   };
 
   return (

@@ -33,8 +33,13 @@ function Page() {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
       );
-      setCategory(response.data.data);
-      setSelectedCategory(response.data.data[0]?._id || "");
+      // setCategory(response.data.data);
+      // setSelectedCategory(response.data.data[0]?._id || "");
+      
+      setCategory([{ _id: "all", name: "All Category" }, ...response.data.data]);
+      setSelectedCategory("all");
+      
+
     };
     fetchCategory();
   }, []);

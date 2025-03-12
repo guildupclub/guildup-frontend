@@ -13,6 +13,7 @@ import {
   Edit,
   Instagram,
   Trash2,
+  Pencil,
   Video,
 } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
@@ -290,7 +291,7 @@ export function ProfileCard() {
                     className="p-1 rounded-md hover:bg-background transition"
                     onClick={() => setIsEditOpen(true)}
                   >
-                    <FiEdit
+                    <Pencil
                       size={18}
                       className="text-muted hover:text-primary"
                     />

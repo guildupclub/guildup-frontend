@@ -19,7 +19,8 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
   // On component mount, select the first category by default
   useEffect(() => {
     if (categorys.length > 0) {
-      setSelectedCategory(categorys[0]._id);
+      setSelectedCategory(categorys[0]._id); 
+      selectCategory(categorys[0]._id);
     }
   }, [categorys, selectCategory]);
 

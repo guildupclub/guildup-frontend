@@ -123,10 +123,12 @@ export function EditCommunityModal({
   const handleAddTag = () => {
     if (newTag && !formData.tags.includes(newTag)) {
       setFormData({ ...formData, tags: [...formData.tags, newTag] });
+      
       setNewTag("");
     }
   };
 
+  console.log("formData.tags", formData.tags);
   const handleRemoveTag = (tagToRemove: string) => {
     setFormData({
       ...formData,
@@ -141,31 +143,31 @@ export function EditCommunityModal({
 
       // Create FormData object for multipart/form-data submission
       const formDataToSend = new FormData();
-      
+
       // Add text fields
       formDataToSend.append("communityId", communityId);
       formDataToSend.append("name", formData.name);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("userId", userId);
-      
+
       // Add tags as a comma-separated string
       formDataToSend.append("additional_tags", formData.tags.join(","));
-      
+
       // Add rules if available
       if (formData.rules) {
         formDataToSend.append("rules", formData.rules);
       }
-      
+
       // Add category if available
       if (formData.category) {
         formDataToSend.append("category", formData.category);
       }
-      
+
       // Add image files if selected
       if (imageFile) {
         formDataToSend.append("image", imageFile);
       }
-      
+
       if (bgImageFile) {
         formDataToSend.append("background_image", bgImageFile);
       }
@@ -195,11 +197,13 @@ export function EditCommunityModal({
             },
           },
         });
-        
+
         // Invalidate relevant queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-        queryClient.invalidateQueries({ queryKey: ["communityProfile", communityId] });
-        
+        queryClient.invalidateQueries({
+          queryKey: ["communityProfile", communityId],
+        });
+
         toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
       } else {
@@ -233,7 +237,9 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">{StringConstants.PAGE_DESCRIPTION}</Label>
+            <Label htmlFor="description">
+              {StringConstants.PAGE_DESCRIPTION}
+            </Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -315,7 +321,7 @@ export function EditCommunityModal({
             </div>
           </div>
 
-{/* removing it for the demo purposes */}
+          {/* removing it for the demo purposes */}
           {/* <div className="grid gap-2">
             <Label htmlFor="rules">{StringConstants.PAGE_RULES}</Label>
             <Textarea
