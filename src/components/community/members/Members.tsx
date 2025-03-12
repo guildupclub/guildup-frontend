@@ -22,6 +22,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { RootState } from "@/redux/store";
+import { StringConstants } from "@/components/common/CommonText";
 
 interface User {
   _id: string;
@@ -44,7 +45,11 @@ interface MembersResponse {
   data: Member[];
 }
 
-export default function Members() {
+interface MembersProps {
+  communityId: string;
+}
+
+export default function Members({communityId}: MembersProps) {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,7 +63,7 @@ export default function Members() {
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );
-  const communityId = activeCommunity?.id;
+  const activeCommunityId = activeCommunity?.id;
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -68,7 +73,7 @@ export default function Members() {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ communityId }),
+            body: JSON.stringify({ communityId: activeCommunityId }),
           }
         );
 
@@ -83,7 +88,7 @@ export default function Members() {
       }
     };
 
-    if (communityId) fetchMembers();
+    if (activeCommunityId) fetchMembers();
   }, [communityId]);
 
   const handleRemoveClick = (userId: string) => {
@@ -136,7 +141,7 @@ export default function Members() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-muted">
           <UserCircle className="h-5 w-5 text-accent" />
-          Community Members
+          {StringConstants.FOLLOWER}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -172,24 +177,24 @@ export default function Members() {
                         <div className="flex gap-1">
                           {member.is_owner && (
                             <Badge className="bg-primary-gradient text-card">
-                              Owner
+                              {StringConstants.OWNER}
                             </Badge>
                           )}
                           {member.is_moderator && (
                             <Badge className="bg-green-500 text-muted-foreground">
-                              Moderator
+                              {StringConstants.MODERATOR}
                             </Badge>
                           )}
                           {member.is_banned && (
                             <Badge className="bg-red-500 text-muted-foreground">
-                              Banned
+                              {StringConstants.BANNED}
                             </Badge>
                           )}
                         </div>
                       </div>
                       <p className="text-sm text-start text-muted-foreground">
-                        Joined {formatDistanceToNow(new Date(member.createdAt))}{" "}
-                        ago
+                        {StringConstants.JOINED} {formatDistanceToNow(new Date(member.createdAt))}{" "}
+                        {StringConstants.AGO}
                       </p>
                     </div>
                   </div>
@@ -208,7 +213,7 @@ export default function Members() {
                           className="cursor-pointer"
                           onClick={() => handleRemoveClick(member.user_id._id)}
                         >
-                          Remove User
+                          {StringConstants.REMOVE_USER}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -222,18 +227,18 @@ export default function Members() {
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent>
           <DialogHeader>
-            <h2 className="text-lg font-semibold">Confirm Removal</h2>
+            <h2 className="text-lg font-semibold">{StringConstants.CONFIRM_REMOVAL}</h2>
           </DialogHeader>
-          <p>Are you sure you want to remove this user?</p>
+          <p>{StringConstants.REMOVAL_CONFIRMATION}</p>
           <DialogFooter>
             <Button
               variant="secondary"
               onClick={() => setShowConfirmModal(false)}
             >
-              Cancel
+              {StringConstants.CANCEL}
             </Button>
             <Button variant="destructive" onClick={confirmRemoveUser}>
-              Remove
+              {StringConstants.REMOVE}
             </Button>
           </DialogFooter>
         </DialogContent>

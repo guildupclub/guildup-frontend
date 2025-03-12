@@ -8,7 +8,7 @@ export default function CommunityLayout({ children }: { children: ReactNode }) {
       <LeftmostSidebar />
       <div className="flex flex-col md:ml-20">
         <Sidebar />
-        <div className="flex flex-1 pe-2 md:ml-80">{children}</div>
+        <div className="flex md:ml-80">{children}</div>
       </div>
     </div>
   );

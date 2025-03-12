@@ -32,6 +32,7 @@ import { FaUserGroup } from "react-icons/fa6";
 import { setMemberDetails } from "@/redux/memberSlice";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
+import { StringConstants } from "../common/CommonText";
 
 export function Sidebar() {
   const dispatch = useDispatch();
@@ -214,14 +215,14 @@ export function Sidebar() {
           {activeCommunityName}
         </h2>
 
-        {isAdmin && (
+        {/* {isAdmin && (
           <button
             className="p-1 rounded-md hover:bg-background transition"
             onClick={() => setIsEditOpen(true)}
           >
             <FiEdit size={18} className="text-muted hover:text-primary" />
           </button>
-        )}
+        )} */}
       </div>
 
       <Separator />
@@ -233,37 +234,43 @@ export function Sidebar() {
         </div>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === "/community/profile"
+          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation("/community/profile")}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
         >
           <FaUserAlt />
-          Profile
+          {StringConstants.PROFILE}
         </Button>
 
         {/* Feed */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === `/community/${activeCommunityId}/feed`
+          className={`w-full justify-start gap-2 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
+            onClick={() => {
+              if (activeCommunityId) {
+                handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+              } else {
+                console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+              }
+            }}            
         >
           <Rss className="h-4 w-4" />
-          Feed
+          {StringConstants.FEED}
         </Button>
 
         {/* Members */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === "/community/members"
+          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation("/community/members")}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
         >
           <FaUserGroup />
-          Members
+          {StringConstants.MEMBER}
         </Button>
 
         {/* Announcements */}
@@ -301,7 +308,7 @@ export function Sidebar() {
           className={`w-full text-white ${isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"}`}
           onClick={() => handleNavigation("/creator-studio")}
         >
-          Creator Studio
+          {StringConstants.CREATOR_STUDIO}
         </Button>
 
         {/* )} */}
@@ -338,7 +345,7 @@ export function Sidebar() {
                       className="bg-card border-background " />
                   </div>
                   <div className="grid gap-2">
-                    <Label>Channel Type</Label>
+                    <Label>{StringConstants.CHANNEL_TYPE}</Label>
                     <Select
                       value={formData.type}
                       onValueChange={(value) => setFormData({ ...formData, type: value })}
@@ -347,18 +354,18 @@ export function Sidebar() {
                         <SelectValue placeholder="Select your topics" />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-background text-muted">
-                        <SelectItem value="discussion">Discussion</SelectItem>
-                        <SelectItem value="chat">Chat</SelectItem>
+                        <SelectItem value="discussion">{StringConstants.DISCUSSION}</SelectItem>
+                        <SelectItem value="chat">{StringConstants.CHAT}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-2">
                     <Label className="flex items-center gap-2">
-                      Want to lock your channel?
+                      {StringConstants.LOCK_CHANNEL_MESSAGE}
                       <div className="relative group">
                         <Info className="w-4 h-4 text-muted cursor-pointer" />
                         <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
-                          Do you want to make this channel private?
+                          {StringConstants.PVT_CHANNEL_MESSAGE}
                         </span>
                       </div>
                     </Label>
@@ -372,11 +379,11 @@ export function Sidebar() {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="true" id="yes" />
-                        <Label htmlFor="yes">Yes</Label>
+                        <Label htmlFor="yes">{StringConstants.YES}</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="false" id="no" />
-                        <Label htmlFor="no">No</Label>
+                        <Label htmlFor="no">{StringConstants.NO}</Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -387,7 +394,7 @@ export function Sidebar() {
                     onClick={() => setIsChannelOpen(false)}
                     className="bg-transparent border-background hover:bg-background text-muted-foreground"
                   >
-                    Cancel
+                    {StringConstants.CANCEL}
                   </Button>
                   <Button
                     onClick={handleCreateChannel}
@@ -417,7 +424,7 @@ export function Sidebar() {
                         type: channel.type,
                       })
                     );
-                    handleNavigation(`/community/channel/${channel.name}`);
+                    handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
                   }}
                 >
                   <Hash />
@@ -440,22 +447,28 @@ export function Sidebar() {
     {/* Mobile View */}
       <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/profile" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation("/community/profile")}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
         >
           Profile
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `/community/${activeCommunityId}/feed` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(`/community/${activeCommunityId}/feed`)}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => {
+            if (activeCommunityId) {
+              handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+            } else {
+              console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+            }
+          }}          
         >
           Feed
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === "/community/members" ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation("/community/members")}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
         >
           Members
         </button>
@@ -467,7 +480,7 @@ export function Sidebar() {
             className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
             onClick={() => {
               dispatch(setActiveChannel(channel));
-              handleNavigation(`/community/channel/${channel.name}`);
+              handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
             }}
           >
             {channel.name}

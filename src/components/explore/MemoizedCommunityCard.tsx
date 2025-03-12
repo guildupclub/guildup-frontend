@@ -30,15 +30,16 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
 
+  console.log("@communityDetails",communityDetails,community)
   return (
     <Card
       onClick={onClick}
-      className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
+      className="relative w-full border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
       <div className="relative h-[80px] w-full bg-gray-200">
         <Image
-          src={community.image || "/defaultCommunityIcon.png"}
+          src={community.community.background_image && community.community.background_image !== "" ? community.community.background_image : "/defaultCommunityIcon.png"}
           alt="Background"
           fill
           className="object-cover"
@@ -48,7 +49,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
       {/* Profile Image */}
       <div className="absolute left-4 top-[50px] w-14 h-14 rounded-full border-4 border-white">
         <Image
-          src={community.icon || "/defaultCommunityIcon.png"}
+          src={community.community.image && community.community.image !== "" ? community.community.image : "/defaultCommunityIcon.png"}
           alt="Profile"
           width={64}
           height={64}

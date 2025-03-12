@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +15,10 @@ import {
 } from "lucide-react";
 import { Comment } from "./Comment";
 import CommentSection from "./CommentSection/CommentSection";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setCommunityData } from "@/redux/communitySlice";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
 import Image from 'next/image';
@@ -35,11 +38,13 @@ interface PostCardProps {
     upvote_userId: any;
     replies?: any;
     media?: any;
+    user_id:any;
   };
   ref: any;
+  userID: string
 }
 
-export function PostCard({ post, ref }: PostCardProps) {
+export function PostCard({ post, ref, userID }: PostCardProps) {
   const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -47,6 +52,40 @@ export function PostCard({ post, ref }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(
     post.upvote_userId?.some((id: string) => id === user?.id) || false
   );
+
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleClickCommunity = useCallback(() => {
+    // Build community object from post fields
+    const community = {
+      _id: post.community_id,
+      name: post.community_name,
+      user_id: userID,
+    };
+
+    if (!community || !community._id) {
+      console.error("Invalid community data:", community);
+      return;
+    }
+
+    dispatch(
+      setCommunityData({
+        communityId: community._id,
+        userId: userID,
+      })
+    );
+
+    dispatch(
+      setActiveCommunity({
+        id: community._id,
+        name: community.name,
+      })
+    );
+
+    router.push("/community/profile");
+  }, [dispatch, router, post]);
+
   const handleSendComment = async () => {
     console.log("@user", user);
     const response = await axios.post(
@@ -127,14 +166,16 @@ export function PostCard({ post, ref }: PostCardProps) {
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
-          <Avatar className="h-10 w-10  border-2 border-purple-500">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>U</AvatarFallback>
-          </Avatar>
+          <div onClick={handleClickCommunity} className="cursor-pointer">
+            <Avatar className="h-10 w-10  border-2 border-purple-500">
+              <AvatarImage src="/placeholder.svg" />
+              <AvatarFallback>U</AvatarFallback>
+            </Avatar>
+          </div>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-muted">{post.title}</h3>
+                <h3 onClick={handleClickCommunity} className="font-medium text-muted cursor-pointer hover:underline">{post.title}</h3>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
                     {formatTimeAgo(post.created_At)}

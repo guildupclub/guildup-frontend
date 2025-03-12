@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface MemberDetails {
   _id: string;
   userId: string;
-  communityId: string;
+  community_id: string;
   role: string;
   joinedAt: string;
   status: string;

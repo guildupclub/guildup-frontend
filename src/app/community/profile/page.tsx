@@ -3,8 +3,7 @@ import { profileData } from "@/components/profile/types/DataTypes";
 
 export default function Page() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      ewfwefwfewfwefw
+    <div className="min-h-screen bg-background grow md:ml-6 md:py-24">
       <ProfileCard />
     </div>
   );
