@@ -1,9 +1,9 @@
 "use client";
 
-import type * as React from "react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
+import { Bell, Home, Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
+import { FaBars } from "react-icons/fa";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,10 +23,32 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { setCommunityData } from "@/redux/communitySlice";
+import React from "react";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import CreatorForm from "../form/CreatorForm";
+
+interface Community {
+  _id: string;
+  title: string;
+  name: string;
+  description: string;
+  subscription: boolean;
+  subscription_price: number;
+  num_member: number;
+}
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
+  const COMMUNITY_PROFILE_PATH= '/community/profile';
+  const COMMUNITY_MEMBERS_PATH= '/community/members';
+  const COMMUNITY_CHANNEL_PATH= '/community/channel';
+  const COMMUNITY_FEED_PATH= '/community/feed';
+  const COMMUNITY_PATH= '/community';
+  const FEED_PATH= '/feed';
   const { data: session } = useSession();
   const router = useRouter();
+  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
   const [isUser, setIsUser] = useState(true)
   // useEffect(() => {
@@ -37,8 +59,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   // }, [user]);
   // Assume communities are stored in state.community.communities (an array of Community)
   // const communities = useSelector((state: RootState) => state?.community?.communities);
-
+  const [isCreatorFormOpen, setIsCreatorFormOpen]= useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -52,7 +75,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: any) => state.channel.activeCommunity
   );
   const activeCommunityId = activeCommunity?.id;
-  console.log("khbjkn", activeCommunityId);
+
+  const communities = useSelector(
+    (state: RootState) => state?.user?.userFollowedCommunities
+  );
+  const getInitials = (name: string) => {
+    return name
+      // [0].toUpperCase();
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
 
   const handleSearch = () => {
@@ -78,31 +113,66 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   };
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [],)
+    if (typeof window !== "undefined") {
+      document.body.style.overflow = isSidebarOpen ? "hidden" : "auto";
+    }
+
+    // Optional cleanup if needed
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSidebarOpen]);
+
+  function handleSelectCommunity(community: any) {
+    dispatch(
+      setActiveCommunity({
+        id: community._id,
+        name: community.name,
+      })
+    );
+
+    if (user?._id) {
+      dispatch(
+        setCommunityData({
+          communityId: community._id,
+          userId: user._id,
+        })
+      );
+    }
+    router.push(COMMUNITY_PROFILE_PATH);
+    setIsSidebarOpen(false);
+  }
 
   return (
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 bg-card pt-2 px-4 lg:px-20 w-full flex",
+          "fixed top-0 z-50 bg-card pt-2 lg:px-20 w-full flex",
           props.className
         )}
         {...props}
       >
         <div className="container flex h-14 items-center px-5">
-          <Link href="/" className="flex items-center space-x-2 mr-6">
+          <div className="flex gap-1 items-center">
+            <button
+              className="md:hidden flex items-center justify-center mr-2"
+              onClick={() => setIsSidebarOpen((prev) => !prev)}
+            >
+              <FaBars className="h-6 w-6" />
+            </button>
+            <Link href="/" className="flex items-center space-x-2 mr-6">
             <Image
               src={Guildup_logo_mobile}
               alt="GuildUp logo"
               className="h-8 w-auto md:hidden"
             />
-            <Image
-              src={guildup_logo}
-              alt="GuildUp logo"
-              className="h-8 w-auto hidden md:block"
-            />
-          </Link>
+              <Image
+                src={guildup_logo || "/placeholder.svg"}
+                alt="GuildUp"
+                className="h-8 w-auto hidden md:block"
+              />
+            </Link>
+          </div>
 
           <div className="flex grow items-center justify-between">
             {/* Searchbar */}
@@ -147,8 +217,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <Link
                       href={
                         activeCommunityId
-                          ? `/community/${activeCommunityId}/feed`
-                          : `/community/feed`
+                          ? `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                          : `${COMMUNITY_FEED_PATH}`
                       }
                       className="flex flex-col items-center justify-center"
                     >
@@ -181,7 +251,27 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                       <DropdownMenuItem
+                      {/* <DropdownMenuItem
+                        asChild
+                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                      >
+                        <Link href="/profile">Profile</Link>
+                      </DropdownMenuItem> */}
+                      {/* <DropdownMenuItem
+                        asChild
+                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                      >
+                        <Link href="/bookings">Bookings</Link>
+                      </DropdownMenuItem> */}
+                      {/* {isUser && (
+                        <DropdownMenuItem
+                          asChild
+                          className="hover:bg-primary-gradient border-b border-zinc-300"
+                        >
+                          <Link href="/payments">Payments</Link>
+                        </DropdownMenuItem>
+                      )} */}
+                      <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
                       >
@@ -236,11 +326,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </Link> */}
           {activeCommunityId ? (
             <Link
-              href={`/community/${activeCommunityId}/feed`}
+              href={`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`}
               className="flex flex-col items-center justify-center"
             >
               <Users className="w-6 h-6" />
-              <span className="text-xs mt-1">My Community</span>
+              <span className="text-xs mt-1">{StringConstants.EXPERTS}</span>
             </Link>
           ) : (
             <Link
@@ -248,7 +338,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               className="flex flex-col items-center justify-center"
             >
               <Users className="w-6 h-6" />
-              <span className="text-xs mt-1">My Community</span>
+              <span className="text-xs mt-1">{StringConstants.EXPERTS}</span>
             </Link>
           )}
 
@@ -264,7 +354,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 />
                 <AvatarFallback>HHH</AvatarFallback>
               </Avatar>
-              <span className="text-xs mt-1">{StringConstants.SIGN_IN}</span>
+              <span className="text-xs mt-1">{StringConstants.SIGN_OUT}</span>
             </button>
           ) : (
             <button
@@ -275,9 +365,96 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <AvatarImage src="/placeholder.svg" alt="User" />
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
-              <span className="text-xs mt-1">Sign in</span>
+              <span className="text-xs mt-1">{StringConstants.SIGN_IN}</span>
             </button>
           )}
+        </div>
+      </div>
+
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-40 transition-opacity duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <div
+        className={cn(
+          "fixed top-16 left-0 h-screen w-64 bg-white shadow-md z-50 p-4 flex flex-col",
+          "transform transition-transform duration-300 ease-in-out border border-solid border-t border-l border-r border-gray-200",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="px-1">
+          <div className="space-y-3 pb-8">
+          {communities && communities.length > 0 ? (
+            communities.map((community: any) => {
+              const isActive = activeCommunityId === community._id
+              return (
+                <button
+                  key={community._id}
+                  className={cn(
+                    "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
+                    isActive
+                      ? "bg-blue-500/20"
+                      : "bg-card"
+                  )}
+                  onClick={() => handleSelectCommunity(community)}
+                >
+                  {/* Avatar */}
+                  <Avatar className={`w-10 h-10 rounded-lg ${isActive? "ring-2 ring-purple-500": 'null'}`}>
+                    <AvatarImage
+                      src={`/placeholder.svg?text=${getInitials(community.name)}`}
+                      alt={community.name}
+                      className="!rounded-lg"
+                    />
+                    <AvatarFallback className="!rounded-lg">
+                      {getInitials(community.name)}
+                    </AvatarFallback>
+                  </Avatar>
+    
+                  {/* Community Name */}
+                  <span
+                    className={cn(
+                      "font-medium text-sm",
+                      isActive ? "text-blue-600 " : "text-gray-800"
+                    )}
+                  >
+                    {community.name}
+                  </span>
+    
+                  {/* Subscription Star (optional) */}
+                  {community.subscription && (
+                    <span className="ml-auto text-yellow-500 text-sm">⭐</span>
+                  )}
+                </button>
+              )
+            })
+          ) : (
+            <p className="text-center">{StringConstants.NO_COMMUNITIES_AVAILABLE}</p>
+          )}
+        </div>
+        <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
+            <h4 className="text-base font-medium">{StringConstants.CREATE_A_PAGE}</h4>
+            <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </DialogTrigger>
+              <CreatorForm
+                onClose={() => setIsCreatorFormOpen(false)}
+              // onSuccess={() => {
+              // Invalidate the cache when a new community is created
+              // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+              // }}
+              />
+            </Dialog>
+          </div>
         </div>
       </div>
 

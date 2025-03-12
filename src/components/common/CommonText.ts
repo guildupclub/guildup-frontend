@@ -114,7 +114,8 @@ export const StringConstants = {
     PRICE: 'Price',
     TITLE: 'Title',
     TYPE: 'Type',
-
+    NO_COMMUNITIES_AVAILABLE: 'No communities available',
+    PUBLIC: 'Public'
 
 }
 

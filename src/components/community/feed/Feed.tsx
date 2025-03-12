@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { FileText, Settings } from "lucide-react";
+import { FileText, Plus, Settings } from "lucide-react";
 import { useCommunityPosts } from "@/hook/queries/useCommunityQueries";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -89,17 +89,24 @@ export function Feed({ communityId }: FeedProps) {
   }
 
   return (
-    <div className="min-h-screen py-20">
-      <div className="max-w-5xl mx-auto px-4">
+    <div className="min-h-screen grow py-2 md:py-24">
+      <div className="max-w-5xl px-2 md:ps-6 flex flex-col gap-6">
         {/* Header */}
-        <div className="flex items-center justify-between py-4 border-b border-zinc-300">
+        <div className="flex items-center justify-between rounded-xl border-b border-zinc-300 bg-card px-6 py-3">
           <div className="flex items-center text-muted gap-2">
             <FileText className="w-5 h-5" />
             <h1 className="text-xl font-semibold">{StringConstants.FEED}</h1>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="hidden md:block">
               <Settings className="w-5 h-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden w-7 h-7 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+            >
+              <Plus className="h-5 w-5" />
             </Button>
           </div>
         </div>
@@ -157,7 +164,7 @@ export function Feed({ communityId }: FeedProps) {
         )}
 
         {/* Posts */}
-        <div className="space-y-6 py-4">
+        <div className="space-y-6">
           {isLoading ? (
             <div className="flex justify-center py-4">
               <Loader />
