@@ -36,17 +36,27 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
-    const fetchTopCommunity = async () => {
+    const fetchCommunities = async () => {
       setLoading(true);
       try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
-          { categoryId: activeCategory }
-        );
-        setCommunities(response.data);
-        console.log("Here in CommunitySection.tsx", response.data.data);
+        let response;
+        if (activeCategory === "all") {
+          response = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?limit=100`
+          );
+        } else {
+          response = await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
+            { categoryId: activeCategory }
+          );
+        }
 
-        if (response && response.data && response.data.r === "s" && Array.isArray(response.data.data)) {
+        if (
+          response &&
+          response.data &&
+          response.data.r === "s" &&
+          Array.isArray(response.data.data)
+        ) {
           setCommunities(response.data.data);
         } else {
           console.error("Invalid response format:", response.data);
@@ -59,12 +69,13 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     };
 
     if (activeCategory) {
-      fetchTopCommunity();
+      fetchCommunities();
     }
   }, [activeCategory]);
 
   const handleClickCommunity = useCallback(
-    ( community: Community ) => {
+    (communityWrapper: { community: Community }) => {
+      const community = communityWrapper.community;
 
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
@@ -83,7 +94,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
       dispatch(
         setActiveCommunity({
           id: community._id,
-          name: community.name, // Include name
+          name: community.name,
         })
       );
 
@@ -91,8 +102,6 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     },
     [dispatch, router]
   );
-
-  // console.log("Here in CommunitySection.tsx ", communities);
 
   return (
     <div className="bg-background min-h-screen lg:p-4">
@@ -110,8 +119,8 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
             ))
           ) : (
             <p className="text-center col-span-3 py-8 text-muted-foreground">
-            No communities found for this category
-          </p>
+              No communities found for this category
+            </p>
           )}
         </div>
       )}

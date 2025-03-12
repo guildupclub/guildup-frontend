@@ -9,6 +9,7 @@ import CommunityCard from "./CommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
+import { setActiveCommunity } from "@/redux/channelSlice";
 
 interface Community {
   community: {
@@ -105,6 +106,13 @@ function SearchPageContent() {
           userId: community.community.user_id,
         })
       );
+
+      dispatch(
+              setActiveCommunity({
+                id: community.community._id,
+                name: community.community.name, 
+              })
+            );
 
       console.log("Navigating to /community/profile"); // ✅ Check if this appears
 

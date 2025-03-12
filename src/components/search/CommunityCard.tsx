@@ -26,6 +26,8 @@ interface Community {
   num_member: number;
   image?: string;
   icon?: string;
+  tags?: string[];
+  background_image: string;
 }
 
 interface CommunityCardProps {
@@ -42,14 +44,20 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     null
   );
 
-  const offerings = Array.isArray(community.offerings) ? community.offerings : [];
-  
+  const offerings = Array.isArray(community.offerings)
+    ? community.offerings
+    : [];
+  const communityDetails = community.community;
   // Get the first offering from the array if it exists
   const firstOffering = offerings.length > 0 ? offerings[0] : null;
-  
+
+  const tags: string[] = community?.community?.tags?.[0]?.includes(",")
+    ? community?.community?.tags[0]?.split(",").map((tag: string) => tag.trim())
+    : community?.community?.tags || [];
+
   // Get tags from the first offering if it exists
-  const tags = firstOffering?.tags || [];
-  
+  // const tags = firstOffering?.tags || [];
+
   return (
     <Card
       onClick={() => onClick(community.community._id)}
@@ -57,22 +65,30 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     >
       <div className="relative h-[80px] w-full bg-gray-200">
         <Image
-          src={community.community.image || "/defaultCommunityIcon.png"}
+          src={
+            community?.community?.background_image ||
+            "/defaultCommunityIcon.png"
+          }
           alt="Background"
           fill
           className="object-cover"
         />
       </div>
-      <div className="absolute left-4 top-[50px] w-14 h-14 rounded-full border-4 border-white">
+      <div className="absolute left-4 top-[50px] rounded-full border border-white">
         <Image
-          src={community.community.icon || "/defaultCommunityIcon.png"}
+          src={
+            community.community.image && community.community.image !== ""
+              ? community.community.image
+              : "/defaultCommunityIcon.png"
+          }
           alt="Profile"
           width={64}
           height={64}
-          className="rounded-full object-cover"
+          className="rounded-full object-cover h-16 w-16"
         />
       </div>
-      <div className="p-4 pt-8 flex-1">
+
+      <div className="p-4 pt-10 flex-1">
         <h3 className="font-semibold text-gray-800 text-lg">
           {community.community.name}
         </h3>
@@ -86,7 +102,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           </span> */}
         </div>
         <div className="flex flex-wrap gap-2 mt-3">
-          {tags.map((tag, index) => (
+          {tags.map((tag: string, index: number) => (
             <Badge
               key={index}
               className="bg-gray-200 text-gray-700 px-3 py-1 text-xs rounded-lg"

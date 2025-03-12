@@ -30,8 +30,13 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
-import { loadRazorpayScript, RazorpayOptions, RazorpayResponse } from "@/components/utils/razorpay";
+import {
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpayResponse,
+} from "@/components/utils/razorpay";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaRupeeSign } from "react-icons/fa";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -352,7 +357,6 @@ export function BookingDialog({
                     <GoDotFill className="" />
                     {offering?.type}
                   </p>
-
                 </div>
 
                 {/* Details (Duration & Price) */}
@@ -370,11 +374,12 @@ export function BookingDialog({
 
                   {/* Price */}
                   <div className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5 text-green-500" />
+                    <FaRupeeSign className="h-5 w-5 text-green-500" />
                     <div>
                       <p className="text-xs text-muted-foreground">Price</p>
                       <p className="text-sm font-medium">
-                        {offering.price.currency} {offering.price.amount}
+                        {/* {offering.price.currency} */}
+                        {offering.price.amount}
                       </p>
                     </div>
                   </div>
@@ -393,7 +398,7 @@ export function BookingDialog({
             <div className="p-6 bg-background">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
-                  Selected Date & Time
+                Choose your available time slot
                 </DialogTitle>
               </DialogHeader>
 
@@ -514,13 +519,13 @@ export function BookingDialog({
                             </div>
                           </div>
                           <div className="bg-background/50 p-3 rounded-md flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-primary/70" />
+                            <FaRupeeSign className="h-5 w-5 text-green-500" />
                             <div>
                               <p className="text-xs text-muted-foreground">
                                 Price
                               </p>
                               <p className="text-sm font-medium">
-                                {offering.price.currency}{" "}
+                                {/* {offering.price.currency}{" "} */}
                                 {offering.price.amount}
                               </p>
                             </div>

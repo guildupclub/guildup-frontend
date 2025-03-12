@@ -74,8 +74,8 @@ export function PostDialog() {
   };
 
   const handlePostCreate = async () => {
-    if (!title || !content) {
-      toast.error("Title and content are required!");
+    if (!content) {
+      toast.error("content are required!");
       return;
     }
 
@@ -93,7 +93,7 @@ export function PostDialog() {
 
       // Reset form
       setIsOpen(false);
-      setTitle("");
+      // setTitle("");
       setContent("");
       clearMediaPreview();
       setTags([]);
@@ -158,12 +158,12 @@ export function PostDialog() {
           </div>
 
           {/* Post Inputs */}
-          <Input
+          {/* <Input
             placeholder="Heading"
             className="p-2 text-lg text-muted placeholder:text-muted focus-visible:ring-0 border border-background bg-card"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-          />
+          /> */}
           <Textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
@@ -172,14 +172,14 @@ export function PostDialog() {
           />
 
           {/* Tags Input */}
-          <Input
+          {/* <Input
             placeholder="Add tags (comma separated)"
             className="p-2 text-sm text-muted placeholder:text-muted focus-visible:ring-0 border border-background bg-card"
             onChange={(e) => {
               const tagList = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
               setTags(tagList);
             }}
-          />
+          /> */}
 
           {/* File Preview */}
           {mediaPreview && (

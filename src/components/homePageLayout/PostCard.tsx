@@ -18,8 +18,7 @@ import CommentSection from "./CommentSection/CommentSection";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
-import Image from 'next/image';
-
+import Image from "next/image";
 
 interface PostCardProps {
   post: {
@@ -31,11 +30,15 @@ interface PostCardProps {
     reply_count: number;
     post_type: string;
     slug: string;
-    community_id: string;
     upvote_userId: any;
     replies?: any;
     media?: any;
-    user_id:any;
+    user_id: any;
+    community_id: {
+      name: string;
+      image: string;
+      background_image: string;
+    };
   };
   ref: any;
 }
@@ -109,7 +112,7 @@ export function PostCard({ post, ref }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `https://your-website.com/posts/${post.slug}`;
+    const shareUrl = `https://guildup-frontend-prod.vercel.app/posts/${post.slug}`;
 
     try {
       await navigator.share({
@@ -122,28 +125,35 @@ export function PostCard({ post, ref }: PostCardProps) {
     }
   };
 
-  // Example comments data
+  const communityName = post?.community_id?.name || "Unknown";
+  const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
 
   return (
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
           <Avatar className="h-10 w-10  border-2 border-purple-500">
-            <AvatarImage src="/placeholder.svg" />
-            <AvatarFallback>U</AvatarFallback>
+            <AvatarImage src={post?.community_id?.image} />
+            <AvatarFallback>
+              <AvatarFallback >
+                {fallbackLetter}
+              </AvatarFallback>
+            </AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-medium text-muted">{post.title}</h3>
+                <h3 className="font-medium text-muted">
+                  {post?.community_id?.name}
+                </h3>
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
                     {formatTimeAgo(post.created_At)}
                   </span>
                   <span className="text-xs  text-muted-foreground">•</span>
-                  <span className="text-xs  text-muted-foreground ">
+                  {/* <span className="text-xs  text-muted-foreground ">
                     Public
-                  </span>
+                  </span> */}
                 </div>
               </div>
               <Button
@@ -159,7 +169,6 @@ export function PostCard({ post, ref }: PostCardProps) {
             </p>
 
             {post?.media?.publicUrl && post?.media?.fileType === "image" && (
-
               <Image
                 src={post.media.publicUrl}
                 alt="Post Image"
