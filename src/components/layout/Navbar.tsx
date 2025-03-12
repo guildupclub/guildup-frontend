@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Home, Compass, Users, ChevronDown, Search } from "lucide-react";
+import { Bell, Home, Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,8 @@ import { StringConstants } from "../common/CommonText";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { setCommunityData } from "@/redux/communitySlice";
 import React from "react";
+import { Dialog, DialogTrigger } from "../ui/dialog";
+import CreatorForm from "../form/CreatorForm";
 
 interface Community {
   _id: string;
@@ -57,7 +59,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   // }, [user]);
   // Assume communities are stored in state.community.communities (an array of Community)
   // const communities = useSelector((state: RootState) => state?.community?.communities);
-
+  const [isCreatorFormOpen, setIsCreatorFormOpen]= useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
@@ -384,7 +386,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         )}
       >
         <div className="px-1">
-          <div className="space-y-3">
+          <div className="space-y-3 pb-8">
           {communities && communities.length > 0 ? (
             communities.map((community: any) => {
               const isActive = activeCommunityId === community._id
@@ -432,6 +434,27 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <p className="text-center">{StringConstants.NO_COMMUNITIES_AVAILABLE}</p>
           )}
         </div>
+        <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
+            <h4 className="text-base font-medium">Create a page</h4>
+            <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </DialogTrigger>
+              <CreatorForm
+                onClose={() => setIsCreatorFormOpen(false)}
+              // onSuccess={() => {
+              // Invalidate the cache when a new community is created
+              // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+              // }}
+              />
+            </Dialog>
+          </div>
         </div>
       </div>
 
