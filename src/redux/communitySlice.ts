@@ -2,6 +2,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface CommunityState {
+  userFollowedCommunities: any;
   communityId: string | null;
   userId: string | null;
 }

@@ -10,19 +10,19 @@ import { ArrowRight } from "lucide-react";
 import { BookingDialog } from "../booking/Bookingdialog"; // Ensure correct import path
 import { useSession, signIn } from "next-auth/react";
 
-function CommunityCard({
-  community,
-  onClick,
-}: {
-  community: any;
-  onClick: (id: string) => void;
-}) {
+interface CommunityCardProps {
+  community: any; 
+  onClick: () => void;
+}
+
+function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
 
   const tags: string[] = community?.community?.tags?.[0]?.includes(",")
     ? community.community.tags[0].split(",").map((tag: string) => tag.trim())
     : community?.community?.tags || [];
+
 
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
@@ -32,8 +32,8 @@ function CommunityCard({
   // console.log("@communityDetails", communityDetails, community);
   return (
     <Card
-      onClick={() => onClick(community._id)}
-      className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
+      onClick={onClick}
+      className="relative w-full border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
       {/* Background Image */}
       <div className="relative h-[80px] w-full bg-gray-200">
@@ -132,6 +132,7 @@ function CommunityCard({
           </Button>
         </div>
       )}
+
       {/* {selectedOffering && (
         <BookingDialog
           offering={selectedOffering}
@@ -144,6 +145,7 @@ function CommunityCard({
 }
 
 export default React.memo(CommunityCard);
+
 
 {
   /* <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
