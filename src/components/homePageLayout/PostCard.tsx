@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
 import Image from "next/image";
+import { API_FRONTEND_URL } from "@/config/constants";
 
 interface PostCardProps {
   post: {
@@ -112,7 +113,7 @@ export function PostCard({ post, ref }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `https://guildup-frontend-prod.vercel.app/posts/${post.slug}`;
+    const shareUrl = `${API_FRONTEND_URL}/posts/${post.slug}`;
 
     try {
       await navigator.share({
@@ -125,7 +126,7 @@ export function PostCard({ post, ref }: PostCardProps) {
     }
   };
 
-  const communityName = post?.community_id?.name || "Unknown";
+  const communityName = post?.community_id?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
 
   return (
@@ -135,9 +136,7 @@ export function PostCard({ post, ref }: PostCardProps) {
           <Avatar className="h-10 w-10  border-2 border-purple-500">
             <AvatarImage src={post?.community_id?.image} />
             <AvatarFallback>
-              <AvatarFallback >
-                {fallbackLetter}
-              </AvatarFallback>
+              <AvatarFallback>{fallbackLetter}</AvatarFallback>
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">

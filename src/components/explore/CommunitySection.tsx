@@ -40,9 +40,10 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
       setLoading(true);
       try {
         let response;
+        let limits = 100;
         if (activeCategory === "all") {
           response = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?limit=100`
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?limit=${limits}`
           );
         } else {
           response = await axios.post(

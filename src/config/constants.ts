@@ -8,3 +8,4 @@ export const API_ENDPOINTS = {
   editCommunity: `${API_BASE_URL}/v1/community/edit`,
 }
 
+export const API_FRONTEND_URL = process.env.NEXTAUTH_URL||"https://guildup-frontend-prod.vercel.app/"

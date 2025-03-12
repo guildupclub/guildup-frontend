@@ -123,7 +123,7 @@ export function LeftmostSidebar() {
 
     // console.log("response in leftSideBAr ", response);
 
-    if (!response.ok) {
+    if (!response || !response.ok) {
       throw new Error("Failed to fetch communities");
     }
     const result = await response.json();
@@ -279,7 +279,7 @@ export function LeftmostSidebar() {
                     src={
                       community.image && community.image !== ""
                         ? community.image
-                        : `/placeholder.svg?text=${getInitials(community.name)}`
+                        : ""
                     }
                     alt={community.name}
                   />
