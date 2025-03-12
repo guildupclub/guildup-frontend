@@ -50,7 +50,7 @@ function Page() {
   }
 
   return (
-    <div className="bg-background">
+    <div className="bg-background pb-16">
         <CategoryBar
           categorys={category}
           selectCategory={setSelectedCategory}
