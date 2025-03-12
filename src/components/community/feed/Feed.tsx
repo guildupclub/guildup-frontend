@@ -98,12 +98,15 @@ export function Feed({ communityId }: FeedProps) {
             <h1 className="text-xl font-semibold">{StringConstants.FEED}</h1>
           </div>
           <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="hidden md:block">
+              <Settings className="w-5 h-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+              className="md:hidden w-7 h-7 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-5 w-5" />
             </Button>
           </div>
         </div>
