@@ -435,7 +435,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           )}
         </div>
         <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
-            <h4 className="text-base font-medium">Create a page</h4>
+            <h4 className="text-base font-medium">{StringConstants.CREATE_A_PAGE}</h4>
             <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
               <DialogTrigger asChild>
                 <Button
