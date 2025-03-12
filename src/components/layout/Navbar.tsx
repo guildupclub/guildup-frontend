@@ -38,6 +38,12 @@ interface Community {
 }
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
+  const COMMUNITY_PROFILE_PATH= '/community/profile';
+  const COMMUNITY_MEMBERS_PATH= '/community/members';
+  const COMMUNITY_CHANNEL_PATH= '/community/channel';
+  const COMMUNITY_FEED_PATH= '/community/feed';
+  const COMMUNITY_PATH= '/community';
+  const FEED_PATH= '/feed';
   const { data: session } = useSession();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -67,12 +73,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: any) => state.channel.activeCommunity
   );
   const activeCommunityId = activeCommunity?.id;
-  console.log("This is active communityID", activeCommunityId);
 
   const communities = useSelector(
-    (state: RootState) => state.user.userFollowedCommunities
+    (state: RootState) => state?.user?.userFollowedCommunities
   );
-  console.log("These are user followed communities", communities);
   const getInitials = (name: string) => {
     return name
       // [0].toUpperCase();
@@ -133,7 +137,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         })
       );
     }
-    router.push("/community/profile");
+    router.push(COMMUNITY_PROFILE_PATH);
     setIsSidebarOpen(false);
   }
 
@@ -211,8 +215,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <Link
                       href={
                         activeCommunityId
-                          ? `/community/${activeCommunityId}/feed`
-                          : `/community/feed`
+                          ? `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                          : `${COMMUNITY_FEED_PATH}`
                       }
                       className="flex flex-col items-center justify-center"
                     >
@@ -320,7 +324,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </Link> */}
           {activeCommunityId ? (
             <Link
-              href={`/community/${activeCommunityId}/feed`}
+              href={`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`}
               className="flex flex-col items-center justify-center"
             >
               <Users className="w-6 h-6" />
@@ -332,7 +336,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               className="flex flex-col items-center justify-center"
             >
               <Users className="w-6 h-6" />
-              <span className="text-xs mt-1">Expert</span>
+              <span className="text-xs mt-1">{StringConstants.EXPERTS}</span>
             </Link>
           )}
 
@@ -359,7 +363,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <AvatarImage src="/placeholder.svg" alt="User" />
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
-              <span className="text-xs mt-1">Sign in</span>
+              <span className="text-xs mt-1">{StringConstants.SIGN_IN}</span>
             </button>
           )}
         </div>
@@ -425,7 +429,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               )
             })
           ) : (
-            <p className="text-center">No communities available</p>
+            <p className="text-center">{StringConstants.NO_COMMUNITIES_AVAILABLE}</p>
           )}
         </div>
         </div>

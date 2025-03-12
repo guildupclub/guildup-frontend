@@ -35,6 +35,11 @@ import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
 
 export function Sidebar() {
+  const COMMUNITY_PROFILE_PATH= '/community/profile';
+  const COMMUNITY_MEMBERS_PATH= '/community/members';
+  const COMMUNITY_CHANNEL_PATH= '/community/channel';
+  const COMMUNITY_PATH= '/community';
+  const FEED_PATH= '/feed';
   const dispatch = useDispatch();
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
@@ -234,10 +239,10 @@ export function Sidebar() {
         </div>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH
+          className={`w-full justify-start gap-2 ${pathname === COMMUNITY_PROFILE_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
+          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
         >
           <FaUserAlt />
           {StringConstants.PROFILE}
@@ -246,12 +251,12 @@ export function Sidebar() {
         {/* Feed */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`
+          className={`w-full justify-start gap-2 ${pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
             onClick={() => {
               if (activeCommunityId) {
-                handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+                handleNavigation(`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`);
               } else {
                 console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
               }
@@ -264,10 +269,10 @@ export function Sidebar() {
         {/* Members */}
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH
+          className={`w-full justify-start gap-2 ${pathname === COMMUNITY_MEMBERS_PATH
             ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
             : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
+          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
         >
           <FaUserGroup />
           {StringConstants.MEMBER}
@@ -424,7 +429,7 @@ export function Sidebar() {
                         type: channel.type,
                       })
                     );
-                    handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
+                    handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
                   }}
                 >
                   <Hash />
@@ -447,30 +452,30 @@ export function Sidebar() {
     {/* Mobile View */}
       <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(StringConstants.COMMUNITY_PROFILE_PATH)}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
         >
-          Profile
+          {StringConstants.PROFILE}
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
           onClick={() => {
             if (activeCommunityId) {
-              handleNavigation(`${StringConstants.COMMUNITY_PATH}/${activeCommunityId}${StringConstants.FEED_PATH}`);
+              handleNavigation(`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`);
             } else {
               console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
             }
           }}          
         >
-          Feed
+          {StringConstants.FEED}
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === StringConstants.COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(StringConstants.COMMUNITY_MEMBERS_PATH)}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
         >
-          Members
+          {StringConstants.MEMBER}
         </button>
 
         {/* Scrollable Channels */}
@@ -480,7 +485,7 @@ export function Sidebar() {
             className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
             onClick={() => {
               dispatch(setActiveChannel(channel));
-              handleNavigation(`${StringConstants.COMMUNITY_CHANNEL_PATH}/${channel.name}`);
+              handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
             }}
           >
             {channel.name}

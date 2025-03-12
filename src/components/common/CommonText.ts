@@ -114,11 +114,8 @@ export const StringConstants = {
     PRICE: 'Price',
     TITLE: 'Title',
     TYPE: 'Type',
-    COMMUNITY_PROFILE_PATH: '/community/profile',
-    COMMUNITY_MEMBERS_PATH: '/community/members',
-    COMMUNITY_CHANNEL_PATH: '/community/channel',
-    COMMUNITY_PATH: '/community',
-    FEED_PATH: '/feed',
+    NO_COMMUNITIES_AVAILABLE: 'No communities available',
+    PUBLIC: 'Public'
 
 }
 

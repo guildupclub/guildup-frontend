@@ -22,6 +22,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
 import Image from 'next/image';
+import { StringConstants } from "../common/CommonText";
 
 
 interface PostCardProps {
@@ -45,6 +46,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, ref, userID }: PostCardProps) {
+  const COMMUNITY_PROFILE_PATH= '/community/profile';
   const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -58,32 +60,34 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
 
   const handleClickCommunity = useCallback(() => {
     // Build community object from post fields
-    const community = {
-      _id: post.community_id,
-      name: post.community_name,
-      user_id: userID,
-    };
+    // const community = {
+    //   _id: post.community_id,
+    //   name: post.community_name,
+    //   user_id: userID,
+    // };
 
-    if (!community || !community._id) {
-      console.error("Invalid community data:", community);
-      return;
-    }
+    // if (!community || !community._id) {
+    //   console.error("Invalid community data:", community);
+    //   return;
+    // }
 
-    dispatch(
-      setCommunityData({
-        communityId: community._id,
-        userId: userID,
-      })
-    );
+    // dispatch(
+    //   setCommunityData({
+    //     communityId: community._id,
+    //     userId: userID,
+    //   })
+    // );
 
-    dispatch(
-      setActiveCommunity({
-        id: community._id,
-        name: community.name,
-      })
-    );
+    // dispatch(
+    //   setActiveCommunity({
+    //     id: community._id,
+    //     // name: community.name,
+    //     name: 'Swapnil',
+    //   })
+    // );
 
-    router.push("/community/profile");
+    // router.push(COMMUNITY_PROFILE_PATH);
+    
   }, [dispatch, router, post]);
 
   const handleSendComment = async () => {
@@ -182,7 +186,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
                   </span>
                   <span className="text-xs  text-muted-foreground">•</span>
                   <span className="text-xs  text-muted-foreground ">
-                    Public
+                    {StringConstants.PUBLIC}
                   </span>
                 </div>
               </div>
