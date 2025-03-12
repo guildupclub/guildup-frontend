@@ -13,6 +13,7 @@ import {
   Edit,
   Instagram,
   Trash2,
+  Pencil,
   Video,
 } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
@@ -290,7 +291,7 @@ export function ProfileCard() {
                     className="p-1 rounded-md hover:bg-background transition"
                     onClick={() => setIsEditOpen(true)}
                   >
-                    <FiEdit
+                    <Pencil
                       size={18}
                       className="text-muted hover:text-primary"
                     />
@@ -480,9 +481,9 @@ export function ProfileCard() {
                           setSelectedOffering(offering);
                         }}
                       >
-                        <span className="line-through text-xs opacity-60">
-                          ₹{offering.price.amount + 1000}
-                        </span>
+                        {/* <span className="line-through text-xs opacity-60">
+                          ₹{offering.price.amount * 1.5}
+                        </span> */}
                         <span>₹{offering.price.amount}</span>
                         <ArrowRight className="w-4 h-4" />
                       </Button>
