@@ -110,7 +110,7 @@ export function RightSidebar() {
         <h2 className="text-lg font-semibold px-4 py-3 border-b border-zinc-200/50">
           {StringConstants.TRENDING_POSTS}
         </h2>
-        <div className="max-h-[430px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-400 scrollbar-track-transparent">
+        <div className="max-h-[470px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
           {isLoading ? (
             // Loading skeleton UI
             Array(3)

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart, MessageCircle, Play, Mic, Send } from "lucide-react";
+import moment from "moment";
 
 interface PostCardProps {
   id: string;
@@ -15,6 +16,8 @@ interface PostCardProps {
   likes: number;
   comments: number;
   avatar: string;
+  name: string;
+  image: string;
   onLike: (id: string) => void;
   onComment: (id: string, comment: string) => void;
 }
@@ -29,6 +32,8 @@ export function PostCard({
   comments,
   avatar,
   onLike,
+  name,
+  image,
   onComment,
 }: PostCardProps) {
   const [isRecording, setIsRecording] = useState(false);
@@ -58,11 +63,14 @@ export function PostCard({
           </Avatar>
           <div className="space-y-1.5 flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{author}</span>
-              <span className="text-sm ">{time}</span>
-              <span className="rounded bg-card px-1.5 py-0.5 text-xs ">
-                Level {level}
+              <span className="font-medium">{name}</span>
+              <span className="text-sm ">
+                {" "}
+                {moment(time).format("YYYY MMM DD, hh:mm A")}
               </span>
+              {/* <span className="rounded bg-card px-1.5 py-0.5 text-xs ">
+                Level {level}
+              </span> */}
             </div>
             <p className=" text-sm leading-relaxed">{content}</p>
             <div className="flex items-center gap-4">

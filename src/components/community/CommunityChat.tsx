@@ -20,6 +20,7 @@ interface Post {
   likes: number;
   comments: number;
   avatar: string;
+  name:string;
 }
 
 function ChatContent() {
@@ -65,6 +66,7 @@ function ChatContent() {
             comments: item.reply_count || 0,
             author: userData.user_name || "Unknown",
             avatar: userData.image || "",
+            name:userData.name||"",
           };
         }) || []
       );

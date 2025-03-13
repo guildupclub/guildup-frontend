@@ -34,6 +34,7 @@
     "framer-motion": "^12.4.7",
     "guildup-frontend": "file:",
     "lucide-react": "^0.473.0",
+    "moment": "^2.30.1",
     "mongodb": "^6.13.0",
     "next": "15.2.1",
     "next-auth": "^4.24.11",
