@@ -117,16 +117,16 @@ function CommunityCard({
               setSelectedOffering(firstOffering);
             }}
           >
-            {firstOffering.price?.amount ? (
+            {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
               <>
                 <span className="line-through text-xs opacity-60">
-                  ₹{firstOffering.price.amount + 1000}
-                </span>{" "}
+                  ₹{firstOffering.price.amount}
+                </span>
+                <span> ₹{firstOffering.discounted_price}</span>
               </>
-            ) : null}
-            {firstOffering.price?.amount
-              ? `₹${firstOffering.price.amount}`
-              : "FREE"}
+            ) : (
+              <span>₹{firstOffering?.price?.amount || "FREE"}</span>
+            )}
           </Button>
         </div>
       ) : (

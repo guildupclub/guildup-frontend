@@ -59,6 +59,7 @@ interface Offering {
     amount: number;
     currency: string;
   };
+  discounted_price:string;
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -95,10 +96,10 @@ export function ProfileCard() {
     (c) => c?._id === activeCommunityId
   );
 
-  const isOwner = memberDetails && 
-                  memberDetails.is_owner === true && 
-                  memberDetails.community_id === community.communityId;
-
+  const isOwner =
+    memberDetails &&
+    memberDetails.is_owner === true &&
+    memberDetails.community_id === community.communityId;
 
   // Now button in the offering card
 
@@ -166,22 +167,19 @@ export function ProfileCard() {
           { communityId: community.communityId }
         );
 
-        console.log("@response",response.data.data)
+        console.log("@response", response.data.data);
         if (response.data.r === "s") {
           setProfile(response.data.data);
-          if(response.data.data.community.image){
-            setAvatarImgUrl(response.data.data.community.image)
-          }
-          else{
-
+          if (response.data.data.community.image) {
+            setAvatarImgUrl(response.data.data.community.image);
+          } else {
             setAvatarImgUrl(
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
             );
           }
-          if(response.data.data.community.background_image){
-            setBgImgUrl(response.data.data.community.background_image)
-          }
-          else{
+          if (response.data.data.community.background_image) {
+            setBgImgUrl(response.data.data.community.background_image);
+          } else {
             setBgImgUrl(
               "https://random-image-pepebigotes.vercel.app/api/random-image"
             );
@@ -248,7 +246,9 @@ export function ProfileCard() {
   if (error) return <div>{error}</div>;
   if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
 
-  {console.log("@prifle",profile.user)}
+  {
+    console.log("@prifle", profile.user);
+  }
   return (
     <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
@@ -349,7 +349,9 @@ export function ProfileCard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <div className="p-4 ">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">{StringConstants.ABOUT}</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
+            {StringConstants.ABOUT}
+          </h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
             <p className="text-muted-foreground leading-relaxed mb-6">
               {profile.community.description}
@@ -415,13 +417,11 @@ export function ProfileCard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-
               {offerings.map((offering) => (
                 <div
                   key={offering._id || Math.random()}
                   className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
                 >
-
                   {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 rounded-lg">
@@ -480,10 +480,17 @@ export function ProfileCard() {
                           setSelectedOffering(offering);
                         }}
                       >
-                        <span className="line-through text-xs opacity-60">
-                          ₹{offering.price.amount + 1000}
-                        </span>
-                        <span>₹{offering.price.amount}</span>
+                        {offering?.discounted_price &&
+                        offering?.price?.amount ? (
+                          <>
+                            <span className="line-through text-xs opacity-60">
+                              ₹{offering.price.amount}
+                            </span>
+                            <span> ₹{offering.discounted_price}</span>
+                          </>
+                        ) : offering?.price?.amount ? (
+                          <span>₹{offering.price.amount}</span>
+                        ) : null}
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
@@ -504,7 +511,7 @@ export function ProfileCard() {
       </div>
       {isEditOpen && (
         <EditCommunityModal
-        profile={profile}
+          profile={profile}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
         />

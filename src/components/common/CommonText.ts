@@ -112,8 +112,10 @@ export const StringConstants = {
     CREATE_NEW_OFFERING: 'Create New Offering',
     EDIT_OFFERING: 'Edit Offering',
     PRICE: 'Price',
+    DISCOUNTED_PRICE:'Discounted Price',
     TITLE: 'Title',
     TYPE: 'Type',
+
 
 
 }

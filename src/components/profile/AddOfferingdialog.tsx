@@ -21,7 +21,10 @@ import {
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { OFFERING_TYPES, StringConstants } from "@/components/common/CommonText";
+import {
+  OFFERING_TYPES,
+  StringConstants,
+} from "@/components/common/CommonText";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -46,6 +49,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       amount: 0,
       currency: "INR",
     },
+    discounted_price: 0,
     duration: 60,
     is_free: false,
     tags: "",
@@ -94,6 +98,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             amount: 0,
             currency: "INR",
           },
+          discounted_price: 0,
           duration: 60,
           is_free: false,
           tags: "",
@@ -167,9 +172,24 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               <SelectContent>
                 {/* <SelectItem value="mentorship">Mentorship</SelectItem> */}
                 {/* <SelectItem value="course">Course</SelectItem> */}
-                <SelectItem value="consultation">{OFFERING_TYPES.CONSULTATION}</SelectItem>
+                <SelectItem value="consultation">
+                  {OFFERING_TYPES.CONSULTATION}
+                </SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="duration">{StringConstants.DURATION} (Mins)</Label>
+            <Input
+              id="duration"
+              type="number"
+              value={formData.duration}
+              onChange={(e) =>
+                setFormData({ ...formData, duration: Number(e.target.value) })
+              }
+              min="15"
+              required
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -193,23 +213,32 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 required
               />
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="duration">{StringConstants.DURATION} (Mins)</Label>
+              <Label htmlFor="discounted_price">
+                {StringConstants.DISCOUNTED_PRICE} (INR)
+              </Label>
               <Input
-                id="duration"
+                id="discoounted_price"
                 type="number"
-                value={formData.duration}
+                value={formData.discounted_price}
                 onChange={(e) =>
-                  setFormData({ ...formData, duration: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    discounted_price: Number(e.target.value),
+                    is_free: Number(e.target.value) === 0,
+                  })
                 }
-                min="15"
+                min="0"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">{StringConstants.TAGS} (comma-separated)</Label>
+            <Label htmlFor="tags">
+              {StringConstants.TAGS} (comma-separated)
+            </Label>
             <Input
               id="tags"
               value={formData.tags}
@@ -221,10 +250,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           </div>
 
           <div className="flex justify-end gap-4">
-            <Button
-              variant="outline"
-              onClick={() => setOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setOpen(false)}>
               {StringConstants.CANCEL}
             </Button>
             <Button type="submit" className="text-white" disabled={loading}>
