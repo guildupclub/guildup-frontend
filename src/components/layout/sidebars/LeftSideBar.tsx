@@ -109,25 +109,35 @@ export function LeftSidebar() {
     return selectedItem?.section === section && selectedItem?.id === id;
   };
 
-  useEffect(() => {
-    async function fetchCommunities() {
-      try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-          {
-            userId: userId,
-          }
-        );
+  // useEffect(() => {
+  //   async function fetchCommunities() {
+  //     try {
+  //       const res = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+  //         {
+  //           userId: userId,
+  //         }
+  //       );
 
-        setMyCommunities(res.data.data);
-        console.log("Comm ======>>>>", res.data.data);
-      } catch (error) {
-        console.error(error);
-        setMyCommunities([]);
-      }
-    }
-    fetchCommunities();
-  }, [userId]); // Ensure this runs when `userId` changes
+  //       setMyCommunities(res.data.data);
+  //       dispatch(setUserFollowedCommunities(res.data.data));
+  //       console.log("Comm ======>>>>", res.data.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       setMyCommunities([]);
+  //     }
+  //   }
+  //   fetchCommunities();
+  // }, [userId]); // Ensure this runs when `userId` changes
+
+  const communities = useSelector((state: RootState) => state?.user?.userFollowedCommunities|| []);
+  const memoizedCommunities = React.useMemo(() => {
+    return communities;
+  }, [communities]);
+  
+  useEffect(() => {
+    setMyCommunities(memoizedCommunities);
+  }, [memoizedCommunities]);
 
   // ✅ Set active community AFTER myCommunities is updated
   useEffect(() => {
