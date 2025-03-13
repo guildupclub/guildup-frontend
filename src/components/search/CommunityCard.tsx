@@ -151,7 +151,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
         </div>
       ) : (
         <div className="mt-auto flex items-center justify-center m-4 p-3 bg-gray-100 rounded-lg">
-          <p className="text-gray-500 font-medium">Not Offering Available</p>
+          <p className="text-gray-500 font-medium">No Offering Available</p>
         </div>
       )}
 

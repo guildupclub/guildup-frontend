@@ -131,7 +131,7 @@ function CommunityCard({
         </div>
       ) : (
         <div className="mt-auto flex items-center justify-center m-4 p-3 bg-gray-100 rounded-lg">
-          <p className="text-muted font-medium">Not Offering Available</p>
+          <p className="text-muted font-medium">No Offering Available</p>
         </div>
       )}
 
