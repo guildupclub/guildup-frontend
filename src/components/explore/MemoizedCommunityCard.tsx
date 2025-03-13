@@ -93,8 +93,7 @@ function CommunityCard({
           ))}
         </div>
       </div>
-
-      {firstOffering && (
+      {firstOffering ? (
         <div className="mt-auto flex items-center justify-between m-4 p-3 bg-blue-50 rounded-lg">
           <div className="flex items-center space-x-2">
             <IoVideocam className="text-primary h-6 w-6" />
@@ -111,7 +110,6 @@ function CommunityCard({
             size="sm"
             className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
             onClick={(e) => {
-              // e.stopPropagation();
               if (!session) {
                 signIn("google");
                 return;
@@ -131,7 +129,12 @@ function CommunityCard({
               : "FREE"}
           </Button>
         </div>
+      ) : (
+        <div className="mt-auto flex items-center justify-center m-4 p-3 bg-gray-100 rounded-lg">
+          <p className="text-muted font-medium">Not Offering Available</p>
+        </div>
       )}
+
       {/* {selectedOffering && (
         <BookingDialog
           offering={selectedOffering}
