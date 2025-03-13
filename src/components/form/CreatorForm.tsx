@@ -156,7 +156,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Page Name</Label>
+            <Label>
+              Page Name<span className="text-red-500">*</span>
+            </Label>
             <Input
               name="name"
               value={formData.name}
@@ -166,7 +168,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label>{StringConstants.SELECT_TOPICS}</Label>
+            <Label>
+              {StringConstants.SELECT_TOPICS}
+              <span className="text-red-500">*</span>
+            </Label>
             <Select onValueChange={handleCategoryChange}>
               <SelectTrigger className="bg-background border-none">
                 <SelectValue placeholder="Select your topic" />
@@ -181,7 +186,11 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>{StringConstants.TAGS}</Label>
+            <Label>
+              {StringConstants.TAGS}
+              <span className="text-red-500">*</span>
+            </Label>
+            <span>(comma-separated)</span>
             <Input
               name="tags"
               value={formData.tags}
@@ -193,7 +202,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{StringConstants.FOLLOWERS} </Label>
+              <Label>
+                {StringConstants.FOLLOWERS}
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 name="instaFollowers"
                 type="number"
@@ -204,7 +216,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label>{StringConstants.SUBSCRIBERS} </Label>
+              <Label>
+                {StringConstants.SUBSCRIBERS}
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 name="youtubeSubscribers"
                 type="number"
@@ -217,7 +232,8 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>{StringConstants.ABOUT_THE_PAGE}</Label>
+            <Label>{StringConstants.ABOUT_THE_PAGE}<span className="text-red-500">*</span>
+            </Label>
             <Textarea
               name="description"
               value={formData.description}

@@ -313,7 +313,7 @@ export function ProfileCard() {
                   {profile.user.user_name}
                 </span>
               </p>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground my-2">
                 <div className="flex items-center gap-1.5">
                   <MdPeopleAlt className="h-5 w-5 text-green-500" />
                   <span className="font-medium text-foreground">

@@ -265,7 +265,10 @@ export function EditCommunityModal({
 
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">{StringConstants.PAGE_NAME}</Label>
+            <Label htmlFor="name">
+              {StringConstants.PAGE_NAME}
+              <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="name"
               value={formData.name}
@@ -278,6 +281,7 @@ export function EditCommunityModal({
           <div className="grid gap-2">
             <Label htmlFor="description">
               {StringConstants.PAGE_DESCRIPTION}
+              <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="description"
@@ -289,7 +293,10 @@ export function EditCommunityModal({
           </div>
 
           <div className="grid gap-2">
-            <Label>{StringConstants.TAGS}</Label>
+            <Label>
+              {StringConstants.TAGS}
+              <span className="text-red-500">*</span>
+            </Label>
             <div className="flex gap-2">
               <Input
                 value={newTag}
@@ -316,7 +323,10 @@ export function EditCommunityModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>{StringConstants.FOLLOWERS} </Label>
+              <Label>
+                {StringConstants.FOLLOWERS}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 name="instaFollowers"
                 type="number"
@@ -332,7 +342,10 @@ export function EditCommunityModal({
               />
             </div>
             <div className="space-y-2">
-              <Label>{StringConstants.SUBSCRIBERS} </Label>
+              <Label>
+                {StringConstants.SUBSCRIBERS}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 name="youtubeSubscribers"
                 type="number"
