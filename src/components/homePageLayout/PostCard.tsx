@@ -150,7 +150,7 @@ export function PostCard({ post, ref }: PostCardProps) {
                   <span className="text-xs text-muted-foreground">
                   {moment(post.created_At).format("YYYY MMM DD, hh:mm A")}
                   </span>
-                  <span className="text-xs  text-muted-foreground">•</span>
+                  {/* <span className="text-xs  text-muted-foreground">•</span> */}
                   {/* <span className="text-xs  text-muted-foreground ">
                     Public
                   </span> */}
