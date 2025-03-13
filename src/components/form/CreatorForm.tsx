@@ -25,7 +25,6 @@ import {
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
 
-
 interface CreatorFormProps {
   onClose: () => void;
   onSuccess?: () => void;
@@ -45,15 +44,19 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     name: "",
     description: "",
     tags: "",
+    instaFollowers: "",
+    youtubeSubscribers: "",
   });
   const [categoryId, setCategoryId] = useState("");
   const [additionalTags] = useState([]);
 
-   // Fetch categories dynamically
-   const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+  // Fetch categories dynamically
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/`
+      );
       if (!response || !response.ok) {
         throw new Error("Failed to fetch categories");
       }
@@ -90,8 +93,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             user_id: userId,
             name: formData.name,
             description: formData.description,
-            additional_tags: formData.tags.split(","),  
+            additional_tags: formData.tags.split(","),
             category_id: categoryId,
+            instagram_followers: formData.instaFollowers,
+            youtube_followers: formData.youtubeSubscribers,
             is_locked: false,
           }),
         }
@@ -103,13 +108,19 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
       if (!data && data.r !== "s")
         console.log(data.e || "Failed to create community");
-      
+
       return data;
     },
     onSuccess: () => {
       toast.success("Community created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["communities"] });
-      setFormData({ name: "", description: "", tags: "" });
+      setFormData({
+        name: "",
+        description: "",
+        tags: "",
+        instaFollowers: "",
+        youtubeSubscribers: "",
+      });
       setCategoryId("");
       onClose();
       onSuccess?.();
@@ -136,73 +147,100 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    (session && (<DialogContent className="sm:max-w-[425px] bg-card text-muted border-none">
-      <DialogHeader className="flex items-center justify-between">
-        <DialogTitle className="text-xl font-normal">
-          Fill to create your page
-        </DialogTitle>
-      </DialogHeader>
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <Label>Page Name</Label>
-          <Input
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="Enter name"
-            className="bg-background border-none"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>{StringConstants.SELECT_TOPICS}</Label>
-          <Select onValueChange={handleCategoryChange}>
-            <SelectTrigger className="bg-background border-none">
-              <SelectValue placeholder="Select your topic" />
-            </SelectTrigger>
-            <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
-              {categories.map((category: Category) => (
-                <SelectItem key={category._id} value={category._id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>{StringConstants.TAGS}</Label>
-          <Input
-            name="tags"
-            value={formData.tags}
-            onChange={handleInputChange}
-            placeholder="Enter Tags"
-            className="bg-background border-none"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>{StringConstants.ABOUT_THE_PAGE}</Label>
-          <Textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            placeholder="Briefly describe your page"
-            className="bg-background border-none min-h-[30px]"
-          />
-        </div>
-      </div>
-      <div className="flex justify-end gap-4 mt-2">
-        <Button
-          variant="outline"
-          onClick={onClose}
-          className="text-muted bg-transparent border-gray-600 hover:bg-background"
-        >
-          {StringConstants.CANCEL}
-        </Button>
+    session && (
+      <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
+        <DialogHeader className="flex items-center justify-between">
+          <DialogTitle className="text-xl font-normal">
+            Fill to create your page
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label>Page Name</Label>
+            <Input
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Enter name"
+              className="bg-background border-none"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>{StringConstants.SELECT_TOPICS}</Label>
+            <Select onValueChange={handleCategoryChange}>
+              <SelectTrigger className="bg-background border-none">
+                <SelectValue placeholder="Select your topic" />
+              </SelectTrigger>
+              <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
+                {categories.map((category: Category) => (
+                  <SelectItem key={category._id} value={category._id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>{StringConstants.TAGS}</Label>
+            <Input
+              name="tags"
+              value={formData.tags}
+              onChange={handleInputChange}
+              placeholder="Enter Tags"
+              className="bg-background border-none"
+            />
+          </div>
 
-        <Button className="text-white" onClick={handleSubmit}>
-         {StringConstants.CREATE}
-        </Button>
-      </div>
-    </DialogContent>) 
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{StringConstants.FOLLOWERS} </Label>
+              <Input
+                name="instaFollowers"
+                type="number"
+                value={formData.instaFollowers}
+                onChange={handleInputChange}
+                placeholder="Enter Instagram Followers"
+                className="bg-background border-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{StringConstants.SUBSCRIBERS} </Label>
+              <Input
+                name="youtubeSubscribers"
+                type="number"
+                value={formData.youtubeSubscribers}
+                onChange={handleInputChange}
+                placeholder="Enter YouTube Subscribers"
+                className="bg-background border-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>{StringConstants.ABOUT_THE_PAGE}</Label>
+            <Textarea
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Briefly describe your page"
+              className="bg-background border-none min-h-[30px]"
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-4 mt-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="text-muted bg-transparent border-gray-600 hover:bg-background"
+          >
+            {StringConstants.CANCEL}
+          </Button>
+
+          <Button className="text-white" onClick={handleSubmit}>
+            {StringConstants.CREATE}
+          </Button>
+        </div>
+      </DialogContent>
     )
   );
 }

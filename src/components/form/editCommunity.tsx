@@ -32,6 +32,8 @@ interface ProfileData {
   image?: string;
   bgImage?: string;
   [key: string]: any;
+  instagram_followers: string | number;
+  youtube_followers: string | number;
 }
 
 interface EditCommunityModalProps {
@@ -55,6 +57,8 @@ export function EditCommunityModal({
     tags: profile?.community?.tags || [],
     image: profile?.community?.image || "",
     bgImage: profile?.community?.bgImage || "",
+    instagram_followers: profile?.community?.instagram_followers || "",
+    youtube_followers: profile?.community?.youtube_followers || "",
   });
 
   // Add state for file objects
@@ -71,32 +75,58 @@ export function EditCommunityModal({
   const userId = user?._id;
 
   // Load community data when modal opens, prioritizing profile prop if available
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     // First try to use the profile prop data
+  //     if (profile) {
+  //       setFormData({
+  //         name: profile?.community?.name || "",
+  //         description: profile?.community?.description || "",
+  //         category: profile?.community?.category || "",
+  //         rules: profile?.community?.rules || "",
+  //         tags: profile?.community?.tags || [],
+  //         image: profile?.community?.image || "",
+  //         bgImage: profile?.community?.bgImage || "",
+  //         instagram_followers: profile?.community?.instagram_followers || "",
+  //         youtube_followers: profile?.community?.youtube_followers || "",
+  //       });
+  //     }
+  //     // If no profile prop or it's missing data, fall back to communityData from Redux
+  //     else if (communityData) {
+  //       setFormData({
+  //         name: communityData.name || "",
+  //         description: communityData.description || "",
+  //         category: communityData.category || "",
+  //         rules: communityData.rules || "",
+  //         tags: communityData.additional_tags || [],
+  //         image: communityData.image || "",
+  //         bgImage: communityData.bgImage || "",
+  //         instagram_followers: communityData?.instagram_followers || "",
+  //         youtube_followers: communityData?.youtube_followers || "",
+  //       });
+  //     }
+  //   }
+  // }, [isOpen, profile, communityData]);
   useEffect(() => {
     if (isOpen) {
-      // First try to use the profile prop data
-      if (profile) {
-        setFormData({
-          name: profile?.community?.name || "",
-          description: profile?.community?.description || "",
-          category: profile?.community?.category || "",
-          rules: profile?.community?.rules || "",
-          tags: profile?.community?.tags || [],
-          image: profile?.community?.image || "",
-          bgImage: profile?.community?.bgImage || "",
-        });
-      }
-      // If no profile prop or it's missing data, fall back to communityData from Redux
-      else if (communityData) {
-        setFormData({
-          name: communityData.name || "",
-          description: communityData.description || "",
-          category: communityData.category || "",
-          rules: communityData.rules || "",
-          tags: communityData.additional_tags || [],
-          image: communityData.image || "",
-          bgImage: communityData.bgImage || "",
-        });
-      }
+      setFormData((prev) => ({
+        ...prev,
+        name: profile?.community?.name || community?.community?.name || "",
+        description: profile?.community?.description || "",
+        category: profile?.community?.category || "",
+        rules: profile?.community?.rules || "",
+        tags: profile?.community?.tags || communityData?.additional_tags || [],
+        image: profile?.community?.image || communityData?.image || "",
+        bgImage: profile?.community?.bgImage || communityData?.bgImage || "",
+        instagram_followers:
+          profile?.community?.instagram_followers ||
+          communityData?.instagram_followers ||
+          "",
+        youtube_followers:
+          profile?.community?.youtube_followers ||
+          communityData?.youtube_followers ||
+          "",
+      }));
     }
   }, [isOpen, profile, communityData]);
 
@@ -123,7 +153,7 @@ export function EditCommunityModal({
   const handleAddTag = () => {
     if (newTag && !formData.tags.includes(newTag)) {
       setFormData({ ...formData, tags: [...formData.tags, newTag] });
-      
+
       setNewTag("");
     }
   };
@@ -152,6 +182,11 @@ export function EditCommunityModal({
 
       // Add tags as a comma-separated string
       formDataToSend.append("additional_tags", formData.tags.join(","));
+      formDataToSend.append(
+        "instagram_followers",
+        formData.instagram_followers
+      );
+      formDataToSend.append("youtube_followers", formData.youtube_followers);
 
       // Add rules if available
       if (formData.rules) {
@@ -166,6 +201,10 @@ export function EditCommunityModal({
       // Add image files if selected
       if (imageFile) {
         formDataToSend.append("image", imageFile);
+      }
+
+      if (bgImageFile) {
+        formDataToSend.append("background_image", bgImageFile);
       }
 
       if (bgImageFile) {
@@ -272,6 +311,41 @@ export function EditCommunityModal({
                   />
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{StringConstants.FOLLOWERS} </Label>
+              <Input
+                name="instaFollowers"
+                type="number"
+                value={formData.instagram_followers}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    instagram_followers: e.target.value,
+                  })
+                }
+                placeholder="Enter Instagram Followers"
+                className="bg-background border-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>{StringConstants.SUBSCRIBERS} </Label>
+              <Input
+                name="youtubeSubscribers"
+                type="number"
+                value={formData.youtube_followers}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    youtube_followers: e.target.value,
+                  })
+                }
+                placeholder="Enter YouTube Subscribers"
+                className="bg-background border-none"
+              />
             </div>
           </div>
 

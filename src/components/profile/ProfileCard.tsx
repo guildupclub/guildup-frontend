@@ -25,7 +25,10 @@ import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
 import { StringConstants } from "../common/CommonText";
-
+import { GrInstagram } from "react-icons/gr";
+import { BsYoutube } from "react-icons/bs";
+import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
+import numbro from "numbro";
 // Add this state in ProfileCard component
 
 interface CommunityProfile {
@@ -44,6 +47,8 @@ interface CommunityProfile {
     tags: string[];
     image: string;
     background_image: string;
+    youtube_followers: string;
+    instagram_followers: string;
   };
 }
 
@@ -59,7 +64,7 @@ interface Offering {
     amount: number;
     currency: string;
   };
-  discounted_price:string;
+  discounted_price: string;
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -241,6 +246,10 @@ export function ProfileCard() {
     setSelectedOfferingModal(offering);
     setIsEditModalOpen(true);
   };
+  const formatNumber = (num: any) => {
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
+  };
 
   if (loading) return <div>{StringConstants.LOADING}</div>;
   if (error) return <div>{error}</div>;
@@ -306,6 +315,7 @@ export function ProfileCard() {
               </p>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1.5">
+                  <MdPeopleAlt className="h-5 w-5 text-green-500" />
                   <span className="font-medium text-foreground">
                     {profile.community.num_member.toLocaleString()}
                   </span>
@@ -313,10 +323,29 @@ export function ProfileCard() {
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-1.5">
+                  <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
                   <span className="font-medium text-foreground">
-                    {profile.community.post_count}
+                    {profile?.community?.post_count}
                   </span>
                   {StringConstants.POSTS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <GrInstagram className="h-5 w-5 text-pink-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.instagram_followers)}
+                  </span>
+                  {StringConstants.FOLLOWERS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <BsYoutube className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.youtube_followers)}
+                  </span>
+                  {StringConstants.SUBSCRIBERS}
                 </div>
               </div>
             </div>
