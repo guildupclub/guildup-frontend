@@ -29,7 +29,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { GrAnnounce } from "react-icons/gr";
 import { FaCalendarAlt, FaUserAlt } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
-import { setMemberDetails } from "@/redux/memberSlice";
+import { clearMemberDetails, setMemberDetails } from "@/redux/memberSlice";
 import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
@@ -107,6 +107,9 @@ export function Sidebar() {
       console.log("@here in useEffect");
       getMemberDetails();
     }
+    return () => {
+      dispatch(clearMemberDetails());
+    };
   }, [activeCommunityId]);
 
   const fetchChannels = async () => {
