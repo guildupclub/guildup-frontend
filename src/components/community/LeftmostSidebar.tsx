@@ -230,8 +230,24 @@ export function LeftmostSidebar() {
   //   }
   // };
 
-  const handleNavigation = (path: string) => {
-    router.push(path);
+  // const handleNavigation = (path: string) => {
+  //   router.push(path);
+  // };
+  const handleNavigation = (path: string,communityId:string) => {
+    const currentPath = window.location.pathname;
+    const pathSegments = currentPath.split('/');
+    const currentPage = pathSegments[3] || 'profile'; // Default to profile if no page specified
+    console.log("@currentPage", path,communityId,currentPage);
+
+    // If we're switching communities, maintain the same page
+    if (currentPage =='channel') {
+      // For channels, always navigate to profile
+      router.push(`/community/${communityId}/profile`);
+    }else if (path.includes('community')) {
+      // const communityId = path.split('/community/')[1];
+      console.log("@communityId", `/community/${communityId}/${currentPage}`,communityId);
+      router.push(`/community/${communityId}/${currentPage}`);
+    } 
   };
 
   if (error) {
@@ -283,7 +299,7 @@ export function LeftmostSidebar() {
                     })
                   );
                   handleNavigation(
-                    `/community/${community._id}/profile`
+                    `/community/${community._id}/profile`,community._id
                   );
                 }}
               >
