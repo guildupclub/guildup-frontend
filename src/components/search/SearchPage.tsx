@@ -116,7 +116,7 @@ function SearchPageContent() {
 
       console.log("Navigating to /community/profile"); // ✅ Check if this appears
 
-      router.push("/community/profile");
+      router.push(`/community/${community.community._id}/profile`);
     },
     [dispatch, router]
   );

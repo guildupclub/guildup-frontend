@@ -27,6 +27,7 @@ import {
   useJoinCommunity,
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Community {
   _id: string;
@@ -40,6 +41,7 @@ interface Community {
 }
 
 export function LeftmostSidebar() {
+  const router = useRouter();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   // const [communities, setCommunities] = useState<Community[]>([]);
@@ -228,6 +230,10 @@ export function LeftmostSidebar() {
   //   }
   // };
 
+  const handleNavigation = (path: string) => {
+    router.push(path);
+  };
+
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
@@ -275,6 +281,9 @@ export function LeftmostSidebar() {
                       communityId: community._id,
                       userId: user._id,
                     })
+                  );
+                  handleNavigation(
+                    `/community/${community._id}/profile`
                   );
                 }}
               >

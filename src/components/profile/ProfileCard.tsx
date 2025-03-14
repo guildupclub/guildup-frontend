@@ -72,10 +72,11 @@ interface Offering {
   total_ratings: number;
 }
 
-export function ProfileCard() {
+export function ProfileCard({ communityId }: ProfileCardProps) {
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
+  console.log("@userFollowedCommunities", userFollowedCommunities);
   const user = useSelector((state: RootState) => state.user.user);
   const community = useSelector((state: RootState) => state.community);
   const memberDetails = useSelector(
@@ -95,7 +96,7 @@ export function ProfileCard() {
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const activeCommunityId = community?.communityId;
+  const activeCommunityId = communityId || community?.communityId;
 
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
@@ -114,11 +115,11 @@ export function ProfileCard() {
 
   // Add fetchOfferings function
   const fetchOfferings = useCallback(async () => {
-    if (!community.communityId) return;
+    if (!activeCommunityId) return;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${community.communityId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${activeCommunityId}`
       );
 
       if (response.data.r === "s") {
@@ -131,20 +132,20 @@ export function ProfileCard() {
     } catch (error) {
       console.error("Error fetching offerings:", error);
     }
-  }, [community]);
+  }, [activeCommunityId]);
 
   // Add useEffect to fetch offerings
   // Add this section after the existing community info grid
 
   const handleLeaveCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 
@@ -159,17 +160,17 @@ export function ProfileCard() {
 
   useEffect(() => {
     fetchOfferings();
-  }, [community.communityId, fetchOfferings]);
+  }, [activeCommunityId, fetchOfferings]);
 
   useEffect(() => {
-    if (!community?.communityId) return; // Ensure communityId is set before fetching
+    if (!activeCommunityId) return; // Ensure communityId is set before fetching
 
     const fetchProfileData = async () => {
       try {
         setLoading(true);
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          { communityId: community.communityId }
+          { communityId: activeCommunityId }
         );
 
         console.log("@response", response.data.data);
@@ -199,17 +200,17 @@ export function ProfileCard() {
     };
 
     fetchProfileData();
-  }, [community?.communityId]); // Dependency array includes communityId
+  }, [activeCommunityId]);
 
   const handleJoinCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 

@@ -6,7 +6,7 @@ import { Hash, Plus, Rss, Crown, Lock, Info } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { setActiveChannel } from "@/redux/channelSlice";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -66,6 +66,7 @@ export function Sidebar() {
     type: "discussion",
     is_locked: false,
   });
+  const params = useParams();
 
   useEffect(() => {
     if (activeCommunityId) {
@@ -240,8 +241,12 @@ export function Sidebar() {
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
               : "hover:bg-background text-muted-foreground"
           }`}
-          onClick={() => handleNavigation("/community/profile")}
-        >
+          onClick={() => {
+            const communityId = activeCommunityId || params.id;
+            if (communityId) {
+              handleNavigation(`/community/${communityId}/profile`);
+            }
+          }}  >
           <FaUserAlt />
           {StringConstants.PROFILE}
         </Button>
@@ -254,9 +259,12 @@ export function Sidebar() {
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
               : "hover:bg-background text-muted-foreground"
           }`}
-          onClick={() =>
-            handleNavigation(`/community/${activeCommunityId}/feed`)
-          }
+          onClick={() => {
+            const communityId = activeCommunityId || params.id;
+            if (communityId) {
+              handleNavigation(`/community/${communityId}/feed`);
+            }
+          }}
         >
           <Rss className="h-4 w-4" />
           {StringConstants.FEED}
@@ -270,7 +278,12 @@ export function Sidebar() {
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
               : "hover:bg-background text-muted-foreground"
           }`}
-          onClick={() => handleNavigation("/community/members")}
+          onClick={() => {
+            const communityId = activeCommunityId || params.id;
+            if (communityId) {
+              handleNavigation(`/community/${communityId}/members`);
+            }
+          }}
         >
           <FaUserGroup />
           {StringConstants.MEMBER}
@@ -291,7 +304,7 @@ export function Sidebar() {
         </Button> */}
         {/* <Button
           variant="ghost"
-          className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
+          className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
           onClick={() => handleNavigation("/community/event")}
         >
           <FaCalendarAlt />
@@ -440,7 +453,9 @@ export function Sidebar() {
                         type: channel.type,
                       })
                     );
-                    handleNavigation(`/community/channel/${channel.name}`);
+                    handleNavigation(
+                      `/community/${activeCommunityId}/channel/${channel.name}`
+                    );
                   }}
                 >
                   <Hash />
