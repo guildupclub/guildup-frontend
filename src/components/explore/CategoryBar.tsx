@@ -24,30 +24,51 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
     }
   }, [categorys, selectCategory]);
 
-
   const handleCategorySelect = (id: string) => {
     setSelectedCategory(id); // Update the selected category state
     selectCategory(id); // Call the parent function
   };
 
   return (
-    <div className="!bg-white backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 overflow-auto scrollbar-none cursor-pointer">
-      <div className="flex gap-4 px-4">
-        {categorys?.map((cat: Category) => (
-          <button
-            className={`text-md cursor-pointer font-semibold flex-shrink-0 ${
-              selectedCategory === cat._id
-                ? "text-gradient underline underline-offset-4 decoration-blue-500"
-                : "hover:text-gradient"
-            }`}
-            onClick={() => handleCategorySelect(cat._id)}
-            key={cat._id}
-          >
-            {cat.name}
-          </button>
-        ))}
+    <>
+      {/* Desktop View (md and larger) */}
+      <div className="hidden md:block !bg-white backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 overflow-scroll scrollbar-none cursor-pointer lg:px-[100px]">
+        <div className="flex gap-4">
+          {categorys?.map((cat: Category) => (
+            <button
+              className={`text-md cursor-pointer font-semibold flex-shrink-0 ${
+                selectedCategory === cat._id
+                  ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                  : "hover:text-gradient"
+              }`}
+              onClick={() => handleCategorySelect(cat._id)}
+              key={cat._id}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Mobile View */}
+      <div className="md:hidden overflow-x-scroll scrollbar-none whitespace-nowrap backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20">
+        <div className="flex gap-2 px-4">
+          {categorys?.map((cat: Category) => (
+            <button
+              className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+                selectedCategory === cat._id
+                  ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                  : "hover:text-gradient"
+              }`}
+              onClick={() => handleCategorySelect(cat._id)}
+              key={cat._id}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 

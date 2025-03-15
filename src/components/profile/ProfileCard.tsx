@@ -13,6 +13,7 @@ import {
   Edit,
   Instagram,
   Trash2,
+  Pencil,
   Video,
 } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
@@ -259,7 +260,7 @@ export function ProfileCard() {
     console.log("@prifle", profile.user);
   }
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="w-full max-w-6xl py-2 px-3 md:px-0">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
           <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
@@ -299,7 +300,7 @@ export function ProfileCard() {
                     className="p-1 rounded-md hover:bg-background transition"
                     onClick={() => setIsEditOpen(true)}
                   >
-                    <FiEdit
+                    <Pencil
                       size={18}
                       className="text-muted hover:text-primary"
                     />
@@ -376,6 +377,7 @@ export function ProfileCard() {
         </div>
       </div>
 
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <div className="p-4 ">
           <h2 className="text-2xl font-semibold text-foreground mb-4">
@@ -430,7 +432,7 @@ export function ProfileCard() {
           </div>
         </div> */}
 
-        <div className="rounded-xl p-4   transition-all duration-300 border border-border/5">
+        <div className="rounded-xl transition-all duration-300 border border-border/5">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-foreground">
               {StringConstants.OFFERINGS}

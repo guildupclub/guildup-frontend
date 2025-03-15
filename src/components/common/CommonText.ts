@@ -115,10 +115,11 @@ export const StringConstants = {
     DISCOUNTED_PRICE:'Discounted Price',
     TITLE: 'Title',
     TYPE: 'Type',
-   
-    SUBSCRIBERS:"Subscribers",
-    FOLLOWERS:"Followers"
 
+    SUBSCRIBERS:"Subscribers",
+    FOLLOWERS:"Followers",
+    NO_COMMUNITIES_AVAILABLE: 'No communities available',
+    PUBLIC: 'Public',
 
 }
 

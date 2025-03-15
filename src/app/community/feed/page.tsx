@@ -30,7 +30,7 @@ export default function FeedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex grow bg-background">
       {activeCommunityId ? (
         <Feed communityId={activeCommunityId} />
       ) : (

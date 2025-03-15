@@ -56,21 +56,16 @@ export function Feed() {
           {posts.length === 0 ? (
             <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
           ) : (
-            <>
-              {posts.map((post: any, index) => (
-                <PostCard
-                  key={post._id}
-                  post={post}
-                  ref={index === posts.length - 1 ? lastPostElementRef : null}
-                />
-              ))}
-              {isFetchingNextPage && (
-                <div className="flex justify-center py-4">
-                  <Loader  />
-                </div>
-              )}
-            </>
+            posts.map((post, index) => (
+              <PostCard
+                key={post._id}
+                post={post}
+                userID={userId}
+                ref={index === posts.length - 1 ? lastPostElementRef : null}
+              />
+            ))
           )}
+          {isFetchingNextPage && <Loader />}
         </TabsContent>
       </Tabs>
     </div>

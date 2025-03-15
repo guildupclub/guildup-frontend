@@ -137,14 +137,14 @@ function ChatContent() {
       </div>
 
       {/* Input Box */}
-      <div className="fixed bottom-0 w-[calc(100%-20rem)] px-3 pr-28 py-2">
+      <div className="fixed bottom-16 w-full md:bottom-0 md:w-[calc(100%-34rem)] px-3 py-2">
         <div className="flex items-center gap-2 rounded-lg p-1 bg-card border border-background">
           <input
             type="text"
             placeholder="Share your thoughts..."
             value={postBody}
             onChange={(e) => setPostBody(e.target.value)}
-            className="flex-1 bg-card text-muted text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
+            className="flex-1 bg-background text-muted text-sm placeholder-zinc-400 rounded px-3 py-2 focus:outline-none"
           />
           <div className="flex gap-8 px-2 py-1">
             <Button
