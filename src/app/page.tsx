@@ -24,7 +24,6 @@ export default function Home() {
       // If the user is new, open the modal
       if (session.user?.isNewUser) {
         setIsModalOpen(true); // Open modal for topic selection
-        console.log("asdasada: ===", session);
       }
     } else {
       router.push("/"); // Redirect to sign-in page if not authenticated
