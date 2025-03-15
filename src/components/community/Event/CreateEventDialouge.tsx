@@ -75,7 +75,7 @@ export function PostDialog() {
 
   const handlePostCreate = async () => {
     if (!content) {
-      toast.error("content are required!");
+      toast.error("Content are required!");
       return;
     }
 

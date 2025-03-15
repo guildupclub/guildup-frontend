@@ -7,16 +7,20 @@ import { Settings, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { RootState } from "@/redux/store";
-import { useChatMessages, useSendChatMessage } from "@/hook/queries/useChatQueries";
+import {
+  useChatMessages,
+  useSendChatMessage,
+} from "@/hook/queries/useChatQueries";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
-
+import moment from "moment";
 interface Post {
   id: string;
   author: string;
   time: string;
   content: string;
   avatar: string;
+  name: string;
 }
 
 function Chat() {
@@ -56,6 +60,7 @@ function Chat() {
             content: item.message_content || "",
             author: userData.user_name || "Unknown",
             avatar: userData.image || "",
+            name: userData.name || "",
           };
         }) || []
       );
@@ -82,7 +87,7 @@ function Chat() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["chatMessages", activeChannelId, userId]
+        queryKey: ["chatMessages", activeChannelId, userId],
       });
       setPostBody(""); // Clear input after sending
     },
@@ -105,11 +110,15 @@ function Chat() {
     );
   }
 
-  if (isLoading) return <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>;
+  if (isLoading)
+    return (
+      <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>
+    );
   if (error)
     return (
       <div className="text-center py-10 text-red-500">
-        {StringConstants.ERROR} {(error as Error).message}. {StringConstants.PLEASE_TRY_AGAIN}
+        {StringConstants.ERROR} {(error as Error).message}.{" "}
+        {StringConstants.PLEASE_TRY_AGAIN}
       </div>
     );
 
@@ -137,17 +146,17 @@ function Chat() {
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium">{post.author}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {post.time}
-                      </span>
+                      <span className="font-medium">{post.name}</span>
+                      {moment(post.time).format("YYYY MMM DD, hh:mm A")}
                     </div>
                     <p className="text-sm text-accent">{post.content}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center text-zinc-400">{StringConstants.NO_POSTS_YET}</div>
+              <div className="text-center text-zinc-400">
+                {StringConstants.NO_POSTS_YET}
+              </div>
             )}
           </div>
         </ScrollArea>

@@ -15,6 +15,7 @@ interface Offering {
   price?: {
     amount: number;
   };
+  discounted_price: string;
   tags?: string[];
   title?: string;
 }
@@ -112,7 +113,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           ))}
         </div>
       </div>
-      {firstOffering && (
+      {firstOffering ? (
         <div className="mt-auto flex items-center justify-between m-4 p-3 bg-blue-50 rounded-lg">
           <div className="flex items-center space-x-2">
             <IoVideocam className="text-primary h-6 w-6" />
@@ -129,7 +130,6 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             size="sm"
             className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
             onClick={(e) => {
-              // e.stopPropagation();
               if (!session) {
                 signIn("google");
                 return;
@@ -137,19 +137,24 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
               setSelectedOffering(firstOffering);
             }}
           >
-            {firstOffering.price?.amount ? (
+            {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
               <>
                 <span className="line-through text-xs opacity-60">
-                  ₹{firstOffering.price.amount + 1000}
-                </span>{" "}
+                  ₹{firstOffering.price.amount}
+                </span>
+                <span> ₹{firstOffering.discounted_price}</span>
               </>
+            ) : firstOffering?.price?.amount ? (
+              <span>₹{firstOffering.price.amount}</span>
             ) : null}
-            {firstOffering.price?.amount
-              ? `₹${firstOffering.price.amount}`
-              : "FREE"}
           </Button>
         </div>
+      ) : (
+        <div className="mt-auto flex items-center justify-center m-4 p-3 bg-gray-100 rounded-lg">
+          <p className="text-gray-500 font-medium">No Offering Available</p>
+        </div>
       )}
+
       {/* {selectedOffering && (
         <BookingDialog
           offering={selectedOffering}

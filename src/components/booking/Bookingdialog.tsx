@@ -88,6 +88,9 @@ export function BookingDialog({
     "date" | "time" | "confirmation"
   >("date");
 
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
+  );
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const user = useSelector((state: RootState) => state.user.user);
   useEffect(() => {
@@ -340,7 +343,7 @@ export function BookingDialog({
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
                   <img
                     src={
-                      user?.image ||
+                      activeCommunity?.image ||
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh"
                     }
                     alt="User"
@@ -398,7 +401,7 @@ export function BookingDialog({
             <div className="p-6 bg-background">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
-                Choose your available time slot
+                  Choose your available time slot
                 </DialogTitle>
               </DialogHeader>
 

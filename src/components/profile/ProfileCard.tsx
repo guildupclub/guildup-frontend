@@ -26,7 +26,10 @@ import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
 import { StringConstants } from "../common/CommonText";
-
+import { GrInstagram } from "react-icons/gr";
+import { BsYoutube } from "react-icons/bs";
+import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
+import numbro from "numbro";
 // Add this state in ProfileCard component
 
 interface CommunityProfile {
@@ -45,6 +48,8 @@ interface CommunityProfile {
     tags: string[];
     image: string;
     background_image: string;
+    youtube_followers: string;
+    instagram_followers: string;
   };
 }
 
@@ -60,6 +65,7 @@ interface Offering {
     amount: number;
     currency: string;
   };
+  discounted_price: string;
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -96,10 +102,10 @@ export function ProfileCard() {
     (c) => c?._id === activeCommunityId
   );
 
-  const isOwner = memberDetails && 
-                  memberDetails.is_owner === true && 
-                  memberDetails.community_id === community.communityId;
-
+  const isOwner =
+    memberDetails &&
+    memberDetails.is_owner === true &&
+    memberDetails.community_id === community.communityId;
 
   // Now button in the offering card
 
@@ -167,22 +173,19 @@ export function ProfileCard() {
           { communityId: community.communityId }
         );
 
-        console.log("@response",response.data.data)
+        console.log("@response", response.data.data);
         if (response.data.r === "s") {
           setProfile(response.data.data);
-          if(response.data.data.community.image){
-            setAvatarImgUrl(response.data.data.community.image)
-          }
-          else{
-
+          if (response.data.data.community.image) {
+            setAvatarImgUrl(response.data.data.community.image);
+          } else {
             setAvatarImgUrl(
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
             );
           }
-          if(response.data.data.community.background_image){
-            setBgImgUrl(response.data.data.community.background_image)
-          }
-          else{
+          if (response.data.data.community.background_image) {
+            setBgImgUrl(response.data.data.community.background_image);
+          } else {
             setBgImgUrl(
               "https://random-image-pepebigotes.vercel.app/api/random-image"
             );
@@ -244,12 +247,18 @@ export function ProfileCard() {
     setSelectedOfferingModal(offering);
     setIsEditModalOpen(true);
   };
+  const formatNumber = (num: any) => {
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
+  };
 
   if (loading) return <div>{StringConstants.LOADING}</div>;
   if (error) return <div>{error}</div>;
   if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
 
-  {console.log("@prifle",profile.user)}
+  {
+    console.log("@prifle", profile.user);
+  }
   return (
     <div className="w-full max-w-6xl py-2 px-3 md:px-0">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
@@ -305,8 +314,9 @@ export function ProfileCard() {
                   {profile.user.user_name}
                 </span>
               </p>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground my-2">
                 <div className="flex items-center gap-1.5">
+                  <MdPeopleAlt className="h-5 w-5 text-green-500" />
                   <span className="font-medium text-foreground">
                     {profile.community.num_member.toLocaleString()}
                   </span>
@@ -314,10 +324,29 @@ export function ProfileCard() {
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-1.5">
+                  <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
                   <span className="font-medium text-foreground">
-                    {profile.community.post_count}
+                    {profile?.community?.post_count}
                   </span>
                   {StringConstants.POSTS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <GrInstagram className="h-5 w-5 text-pink-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.instagram_followers)}
+                  </span>
+                  {StringConstants.FOLLOWERS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <BsYoutube className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.youtube_followers)}
+                  </span>
+                  {StringConstants.SUBSCRIBERS}
                 </div>
               </div>
             </div>
@@ -348,9 +377,12 @@ export function ProfileCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-        <div className="">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">{StringConstants.ABOUT}</h2>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="p-4 ">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
+            {StringConstants.ABOUT}
+          </h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
             <p className="text-muted-foreground leading-relaxed mb-6">
               {profile.community.description}
@@ -416,13 +448,11 @@ export function ProfileCard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-
               {offerings.map((offering) => (
                 <div
                   key={offering._id || Math.random()}
                   className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
                 >
-
                   {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 rounded-lg">
@@ -481,10 +511,17 @@ export function ProfileCard() {
                           setSelectedOffering(offering);
                         }}
                       >
-                        {/* <span className="line-through text-xs opacity-60">
-                          ₹{offering.price.amount * 1.5}
-                        </span> */}
-                        <span>₹{offering.price.amount}</span>
+                        {offering?.discounted_price &&
+                        offering?.price?.amount ? (
+                          <>
+                            <span className="line-through text-xs opacity-60">
+                              ₹{offering.price.amount}
+                            </span>
+                            <span> ₹{offering.discounted_price}</span>
+                          </>
+                        ) : offering?.price?.amount ? (
+                          <span>₹{offering.price.amount}</span>
+                        ) : null}
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
@@ -505,7 +542,7 @@ export function ProfileCard() {
       </div>
       {isEditOpen && (
         <EditCommunityModal
-        profile={profile}
+          profile={profile}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
         />

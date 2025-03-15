@@ -21,9 +21,10 @@ import { setActiveCommunity } from "@/redux/channelSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
-import Image from 'next/image';
+import Image from "next/image";
+import { API_FRONTEND_URL } from "@/config/constants";
+import moment from "moment";
 import { StringConstants } from "../common/CommonText";
-
 
 
 interface PostCardProps {
@@ -156,7 +157,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `https://guildup-frontend-prod.vercel.app/posts/${post.slug}`;
+    const shareUrl = `${API_FRONTEND_URL}/posts/${post.slug}`;
 
     try {
       await navigator.share({
@@ -169,23 +170,19 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     }
   };
 
-  const communityName = post?.community_id?.name || "Unknown";
+  const communityName = post?.community_id?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
 
   return (
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
-          <div onClick={handleClickCommunity} className="cursor-pointer">
-            <Avatar className="h-10 w-10  border-2 border-purple-500">
-              <AvatarImage src={post?.community_id?.image} />
-              <AvatarFallback>
-              <AvatarFallback >
-                {fallbackLetter}
-              </AvatarFallback>
+          <Avatar className="h-10 w-10  border-2 border-purple-500">
+            <AvatarImage src={post?.community_id?.image} />
+            <AvatarFallback>
+              <AvatarFallback>{fallbackLetter}</AvatarFallback>
             </AvatarFallback>
             </Avatar>
-          </div>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
@@ -193,10 +190,9 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
 
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
-                    {formatTimeAgo(post.created_At)}
+                  {moment(post.created_At).format("YYYY MMM DD, hh:mm A")}
                   </span>
-                  <span className="text-xs  text-muted-foreground">•</span>
-
+                  {/* <span className="text-xs  text-muted-foreground">•</span> */}
                   {/* <span className="text-xs  text-muted-foreground ">
                     Public
                   </span> */}

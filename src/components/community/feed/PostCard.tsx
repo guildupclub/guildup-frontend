@@ -16,6 +16,8 @@ import { CommentSection } from "./CommentSection";
 import { FaShare } from "react-icons/fa";
 import { StringConstants } from "@/components/common/CommonText";
 import { useSession } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface PostCardProps {
   post: {
@@ -41,6 +43,19 @@ export function PostCard({ post }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [relativeTime, setRelativeTime] = useState("");
   const { data: session } = useSession();
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
+  );
+
+  const name = activeCommunity?.name;
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   useEffect(() => {
     setRelativeTime(
@@ -54,12 +69,12 @@ export function PostCard({ post }: PostCardProps) {
         {/* Header */}
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
-            <AvatarImage src={session?.user?.image} />
-            <AvatarFallback>UN</AvatarFallback>
+            <AvatarImage src={activeCommunity?.image} />
+            <AvatarFallback>{getInitials(name || "")}</AvatarFallback>
           </Avatar>
           <div className="flex-1 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{session?.user?.name}</span>
+              <span className="font-medium">{activeCommunity?.name}</span>
               <Badge variant="outline" className="text-xs bg-transparent">
                 {StringConstants.HOST}
               </Badge>
@@ -102,7 +117,9 @@ export function PostCard({ post }: PostCardProps) {
             <Heart
               className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : ""}`}
             />
-            <span>{post.up_votes} {StringConstants.LIKE}</span>
+            <span>
+              {post.up_votes} {StringConstants.LIKE}
+            </span>
           </Button>
 
           <Button
@@ -112,7 +129,9 @@ export function PostCard({ post }: PostCardProps) {
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageCircleMore className="h-5 w-5" />
-            <span>{post.reply_count} {StringConstants.COMMENT}</span>
+            <span>
+              {post.reply_count} {StringConstants.COMMENT}
+            </span>
           </Button>
           <Button
             variant="ghost"
