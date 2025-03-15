@@ -28,6 +28,7 @@ import {
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
 
+
 interface Community {
   _id: string;
   title: string;
@@ -111,7 +112,7 @@ export function LeftmostSidebar() {
   // Fetch communities function
   const fetchCommunities = async (): Promise<Community[]> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
       {
         method: "POST",
         headers: {
