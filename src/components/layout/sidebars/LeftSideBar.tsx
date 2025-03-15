@@ -113,7 +113,7 @@ export function LeftSidebar() {
     async function fetchCommunities() {
       try {
         const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
           {
             userId: userId,
           }

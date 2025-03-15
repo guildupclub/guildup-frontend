@@ -111,7 +111,7 @@ export function LeftmostSidebar() {
   // Fetch communities function
   const fetchCommunities = async (): Promise<Community[]> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
       {
         method: "POST",
         headers: {

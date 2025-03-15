@@ -64,7 +64,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
@@ -231,7 +231,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </div>
 
               <div className="hidden md:block">
-                {isMounted && user?._id ? (
+                {user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
