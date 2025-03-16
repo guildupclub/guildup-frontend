@@ -6,13 +6,8 @@ import { StringConstants } from "@/components/common/CommonText";
 import { useParams } from "next/navigation";
 
 export default function FeedPage() {
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
-
   const params = useParams();
-  console.log("@params", params);
-  const activeCommunityId = activeCommunity?.id || params.id;
+  const activeCommunityId =  params.id;
 
   return (
     <div className="min-h-screen bg-background">

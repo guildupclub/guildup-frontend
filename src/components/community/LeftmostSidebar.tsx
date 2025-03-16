@@ -27,7 +27,7 @@ import {
   useJoinCommunity,
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 interface Community {
   _id: string;
@@ -55,13 +55,12 @@ export function LeftmostSidebar() {
     setShowCreatorForm((prev) => !prev);
   };
 
+  const params = useParams();
   const dispatch = useDispatch();
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
+ 
   const user = useSelector((state: RootState) => state.user.user);
 
-  const activeCommunityId = activeCommunity?.id;
+  const activeCommunityId = params.id;
   useEffect(() => {
     fetchCommunities();
   }, []);

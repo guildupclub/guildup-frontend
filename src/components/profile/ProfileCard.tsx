@@ -163,7 +163,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   }, [activeCommunityId, fetchOfferings]);
 
   useEffect(() => {
-    if (!activeCommunityId) return; // Ensure communityId is set before fetching
+    if (!communityId) return; // Ensure communityId is set before fetching
 
     const fetchProfileData = async () => {
       try {
@@ -200,7 +200,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     };
 
     fetchProfileData();
-  }, [activeCommunityId]);
+  }, [communityId,activeCommunityId]);
 
   const handleJoinCommunity = async () => {
     if (!user?._id || !activeCommunityId) return;
