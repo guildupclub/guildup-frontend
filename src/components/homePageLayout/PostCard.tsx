@@ -183,7 +183,6 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
               <AvatarFallback>{fallbackLetter}</AvatarFallback>
             </AvatarFallback>
             </Avatar>
-          </div>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
