@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   compiler: {
-    removeConsole: true,
+    removeConsole: false,
   },
   images: {
     domains: [
@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
       "lh3.googleusercontent.com",
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
-      "storage.googleapis.com"
+      "storage.googleapis.com",
+      "img.freepik.com"
     ], // Correct usage for external domains
     remotePatterns: [
       {

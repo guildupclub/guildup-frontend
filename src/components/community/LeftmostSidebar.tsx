@@ -27,6 +27,7 @@ import {
   useJoinCommunity,
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
+import { useParams, useRouter } from "next/navigation";
 
 
 interface Community {
@@ -41,6 +42,7 @@ interface Community {
 }
 
 export function LeftmostSidebar() {
+  const router = useRouter();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   // const [communities, setCommunities] = useState<Community[]>([]);
@@ -54,13 +56,12 @@ export function LeftmostSidebar() {
     setShowCreatorForm((prev) => !prev);
   };
 
+  const params = useParams();
   const dispatch = useDispatch();
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
+ 
   const user = useSelector((state: RootState) => state.user.user);
 
-  const activeCommunityId = activeCommunity?.id;
+  const activeCommunityId = params.id;
   useEffect(() => {
     fetchCommunities();
   }, []);
@@ -228,6 +229,26 @@ export function LeftmostSidebar() {
   //   }
   // };
 
+  // const handleNavigation = (path: string) => {
+  //   router.push(path);
+  // };
+  const handleNavigation = (path: string,communityId:string) => {
+    const currentPath = window.location.pathname;
+    const pathSegments = currentPath.split('/');
+    const currentPage = pathSegments[3] || 'profile'; // Default to profile if no page specified
+    console.log("@currentPage", path,communityId,currentPage);
+
+    // If we're switching communities, maintain the same page
+    if (currentPage =='channel') {
+      // For channels, always navigate to profile
+      router.push(`/community/${communityId}/profile`);
+    }else if (path.includes('community')) {
+      // const communityId = path.split('/community/')[1];
+      console.log("@communityId", `/community/${communityId}/${currentPage}`,communityId);
+      router.push(`/community/${communityId}/${currentPage}`);
+    } 
+  };
+
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
@@ -275,6 +296,9 @@ export function LeftmostSidebar() {
                       communityId: community._id,
                       userId: user._id,
                     })
+                  );
+                  handleNavigation(
+                    `/community/${community._id}/profile`,community._id
                   );
                 }}
               >

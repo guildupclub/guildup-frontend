@@ -99,7 +99,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         })
       );
 
-      router.push("/community/profile");
+      router.push(`/community/${community._id}/profile`);
     },
     [dispatch, router]
   );

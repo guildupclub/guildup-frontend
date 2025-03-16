@@ -30,7 +30,7 @@ import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
-// Add this state in ProfileCard component
+import { useQuery } from "@tanstack/react-query";
 
 interface CommunityProfile {
   user: {
@@ -73,30 +73,25 @@ interface Offering {
   total_ratings: number;
 }
 
-export function ProfileCard() {
+export function ProfileCard({ communityId }: ProfileCardProps) {
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
+  console.log("@userFollowedCommunities", userFollowedCommunities);
   const user = useSelector((state: RootState) => state.user.user);
   const community = useSelector((state: RootState) => state.community);
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
   );
   const { data: session, status } = useSession();
-  const [profile, setProfile] = useState<CommunityProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setBgImgUrl] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOfferingModal, setSelectedOfferingModal] = useState(null);
-
-  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
-    null
-  );
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const activeCommunityId = community?.communityId;
+  const activeCommunityId = communityId || community?.communityId;
 
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
@@ -107,19 +102,50 @@ export function ProfileCard() {
     memberDetails.is_owner === true &&
     memberDetails.community_id === community.communityId;
 
-  // Now button in the offering card
+  const {
+    data: profile,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['communityProfile', activeCommunityId],
+    queryFn: async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        { communityId: activeCommunityId }
+      );
+      console.log("@responseProfilePAge", response.data.data )
+      if (response.data.r === 's') {
+        // Update avatar and background images
+        if (response.data.data.community.image) {
+          setAvatarImgUrl(response.data.data.community.image);
+        } else {
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+          );
+        }
+        
+        if (response.data.data.community.background_image) {
+          setBgImgUrl(response.data.data.community.background_image);
+        } else {
+          setBgImgUrl(
+            "https://random-image-pepebigotes.vercel.app/api/random-image"
+          );
+        }
+        
+        return response.data.data;
+      }
+      throw new Error("Failed to fetch community profile");
+    },
+    enabled: !!activeCommunityId
+  });
 
-  // First, add the Offering interface
-
-  // Add offerings state to existing states
-
-  // Add fetchOfferings function
+  console.log("@profile",profile?.community.background_image)
   const fetchOfferings = useCallback(async () => {
-    if (!community.communityId) return;
+    if (!activeCommunityId) return;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${community.communityId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${activeCommunityId}`
       );
 
       if (response.data.r === "s") {
@@ -132,20 +158,21 @@ export function ProfileCard() {
     } catch (error) {
       console.error("Error fetching offerings:", error);
     }
-  }, [community]);
+  }, [activeCommunityId]);
 
-  // Add useEffect to fetch offerings
-  // Add this section after the existing community info grid
+  useEffect(() => {
+    fetchOfferings();
+  }, [activeCommunityId, fetchOfferings]);
 
   const handleLeaveCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 
@@ -158,59 +185,15 @@ export function ProfileCard() {
     }
   };
 
-  useEffect(() => {
-    fetchOfferings();
-  }, [community.communityId, fetchOfferings]);
-
-  useEffect(() => {
-    if (!community?.communityId) return; // Ensure communityId is set before fetching
-
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          { communityId: community.communityId }
-        );
-
-        console.log("@response", response.data.data);
-        if (response.data.r === "s") {
-          setProfile(response.data.data);
-          if (response.data.data.community.image) {
-            setAvatarImgUrl(response.data.data.community.image);
-          } else {
-            setAvatarImgUrl(
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-            );
-          }
-          if (response.data.data.community.background_image) {
-            setBgImgUrl(response.data.data.community.background_image);
-          } else {
-            setBgImgUrl(
-              "https://random-image-pepebigotes.vercel.app/api/random-image"
-            );
-          }
-        }
-      } catch (error) {
-        setError("Failed to load community profile");
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfileData();
-  }, [community?.communityId]); // Dependency array includes communityId
-
   const handleJoinCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 
@@ -252,20 +235,18 @@ export function ProfileCard() {
     return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
   };
 
-  if (loading) return <div>{StringConstants.LOADING}</div>;
-  if (error) return <div>{error}</div>;
+  if (isLoading) return <div>{StringConstants.LOADING}</div>;
+  if (error) return <div>{error instanceof Error ? error.message : 'Error loading profile'}</div>;
   if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
 
-  {
-    console.log("@prifle", profile.user);
-  }
+
   return (
     <div className="w-full max-w-6xl py-2 px-3 md:px-0">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
           <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
             <Image
-              src={bgImgUrl || "/placeholder.svg"}
+              src={profile?.community.background_image != undefined ? profile?.community.background_image :"https://img.freepik.com/free-vector/copy-space-violet-wavy-shapes-background_23-2148403375.jpg?t=st=1742123016~exp=1742126616~hmac=6c247e6cb6520700f598721d460efa004964af8dc65d1eb0a929a6a317584510&w=1380"}
               alt="Profile banner"
               width={1200}
               height={400}
@@ -276,7 +257,7 @@ export function ProfileCard() {
           <div className="absolute -bottom-16 left-8">
             <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
               <Image
-                src={avatarImgUrl || "/placeholder.svg"}
+                src={ profile?.community?.image ? profile?.community?.image:"/placeholder.svg"}
                 alt={profile.community.name}
                 width={100}
                 height={100}
@@ -399,38 +380,6 @@ export function ProfileCard() {
             </div>
           </div>
         </div>
-
-        {/* <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">
-            Community Info
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Privacy
-              </h3>
-              <p className="text-muted-foreground flex items-center gap-2">
-                {profile.community.is_locked ? (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />
-                    Private Community
-                  </>
-                ) : (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                    Public Community
-                  </>
-                )}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Created By
-              </h3>
-              <p className="text-muted-foreground">{profile.user.user_name}</p>
-            </div>
-          </div>
-        </div> */}
 
         <div className="rounded-xl transition-all duration-300 border border-border/5">
           <div className="flex justify-between items-center mb-4">

@@ -60,10 +60,8 @@ export default function Members({communityId}: MembersProps) {
   const { user } = useSelector((state: RootState) => state.user);
   const removerUserId = user?._id;
 
-  const activeCommunity = useSelector(
-    (state: any) => state.channel.activeCommunity
-  );
-  const activeCommunityId = activeCommunity?.id;
+
+  const activeCommunityId = communityId
 
   useEffect(() => {
     const fetchMembers = async () => {
