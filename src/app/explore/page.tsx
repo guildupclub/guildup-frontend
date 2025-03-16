@@ -30,6 +30,7 @@ function Page() {
 
   useEffect(() => {
     const fetchCategory = async () => {
+      console.log("URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
       );
