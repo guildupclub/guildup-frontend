@@ -1,6 +1,7 @@
 "use client";
 import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
+import { API_BASE_URL } from '../../config/constants';
 import CommunitySection from "@/components/explore/CommunitySection";
 import TrendingSection from "@/components/explore/TrendingSection";
 import axios from "axios";
@@ -31,6 +32,7 @@ function Page() {
   useEffect(() => {
     const fetchCategory = async () => {
       console.log("BACKEND_URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
+      console.log("BACKENDURL_FROM_POST", API_BASE_URL);
       console.log("NEXTAUTH_URL", `${process.env.NEXTAUTH_URL}`);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
