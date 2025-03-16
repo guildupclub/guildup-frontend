@@ -30,7 +30,8 @@ function Page() {
 
   useEffect(() => {
     const fetchCategory = async () => {
-      console.log("URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`);
+      console.log("BACKEND_URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
+      console.log("NEXTAUTH_URL", `${process.env.NEXTAUTH_URL}`);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
       );
