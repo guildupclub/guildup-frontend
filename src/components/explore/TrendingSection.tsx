@@ -13,6 +13,7 @@ function TrendingSection() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log("BACKEND_URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
     const fetchTrendingCategories = async () => {
       try {
         setIsLoading(true);
