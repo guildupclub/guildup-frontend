@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   compiler: {
-    removeConsole: false,
+    removeConsole: true,
   },
   images: {
     domains: [
@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
       "storage.googleapis.com",
-      "img.freepik.com"
+      "img.freepik.com",
     ], // Correct usage for external domains
     remotePatterns: [
       {
@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
         hostname: "api.dicebear.com",
       },
     ],
-  }
+  },
 };
 
 export default nextConfig;

@@ -36,11 +36,6 @@ import { StringConstants } from "../common/CommonText";
 import { useQuery } from "@tanstack/react-query";
 
 export function Sidebar() {
-  const COMMUNITY_PROFILE_PATH= '/community/profile';
-  const COMMUNITY_MEMBERS_PATH= '/community/members';
-  const COMMUNITY_CHANNEL_PATH= '/community/channel';
-  const COMMUNITY_PATH= '/community';
-  const FEED_PATH= '/feed';
   const dispatch = useDispatch();
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
@@ -72,18 +67,18 @@ export function Sidebar() {
   const {
     data: communityDetails,
     isLoading: isLoadingCommunity,
-    error: communityError
+    error: communityError,
   } = useQuery({
-    queryKey: ['communityProfile', urlCommunityId],
+    queryKey: ["communityProfile", urlCommunityId],
     queryFn: async () => {
       if (!urlCommunityId) return null;
-      
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             communityId: urlCommunityId,
@@ -92,14 +87,13 @@ export function Sidebar() {
       );
 
       const result = await response.json();
-      if (result.r === 's' && result.data) {
+      if (result.r === "s" && result.data) {
         return result.data;
       }
       return null;
     },
     enabled: !!urlCommunityId,
   });
-
 
   console.log("@communityDetails", communityDetails);
   useEffect(() => {
@@ -245,9 +239,7 @@ export function Sidebar() {
   };
 
   return (
-    <>
-    {/* Desktop View */}
-    <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
+    <div className="fixed h-screen w-80 bg-card p-4 py-24">
       <div className="flex items-center justify-between px-2">
         {isLoadingCommunity ? (
           <div className="h-6 w-32 bg-background animate-pulse rounded" />
@@ -321,39 +313,10 @@ export function Sidebar() {
           {StringConstants.MEMBER}
         </Button>
 
-        {/* Announcements */}
-        {/* <Button
-      variant="ghost"
-      className={`w-full justify-start gap-2 ${
-        pathname === "/community/announcements"
-          ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-          : "hover:bg-background text-muted-foreground"
-      }`}
-      onClick={() => handleNavigation("/community/announcements")}
-    >
-      <GrAnnounce />
-      Announcements
-    </Button> */}
-        {/* <Button
-      variant="ghost"
-      className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
-      onClick={() => handleNavigation("/community/event")}
-    >
-      <FaCalendarAlt />
-      Events
-    </Button> */}
-        {/* <Button
-      variant="ghost"
-      className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
-      onClick={() => handleNavigation("/community/announcements")}
-    >
-      <GrAnnounce />
-      Announcements
-    </Button> */}
-
-        {/* {isAdmin && ( */}
         <Button
-          className={`w-full text-white ${isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"}`}
+          className={`w-full text-white ${
+            isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
+          }`}
           onClick={() => handleNavigation("/creator-studio")}
         >
           {StringConstants.CREATOR_STUDIO}
@@ -363,14 +326,13 @@ export function Sidebar() {
           <div className="flex items-center justify-between mb-2 ">
             <h2 className="text-lg font-semibold text-muted ">Channels</h2>
             <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
-              {/* {
-      isAdmin && ( */}
-
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-8 w-8 hover:bg-background ${isAdmin ? "" : "cursor-not-allowed opacity-50"}`}
+                  className={`h-8 w-8 hover:bg-background ${
+                    isAdmin ? "" : "cursor-not-allowed opacity-50"
+                  }`}
                   disabled={!isAdmin}
                 >
                   <Plus className="h-4 w-4 text-muted-foreground" />
@@ -387,21 +349,30 @@ export function Sidebar() {
                       id="name"
                       placeholder="Enter name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-card border-background " />
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="bg-card border-background "
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label>{StringConstants.CHANNEL_TYPE}</Label>
                     <Select
                       value={formData.type}
-                      onValueChange={(value) => setFormData({ ...formData, type: value })}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, type: value })
+                      }
                     >
                       <SelectTrigger className="bg-card border-background text-muted">
                         <SelectValue placeholder="Select your topics" />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-background text-muted">
-                        <SelectItem value="discussion">{StringConstants.DISCUSSION}</SelectItem>
-                        <SelectItem value="chat">{StringConstants.CHAT}</SelectItem>
+                        <SelectItem value="discussion">
+                          {StringConstants.DISCUSSION}
+                        </SelectItem>
+                        <SelectItem value="chat">
+                          {StringConstants.CHAT}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -417,10 +388,12 @@ export function Sidebar() {
                     </Label>
                     <RadioGroup
                       value={formData.is_locked.toString()}
-                      onValueChange={(value) => setFormData({
-                        ...formData,
-                        is_locked: value === "true",
-                      })}
+                      onValueChange={(value) =>
+                        setFormData({
+                          ...formData,
+                          is_locked: value === "true",
+                        })
+                      }
                       className="flex gap-4"
                     >
                       <div className="flex items-center space-x-2">
@@ -459,9 +432,11 @@ export function Sidebar() {
                 <Button
                   key={channel?.id}
                   variant="ghost"
-                  className={`w-full justify-start gap-2 ${activeChannel.id === channel.id
-                    ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                    : " hover:bg-background text-muted-foreground"}`}
+                  className={`w-full justify-start gap-2 ${
+                    activeChannel.id === channel.id
+                      ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
+                      : " hover:bg-background text-muted-foreground"
+                  }`}
                   onClick={() => {
                     dispatch(
                       setActiveChannel({
@@ -488,52 +463,9 @@ export function Sidebar() {
       {isEditOpen && (
         <EditCommunityModal
           isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)} />
+          onClose={() => setIsEditOpen(false)}
+        />
       )}
     </div>
-    
-    {/* Mobile View */}
-      <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
-        >
-          {StringConstants.PROFILE}
-        </button>
-
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => {
-            if (activeCommunityId) {
-              handleNavigation(`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`);
-            } else {
-              console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
-            }
-          }}          
-        >
-          {StringConstants.FEED}
-        </button>
-
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
-        >
-          {StringConstants.MEMBER}
-        </button>
-
-        {/* Scrollable Channels */}
-        {channels.map((channel :any) => (
-          <button
-            key={channel?.id}
-            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
-            onClick={() => {
-              dispatch(setActiveChannel(channel));
-              handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
-            }}
-          >
-            {channel.name}
-          </button>
-        ))}
-      </div></>
   );
 }
