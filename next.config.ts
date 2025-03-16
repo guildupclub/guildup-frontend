@@ -13,7 +13,8 @@ const nextConfig: NextConfig = {
       "lh3.googleusercontent.com",
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
-      "storage.googleapis.com"
+      "storage.googleapis.com",
+      "img.freepik.com"
     ], // Correct usage for external domains
     remotePatterns: [
       {

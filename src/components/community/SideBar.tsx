@@ -69,12 +69,12 @@ export function Sidebar() {
     isLoading: isLoadingCommunity,
     error: communityError
   } = useQuery({
-    queryKey: ['communityDetails', urlCommunityId],
+    queryKey: ['communityProfile', urlCommunityId],
     queryFn: async () => {
       if (!urlCommunityId) return null;
       
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/view`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
         {
           method: 'POST',
           headers: {
@@ -95,6 +95,8 @@ export function Sidebar() {
     enabled: !!urlCommunityId,
   });
 
+
+  console.log("@communityDetails", communityDetails);
   useEffect(() => {
     if (urlCommunityId) {
       fetchChannels();
@@ -246,7 +248,7 @@ export function Sidebar() {
           <h2 className="text-lg text-red-500">Error loading community</h2>
         ) : (
           <h2 className="text-lg text-muted-foreground font-semibold">
-            {communityDetails?.name}
+            {communityDetails?.community?.name}
           </h2>
         )}
 

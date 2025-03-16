@@ -54,7 +54,7 @@ export function Feed({ communityId }: FeedProps) {
   } = useCommunityPosts(communityId);
 
   // Show message for non-signed in users or users without communities
-  if (!session || (userFollowedCommunities && userFollowedCommunities.length === 0)) {
+  if (!session ) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
         <div className="flex flex-col items-center space-y-6 max-w-md text-center">
