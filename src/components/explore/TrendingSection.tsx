@@ -40,7 +40,7 @@ function TrendingSection() {
     <div className="flex flex-col gap-4">
       {/* Trending Tags Section */}
       <div className="bg-card p-4 rounded-lg h-[500px] overflow-auto scrollbar-none border border-zinc-200/30">
-        <h2 className="text-lg font-semibold mb-3 border-b pb-2 border-zinc-200/50">Trending Tags</h2>
+        <h2 className="text-lg font-semibold mb-3 border-b pb-2 border-zinc-200/50">Siddhu Moosewala !!!</h2>
         
         {isLoading ? (
           <div className="space-y-3 animate-pulse">
