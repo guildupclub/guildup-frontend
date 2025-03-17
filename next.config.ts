@@ -13,8 +13,8 @@ const nextConfig: NextConfig = {
       "lh3.googleusercontent.com",
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
-      "storage.googleapis.com"
-    ], // Correct usage for external domains
+      "storage.googleapis.com",
+    ],
     remotePatterns: [
       {
         protocol: "https",
@@ -26,7 +26,10 @@ const nextConfig: NextConfig = {
         hostname: "api.dicebear.com",
       },
     ],
-  }
+  },
+  env: {
+    NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
+  },
 };
 
 export default nextConfig;
