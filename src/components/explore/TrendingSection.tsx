@@ -62,7 +62,7 @@ function TrendingSection() {
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">#{category.name}</span>
-                  <span className="text-xs text-muted-foreground">{category.num_communities} creator</span>
+                  <span className="text-xs text-muted-foreground">{category.num_communities} Pages !!!</span>
                 </div>
               </div>
             ))}
