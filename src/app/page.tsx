@@ -12,7 +12,6 @@ export default function Home() {
 
   const handleTopicSelection = (selectedTopics: string[]) => {
     setIsModalOpen(false); // Close modal after topic selection
-    console.log("Selected Topics: ", selectedTopics); // Process selected topics
   };
 
   useEffect(() => {
