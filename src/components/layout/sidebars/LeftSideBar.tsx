@@ -23,6 +23,7 @@ import { getSelectedTopic } from "@/redux/postSlice";
 import { Button } from "@/components/ui/button";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { StringConstants } from "@/components/common/CommonText";
+import { setCommunityData } from "@/redux/communitySlice";
 // Optionally, if you're updating selected topics in the topic slice
 // import { setSelectedTopics } from "@/redux/topicSlice";
 
@@ -31,7 +32,15 @@ type SelectedItem = {
   id: number | string;
 };
 
+interface Community {
+  _id: string;
+  name: string;
+  image:string,
+  background_image:string
+}
+
 export function LeftSidebar() {
+  const COMMUNITY_PROFILE_PATH= '/community/profile'
   const userId = useSelector((state: RootState) => state.user.user?._id);
   // Extract session ID
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
@@ -136,14 +145,29 @@ export function LeftSidebar() {
         setActiveCommunity({
           id: myCommunities[0]?._id, // Now it's properly set
           name: myCommunities[0]?.name,
+          image: myCommunities[0]?.image,
+          background_image: myCommunities[0]?.background_image
         })
       );
     }
   }, [myCommunities, dispatch]); // Runs when `myCommunities` updates
 
-  const handleCommunityClick = (community: { _id: string; name: string }) => {
-    dispatch(setActiveCommunity({ id: community._id, name: community.name }));
-    router.push(`/community/${community._id}/feed`);
+  const handleCommunityClick = (community: Community) => {
+    dispatch(
+      setActiveCommunity({
+        id: community._id, // Now it's properly set
+        name: community.name,
+        image: community.image,
+        background_image: community.background_image
+      })
+    );
+    dispatch(
+      setCommunityData({
+        communityId: community._id,
+        userId: userId,
+      })
+    );
+    router.push(COMMUNITY_PROFILE_PATH);
   };
   function handleSelectChange(communityId: string) {
     setSelectedCommunities((prev) =>
@@ -509,7 +533,7 @@ export function LeftSidebar() {
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 max-h-[365px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
             {myCommunities
-              ?.filter((community: any) => community !== null)
+              ?.filter((community: Community) => community !== null)
               .map((community: any) => (
                 <button
                   key={community?._id}
