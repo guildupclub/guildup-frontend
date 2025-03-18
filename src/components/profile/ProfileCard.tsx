@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import axios from "axios";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
 import {
   ArrowRight,
@@ -30,6 +30,11 @@ import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
+import {
+  setActiveCommunity,
+  setUserBankDetails,
+  setUserCalendarConnected,
+} from "@/redux/channelSlice";
 // Add this state in ProfileCard component
 
 interface CommunityProfile {
@@ -74,6 +79,7 @@ interface Offering {
 }
 
 export function ProfileCard() {
+  const dispatch = useDispatch();
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
@@ -190,6 +196,17 @@ export function ProfileCard() {
               "https://random-image-pepebigotes.vercel.app/api/random-image"
             );
           }
+
+          dispatch(
+            setUserBankDetails(
+              response.data.data.user.user_isBankDetailsAdded || false
+            )
+          );
+          dispatch(
+            setUserCalendarConnected(
+              response.data.data.user.user_iscalendarConnected || false
+            )
+          );
         }
       } catch (error) {
         setError("Failed to load community profile");
@@ -376,7 +393,6 @@ export function ProfileCard() {
           </div>
         </div>
       </div>
-
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <div className="p-4 ">

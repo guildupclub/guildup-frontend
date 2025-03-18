@@ -46,6 +46,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   );
   const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
 
+  const user_isBankDetailsAdded = useSelector(
+    (state: RootState) => state.channel.activeCommunity?.user_isBankDetailsAdded
+  );
+  const user_iscalendarConnected = useSelector(
+    (state: RootState) =>
+      state.channel.activeCommunity?.user_iscalendarConnected
+  );
+
   // Bank details form state
   const [bankDetails, setBankDetails] = useState({
     accountHolderName: "",
@@ -76,6 +84,21 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     is_free: false,
     tags: "",
   });
+
+  useEffect(() => {
+    if (open) {
+      // If bank details are added, skip to step 2
+      if (user_isBankDetailsAdded) {
+        // If calendar is also connected, skip to step 3
+        if (user_iscalendarConnected) {
+          setCurrentStep(3);
+          setCalendarConnected(true);
+        } else {
+          setCurrentStep(2);
+        }
+      }
+    }
+  }, [open, user_isBankDetailsAdded, user_iscalendarConnected]);
 
   useEffect(() => {
     return () => {
@@ -265,14 +288,26 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
   const handleDialogClose = () => {
     setOpen(false);
-    setCurrentStep(1);
+    // Reset to step 1 only if bank details are not added
+    if (!user_isBankDetailsAdded) {
+      setCurrentStep(1);
+    } else if (!user_iscalendarConnected) {
+      setCurrentStep(2);
+    } else {
+      setCurrentStep(3);
+    }
+
     setBankDetails({
       accountHolderName: "",
       accountNumber: "",
       ifscCode: "",
       panCard: "",
     });
-    setCalendarConnected(false);
+
+    // Only reset calendar connected if not already connected in Redux
+    if (!user_iscalendarConnected) {
+      setCalendarConnected(false);
+    }
   };
 
   return (
