@@ -46,8 +46,9 @@ const BookingPage = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        // const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${userId}`);
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/67d05e56d43e443ee256c756`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${userId}`);
+        // For testing
+        // const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/67d05e56d43e443ee256c756`);
         const data: Booking[] = response.data.bookings;
         console.log("this is data ",data);
         
