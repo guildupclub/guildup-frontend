@@ -13,7 +13,7 @@ export default function MembersPage() {
   const activeCommunityId = activeCommunity?.id;
 
   return (
-    <div className="min-h-screen bg-background py-20 text-center px-4">
+    <div className="min-h-screen bg-background md:py-20 text-center ps-2 w-full">
       {activeCommunityId ? (
         <Members communityId={activeCommunityId} />
       ) : (
