@@ -47,6 +47,7 @@ interface BookingDialogProps {
       amount: number;
       currency: string;
     };
+    discounted_price: number;
     duration: number;
   };
   isOpen: boolean;
@@ -151,6 +152,8 @@ export function BookingDialog({
   //   date.setMinutes(Number.parseInt(minutes));
   //   return format(date, "h:mm a");
   // };
+
+  // console.log("offfafhgwfvj:    ", offering);
 
   const handleBookSlot = async () => {
     setIsProcessing(true);
@@ -382,7 +385,7 @@ export function BookingDialog({
                       <p className="text-xs text-muted-foreground">Price</p>
                       <p className="text-sm font-medium">
                         {/* {offering.price.currency} */}
-                        {offering.price.amount}
+                        {offering.discounted_price || offering.price.amount}
                       </p>
                     </div>
                   </div>
@@ -529,7 +532,8 @@ export function BookingDialog({
                               </p>
                               <p className="text-sm font-medium">
                                 {/* {offering.price.currency}{" "} */}
-                                {offering.price.amount}
+                                {offering.discounted_price ||
+                                  offering.price.amount}
                               </p>
                             </div>
                           </div>

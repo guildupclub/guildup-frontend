@@ -45,6 +45,7 @@ interface PostCardProps {
       name: string;
       image: string;
       background_image: string;
+      _id: string
     };
   };
   ref: any;
@@ -65,34 +66,32 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   const router = useRouter();
 
   const handleClickCommunity = useCallback(() => {
-    // Build community object from post fields
-    // const community = {
-    //   _id: post.community_id,
-    //   name: post.community_name,
-    //   user_id: userID,
-    // };
-
-    // if (!community || !community._id) {
-    //   console.error("Invalid community data:", community);
-    //   return;
-    // }
-
-    // dispatch(
-    //   setCommunityData({
-    //     communityId: community._id,
-    //     userId: userID,
-    //   })
-    // );
-
-    // dispatch(
-    //   setActiveCommunity({
-    //     id: community._id,
-    //     // name: community.name,
-    //     name: 'Swapnil',
-    //   })
-    // );
-
-    // router.push(COMMUNITY_PROFILE_PATH);
+    const community_id= post.community_id._id;
+    const community_name= post.community_id.name
+    
+    if (!community_id) {
+      console.error("Invalid community data:");
+      return;
+    }
+    
+    dispatch(
+      setCommunityData({
+        communityId: community_id,
+        userId: userID,
+      })
+    );
+    
+    dispatch(
+      setActiveCommunity({
+        id: community_id,
+        name: community_name,
+        image: post.community_id.image,
+        background_image: post.community_id.background_image
+      })
+    );
+    
+    console.log("donme");
+    router.push(COMMUNITY_PROFILE_PATH);
     
   }, [dispatch, router, post]);
 

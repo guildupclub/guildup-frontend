@@ -123,7 +123,7 @@ function Chat() {
     );
 
   return (
-    <div className="flex flex-col h-screen pb-20">
+    <div className="flex flex-col h-screen pb-20 w-full">
       {/* Channel Header */}
       <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
@@ -133,7 +133,7 @@ function Chat() {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden w-full">
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {(posts || []).length > 0 ? (
@@ -145,7 +145,7 @@ function Chat() {
                     className="w-10 h-10 rounded-full"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 justify-between">
                       <span className="font-medium">{post.name}</span>
                       {moment(post.time).format("YYYY MMM DD, hh:mm A")}
                     </div>
