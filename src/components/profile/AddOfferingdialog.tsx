@@ -391,7 +391,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div>
                     <h3 className="font-medium">Manage Bookings Seamlessly</h3>
                     <p className="text-sm text-muted-foreground">
-                      We'll automatically sync appointments to your Google
+                      We&apos;ll automatically sync appointments to your Google
                       Calendar. Stay organized effortlessly.
                     </p>
                   </div>
@@ -418,7 +418,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               <form onSubmit={handleBankDetailsSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="accountHolderName">
-                    Account holder's name
+                    Account holder&apos;s name
                   </Label>
                   <Input
                     id="accountHolderName"
@@ -521,7 +521,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div>
                     <h3 className="font-medium">Manage Bookings Seamlessly</h3>
                     <p className="text-sm text-muted-foreground">
-                      We'll automatically sync appointments to your Google
+                      We&apos;ll automatically sync appointments to your Google
                       Calendar. Stay organized effortlessly.
                     </p>
                   </div>
@@ -624,7 +624,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div>
                     <h3 className="font-medium">Manage Bookings Seamlessly</h3>
                     <p className="text-sm text-muted-foreground">
-                      We'll automatically sync appointments to your Google
+                      We&apos;ll automatically sync appointments to your Google
                       Calendar. Stay organized effortlessly.
                     </p>
                   </div>
