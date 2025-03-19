@@ -28,6 +28,7 @@ import {
   OFFERING_TYPES,
   StringConstants,
 } from "@/components/common/CommonText";
+import { toast } from "sonner";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -110,19 +111,20 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   }, [pollingInterval]);
 
   const checkCalendarConnection = async () => {
-    if (!user?._id) return;
+    if (!user?._id) return false;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/check-connection/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/check-connection/${user._id}`
       );
 
       if (response.data.r === "s" && response.data.data.connected) {
-        setCalendarConnected(true);
+        return true;
       }
     } catch (error) {
       console.error("Error checking calendar connection:", error);
     }
+    return false;
   };
 
   const handleBankDetailsSubmit = async (e: React.FormEvent) => {
@@ -151,11 +153,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setCurrentStep(2);
       } else {
         // Handle error
-        alert("Failed to verify bank details. Please try again.");
+        toast.error("Failed to verify bank details. Please try again.");
+        // alert("Failed to verify bank details. Please try again.");
       }
     } catch (error) {
       console.error("Error verifying bank details:", error);
-      alert("An error occurred while verifying bank details.");
+      toast.error("An error occurred while verifying bank details.");
+      // alert("An error occurred while verifying bank details.");
     } finally {
       setLoading(false);
     }
@@ -183,6 +187,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setLoading(false);
         // Automatically proceed to step 3
         setCurrentStep(3);
+        toast.success("Calendar already connected.");
         return;
       }
 
@@ -191,7 +196,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         console.log("Redirecting...");
         newTab = window.open(response.data.data.authUrl, "_blank");
         if (!newTab) {
-          alert("Pop-up blocked! Please allow pop-ups for this site.");
+          toast.warning("Pop-up blocked! Please allow pop-ups for this site.");
           setLoading(false);
           return;
         }
@@ -200,27 +205,33 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setAuthWindowOpen(true);
 
         // Start polling to check if calendar is connected
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
           // Check if the popup window is closed
           if (newTab && newTab.closed) {
-            checkCalendarConnection();
-            // For demo purposes, we'll simulate a successful connection
-            // In production, you should rely on the actual API response
-            setCalendarConnected(true);
-            clearInterval(interval);
-            setPollingInterval(null);
-            setAuthWindowOpen(false);
-            setLoading(false);
+            const connectionStatus = await checkCalendarConnection();
+            if (connectionStatus) {
+              setCalendarConnected(true);
+              clearInterval(interval);
+              setPollingInterval(null);
+              setAuthWindowOpen(false);
+              setLoading(false);
+              toast.success("Calendar successfully connected.");
+            } else {
+              setLoading(false);
+              toast.error("Failed to connect calendar. Please try again.");
+            }
           }
         }, 1000);
 
         setPollingInterval(interval);
       }
     } catch (error) {
+      toast.error("Error connecting calendar. Please try again.");
       console.error("Error connecting calendar:", error);
       setLoading(false);
     }
   };
+
   const handleCalendarSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentStep(3);
@@ -407,8 +418,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div>
                     <h3 className="font-medium">Publish Your First Offering</h3>
                     <p className="text-sm text-muted-foreground">
-                      Enter your bank details to receive earnings from your
-                      consultations and digital services.
+                      Create your first offering and start earning. 
                     </p>
                   </div>
                 </div>
@@ -570,7 +580,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       disabled={loading}
                     >
                       <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                        src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                         alt="Google"
                         className="w-5 h-5 mr-2"
                       />

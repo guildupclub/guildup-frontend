@@ -1,7 +1,8 @@
-
 import React from 'react';
 import { signIn } from 'next-auth/react';
 import { Button } from '../ui/button';
+import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
 
 interface GoogleSignInProps {
   isLoading?: boolean;
@@ -12,6 +13,13 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
+        <Link 
+          href="/"
+          className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+        </Link>
+
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-accent">Welcome</h1>
           <p className="text-muted-foreground">Sign in to your account</p>
