@@ -174,7 +174,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     try {
       // Redirect to calendar access endpoint
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/calendar-access/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/calendar-access/${user._id}`
       );
       console.log(response);
 
