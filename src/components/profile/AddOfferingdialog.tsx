@@ -111,7 +111,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   }, [pollingInterval]);
 
   const checkCalendarConnection = async () => {
-    if (!user?._id) return false;
+    if (!user?._id) return;
 
     try {
       const response = await axios.get(
@@ -119,9 +119,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       );
 
       if (response.data.r === "s" && response.data.data.connected) {
-        return true;
+        setCalendarConnected(true);
       }
     } catch (error) {
+      toast.error("Error checking calendar connection. Please try again.");
       console.error("Error checking calendar connection:", error);
     }
     return false;
