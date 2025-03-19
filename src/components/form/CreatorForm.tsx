@@ -149,7 +149,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
         <DialogHeader className="flex items-center justify-between py-2">
           <DialogTitle className="text-xl font-semibold font-serif">
-            Let's Build your Guild!
+            Let&apos;s Build your Guild!
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
           A Guild is your digital home for sharing expertise, building community, and earning money.
