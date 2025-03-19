@@ -194,6 +194,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
       console.log(response.data.data.authUrl);
       if (response.data.data.authUrl) {
+        toast.info("Redirecting...");
         console.log("Redirecting...");
         newTab = window.open(response.data.data.authUrl, "_blank");
         if (!newTab) {
@@ -255,7 +256,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       if (response.data.data && response.data.data.authUrl) {
         newTab = window.open(response.data.data.authUrl, "_blank");
         if (!newTab) {
-          alert("Pop-up blocked! Please allow pop-ups for this site.");
+          toast.warning("Pop-up blocked! Please allow pop-ups for this site.");
+          // alert("Pop-up blocked! Please allow pop-ups for this site.");
         }
         return;
       }
@@ -287,6 +289,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         });
       }
     } catch (error) {
+      toast.error("Error creating offering. Please try again.");
       console.error("Error creating offering:", error);
       if (newTab) {
         newTab.close();
@@ -428,6 +431,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 <div className="space-y-2">
                   <Label htmlFor="accountHolderName">
                     Account holder&apos;s name
+                    &nbsp;<span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="accountHolderName"
@@ -444,7 +448,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="accountNumber">Account number</Label>
+                  <Label htmlFor="accountNumber">Account number
+                    &nbsp;<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="accountNumber"
                     value={bankDetails.accountNumber}
@@ -460,7 +466,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="ifscCode">IFSC Code</Label>
+                  <Label htmlFor="ifscCode">IFSC Code
+                    &nbsp;<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="ifscCode"
                     value={bankDetails.ifscCode}

@@ -61,8 +61,8 @@ function TrendingSection() {
                 className="p-2 border-b border-zinc-200/30 hover:bg-muted/10 transition-colors rounded-md"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">#{category.name}</span>
-                  <span className="text-xs text-muted-foreground">{category.num_communities} Pages !!!</span>
+                  <span className="text-sm font-medium">{category.name}</span>
+                  <span className="text-xs text-muted-foreground">{category.num_communities} Guilds</span>
                 </div>
               </div>
             ))}

@@ -5,7 +5,6 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -78,8 +78,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     console.log("Category changed to:", value);
     setCategoryId(value);
   };
-
-  console.log("Categories", categoryId);
 
   // Mutation for creating community
   const createCommunity = useMutation({
@@ -149,21 +147,24 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   return (
     session && (
       <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
-        <DialogHeader className="flex items-center justify-between">
-          <DialogTitle className="text-xl font-normal">
-            Fill to create your page
+        <DialogHeader className="flex items-center justify-between py-2">
+          <DialogTitle className="text-xl font-semibold font-serif">
+            Let's Build your Guild!
           </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+          A Guild is your digital home for sharing expertise, building community, and earning money.
+          </DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="space-y-5 ">
           <div className="space-y-2">
             <Label>
-              Page Name<span className="text-red-500">*</span>
+              Name your Guild&nbsp;<span className="text-red-500">*</span>
             </Label>
             <Input
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter name"
+              placeholder="Mindfulness with Shivani"
               className="bg-background border-none"
             />
           </div>
@@ -174,7 +175,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             </Label>
             <Select onValueChange={handleCategoryChange}>
               <SelectTrigger className="bg-background border-none">
-                <SelectValue placeholder="Select your topic" />
+                <SelectValue placeholder="Area of expertise?" />
               </SelectTrigger>
               <SelectContent className="bg-background text-accent border-none h-64 cursor-pointer">
                 {categories.map((category: Category) => (
@@ -187,20 +188,20 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </div>
           <div className="space-y-2">
             <Label>
-              {StringConstants.TAGS}
+              Keywords&nbsp;
               <span className="text-red-500">*</span>
             </Label>
-            <span>(comma-separated)</span>
+            <span>&nbsp;(comma-separated)</span>
             <Input
               name="tags"
               value={formData.tags}
               onChange={handleInputChange}
-              placeholder="Enter Tags"
+              placeholder="Enter keywords to help users find your Guild"
               className="bg-background border-none"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>
                 {StringConstants.FOLLOWERS}
@@ -229,16 +230,16 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
                 className="bg-background border-none"
               />
             </div>
-          </div>
+          </div> */}
 
           <div className="space-y-2">
-            <Label>{StringConstants.ABOUT_THE_PAGE}<span className="text-red-500">*</span>
+            <Label>{StringConstants.ABOUT_THE_PAGE}&nbsp;<span className="text-red-500">*</span>
             </Label>
             <Textarea
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Briefly describe your page"
+              placeholder="Weekly mindfulness tips & guided meditations to reduce stress."
               className="bg-background border-none min-h-[30px]"
             />
           </div>

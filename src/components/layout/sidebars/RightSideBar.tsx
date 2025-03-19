@@ -71,7 +71,7 @@ export function RightSidebar() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast.info ("Please sign in to create a page", {
+      toast.info ("Please sign in to Build your Guild", {
         action: {
           label: 'Sign In',
           onClick: () => signIn(),
@@ -87,8 +87,8 @@ export function RightSidebar() {
       {/* Creator Box - Only show if user is not already a creator */}
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold text-lg">
-            Ready to start making money?
+          <h1 className="font-semibold text-lg font-sans">
+          Ready to Turn Your Expertise into income?
           </h1>
           <Dialog open={session ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
             <Button
