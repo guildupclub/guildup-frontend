@@ -206,8 +206,8 @@ export function BookingDialog({
               }
             );
             console.log("Payment Verified");
-            toast.success("Payment Successful! Booking confirmed.");
-            // alert("Payment Successful! Booking confirmed.");
+            // toast.success("Payment Successful! Booking confirmed.");
+            alert("Payment Successful! Booking confirmed.");
           },
           theme: {
             color: "#3399cc",
