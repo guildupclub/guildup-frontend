@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Authentication Complete</title>
+    <script>
+      window.onload = function () {
+        // Send message to opener (parent) window
+        if (window.opener) {
+          window.opener.postMessage(
+            { type: "GOOGLE_CALENDAR_AUTH_SUCCESS" },
+            window.location.origin
+          );
+          // Close this window after sending the message
+          setTimeout(function () {
+            window.close();
+          }, 1000);
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <div style="text-align: center; margin-top: 100px">
+      <h1>Authentication Complete</h1>
+      <p>You can close this window and return to the application.</p>
+    </div>
+  </body>
+</html>

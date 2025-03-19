@@ -43,6 +43,7 @@ interface BookingDialogProps {
     title: string;
     description: string;
     type: string;
+    tags: string[];
     price: {
       amount: number;
       currency: string;
@@ -340,7 +341,6 @@ export function BookingDialog({
                 <h1 className="text-muted font-bold text-2xl">
                   Hello {user?.name}
                 </h1>
-
                 {/* Avatar */}
                 <div className="relative w-24 h-24 mx-auto">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
@@ -353,7 +353,6 @@ export function BookingDialog({
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-md"
                   />
                 </div>
-
                 {/* User Name */}
                 <div className="text-center">
                   <p className="text-xl font-semibold text-primary leading-tight">
@@ -364,7 +363,6 @@ export function BookingDialog({
                     {offering?.type}
                   </p>
                 </div>
-
                 {/* Details (Duration & Price) */}
                 <div className="flex justify-between items-center w-full px-4">
                   {/* Duration */}
@@ -390,13 +388,21 @@ export function BookingDialog({
                     </div>
                   </div>
                 </div>
-
                 {/* Description */}
                 {/* <p className="text-sm text-muted-foreground leading-relaxed">
                   Lorem ipsum dolor sit amet, consectetur adipisicing elit.
                   Totam, nulla dolorem aspernatur doloribus officia asperiores.
                 </p> */}
-                <p>{offering?.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  {offering?.tags?.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
 

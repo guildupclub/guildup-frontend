@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import type React from "react";
-
+import { FcGoogle } from "react-icons/fc";
 import {
   Dialog,
   DialogContent,
@@ -101,20 +101,38 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   }, [open, user_isBankDetailsAdded, user_iscalendarConnected]);
 
   useEffect(() => {
+    // Function to handle messages from the popup
+    const handleAuthMessage = (event:any) => {
+      // Verify the origin of the message
+      if (event.origin !== window.location.origin) return;
+
+      // Check if this is our auth success message
+      if (event.data && event.data.type === "GOOGLE_CALENDAR_AUTH_SUCCESS") {
+        checkCalendarConnection();
+        setCalendarConnected(true);
+        setAuthWindowOpen(false);
+        setLoading(false);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener("message", handleAuthMessage);
+
+    // Clean up
     return () => {
-      // Clean up interval on component unmount
+      window.removeEventListener("message", handleAuthMessage);
       if (pollingInterval) {
         clearInterval(pollingInterval);
       }
     };
-  }, [pollingInterval]);
+  }, []);
 
   const checkCalendarConnection = async () => {
     if (!user?._id) return;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/check-connection/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/check-connection/${user._id}`
       );
 
       if (response.data.r === "s" && response.data.data.connected) {
@@ -133,7 +151,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     try {
       // Send bank details to verification endpoint
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/payment/bank-details-verify`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
           user_id: user._id,
           bank_details: {
@@ -164,11 +182,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     if (!user?._id) return;
 
     setLoading(true);
-    let newTab: Window | null = null;
     try {
       // Redirect to calendar access endpoint
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/calendar-access/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/calendar-access/${user._id}`
       );
       console.log(response);
 
@@ -188,8 +205,15 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       console.log(response.data.data.authUrl);
       if (response.data.data.authUrl) {
         console.log("Redirecting...");
-        newTab = window.open(response.data.data.authUrl, "_blank");
-        if (!newTab) {
+
+        // Open the auth URL in a new window with specific dimensions
+        const authWindow = window.open(
+          response.data.data.authUrl,
+          "_blank",
+          "width=600,height=700,resizable=yes,scrollbars=yes"
+        );
+
+        if (!authWindow) {
           alert("Pop-up blocked! Please allow pop-ups for this site.");
           setLoading(false);
           return;
@@ -201,15 +225,15 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         // Start polling to check if calendar is connected
         const interval = setInterval(() => {
           // Check if the popup window is closed
-          if (newTab && newTab.closed) {
-            checkCalendarConnection();
-            // For demo purposes, we'll simulate a successful connection
-            // In production, you should rely on the actual API response
-            setCalendarConnected(true);
-            clearInterval(interval);
-            setPollingInterval(null);
-            setAuthWindowOpen(false);
-            setLoading(false);
+          if (authWindow && authWindow.closed) {
+            checkCalendarConnection().then(() => {
+              // After checking connection, update UI
+              setCalendarConnected(true);
+              clearInterval(interval);
+              setPollingInterval(null);
+              setAuthWindowOpen(false);
+              setLoading(false);
+            });
           }
         }, 1000);
 
@@ -568,11 +592,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                       disabled={loading}
                     >
-                      <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
-                        alt="Google"
-                        className="w-5 h-5 mr-2"
-                      />
+                      <FcGoogle className="h-5 w-5" />
                       Connect with Google
                     </Button>
                   )}
