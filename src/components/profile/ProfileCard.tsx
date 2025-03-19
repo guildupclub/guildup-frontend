@@ -774,21 +774,14 @@ export function ProfileCard() {
         </div>
 
         {/* Testimonials Section */}
-        <div className="col-span-1 lg:col-span-2 mt-8">
+        {/* <div className="col-span-1 lg:col-span-2 mt-8">
           <h2 className="text-2xl px-4 font-bold text-foreground">
             Testimonials
           </h2>
           <div className="rounded-xl px-4 py-2 shadow-sm ">
-            {/* <InfiniteMovingCards
-              items={testimonials}
-              direction="left"
-              speed="slow"
-              pauseOnHover={true}
-              className="py-4"
-            /> */}
             <Testimonials />
           </div>
-        </div>
+        </div> */}
 
         {/* <div className="col-span-1 lg:col-span-2 mt-4">
           <h2 className="text-2xl font-semibold text-foreground mb-4">Testimonials</h2>
