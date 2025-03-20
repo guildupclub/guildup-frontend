@@ -55,14 +55,11 @@ const ProfilePage = () => {
   React.useEffect(() => {
     const updateUserProfile = async () => {
       try {
-        // const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile, {userId}`);
-        const response = await axios.post(`http://localhost:8000/v1/auth/profile`,{userId});
-        console.log("This is response data",response.data.data);
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`, {userId});
         
         if (response.data.r === "s") {
           setProfile(response.data.data);
           setProfileCopy(response.data.data)
-          console.log("This is my avatar",response.data.data.image);
           
           if (response.data.data.avatar) {
             setAvatarImgUrl(response.data.data.avatar);
@@ -83,10 +80,9 @@ const ProfilePage = () => {
 
   const updateUserProfile = async () => {
     try {
-      // const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit, {updateData: changedFields, userId}`);
-      const response = await axios.patch('http://localhost:8000/v1/auth/edit', {updateData: changedFields, userId});
+      const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit`, {updateData: changedFields, userId});
       if (response.data.r === "e") {
-        toast.error(response.data.e)
+        toast.error(response.data.message)
         setProfile(profileCopy)
       } else {
         toast.success("Signed in successfully!");
@@ -126,7 +122,6 @@ const ProfilePage = () => {
 
     const previousAvatarUrl = avatarImgUrl;
     try {
-      // Create FormData and append both userId and file
       const formData = new FormData();
       formData.append("userId", userId);
       formData.append("avatar", file);
@@ -141,7 +136,6 @@ const ProfilePage = () => {
 
       if (response.data.r === "s") {
         const newAvatarUrl = response.data.data.user.avatar;
-        console.log(newAvatarUrl);
         setAvatarImgUrl(newAvatarUrl);
         toast.success(response.data.data.message);
         setIsModalOpen(false);
