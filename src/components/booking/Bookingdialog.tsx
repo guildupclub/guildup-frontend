@@ -206,6 +206,7 @@ export function BookingDialog({
               }
             );
             console.log("Payment Verified");
+            // toast.success("Payment Successful! Booking confirmed.");
             alert("Payment Successful! Booking confirmed.");
           },
           theme: {
@@ -214,6 +215,7 @@ export function BookingDialog({
         };
 
         const razorpayInstance = new window.Razorpay(razorpayOptions);
+        onClose(); // closing the dialog before opening the payment gateway
         razorpayInstance.open();
       } else {
         console.error("Failed to create order:", response.data.message);
@@ -233,7 +235,7 @@ export function BookingDialog({
   const handlePayment = async (orderId: string) => {
     const scriptLoaded = await loadRazorpayScript();
     if (!scriptLoaded) {
-      // toast.error("Failed to load payment gateway");
+      toast.error("Failed to load payment gateway");
       return;
     }
 
@@ -283,12 +285,12 @@ export function BookingDialog({
       );
 
       if (response.data.booking) {
-        // toast.success("Booking confirmed successfully!");
+        toast.success("Booking confirmed successfully!");
         console.log("Booking confirmed successfully!");
-        alert("Booking confirmed successfully!");
+        // alert("Booking confirmed successfully!");
         onClose();
       } else {
-        // toast.error("Payment verification failed");
+        toast.error("Payment verification failed");
       }
     } catch (error) {
       console.error("Payment verification error:", error);

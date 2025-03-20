@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { Heart, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -16,7 +16,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
-
+import { toast } from 'sonner';
 interface TrendingPost {
   _id: string;
   user_id: {
@@ -71,7 +71,12 @@ export function RightSidebar() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      signIn("google");
+      toast("Please sign in to Build your Guild", {
+        action: {
+          label: 'Sign In',
+          onClick: () => signIn(),
+        }
+      });
     } else {
       setIsDialogOpen(true);
     }
@@ -82,23 +87,17 @@ export function RightSidebar() {
       {/* Creator Box - Only show if user is not already a creator */}
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold text-lg">
-            Ready to start making money?
+          <h1 className="font-semibold text-lg font-sans">
+          Ready to Turn Your Expertise into income?
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={session ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
             <Button
               className="w-full text-white shadow-md"
               onClick={handleCreatorButtonClick}
             >
-              {session ? (
-                <DialogTrigger className="w-full">
-                  {StringConstants.CREATE_A_PAGE}
-                </DialogTrigger>
-              ) : (
-                <>{StringConstants.CREATE_A_PAGE}</>
-              )}
+              {StringConstants.CREATE_A_PAGE}
             </Button>
-
+            
             {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
           </Dialog>
         </div>

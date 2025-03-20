@@ -28,6 +28,7 @@ import {
   OFFERING_TYPES,
   StringConstants,
 } from "@/components/common/CommonText";
+import { toast } from "sonner";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -114,15 +115,17 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/check-connection/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/check-connection/${user._id}`
       );
 
       if (response.data.r === "s" && response.data.data.connected) {
         setCalendarConnected(true);
       }
     } catch (error) {
+      toast.error("Error checking calendar connection. Please try again.");
       console.error("Error checking calendar connection:", error);
     }
+    return false;
   };
 
   const handleBankDetailsSubmit = async (e: React.FormEvent) => {
@@ -132,8 +135,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     setLoading(true);
     try {
       // Send bank details to verification endpoint
+      
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/payment/bank-details-verify`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
           user_id: user._id,
           bank_details: {
@@ -150,11 +154,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setCurrentStep(2);
       } else {
         // Handle error
-        alert("Failed to verify bank details. Please try again.");
+        toast.error("Failed to verify bank details. Please try again.");
+        // alert("Failed to verify bank details. Please try again.");
       }
     } catch (error) {
       console.error("Error verifying bank details:", error);
-      alert("An error occurred while verifying bank details.");
+      toast.error("An error occurred while verifying bank details.");
+      // alert("An error occurred while verifying bank details.");
     } finally {
       setLoading(false);
     }
@@ -168,7 +174,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     try {
       // Redirect to calendar access endpoint
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/calendar/calendar-access/${user._id}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/calendar-access/${user._id}`
       );
       console.log(response);
 
@@ -182,15 +188,17 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setLoading(false);
         // Automatically proceed to step 3
         setCurrentStep(3);
+        toast.success("Calendar already connected.");
         return;
       }
 
       console.log(response.data.data.authUrl);
       if (response.data.data.authUrl) {
+        toast.info("Redirecting...");
         console.log("Redirecting...");
         newTab = window.open(response.data.data.authUrl, "_blank");
         if (!newTab) {
-          alert("Pop-up blocked! Please allow pop-ups for this site.");
+          toast.warning("Pop-up blocked! Please allow pop-ups for this site.");
           setLoading(false);
           return;
         }
@@ -199,9 +207,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setAuthWindowOpen(true);
 
         // Start polling to check if calendar is connected
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
           // Check if the popup window is closed
           if (newTab && newTab.closed) {
+            const connectionStatus = await checkCalendarConnection();
             checkCalendarConnection();
             // For demo purposes, we'll simulate a successful connection
             // In production, you should rely on the actual API response
@@ -216,10 +225,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setPollingInterval(interval);
       }
     } catch (error) {
+      toast.error("Error connecting calendar. Please try again.");
       console.error("Error connecting calendar:", error);
       setLoading(false);
     }
   };
+
   const handleCalendarSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentStep(3);
@@ -245,7 +256,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       if (response.data.data && response.data.data.authUrl) {
         newTab = window.open(response.data.data.authUrl, "_blank");
         if (!newTab) {
-          alert("Pop-up blocked! Please allow pop-ups for this site.");
+          toast.warning("Pop-up blocked! Please allow pop-ups for this site.");
+          // alert("Pop-up blocked! Please allow pop-ups for this site.");
         }
         return;
       }
@@ -277,6 +289,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         });
       }
     } catch (error) {
+      toast.error("Error creating offering. Please try again.");
       console.error("Error creating offering:", error);
       if (newTab) {
         newTab.close();
@@ -406,8 +419,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div>
                     <h3 className="font-medium">Publish Your First Offering</h3>
                     <p className="text-sm text-muted-foreground">
-                      Enter your bank details to receive earnings from your
-                      consultations and digital services.
+                      Create your first offering and start earning. 
                     </p>
                   </div>
                 </div>
@@ -419,6 +431,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 <div className="space-y-2">
                   <Label htmlFor="accountHolderName">
                     Account holder&apos;s name
+                    &nbsp;<span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="accountHolderName"
@@ -435,7 +448,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="accountNumber">Account number</Label>
+                  <Label htmlFor="accountNumber">Account number
+                    &nbsp;<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="accountNumber"
                     value={bankDetails.accountNumber}
@@ -451,7 +466,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="ifscCode">IFSC Code</Label>
+                  <Label htmlFor="ifscCode">IFSC Code
+                    &nbsp;<span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="ifscCode"
                     value={bankDetails.ifscCode}
@@ -466,7 +483,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   />
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="panCard">PAN Card</Label>
                   <Input
                     id="panCard"
@@ -480,7 +497,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     placeholder="Enter PAN Details"
                     required
                   />
-                </div>
+                </div> */}
 
                 <div className="flex justify-end">
                   <Button
@@ -569,7 +586,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       disabled={loading}
                     >
                       <img
-                        src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"
+                        src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                         alt="Google"
                         className="w-5 h-5 mr-2"
                       />
