@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "vercel-prod" ]
+    branches: [ "dev", "prod" ]
   pull_request:
-    branches: [ "vercel-prod" ]
+    branches: [ "dev", "prod" ]
 
 jobs:
   build:
