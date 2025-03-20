@@ -251,26 +251,26 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                      {/* <DropdownMenuItem
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
                         <Link href="/profile">Profile</Link>
-                      </DropdownMenuItem> */}
-                      {/* <DropdownMenuItem
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
                         <Link href="/bookings">Bookings</Link>
-                      </DropdownMenuItem> */}
-                      {/* {isUser && (
+                      </DropdownMenuItem>
+                      {isUser && (
                         <DropdownMenuItem
                           asChild
                           className="hover:bg-primary-gradient border-b border-zinc-300"
                         >
                           <Link href="/payments">Payments</Link>
                         </DropdownMenuItem>
-                      )} */}
+                      )}
                       <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
