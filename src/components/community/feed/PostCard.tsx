@@ -18,7 +18,8 @@ import { StringConstants } from "@/components/common/CommonText";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-
+import DOMPurify from "dompurify";
+import he from "he";
 interface PostCardProps {
   post: {
     _id: string;
@@ -63,6 +64,13 @@ export function PostCard({ post }: PostCardProps) {
     );
   }, [post.created_At]);
 
+  const parsedBody =
+    post.body.startsWith('"') && post.body.endsWith('"')
+      ? post.body.slice(1, -1)
+      : post.body;
+  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
+
+  // console.log("Sanitized Body:", sanitizedBody);
   return (
     <div className="bg-card rounded-lg overflow-hidden">
       <div className="p-4">
@@ -84,8 +92,12 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Content */}
+
         <div className="mt-3 text-muted-foreground">
-          <p>{post.body}</p>
+          <div
+            className="text-sm text-accent mt-2"
+            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+          />
 
           {post?.media?.publicUrl && post?.media?.fileType === "image" && (
             <img
@@ -94,7 +106,6 @@ export function PostCard({ post }: PostCardProps) {
               className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
             />
           )}
-
           {/* Video Placeholder */}
           {post?.media?.publicUrl && post?.media?.fileType === "video" && (
             <video
