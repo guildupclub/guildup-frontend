@@ -1,18 +1,31 @@
 "use client";
 
 import * as React from "react";
-import { Link2, Smile, Plus, Image, Video, Gift, Link } from "lucide-react";
+import { Plus, Image, Video, Link as LinkIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 import { useCreatePost } from "@/hook/queries/usePostMutations";
 import { StringConstants } from "@/components/common/CommonText";
+import Link from "@tiptap/extension-link"; // Import the correct Link extension
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import {
+  Bold,
+  Italic,
+  UnderlineIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+  Link as LinkLucide,
+} from "lucide-react";
 
 interface MediaPreview {
   file: File;
@@ -24,7 +37,9 @@ export function PostDialog() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [content, setContent] = React.useState("");
   const [title, setTitle] = React.useState("");
-  const [mediaPreview, setMediaPreview] = React.useState<MediaPreview | null>(null);
+  const [mediaPreview, setMediaPreview] = React.useState<MediaPreview | null>(
+    null
+  );
   const [tags, setTags] = React.useState<string[]>([]);
 
   const imageInputRef = React.useRef<HTMLInputElement>(null);
@@ -44,10 +59,10 @@ export function PostDialog() {
   const userID = useSelector((state: RootState) => state.user.user?._id);
 
   const { data: session } = useSession();
-  
+
   // Use the React Query mutation hook
   const createPostMutation = useCreatePost();
-  
+
   const handleFileSelection = (
     event: React.ChangeEvent<HTMLInputElement>,
     fileType: "image" | "video" | "gif" | "link"
@@ -57,12 +72,12 @@ export function PostDialog() {
 
     // Create a preview URL for the selected file
     const previewUrl = URL.createObjectURL(file);
-    
+
     // Store the file and preview URL
     setMediaPreview({
       file,
       previewUrl,
-      type: fileType
+      type: fileType,
     });
   };
 
@@ -80,20 +95,22 @@ export function PostDialog() {
     }
 
     try {
+      // Stringify the HTML content if needed
+      const contentToSend = JSON.stringify(content);
+
       await createPostMutation.mutateAsync({
         userId: userID || "",
         communityId: activeCommunityId || "",
         title,
-        body: content,
+        body: contentToSend,
         tags: tags.length > 0 ? tags : undefined,
-        file: mediaPreview?.file
+        file: mediaPreview?.file,
       });
 
       toast.success("Post created successfully!");
 
       // Reset form
       setIsOpen(false);
-      // setTitle("");
       setContent("");
       clearMediaPreview();
       setTags([]);
@@ -111,6 +128,30 @@ export function PostDialog() {
       }
     };
   }, [mediaPreview]);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right"],
+      }),
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setContent(html);
+    },
+  });
+
+  // Update editor content when content state changes
+  React.useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   return (
     <Dialog
@@ -151,7 +192,9 @@ export function PostDialog() {
               </Avatar>
               <span className="text-muted">
                 {session?.user?.name || "User Name"}{" "}
-                <span className="text-maccent">{StringConstants.POSTING_IN}</span>{" "}
+                <span className="text-maccent">
+                  {StringConstants.POSTING_IN}
+                </span>{" "}
                 <span className="font-medium">{activeCommunity?.name}</span>
               </span>
             </div>
@@ -164,12 +207,114 @@ export function PostDialog() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           /> */}
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write something..."
-            className="min-h-[200px] bg-card border border-background p-2 text-muted placeholder:text-muted focus-visible:ring-0 resize-none"
-          />
+
+          <div className="space-y-0">
+            <div className="flex items-center gap-2 p-2 bg-card border border-background rounded-t-md">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                disabled={!editor?.can().chain().focus().toggleBold().run()}
+              >
+                <Bold className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                disabled={!editor?.can().chain().focus().toggleItalic().run()}
+              >
+                <Italic className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                disabled={
+                  !editor?.can().chain().focus().toggleUnderline().run()
+                }
+              >
+                <UnderlineIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                disabled={
+                  !editor?.can().chain().focus().toggleBulletList().run()
+                }
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("left").run()
+                }
+              >
+                <AlignLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("center").run()
+                }
+              >
+                <AlignCenter className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("right").run()
+                }
+              >
+                <AlignRight className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => {
+                  const url = window.prompt("URL");
+                  if (url) {
+                    editor?.chain().focus().setLink({ href: url }).run();
+                  }
+                }}
+                disabled={
+                  !editor?.can().chain().focus().setLink({ href: "" }).run()
+                }
+              >
+                <LinkIcon className="h-4 w-4" />
+              </Button>
+            </div>
+            <div
+              className="relative w-full h-[270px] border border-gray-300 rounded-md"
+              onClick={() => editor?.commands.focus()}
+            >
+              <EditorContent
+                editor={editor}
+                className="w-full h-full p-2 overflow-y-auto bg-white text-black outline-none"
+              />
+            </div>
+          </div>
 
           {/* Tags Input */}
           {/* <Input
@@ -192,9 +337,10 @@ export function PostDialog() {
                       className="h-10 w-10 object-cover rounded"
                     />
                   )}
-                  {(mediaPreview.type === "image" || mediaPreview.type === "gif") && (
+                  {(mediaPreview.type === "image" ||
+                    mediaPreview.type === "gif") && (
                     <img
-                      src={mediaPreview.previewUrl}
+                      src={mediaPreview.previewUrl || "/placeholder.svg"}
                       className="h-10 w-10 object-cover rounded"
                       alt={mediaPreview.file.name}
                     />
@@ -261,7 +407,7 @@ export function PostDialog() {
               accept="image/gif"
               onChange={(e) => handleFileSelection(e, "gif")}
             />
-            <Button
+            {/* <Button
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-lg bg-pink-200 hover:bg-pink-300 text-pink-700"
@@ -269,10 +415,10 @@ export function PostDialog() {
               onClick={() => gifInputRef.current?.click()}
             >
               <Gift />
-            </Button>
+            </Button> */}
 
             {/* Link Upload */}
-            <input
+            {/* <input
               type="text"
               ref={linkInputRef}
               className="hidden"
@@ -296,7 +442,7 @@ export function PostDialog() {
               }}
             >
               <Link />
-            </Button>
+            </Button> */}
           </div>
 
           {/* Submit Button */}

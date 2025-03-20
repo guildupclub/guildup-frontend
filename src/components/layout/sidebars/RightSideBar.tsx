@@ -16,7 +16,8 @@ import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
-import { toast } from 'sonner';
+import { toast } from "sonner";
+import DOMPurify from "dompurify";
 interface TrendingPost {
   _id: string;
   user_id: {
@@ -73,9 +74,9 @@ export function RightSidebar() {
     if (!session) {
       toast("Please sign in to Build your Guild", {
         action: {
-          label: 'Sign In',
+          label: "Sign In",
           onClick: () => signIn(),
-        }
+        },
       });
     } else {
       setIsDialogOpen(true);
@@ -88,16 +89,19 @@ export function RightSidebar() {
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
           <h1 className="font-semibold text-lg font-sans">
-          Ready to Turn Your Expertise into income?
+            Ready to Turn Your Expertise into income?
           </h1>
-          <Dialog open={session ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={session ? isDialogOpen : false}
+            onOpenChange={setIsDialogOpen}
+          >
             <Button
               className="w-full text-white shadow-md"
               onClick={handleCreatorButtonClick}
             >
               {StringConstants.CREATE_A_PAGE}
             </Button>
-            
+
             {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
           </Dialog>
         </div>
@@ -160,10 +164,16 @@ export function RightSidebar() {
                     </span>
                   </div>
 
-                  <p className="text-sm line-clamp-3 font-normal text-foreground/90">
-                    {post.body}
-                  </p>
-
+                  <p
+                    className="text-sm line-clamp-4 font-normal text-foreground/90"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        post.body.startsWith('"') && post.body.endsWith('"')
+                          ? post.body.slice(1, -1) 
+                          : post.body
+                      ),
+                    }}
+                  />
                   {/* <div className="flex items-center text-xs text-muted-foreground pt-1">
                     <div className="flex items-center gap-1 group">
                       <Heart className="h-3.5 w-3.5 group-hover:text-red-500 transition-colors" />

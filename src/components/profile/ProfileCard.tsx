@@ -774,109 +774,14 @@ export function ProfileCard() {
         </div>
 
         {/* Testimonials Section */}
-        {/* <div className="col-span-1 lg:col-span-2 mt-8">
+        <div className="col-span-1 lg:col-span-2 mt-8">
           <h2 className="text-2xl px-4 font-bold text-foreground">
             Testimonials
           </h2>
           <div className="rounded-xl px-4 py-2 shadow-sm ">
             <Testimonials />
           </div>
-        </div> */}
-
-        {/* <div className="col-span-1 lg:col-span-2 mt-4">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Testimonials</h2>
-          <div className="relative w-full overflow-hidden">
-            <div
-              ref={testimonialRef}
-              className="flex gap-6 py-4 overflow-x-auto scrollbar-hide"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            >
-              {testimonials.map((testimonial) => (
-                <div
-                  key={testimonial.id}
-                  className="flex-shrink-0 w-80 bg-card rounded-xl p-6 shadow-sm border border-border/5 hover:shadow-md transition-all duration-300"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <Image
-                      src={testimonial.avatar || "/placeholder.svg"}
-                      alt={testimonial.name}
-                      width={48}
-                      height={48}
-                      className="rounded-full"
-                      unoptimized
-                    />
-                    <div>
-                      <h3 className="font-medium text-foreground">{testimonial.name}</h3>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground mb-4">{testimonial.content}</p>
-                  <div className="flex items-center">{renderStars(testimonial.rating)}</div>
-                </div>
-              ))}
-              {/* Duplicate the first few testimonials to create the infinite effect */}
-        {/* {testimonials.slice(0, 3).map((testimonial) => (
-                <div
-                  key={`duplicate-${testimonial.id}`}
-                  className="flex-shrink-0 w-80 bg-card rounded-xl p-6 shadow-sm border border-border/5 hover:shadow-md transition-all duration-300"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <Image
-                      src={testimonial.avatar || "/placeholder.svg"}
-                      alt={testimonial.name}
-                      width={48}
-                      height={48}
-                      className="rounded-full"
-                      unoptimized
-                    />
-                    <div>
-                      <h3 className="font-medium text-foreground">{testimonial.name}</h3>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground mb-4">{testimonial.content}</p>
-                  <div className="flex items-center">{renderStars(testimonial.rating)}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Gradient overlays for infinite scroll effect */}
-        {/*     <div className="absolute top-0 bottom-0 left-0 w-12 bg-gradient-to-r from-background to-transparent pointer-events-none"></div>
-            <div className="absolute top-0 bottom-0 right-0 w-12 bg-gradient-to-l from-background to-transparent pointer-events-none"></div>
-          </div>
-        </div> */}
-
-        {/* <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">
-            Community Info
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Privacy
-              </h3>
-              <p className="text-muted-foreground flex items-center gap-2">
-                {profile.community.is_locked ? (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />
-                    Private Community
-                  </>
-                ) : (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                    Public Community
-                  </>
-                )}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Created By
-              </h3>
-              <p className="text-muted-foreground">{profile.user.user_name}</p>
-            </div>
-          </div>
-        </div> */}
+        </div>
       </div>
       {isEditOpen && (
         <EditCommunityModal
