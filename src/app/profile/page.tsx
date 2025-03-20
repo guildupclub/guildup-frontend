@@ -4,35 +4,167 @@ import * as React from "react";
 import Image from "next/image";
 import { FaArrowLeft } from 'react-icons/fa';
 import InputField from '@/components/userProfile/Input'
+import axios from 'axios';
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "./../../components/ui/dialog";
+import { StringConstants } from "@/components/common/CommonText";
 
-
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  image: string;
+  avatar: string;
+  cover: string | null;
+  about: string;
+  phone: string;
+  location: string;
+  user_interests: string[];
+  save: string[];
+  share: string[];
+  upvote: string[];
+  downvote: string[];
+  emailVerified: string | null;
+  community_joined: string[];
+  is_creator: boolean;
+  custom_feeds: string[];
+}
 
 const ProfilePage = () => {
-  const [profile, setProfile] = React.useState({
-    firstName: "Ravi Kumar Cyber Specialist",
-    lastName: "Cyber Specialist",
-    email: "ravikumarcyber@gmail.com",
-    phone: "9205087xxx",
-    location: "Sector 42, near Rajiv chowk",
-    password: "Ravi@1234",
-  });
-
+  const {user}= useSelector((state: RootState)=> state.user);
+  const userId= user?._id
+  const [profile, setProfile] = React.useState<User | null>(null);
+  const [profileCopy, setProfileCopy] = React.useState<User | null>(null);
   const [isEditable, setIsEditable] = React.useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
+  const [avatarImgUrl, setAvatarImgUrl]= React.useState<string>('');
+  const [changedFields, setChangedFields] = React.useState({});
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
+
+
+  React.useEffect(() => {
+    const updateUserProfile = async () => {
+      try {
+        // const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile, {userId}`);
+        const response = await axios.post(`http://localhost:8000/v1/auth/profile`,{userId});
+        console.log("This is response data",response.data.data);
+        
+        if (response.data.r === "s") {
+          setProfile(response.data.data);
+          setProfileCopy(response.data.data)
+          console.log("This is my avatar",response.data.data.image);
+          
+          if (response.data.data.avatar) {
+            setAvatarImgUrl(response.data.data.avatar);
+          } else if(response.data.data.image){
+            setAvatarImgUrl(response.data.data.image);
+          }else {
+            setAvatarImgUrl(
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.name}`
+            );
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+    updateUserProfile();
+  }, []);
+
+  const updateUserProfile = async () => {
+    try {
+      // const response = await axios.patch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit, {updateData: changedFields, userId}`);
+      const response = await axios.patch('http://localhost:8000/v1/auth/edit', {updateData: changedFields, userId});
+      if (response.data.r === "e") {
+        toast.error(response.data.e)
+        setProfile(profileCopy)
+      } else {
+        toast.success("Signed in successfully!");
+        setProfile(response.data.data.user);
+        setProfileCopy(response.data.data.user)
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!profile) return;
     const { name, value } = e.target;
-    setProfile((prevProfile) => ({
-      ...prevProfile,
-      [name]: value,
-    }));
+    setProfile((prevProfile) => prevProfile ? { ...prevProfile, [name]: value } : null);
+    setChangedFields(prevChanged => ({ ...prevChanged, [name]: value }));
   };
 
   const handleSave = () => {
-    console.log("Profile Data:", profile);
-    setIsEditable(false);
+    if (profile) {
+      updateUserProfile();
+      setIsEditable(false);
+    }
   };
 
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      event.target.value = "";
+      toast.error("Please select an image file.");
+      return;
+    }
+
+    const previousAvatarUrl = avatarImgUrl;
+    try {
+      // Create FormData and append both userId and file
+      const formData = new FormData();
+      formData.append("userId", userId);
+      formData.append("avatar", file);
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/update-avatar`,
+        formData, { headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.r === "s") {
+        const newAvatarUrl = response.data.data.user.avatar;
+        console.log(newAvatarUrl);
+        setAvatarImgUrl(newAvatarUrl);
+        toast.success(response.data.data.message);
+        setIsModalOpen(false);
+      } else if (response.data.r === "e") {
+        if (Array.isArray(response.data.e)) {
+          response.data.e.forEach((err: any) => {
+            toast.error(err.message);
+          });
+        } else {
+          toast.error(response.data.e);
+        }
+        setAvatarImgUrl(previousAvatarUrl);
+      }
+    } catch (error: any) {
+      console.error("Error uploading profile picture:", error);
+      toast.error(error.message || "Error uploading profile picture.");
+      setAvatarImgUrl(previousAvatarUrl);
+    }finally {
+      event.target.value = "";
+    }
+  };
+
+  if (!profile) return <p>Loading...</p>;
   return (
     <div className="flex bg-[#f2f2f2]">
       <div className="flex grow flex-col w-full gap-6 px-20 mx-5 mt-6">
@@ -48,15 +180,49 @@ const ProfilePage = () => {
         </div>
         <div className="flex flex-col w-full bg-card shadow-md p-6 rounded-lg relative gap-12">
           <div className="flex items-center gap-4">
-            <Image
-              src="/profile.jpg"
-              alt="Profile Picture"
-              width={80}
-              height={80}
-              className="rounded-full bg-red-500"
-            />
+          <Dialog>
+            {/* Use DialogTrigger to wrap the Image, so clicking opens the modal */}
+            <DialogTrigger asChild>
+              <Image
+                src={avatarImgUrl}
+                alt="Profile Picture"
+                width={80}
+                height={80}
+                className="rounded-full hover:cursor-pointer"
+              />
+            </DialogTrigger>
+
+            {/* Dialog Content */}
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Update Profile Picture</DialogTitle>
+                <DialogDescription>
+                  {StringConstants.UPDATE_PROFILE_PICTURE_DESCRIPTION ||
+                    "Upload a new image to update your profile picture."}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4 flex flex-col space-y-4">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:bg-gray-100 file:hover:bg-gray-200"
+                />
+              </div>
+
+              {/* Footer with a close button */}
+              <DialogFooter>
+                <DialogClose asChild>
+                  <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    {StringConstants.CLOSE}
+                  </button>
+                </DialogClose>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
             <div>
-              <h2 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">{profile.firstName}</h2>
+              <h2 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">{profile.name}</h2>
               <p className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">{profile.email}</p>
             </div>
             <button className={`ml-auto bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700 transition ${isEditable ? 'bg-gray-500 pointer-events-none' : 'null'}`}
@@ -65,23 +231,23 @@ const ProfilePage = () => {
             </button>
           </div>
 
-           <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <InputField
-              label="First Name"
-              name="firstName"
-              placeholder="Enter your first name"
-              value={profile.firstName}
-              onChange={handleChange}
-              disabled={!isEditable}
-            />
-            <InputField
+                label="Name"
+                name="name"
+                placeholder="Enter your name"
+                value={profile.name}
+                onChange={handleChange}
+                disabled={!isEditable}
+              />
+            {/* <InputField
               label="Last Name"
               name="lastName"
               placeholder="Enter your last name"
               value={profile.lastName}
               onChange={handleChange}
               disabled={!isEditable}
-            />
+            /> */}
             <InputField
               label="Email ID"
               type="email"
@@ -89,7 +255,7 @@ const ProfilePage = () => {
               placeholder="Enter your email"
               value={profile.email}
               onChange={handleChange}
-              disabled={!isEditable}
+              disabled
             />
             <InputField
               label="Phone Number"
@@ -100,116 +266,7 @@ const ProfilePage = () => {
               disabled={!isEditable}
               prefix="+91"
             />
-            <InputField
-              label="Location"
-              name="location"
-              placeholder="Enter your location"
-              value={profile.location}
-              onChange={handleChange}
-              disabled={!isEditable}
-            />
-            <InputField
-              label="Password"
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={profile.password}
-              onChange={handleChange}
-              disabled={!isEditable}
-              isPasswordVisible={isPasswordVisible}
-              onTogglePasswordVisibility={() => isEditable && setIsPasswordVisible((prev) => !prev)}
-            />
           </div>
-          {/* 
-          <div className="grid grid-cols-2 gap-4">
-              First Name 
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">First Name</label>
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Enter your first name"
-                value={profile.firstName}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-500 rounded-md bg-white focus:ring-2 focus:ring-blue-500"
-                disabled={!isEditable}
-
-              />
-            </div>
-              Last Name 
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Enter your last name"
-                value={profile.lastName}
-                onChange={handleChange}
-                disabled={!isEditable}
-                className="w-full px-3 py-2 border border-gray-500 rounded-md bg-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-              Email ID 
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Email ID</label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email"
-                value={profile.email}
-                onChange={handleChange}
-                disabled={!isEditable}
-                className="w-full px-3 py-2 border border-gray-500 rounded-md bg-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-              Phone Number 
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Phone Number</label>
-              <div className="flex items-center border rounded-md bg-white border-gray-500">
-                <span className="px-3">+91</span>
-                <input
-                  type="text"
-                  name="phone"
-                  value={profile.phone}
-                  placeholder="Enter your phone number"
-                  onChange={handleChange}
-                  disabled={!isEditable}
-                  className="w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-              Location
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Location</label>
-              <input
-                type="text"
-                name="location"
-                value={profile.location}
-                placeholder="Enter your location"
-                onChange={handleChange}
-                disabled={!isEditable}
-                className="w-full px-3 py-2 border border-gray-500 rounded-md bg-white focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-              Password 
-            <div>
-              <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Password</label>
-              <div className="flex items-center border rounded-md bg-white border-gray-500">
-                <input
-                  type={isPasswordVisible ? 'text' : 'password'}
-                  name="password"
-                  value={profile.password}
-                  placeholder="Enter your password"
-                  onChange={handleChange}
-                  disabled={!isEditable}
-                  className="w-full px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                />
-                <span className="px-3 cursor-pointer" onClick={() => isEditable && setIsPasswordVisible(prevState => !prevState)}>
-                  {isPasswordVisible ? <FaEyeSlash />: <FaEye/> }
-                </span>
-              </div>
-            </div>
-          </div> */}
 
           <div className="flex justify-start">
             <button
