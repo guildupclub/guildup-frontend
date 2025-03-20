@@ -71,7 +71,7 @@ export function RightSidebar() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast.info ("Please sign in to Build your Guild", {
+      toast("Please sign in to Build your Guild", {
         action: {
           label: 'Sign In',
           onClick: () => signIn(),
