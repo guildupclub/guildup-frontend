@@ -20,6 +20,7 @@ interface Post {
   likes: number;
   comments: number;
   avatar: string;
+  name:string;
 }
 
 function ChatContent() {
@@ -65,6 +66,7 @@ function ChatContent() {
             comments: item.reply_count || 0,
             author: userData.user_name || "Unknown",
             avatar: userData.image || "",
+            name:userData.name||"",
           };
         }) || []
       );
@@ -124,7 +126,7 @@ function ChatContent() {
       {/* Chat Messages */}
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="px-6 py-4 pb-24 space-y-6">
+          <div className="px-2 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
               posts.map((post:any) => <PostCard key={post.id} {...post} />)
             ) : (

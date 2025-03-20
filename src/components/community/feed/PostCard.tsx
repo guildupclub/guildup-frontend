@@ -16,7 +16,10 @@ import { CommentSection } from "./CommentSection";
 import { FaShare } from "react-icons/fa";
 import { StringConstants } from "@/components/common/CommonText";
 import { useSession } from "next-auth/react";
-
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import DOMPurify from "dompurify";
+import he from "he";
 interface PostCardProps {
   post: {
     _id: string;
@@ -41,6 +44,19 @@ export function PostCard({ post }: PostCardProps) {
   const [liked, setLiked] = useState(false);
   const [relativeTime, setRelativeTime] = useState("");
   const { data: session } = useSession();
+  const activeCommunity = useSelector(
+    (state: RootState) => state.channel.activeCommunity
+  );
+
+  const name = activeCommunity?.name;
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   useEffect(() => {
     setRelativeTime(
@@ -48,18 +64,25 @@ export function PostCard({ post }: PostCardProps) {
     );
   }, [post.created_At]);
 
+  const parsedBody =
+    post.body.startsWith('"') && post.body.endsWith('"')
+      ? post.body.slice(1, -1)
+      : post.body;
+  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
+
+  // console.log("Sanitized Body:", sanitizedBody);
   return (
     <div className="bg-card rounded-lg overflow-hidden">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500">
-            <AvatarImage src={session?.user?.image} />
-            <AvatarFallback>UN</AvatarFallback>
+            <AvatarImage src={activeCommunity?.image} />
+            <AvatarFallback>{getInitials(name || "")}</AvatarFallback>
           </Avatar>
           <div className="flex-1 text-muted-foreground">
             <div className="flex items-center gap-2">
-              <span className="font-medium">{session?.user?.name}</span>
+              <span className="font-medium">{activeCommunity?.name}</span>
               <Badge variant="outline" className="text-xs bg-transparent">
                 {StringConstants.HOST}
               </Badge>
@@ -69,8 +92,12 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* Content */}
+
         <div className="mt-3 text-muted-foreground">
-          <p>{post.body}</p>
+          <div
+            className="text-sm text-accent mt-2"
+            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+          />
 
           {post?.media?.publicUrl && post?.media?.fileType === "image" && (
             <img
@@ -79,7 +106,6 @@ export function PostCard({ post }: PostCardProps) {
               className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
             />
           )}
-
           {/* Video Placeholder */}
           {post?.media?.publicUrl && post?.media?.fileType === "video" && (
             <video
@@ -102,7 +128,9 @@ export function PostCard({ post }: PostCardProps) {
             <Heart
               className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : ""}`}
             />
-            <span>{post.up_votes} {StringConstants.LIKE}</span>
+            <span>
+              {post.up_votes} {StringConstants.LIKE}
+            </span>
           </Button>
 
           <Button
@@ -112,7 +140,9 @@ export function PostCard({ post }: PostCardProps) {
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageCircleMore className="h-5 w-5" />
-            <span>{post.reply_count} {StringConstants.COMMENT}</span>
+            <span>
+              {post.reply_count} {StringConstants.COMMENT}
+            </span>
           </Button>
           <Button
             variant="ghost"

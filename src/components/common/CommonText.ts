@@ -2,15 +2,15 @@ import { Description } from "@radix-ui/react-dialog";
 import Members from "../community/members/Members";
 
 export const StringConstants = {
-    CREATE_A_PAGE : 'Create a Page',
+    CREATE_A_PAGE : 'Build Your Guild',
     TAGS : 'Tags',
     PAGE_NAME : 'Page Name',
     EDIT_PAGE: 'Edit Page',
     DESCRIPTION: 'Description',
     PAGE_DESCRIPTION: 'Page Description',
     PAGE_TYPE: 'Page Type',
-    SELECT_TOPICS: 'Select Topics',
-    ABOUT_THE_PAGE: 'About the page',
+    SELECT_TOPICS: 'Select your Category',
+    ABOUT_THE_PAGE: 'Tell us what your page is about',
     FEW_WORDS_ABOUT_PAGE: 'Few words about the page',
     HOME_PAGE: 'Home',
     EXPLORE_PAGE: 'Explore',
@@ -112,10 +112,14 @@ export const StringConstants = {
     CREATE_NEW_OFFERING: 'Create New Offering',
     EDIT_OFFERING: 'Edit Offering',
     PRICE: 'Price',
+    DISCOUNTED_PRICE:'Discounted Price',
     TITLE: 'Title',
     TYPE: 'Type',
+
+    SUBSCRIBERS:"Subscribers",
+    FOLLOWERS:"Followers",
     NO_COMMUNITIES_AVAILABLE: 'No communities available',
-    PUBLIC: 'Public'
+    PUBLIC: 'Public',
 
 }
 

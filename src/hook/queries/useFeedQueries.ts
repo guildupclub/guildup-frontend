@@ -29,6 +29,7 @@ interface ApiResponse {
 }
 
 const fetchPosts = async ({ userId, page }: FetchPostsParams): Promise<Post[]> => {
+  console.log("BACKEND_URL", `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}`);
   const response = await fetch(API_ENDPOINTS.getPosts, {
     method: "POST",
     headers: {

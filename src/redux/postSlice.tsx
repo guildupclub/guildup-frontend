@@ -26,6 +26,7 @@ export const fetchPosts = createAsyncThunk(
   'posts/fetchPosts',
   async (body: any, thunkAPI) => {
     console.log("@body",body)
+    console.log("BACKENDURL_FROM_POST", API_BASE_URL);
     const res = await fetch(`${API_BASE_URL}/v1/post/getPosts`,
     {
         method: "POST",

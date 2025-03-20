@@ -19,6 +19,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { StringConstants } from "../common/CommonText";
 
 const EditOfferingModal = ({
   offering,
@@ -108,6 +109,19 @@ const EditOfferingModal = ({
               </SelectContent>
             </Select>
           </div>
+          <div className="space-y-2">
+              <label htmlFor="duration">Duration (mins)</label>
+              <Input
+                id="duration"
+                type="number"
+                value={formData.duration}
+                onChange={(e) =>
+                  setFormData({ ...formData, duration: Number(e.target.value) })
+                }
+                min="15"
+                required
+              />
+            </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label htmlFor="price">Price (INR)</label>
@@ -130,18 +144,25 @@ const EditOfferingModal = ({
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="duration">Duration (mins)</label>
+              <label htmlFor="discounted_price">
+                {StringConstants.DISCOUNTED_PRICE} (INR)
+              </label>
               <Input
-                id="duration"
+                id="discoounted_price"
                 type="number"
-                value={formData.duration}
+                value={formData.discounted_price}
                 onChange={(e) =>
-                  setFormData({ ...formData, duration: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    discounted_price: Number(e.target.value),
+                    is_free: Number(e.target.value) === 0,
+                  })
                 }
-                min="15"
+                min="0"
                 required
               />
             </div>
+          
           </div>
           <div className="space-y-2">
             <label htmlFor="tags">Tags (comma-separated)</label>

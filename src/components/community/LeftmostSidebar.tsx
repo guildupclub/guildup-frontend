@@ -28,6 +28,7 @@ import {
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
 
+
 interface Community {
   _id: string;
   title: string;
@@ -35,7 +36,8 @@ interface Community {
   description: string;
   subscription: boolean;
   subscription_price: number;
-  num_member: number;
+  image: string;
+  background_image: string;
 }
 
 export function LeftmostSidebar() {
@@ -111,7 +113,7 @@ export function LeftmostSidebar() {
   // Fetch communities function
   const fetchCommunities = async (): Promise<Community[]> => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
       {
         method: "POST",
         headers: {
@@ -120,6 +122,7 @@ export function LeftmostSidebar() {
         body: JSON.stringify({ userId }),
       }
     );
+
 
     if (!response.ok) {
       throw new Error("Failed to fetch communities");
@@ -137,7 +140,9 @@ export function LeftmostSidebar() {
       dispatch(
         setActiveCommunity({
           id: validCommunities[0]._id,
-          name: validCommunities[0].name, // Include name
+          name: validCommunities[0].name,
+          image: validCommunities[0].image,
+          background_image: validCommunities[0].background_image,
         })
       );
     }
@@ -261,6 +266,8 @@ export function LeftmostSidebar() {
                     setActiveCommunity({
                       id: community._id,
                       name: community.name,
+                      image: community.image,
+                      background_image: community.background_image,
                     })
                   );
                   dispatch(
@@ -277,7 +284,7 @@ export function LeftmostSidebar() {
                     src={
                       community.image && community.image !== ""
                         ? community.image
-                        : `/placeholder.svg?text=${getInitials(community.name)}`
+                        : ""
                     }
                     alt={community.name}
                     className="!rounded-lg"

@@ -1,32 +1,32 @@
 "use client";
 
-import { RootState } from "@/redux/store";
-import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
+import type React from "react";
+
+import type { RootState } from "@/redux/store";
+import { Avatar } from "@radix-ui/react-avatar";
 import axios from "axios";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useCallback, useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import {
-  ArrowRight,
-  Badge,
-  Edit,
-  Instagram,
-  Trash2,
-  Pencil,
-  Video,
-} from "lucide-react";
+import { ArrowRight, Edit, Trash2, Pencil } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
 import { signIn, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { HiMiniUserGroup } from "react-icons/hi2";
-import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
 import { StringConstants } from "../common/CommonText";
-
+import { GrInstagram } from "react-icons/gr";
+import { BsYoutube } from "react-icons/bs";
+import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
+import numbro from "numbro";
+import {
+  setUserBankDetails,
+  setUserCalendarConnected,
+} from "@/redux/channelSlice";
 // Add this state in ProfileCard component
 
 interface CommunityProfile {
@@ -45,6 +45,8 @@ interface CommunityProfile {
     tags: string[];
     image: string;
     background_image: string;
+    youtube_followers: string;
+    instagram_followers: string;
   };
 }
 
@@ -60,6 +62,7 @@ interface Offering {
     amount: number;
     currency: string;
   };
+  discounted_price: string;
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -67,7 +70,153 @@ interface Offering {
   total_ratings: number;
 }
 
+// Add this interface after the other interfaces
+interface Testimonial {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+  content: string;
+  rating: number;
+}
+
+interface CardProps {
+  item: Testimonial;
+}
+
+function Card({ item }: CardProps) {
+  return (
+    <div className="flex w-[300px] flex-col gap-2 rounded-md border border-border bg-card p-4 shadow-sm">
+      <div className="flex items-center space-x-4">
+        <Image
+          src={item.avatar || "/placeholder.svg"}
+          alt={item.name}
+          width={48}
+          height={48}
+          className="rounded-full"
+          unoptimized
+        />
+        <div>
+          <h3 className="font-medium text-foreground">{item.name}</h3>
+          <p className="text-sm text-muted-foreground">{item.role}</p>
+        </div>
+      </div>
+      <p className="text-sm text-muted-foreground">{item.content}</p>
+      <div className="flex items-center">
+        {Array(5)
+          .fill(0)
+          .map((_, i) => (
+            <svg
+              key={i}
+              className={`w-4 h-4 ${
+                i < item.rating ? "text-yellow-400" : "text-gray-300"
+              }`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-.181h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+            </svg>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+interface InfiniteMovingCardsProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  items: Testimonial[];
+  direction: "left" | "right";
+  speed: "fast" | "normal" | "slow";
+  pauseOnHover?: boolean;
+}
+
+const containerVariants = {
+  initial: {
+    x: "100%",
+  },
+  animate: {
+    x: "-100%",
+    transition: {
+      x: { repeat: Number.POSITIVE_INFINITY, duration: 13, ease: "linear" },
+    },
+  },
+};
+
+const itemVariants = {
+  initial: {
+    x: 0,
+  },
+  animate: {
+    x: "-100%",
+    transition: {
+      x: { repeat: Number.POSITIVE_INFINITY, duration: 13, ease: "linear" },
+    },
+  },
+};
+
+const InfiniteMovingCards = ({
+  items,
+  direction = "left",
+  speed = "normal",
+  pauseOnHover = true,
+  className,
+  ...props
+}: InfiniteMovingCardsProps) => {
+  const xStart = direction === "left" ? "100%" : "-100%";
+  const xEnd = direction === "left" ? "-100%" : "100%";
+
+  let duration = 13;
+  if (speed === "fast") {
+    duration = 8;
+  }
+  if (speed === "slow") {
+    duration = 20;
+  }
+
+  const containerVariants = {
+    initial: {
+      x: xStart,
+    },
+    animate: {
+      x: xEnd,
+      transition: {
+        x: {
+          repeat: Number.POSITIVE_INFINITY,
+          duration: duration,
+          ease: "linear",
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="relative w-full overflow-hidden">
+      <div className="py-4">
+        <motion.div
+          className="flex w-max gap-6"
+          variants={containerVariants}
+          initial="initial"
+          animate="animate"
+          style={{
+            "--num": items.length,
+          }}
+          whileHover={pauseOnHover ? "paused" : ""}
+          {...props}
+        >
+          {items.map((item, i) => (
+            <Card key={i} item={item} />
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+import { motion } from "framer-motion";
+import Testimonials from "../testimonial/Testimonial";
+
 export function ProfileCard() {
+  const dispatch = useDispatch();
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
@@ -92,14 +241,110 @@ export function ProfileCard() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = community?.communityId;
 
+  // Add this state in ProfileCard component after other state declarations
+  const [testimonials, setTestimonials] = useState([
+    {
+      quote:
+        "This community has been transformative for my personal growth. The resources and support are unmatched!",
+      name: "Sarah Johnson",
+      title: "Community Member",
+      avatar:
+        "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
+      content:
+        "I've been a member for over a year and the quality of content keeps getting better. Highly recommend!",
+      rating: 5,
+      id: "1",
+    },
+    {
+      quote:
+        "I've been a member for over a year and the quality of content keeps getting better. Highly recommend!",
+      name: "Michael Chen",
+      title: "Premium Subscriber",
+      avatar:
+        "https://images.unsplash.com/photo-1580489944761-15a19d674x?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      content:
+        "The workshops offered here have helped me advance my career in ways I never expected. Thank you!",
+      rating: 4,
+      id: "2",
+    },
+    {
+      quote:
+        "The workshops offered here have helped me advance my career in ways I never expected. Thank you!",
+      name: "Jessica Williams",
+      title: "Workshop Participant",
+      avatar:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad7d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      content:
+        "The sense of belonging I've found here is incredible. Everyone is so supportive and encouraging.",
+      rating: 5,
+      id: "3",
+    },
+    {
+      quote:
+        "The sense of belonging I've found here is incredible. Everyone is so supportive and encouraging.",
+      name: "David Rodriguez",
+      title: "Community Member",
+      avatar:
+        "https://images.unsplash.com/photo-1531427186534-742ad904efd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      content:
+        "The courses offered here have completely changed my perspective. I've learned so much!",
+      rating: 4,
+      id: "4",
+    },
+    {
+      quote:
+        "The courses offered here have completely changed my perspective. I've learned so much!",
+      name: "Emma Thompson",
+      title: "Course Graduate",
+      avatar:
+        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
+      content:
+        "This community has been transformative for my personal growth. The resources and support are unmatched!",
+      rating: 5,
+      id: "5",
+    },
+  ]);
+
+  // Add this ref and effect for the infinite scroll animation
+  const testimonialRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = testimonialRef.current;
+    if (!scrollContainer) return;
+
+    let animationId: number;
+    let startTime: number | null = null;
+    const duration = 30000; // 30 seconds for one complete scroll
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = (elapsed % duration) / duration;
+
+      if (scrollContainer) {
+        const totalWidth =
+          scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        scrollContainer.scrollLeft = totalWidth * progress;
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
   const isCommunityFollowed = userFollowedCommunities.some(
     (c) => c?._id === activeCommunityId
   );
 
-  const isOwner = memberDetails && 
-                  memberDetails.is_owner === true && 
-                  memberDetails.community_id === community.communityId;
-
+  const isOwner =
+    memberDetails &&
+    memberDetails.is_owner === true &&
+    memberDetails.community_id === community.communityId;
 
   // Now button in the offering card
 
@@ -164,29 +409,39 @@ export function ProfileCard() {
         setLoading(true);
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          { communityId: community.communityId }
+          {
+            communityId: community.communityId,
+          }
         );
 
-        console.log("@response",response.data.data)
+        console.log("@response", response.data.data);
         if (response.data.r === "s") {
           setProfile(response.data.data);
-          if(response.data.data.community.image){
-            setAvatarImgUrl(response.data.data.community.image)
-          }
-          else{
-
+          if (response.data.data.community.image) {
+            setAvatarImgUrl(response.data.data.community.image);
+          } else {
             setAvatarImgUrl(
               `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
             );
           }
-          if(response.data.data.community.background_image){
-            setBgImgUrl(response.data.data.community.background_image)
-          }
-          else{
+          if (response.data.data.community.background_image) {
+            setBgImgUrl(response.data.data.community.background_image);
+          } else {
             setBgImgUrl(
               "https://random-image-pepebigotes.vercel.app/api/random-image"
             );
           }
+
+          dispatch(
+            setUserBankDetails(
+              response.data.data.user.user_isBankDetailsAdded || false
+            )
+          );
+          dispatch(
+            setUserCalendarConnected(
+              response.data.data.user.user_iscalendarConnected || false
+            )
+          );
         }
       } catch (error) {
         setError("Failed to load community profile");
@@ -244,12 +499,33 @@ export function ProfileCard() {
     setSelectedOfferingModal(offering);
     setIsEditModalOpen(true);
   };
+  const formatNumber = (num: any) => {
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
+  };
+
+  // Add this function to render star ratings
+  const renderStars = (rating: number) => {
+    return Array(5)
+      .fill(0)
+      .map((_, i) => (
+        <svg
+          key={i}
+          className={`w-4 h-4 ${
+            i < rating ? "text-yellow-400" : "text-gray-300"
+          }`}
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-.181h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+        </svg>
+      ));
+  };
 
   if (loading) return <div>{StringConstants.LOADING}</div>;
   if (error) return <div>{error}</div>;
   if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
-
-  {console.log("@prifle",profile.user)}
+  console.log("@prifle", profile.user);
   return (
     <div className="w-full max-w-6xl py-2 px-3 md:px-0">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
@@ -305,8 +581,9 @@ export function ProfileCard() {
                   {profile.user.user_name}
                 </span>
               </p>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground my-2">
                 <div className="flex items-center gap-1.5">
+                  <MdPeopleAlt className="h-5 w-5 text-green-500" />
                   <span className="font-medium text-foreground">
                     {profile.community.num_member.toLocaleString()}
                   </span>
@@ -314,10 +591,29 @@ export function ProfileCard() {
                 </div>
                 <div className="w-1 h-1 rounded-full bg-border" />
                 <div className="flex items-center gap-1.5">
+                  <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
                   <span className="font-medium text-foreground">
-                    {profile.community.post_count}
+                    {profile?.community?.post_count}
                   </span>
                   {StringConstants.POSTS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <GrInstagram className="h-5 w-5 text-pink-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.instagram_followers)}
+                  </span>
+                  {StringConstants.FOLLOWERS}
+                </div>
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5">
+                  <BsYoutube className="h-5 w-5 text-red-500" />
+                  <span className="font-medium text-foreground">
+                    {formatNumber(profile.community?.youtube_followers)}
+                  </span>
+                  {StringConstants.SUBSCRIBERS}
                 </div>
               </div>
             </div>
@@ -348,9 +644,11 @@ export function ProfileCard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-        <div className="">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">{StringConstants.ABOUT}</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="p-4 ">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
+            {StringConstants.ABOUT}
+          </h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
             <p className="text-muted-foreground leading-relaxed mb-6">
               {profile.community.description}
@@ -367,39 +665,6 @@ export function ProfileCard() {
             </div>
           </div>
         </div>
-
-        {/* <div className="bg-card rounded-xl p-8 shadow-sm hover:shadow-md transition-all duration-300 border border-border/5">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">
-            Community Info
-          </h2>
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Privacy
-              </h3>
-              <p className="text-muted-foreground flex items-center gap-2">
-                {profile.community.is_locked ? (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />
-                    Private Community
-                  </>
-                ) : (
-                  <>
-                    <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
-                    Public Community
-                  </>
-                )}
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Created By
-              </h3>
-              <p className="text-muted-foreground">{profile.user.user_name}</p>
-            </div>
-          </div>
-        </div> */}
-
         <div className="rounded-xl transition-all duration-300 border border-border/5">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-semibold text-foreground">
@@ -416,13 +681,11 @@ export function ProfileCard() {
             </div>
           ) : (
             <div className="flex flex-col gap-4">
-
               {offerings.map((offering) => (
                 <div
                   key={offering._id || Math.random()}
                   className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
                 >
-
                   {/* Top Row: Icon + Title + Description */}
                   <div className="flex items-start gap-4">
                     <div className="p-2 bg-blue-50 rounded-lg">
@@ -481,10 +744,17 @@ export function ProfileCard() {
                           setSelectedOffering(offering);
                         }}
                       >
-                        {/* <span className="line-through text-xs opacity-60">
-                          ₹{offering.price.amount * 1.5}
-                        </span> */}
-                        <span>₹{offering.price.amount}</span>
+                        {offering?.discounted_price &&
+                        offering?.price?.amount ? (
+                          <>
+                            <span className="line-through text-xs opacity-60">
+                              ₹{offering.price.amount}
+                            </span>
+                            <span> ₹{offering.discounted_price}</span>
+                          </>
+                        ) : offering?.price?.amount ? (
+                          <span>₹{offering.price.amount}</span>
+                        ) : null}
                         <ArrowRight className="w-4 h-4" />
                       </Button>
                     </div>
@@ -502,10 +772,20 @@ export function ProfileCard() {
             </div>
           )}
         </div>
+
+        {/* Testimonials Section */}
+        <div className="col-span-1 lg:col-span-2 mt-8">
+          <h2 className="text-2xl px-4 font-bold text-foreground">
+            Testimonials
+          </h2>
+          <div className="rounded-xl px-4 py-2 shadow-sm ">
+            <Testimonials />
+          </div>
+        </div>
       </div>
       {isEditOpen && (
         <EditCommunityModal
-        profile={profile}
+          profile={profile}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
         />

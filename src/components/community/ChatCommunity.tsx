@@ -7,16 +7,20 @@ import { Settings, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { RootState } from "@/redux/store";
-import { useChatMessages, useSendChatMessage } from "@/hook/queries/useChatQueries";
+import {
+  useChatMessages,
+  useSendChatMessage,
+} from "@/hook/queries/useChatQueries";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
-
+import moment from "moment";
 interface Post {
   id: string;
   author: string;
   time: string;
   content: string;
   avatar: string;
+  name: string;
 }
 
 function Chat() {
@@ -56,6 +60,7 @@ function Chat() {
             content: item.message_content || "",
             author: userData.user_name || "Unknown",
             avatar: userData.image || "",
+            name: userData.name || "",
           };
         }) || []
       );
@@ -82,7 +87,7 @@ function Chat() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["chatMessages", activeChannelId, userId]
+        queryKey: ["chatMessages", activeChannelId, userId],
       });
       setPostBody(""); // Clear input after sending
     },
@@ -105,16 +110,20 @@ function Chat() {
     );
   }
 
-  if (isLoading) return <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>;
+  if (isLoading)
+    return (
+      <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>
+    );
   if (error)
     return (
       <div className="text-center py-10 text-red-500">
-        {StringConstants.ERROR} {(error as Error).message}. {StringConstants.PLEASE_TRY_AGAIN}
+        {StringConstants.ERROR} {(error as Error).message}.{" "}
+        {StringConstants.PLEASE_TRY_AGAIN}
       </div>
     );
 
   return (
-    <div className="flex flex-col h-screen pb-20">
+    <div className="flex flex-col h-screen pb-20 w-full">
       {/* Channel Header */}
       <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
@@ -124,7 +133,7 @@ function Chat() {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden w-full">
         <ScrollArea className="h-full">
           <div className="px-6 py-4 pb-24 space-y-6">
             {(posts || []).length > 0 ? (
@@ -136,18 +145,18 @@ function Chat() {
                     className="w-10 h-10 rounded-full"
                   />
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{post.author}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {post.time}
-                      </span>
+                    <div className="flex items-center gap-2 justify-between">
+                      <span className="font-medium">{post.name}</span>
+                      {moment(post.time).format("YYYY MMM DD, hh:mm A")}
                     </div>
                     <p className="text-sm text-accent">{post.content}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center text-zinc-400">{StringConstants.NO_POSTS_YET}</div>
+              <div className="text-center text-zinc-400">
+                {StringConstants.NO_POSTS_YET}
+              </div>
             )}
           </div>
         </ScrollArea>

@@ -1,15 +1,12 @@
-// 
+//
 
 "use client";
 
 import * as React from "react";
-import { Heart, User } from "lucide-react";
+import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Dialog,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import FooterLinks from "./FootLinks";
 import { useEffect, useState } from "react";
@@ -19,13 +16,19 @@ import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
-
+import { toast } from "sonner";
+import DOMPurify from "dompurify";
 interface TrendingPost {
   _id: string;
   user_id: {
     _id: string;
     avatar: string | null;
     name: string;
+  };
+  community_id: {
+    name: string;
+    image: string | null;
+    background_image: string | null;
   };
   body: string;
   up_votes: number;
@@ -36,7 +39,7 @@ export function RightSidebar() {
   const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
-  
+
   // Get the user data from Redux store
   const user = useSelector((state: RootState) => state.user);
   // Check if user is already a creator using the is_creator flag
@@ -69,7 +72,12 @@ export function RightSidebar() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      signIn("google");
+      toast("Please sign in to Build your Guild", {
+        action: {
+          label: "Sign In",
+          onClick: () => signIn(),
+        },
+      });
     } else {
       setIsDialogOpen(true);
     }
@@ -80,17 +88,18 @@ export function RightSidebar() {
       {/* Creator Box - Only show if user is not already a creator */}
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold text-lg">Ready to start making money?</h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <Button 
-              className="w-full text-white shadow-md" 
+          <h1 className="font-semibold text-lg font-sans">
+            Ready to Turn Your Expertise into income?
+          </h1>
+          <Dialog
+            open={session ? isDialogOpen : false}
+            onOpenChange={setIsDialogOpen}
+          >
+            <Button
+              className="w-full text-white shadow-md"
               onClick={handleCreatorButtonClick}
             >
-              {session ? (
-                <DialogTrigger className="w-full">{StringConstants.CREATE_A_PAGE}</DialogTrigger>
-              ) : (
-                <>{StringConstants.CREATE_A_PAGE}</>
-              )}
+              {StringConstants.CREATE_A_PAGE}
             </Button>
 
             {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
@@ -103,26 +112,31 @@ export function RightSidebar() {
         <h2 className="text-lg font-semibold px-4 py-3 border-b border-zinc-200/50">
           {StringConstants.TRENDING_POSTS}
         </h2>
-        <div className="max-h-[430px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-400 scrollbar-track-transparent">
+        <div className="max-h-[470px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
           {isLoading ? (
             // Loading skeleton UI
-            Array(3).fill(0).map((_, index) => (
-              <div key={index} className="px-4 py-3 border-b border-zinc-200/50 last:border-0">
-                <div className="flex gap-3">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Skeleton className="h-5 w-5 rounded-full" />
-                      <Skeleton className="h-3 w-24" />
+            Array(3)
+              .fill(0)
+              .map((_, index) => (
+                <div
+                  key={index}
+                  className="px-4 py-3 border-b border-zinc-200/50 last:border-0"
+                >
+                  <div className="flex gap-3">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-5 w-5 rounded-full" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-5/6" />
                     </div>
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-5/6" />
+                  </div>
+                  <div className="flex items-center gap-4 mt-2">
+                    <Skeleton className="h-3 w-12" />
                   </div>
                 </div>
-                <div className="flex items-center gap-4 mt-2">
-                  <Skeleton className="h-3 w-12" />
-                </div>
-              </div>
-            ))
+              ))
           ) : trendingPosts.length > 0 ? (
             trendingPosts.map((post) => (
               <div
@@ -131,9 +145,12 @@ export function RightSidebar() {
               >
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6 ring-1 ring-zinc-200">
-                      {post.user_id?.avatar ? (
-                        <AvatarImage src={post.user_id.avatar} alt={post.user_id.name || "User"} />
+                    <Avatar className="h-8 w-8 ring-1 ring-zinc-200">
+                      {post?.community_id?.image ? (
+                        <AvatarImage
+                          src={post?.community_id?.image}
+                          alt={post?.community_id?.name || "User"}
+                        />
                       ) : (
                         <AvatarFallback className="bg-primary/10 text-primary">
                           <User className="h-3 w-3" />
@@ -141,14 +158,22 @@ export function RightSidebar() {
                       )}
                     </Avatar>
                     <span className="text-xs font-medium text-muted-foreground">
-                      {post.user_id && post.user_id.name ? post.user_id.name : ""}
+                      {post?.community_id && post.community_id.name
+                        ? post.community_id.name
+                        : ""}
                     </span>
                   </div>
 
-                  <p className="text-sm line-clamp-3 font-normal text-foreground/90">
-                    {post.body}
-                  </p>
-
+                  <p
+                    className="text-sm line-clamp-4 font-normal text-foreground/90"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        post.body.startsWith('"') && post.body.endsWith('"')
+                          ? post.body.slice(1, -1) 
+                          : post.body
+                      ),
+                    }}
+                  />
                   {/* <div className="flex items-center text-xs text-muted-foreground pt-1">
                     <div className="flex items-center gap-1 group">
                       <Heart className="h-3.5 w-3.5 group-hover:text-red-500 transition-colors" />
@@ -160,7 +185,9 @@ export function RightSidebar() {
             ))
           ) : (
             <div className="px-4 py-8 text-center">
-              <p className="text-muted-foreground">No trending posts available</p>
+              <p className="text-muted-foreground">
+                No trending posts available
+              </p>
             </div>
           )}
         </div>

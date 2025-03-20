@@ -21,10 +21,11 @@ import { setActiveCommunity } from "@/redux/channelSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { FaRegCommentDots, FaShare } from "react-icons/fa";
-import Image from 'next/image';
+import Image from "next/image";
+import { API_FRONTEND_URL } from "@/config/constants";
+import moment from "moment";
 import { StringConstants } from "../common/CommonText";
-
-
+import DOMPurify from "dompurify";
 
 interface PostCardProps {
   post: {
@@ -44,14 +45,15 @@ interface PostCardProps {
       name: string;
       image: string;
       background_image: string;
+      _id: string;
     };
   };
   ref: any;
-  userID: string
+  userID: string;
 }
 
 export function PostCard({ post, ref, userID }: PostCardProps) {
-  const COMMUNITY_PROFILE_PATH= '/community/profile';
+  const COMMUNITY_PROFILE_PATH = "/community/profile";
   const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -64,35 +66,32 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   const router = useRouter();
 
   const handleClickCommunity = useCallback(() => {
-    // Build community object from post fields
-    // const community = {
-    //   _id: post.community_id,
-    //   name: post.community_name,
-    //   user_id: userID,
-    // };
+    const community_id = post.community_id._id;
+    const community_name = post.community_id.name;
 
-    // if (!community || !community._id) {
-    //   console.error("Invalid community data:", community);
-    //   return;
-    // }
+    if (!community_id) {
+      console.error("Invalid community data:");
+      return;
+    }
 
-    // dispatch(
-    //   setCommunityData({
-    //     communityId: community._id,
-    //     userId: userID,
-    //   })
-    // );
+    dispatch(
+      setCommunityData({
+        communityId: community_id,
+        userId: userID,
+      })
+    );
 
-    // dispatch(
-    //   setActiveCommunity({
-    //     id: community._id,
-    //     // name: community.name,
-    //     name: 'Swapnil',
-    //   })
-    // );
+    dispatch(
+      setActiveCommunity({
+        id: community_id,
+        name: community_name,
+        image: post.community_id.image,
+        background_image: post.community_id.background_image,
+      })
+    );
 
-    // router.push(COMMUNITY_PROFILE_PATH);
-    
+    console.log("donme");
+    router.push(COMMUNITY_PROFILE_PATH);
   }, [dispatch, router, post]);
 
   const handleSendComment = async () => {
@@ -156,7 +155,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `https://guildup-frontend-prod.vercel.app/posts/${post.slug}`;
+    const shareUrl = `${API_FRONTEND_URL}/posts/${post.slug}`;
 
     try {
       await navigator.share({
@@ -169,34 +168,39 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     }
   };
 
-  const communityName = post?.community_id?.name || "Unknown";
+  const communityName = post?.community_id?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
+  const parsedBody =
+    post.body.startsWith('"') && post.body.endsWith('"')
+      ? post.body.slice(1, -1)
+      : post.body;
+  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
 
   return (
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
-          <div onClick={handleClickCommunity} className="cursor-pointer">
-            <Avatar className="h-10 w-10  border-2 border-purple-500">
-              <AvatarImage src={post?.community_id?.image} />
-              <AvatarFallback>
-              <AvatarFallback >
-                {fallbackLetter}
-              </AvatarFallback>
+          <Avatar className="h-10 w-10  border-2 border-purple-500">
+            <AvatarImage src={post?.community_id?.image} />
+            <AvatarFallback>
+              <AvatarFallback>{fallbackLetter}</AvatarFallback>
             </AvatarFallback>
-            </Avatar>
-          </div>
+          </Avatar>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h3 onClick={handleClickCommunity} className="font-medium text-muted cursor-pointer hover:underline">{post?.community_id?.name}</h3>
+                <h3
+                  onClick={handleClickCommunity}
+                  className="font-medium text-muted cursor-pointer hover:underline"
+                >
+                  {post?.community_id?.name}
+                </h3>
 
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
-                    {formatTimeAgo(post.created_At)}
+                    {moment(post.created_At).format("YYYY MMM DD, hh:mm A")}
                   </span>
-                  <span className="text-xs  text-muted-foreground">•</span>
-
+                  {/* <span className="text-xs  text-muted-foreground">•</span> */}
                   {/* <span className="text-xs  text-muted-foreground ">
                     Public
                   </span> */}
@@ -210,9 +214,10 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
                 <MoreVertical className="h-5 w-5  " />
               </Button>
             </div>
-            <p className="text-sm text-accent mt-2">
-              {renderBodyWithHashtags(post.body)}
-            </p>
+            <p
+              className="text-sm text-accent mt-2"
+              dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+            />
 
             {post?.media?.publicUrl && post?.media?.fileType === "image" && (
               <Image
