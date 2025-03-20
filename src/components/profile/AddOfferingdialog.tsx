@@ -102,7 +102,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
   useEffect(() => {
     // Function to handle messages from the popup
-    const handleAuthMessage = (event:any) => {
+    const handleAuthMessage = (event: any) => {
       // Verify the origin of the message
       if (event.origin !== window.location.origin) return;
 
@@ -720,18 +720,20 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Input
                       id="price"
                       type="number"
-                      value={formData.price.amount}
-                      onChange={(e) =>
+                      value={
+                        formData.price.amount === 0 ? "" : formData.price.amount
+                      } 
+                      onChange={(e) => {
+                        const value = e.target.value;
                         setFormData({
                           ...formData,
                           price: {
                             ...formData.price,
-                            amount: Number(e.target.value),
+                            amount: value === "" ? 0 : Number(value), 
                           },
-                          is_free: Number(e.target.value) === 0,
-                        })
-                      }
-                      min="0"
+                          is_free: value === "" || Number(value) === 0,
+                        });
+                      }}
                       required
                     />
                   </div>
@@ -743,14 +745,18 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Input
                       id="discounted_price"
                       type="number"
-                      value={formData.discounted_price}
-                      onChange={(e) =>
+                      value={
+                        formData.discounted_price === 0
+                          ? ""
+                          : formData.discounted_price
+                      } // Handle empty input
+                      onChange={(e) => {
+                        const value = e.target.value;
                         setFormData({
                           ...formData,
-                          discounted_price: Number(e.target.value),
-                        })
-                      }
-                      min="0"
+                          discounted_price: value === "" ? 0 : Number(value),
+                        });
+                      }}
                       required
                     />
                   </div>
