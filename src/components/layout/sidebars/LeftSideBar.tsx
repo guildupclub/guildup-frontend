@@ -140,9 +140,6 @@ export function LeftSidebar() {
   // }, [userId]); // Ensure this runs when `userId` changes
 
   const communities = useSelector((state: RootState) => state?.user?.userFollowedCommunities|| []);
-  const memoizedCommunities = React.useMemo(() => {
-    return communities;
-  }, [communities]);
   
   useEffect(() => {
     async function fetchCommunities() {
@@ -161,8 +158,8 @@ export function LeftSidebar() {
         setMyCommunities([]);
       }
     }
-    fetchCommunities();
-  }, [userId]); // Ensure this runs when `userId` changes
+    // fetchCommunities();
+  }, []); // Ensure this runs when `userId` changes
 
   // ✅ Set active community AFTER myCommunities is updated
   useEffect(() => {
@@ -558,8 +555,8 @@ export function LeftSidebar() {
             )}
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-2 max-h-[365px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
-            {myCommunities
-              ?.filter((community: Community) => community !== null)
+            {communities
+              ?.filter((community: any) => community !== null)
               .map((community: any) => (
                 <button
                   key={community?._id}
