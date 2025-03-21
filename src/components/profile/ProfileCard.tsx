@@ -777,25 +777,26 @@ export function ProfileCard() {
         <div className="col-span-1 lg:col-span-2 mt-8">
           <div className="rounded-xl px-4 py-2 shadow-sm ">
             <Testimonials />
+          </div>
         </div>
-      </div>
-      {isEditOpen && (
-        <EditCommunityModal
-          profile={profile}
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-        />
-      )}
+        {isEditOpen && (
+          <EditCommunityModal
+            profile={profile}
+            isOpen={isEditOpen}
+            onClose={() => setIsEditOpen(false)}
+          />
+        )}
 
-      {isEditModalOpen && selectedOfferingModal && (
-        <EditOfferingModal
-          offering={selectedOfferingModal}
-          userId={user?._id}
-          communityId={activeCommunityId}
-          onClose={() => setIsEditModalOpen(false)}
-          onUpdate={fetchOfferings}
-        />
-      )}
+        {isEditModalOpen && selectedOfferingModal && (
+          <EditOfferingModal
+            offering={selectedOfferingModal}
+            userId={user?._id}
+            communityId={activeCommunityId}
+            onClose={() => setIsEditModalOpen(false)}
+            onUpdate={fetchOfferings}
+          />
+        )}
+      </div>
     </div>
   );
 }
