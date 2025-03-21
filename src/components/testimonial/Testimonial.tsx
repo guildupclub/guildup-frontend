@@ -30,7 +30,10 @@ export default function Testimonials() {
   const user = useSelector((state: RootState) => state.user.user);
   const communityId = activeCommunity?.id;
   const userId = user?._id;
-
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] =
@@ -184,7 +187,8 @@ export default function Testimonials() {
         <div className="relative">
           <Button
             onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading || !communityId || !userId}
+            // disabled={isUploading || !communityId || !userId}
+            disabled={!isAdmin}
             className="flex items-center gap-2 text-white"
           >
             {isUploading ? (
