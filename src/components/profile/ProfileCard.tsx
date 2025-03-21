@@ -775,9 +775,8 @@ export function ProfileCard() {
 
         {/* Testimonials Section */}
         <div className="col-span-1 lg:col-span-2 mt-8">
-          <div className="rounded-xl px-4 py-2 shadow-sm">
+          <div className="rounded-xl px-4 py-2 shadow-sm ">
             <Testimonials />
-          </div>
         </div>
       </div>
       {isEditOpen && (
