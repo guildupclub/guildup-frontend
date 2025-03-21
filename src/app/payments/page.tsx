@@ -13,7 +13,7 @@ function Payments() {
       </div>
       <div className="flex flex-col gap-10">
         <Card />
-        {/* <RecentTransactions /> */}
+        <RecentTransactions />
       </div>
     </div>
   )

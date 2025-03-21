@@ -1,14 +1,18 @@
 "use client";
 import HomePage from "@/components/homePageLayout/HomePage";
 import TopicSelectionModal from "@/components/SelectTopicForm";
+import { setUserFollowedCommunities } from "@/redux/userSlice";
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const dispatch= useDispatch();
 
   const handleTopicSelection = (selectedTopics: string[]) => {
     setIsModalOpen(false); // Close modal after topic selection
@@ -20,6 +24,20 @@ export default function Home() {
     }
 
     if (session) {
+      async function fetchCommunities() {
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+            {
+              userId: session?.user._id,
+            }
+          );
+          dispatch(setUserFollowedCommunities(res.data.data));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      fetchCommunities();
       // If the user is new, open the modal
       if (session.user?.isNewUser) {
         setIsModalOpen(true); // Open modal for topic selection
