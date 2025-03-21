@@ -109,46 +109,53 @@ export function LeftmostSidebar() {
   //     setIsLoading(false);
   //   }
   // };
-
+    
+  const myCommunities = useSelector((state: RootState) => state?.user?.userFollowedCommunities|| []);
   // Fetch communities function
-  const fetchCommunities = async (): Promise<Community[]> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      }
-    );
+  const fetchCommunities = async () => {
+    // const response = await fetch(
+    //   `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({ userId }),
+    //   }
+    // );
 
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch communities");
-    }
-    const result = await response.json();
-    console.log("comm", result);
-    const validCommunities = result?.data?.filter(
-      (community: Community | null) => community !== null
-    );
-    // setCommunitie(validCommunities);
-
-    dispatch(setUserFollowedCommunities(validCommunities));
-
-    if (validCommunities.length > 0 && !activeCommunityId) {
-      dispatch(
-        setActiveCommunity({
-          id: validCommunities[0]._id,
-          name: validCommunities[0].name,
-          image: validCommunities[0].image,
-          background_image: validCommunities[0].background_image,
-        })
-      );
-    }
+    // if (!response.ok) {
+    //   throw new Error("Failed to fetch communities");
+    // }
     // const result = await response.json();
-    return result.data.filter(
-      (community: Community | null) => community !== null
+    // console.log("comm", result);
+    // const validCommunities = result?.data?.filter(
+    //   (community: Community | null) => community !== null
+    // );
+    // // setCommunitie(validCommunities);
+
+    // dispatch(setUserFollowedCommunities(validCommunities));
+
+    // if (validCommunities.length > 0 && !activeCommunityId) {
+    //   dispatch(
+    //     setActiveCommunity({
+    //       id: validCommunities[0]._id,
+    //       name: validCommunities[0].name,
+    //       image: validCommunities[0].image,
+    //       background_image: validCommunities[0].background_image,
+    //     })
+    //   );
+    // }
+    // const result = await response.json();
+    // return result.data.filter(
+    //   (community: Community | null) => community !== null
+    // );
+
+    console.log("leftmostsidebar> communities", myCommunities);
+    
+    return myCommunities.filter(
+      (community: any) => community !== null
     );
   };
 
