@@ -116,7 +116,7 @@ export function RightSidebar() {
               {StringConstants.CREATE_A_PAGE}
             </Button>
 
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} isLoginScreen={false} /> }
+            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
           </Dialog>
         </div>
       )}

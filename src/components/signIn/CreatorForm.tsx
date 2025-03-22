@@ -25,17 +25,16 @@ import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
-interface CreatorFormProps {
-  onClose: () => void;
-  onSuccess?: () => void;
-}
-
 interface Category {
   _id: string;
   name: string;
 }
 
-export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+interface FormProps {
+  onSuccess?: () => void;
+}
+
+export default function CreatorForm({onSuccess}: FormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
@@ -120,12 +119,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         youtubeSubscribers: "",
       });
       setCategoryId("");
-      onClose();
       onSuccess?.();
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
-      onClose();
     },
   });
 
@@ -145,16 +142,14 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    (session && (
-      <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
-        <DialogHeader className="flex items-center justify-between py-2">
-          <DialogTitle className="text-xl font-semibold font-serif">
-            Let&apos;s Build your Guild!
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-          A Guild is your digital home for sharing expertise, building community, and earning money.
-          </DialogDescription>
-        </DialogHeader>
+      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
+        <div className="flex flex-col justify-start items-center pb-4">
+          <h2 className="text-xl font-semibold font-serif">Let&apos;s Build your Guild!</h2>
+          <p className="text-sm text-muted-foreground">
+            A Guild is your digital home for sharing expertise, building community, and earning money.
+          </p>
+        </div>
+
         <div className="space-y-5 ">
           <div className="space-y-2">
             <Label>
@@ -244,20 +239,12 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             />
           </div>
         </div>
-        <div className="flex justify-end gap-4 mt-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="text-muted bg-transparent border-gray-600 hover:bg-background"
-          >
-            {StringConstants.CANCEL}
-          </Button>
 
+        <div className="flex justify-end gap-4 mt-4">
           <Button className="text-white" onClick={handleSubmit}>
             {StringConstants.CREATE}
           </Button>
         </div>
-      </DialogContent>
-    ))
+      </div>
   );
 }
