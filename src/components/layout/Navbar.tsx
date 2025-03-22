@@ -313,8 +313,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Button className="bg-primary-gradient" onClick={() => signIn()}>
-                    {StringConstants.SIGN_IN}
+                  // <Button className="bg-primary-gradient" onClick={() => signIn()}>
+                  //   {StringConstants.SIGN_IN}
+                  // </Button>
+
+                  <Button
+                    onClick={() => signIn(undefined, { 
+                      callbackUrl: `${window.location.origin}/?hero=2`
+                    })}
+                  >
+                    Sign In
                   </Button>
                 )}
               </div>

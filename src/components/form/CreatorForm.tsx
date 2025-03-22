@@ -28,6 +28,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 interface CreatorFormProps {
   onClose: () => void;
   onSuccess?: () => void;
+  isLoginScreen: boolean
 }
 
 interface Category {
@@ -35,11 +36,13 @@ interface Category {
   name: string;
 }
 
-export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+export default function CreatorForm({ onClose, onSuccess, isLoginScreen }: CreatorFormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
-
+  console.log("this is the check ", session);
+  console.log("this is the login check ", isLoginScreen);
+  
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -145,8 +148,11 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    session && (
+    (session || (!session && isLoginScreen)) && (
+      <>
+      <div style={{ border: "1px solid red" }}>Checking visibility2</div>
       <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
+        <div style={{ border: "1px solid red" }}>Checking visibility3</div>
         <DialogHeader className="flex items-center justify-between py-2">
           <DialogTitle className="text-xl font-semibold font-serif">
             Let&apos;s Build your Guild!
@@ -257,7 +263,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             {StringConstants.CREATE}
           </Button>
         </div>
-      </DialogContent>
+      </DialogContent></>
     )
   );
 }

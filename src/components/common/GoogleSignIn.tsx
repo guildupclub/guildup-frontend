@@ -11,7 +11,7 @@ interface GoogleSignInProps {
 
 const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/' }) => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex items-center justify-center bg-background w-full h-full">
       <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
         <Link 
           href="/"
@@ -48,6 +48,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
           </svg>
           Continue with Google
         </Button>
+        <p>By creating an account, you agree to our <span className='text-[#334BFF]'>Terms of use</span> and <span className='text-[#334BFF]'>Privacy policy</span></p>
       </div>
     </div>
   );
