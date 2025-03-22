@@ -281,7 +281,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
-                        <Link href="/bookings">Bookings</Link>
+                        <Link href="/booking">Bookings</Link>
                       </DropdownMenuItem>
                       {isUser && (
                         <DropdownMenuItem
