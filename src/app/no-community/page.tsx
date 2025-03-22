@@ -4,6 +4,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaUsers } from "react-icons/fa";
+import { toast } from "sonner";
 
 const NoCommunitySelected = () => {
   const { data: session, status } = useSession();
@@ -15,7 +16,8 @@ const NoCommunitySelected = () => {
 
   const handleCreateCommunity = () => {
     if (!session) {
-      signIn("google", { callbackUrl: "/" });
+      signIn();
+      return;
     }
   };
 
