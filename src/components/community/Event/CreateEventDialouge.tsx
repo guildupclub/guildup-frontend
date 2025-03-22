@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Image, Video, Link as LinkIcon } from "lucide-react";
+import { Plus, Image, Video, LinkIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -24,7 +24,6 @@ import {
   AlignCenter,
   AlignRight,
   List,
-  Link as LinkLucide,
 } from "lucide-react";
 
 interface MediaPreview {
@@ -69,6 +68,17 @@ export function PostDialog() {
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+  
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; 
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(
+        "File size exceeds 20MB limit. Please upload a smaller file."
+      );
+    
+      event.target.value = "";
+      return;
+    }
 
     // Create a preview URL for the selected file
     const previewUrl = URL.createObjectURL(file);
