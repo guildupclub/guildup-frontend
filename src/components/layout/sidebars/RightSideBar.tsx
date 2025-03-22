@@ -88,7 +88,7 @@ export function RightSidebar() {
         action: {
           label: "Sign In",
           onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}/?hero=1`
+            callbackUrl: `${window.location.origin}?hero=1`
           }),
         },
       });

@@ -16,14 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
-import { DialogDescription } from "@radix-ui/react-dialog";
+import { useRouter } from "next/router";
 
 interface Category {
   _id: string;
@@ -109,6 +104,7 @@ export default function CreatorForm({onSuccess}: FormProps) {
       return data;
     },
     onSuccess: () => {
+      const router = useRouter();
       toast.success("Community created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["communities"] });
       setFormData({
@@ -120,6 +116,7 @@ export default function CreatorForm({onSuccess}: FormProps) {
       });
       setCategoryId("");
       onSuccess?.();
+      router.push("/");
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);

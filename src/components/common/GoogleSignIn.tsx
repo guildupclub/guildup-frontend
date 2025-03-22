@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
@@ -10,6 +10,38 @@ interface GoogleSignInProps {
 }
 
 const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/' }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [finalCallbackUrl, setFinalCallbackUrl] = useState(callbackUrl);
+
+  // This hook will ensure the code is run only on the client-side (after mount)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Use useRouter only after the component has mounted
+  useEffect(() => {
+    if (isMounted) {
+      const currentUrl = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      const param = urlParams.get('callbackUrl');
+      const hero= param?.split('=')[1]
+      
+      
+
+      // Set the callbackUrl dynamically based on the `hero` query parameter
+      const newCallbackUrl =
+        hero === '1'
+          ? currentUrl
+          : `${window.location.origin}/`;
+
+      setFinalCallbackUrl(newCallbackUrl);
+    }
+  }, [isMounted]);
+
+  if (!isMounted) {
+    return null;
+  }
   return (
     <div className="flex items-center justify-center bg-background w-full h-full">
       <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
@@ -28,7 +60,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: finalCallbackUrl })}
           disabled={isLoading}
         >
           <svg
