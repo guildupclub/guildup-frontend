@@ -1,7 +1,7 @@
 "use client";
 import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
-import { API_BASE_URL } from '../../config/constants';
+import { API_BASE_URL } from "../../config/constants";
 import CommunitySection from "@/components/explore/CommunitySection";
 import TrendingSection from "@/components/explore/TrendingSection";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
+import Header from "@/components/explore/Header";
 
 function Page() {
   const [category, setCategory] = useState<any>([]);
@@ -39,11 +40,12 @@ function Page() {
       );
       // setCategory(response.data.data);
       // setSelectedCategory(response.data.data[0]?._id || "");
-      
-      setCategory([{ _id: "all", name: "All Category" }, ...response.data.data]);
-      setSelectedCategory("all");
-      
 
+      setCategory([
+        { _id: "all", name: "All Category" },
+        ...response.data.data,
+      ]);
+      setSelectedCategory("all");
     };
     fetchCategory();
   }, []);
@@ -55,10 +57,8 @@ function Page() {
 
   return (
     <div className="bg-background pb-16">
-        <CategoryBar
-          categorys={category}
-          selectCategory={setSelectedCategory}
-        />
+      <CategoryBar categorys={category} selectCategory={setSelectedCategory} />
+      <Header />
       <div className="w-full lg:px-[100px] ">
         <div className="p-6 sm:px-0">
           <div className="flex gap-6 md:justify-between">

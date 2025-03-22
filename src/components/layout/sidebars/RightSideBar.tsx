@@ -88,7 +88,7 @@ export function RightSidebar() {
       {/* Creator Box - Only show if user is not already a creator */}
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold text-lg font-sans">
+          <h1 className="font-semibold  font-sans">
             Ready to Turn Your Expertise into income?
           </h1>
           <Dialog
@@ -169,7 +169,7 @@ export function RightSidebar() {
                     dangerouslySetInnerHTML={{
                       __html: DOMPurify.sanitize(
                         post.body.startsWith('"') && post.body.endsWith('"')
-                          ? post.body.slice(1, -1) 
+                          ? post.body.slice(1, -1)
                           : post.body
                       ),
                     }}
