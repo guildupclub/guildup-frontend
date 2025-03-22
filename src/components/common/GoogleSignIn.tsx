@@ -3,6 +3,8 @@ import { signIn } from 'next-auth/react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface GoogleSignInProps {
   isLoading?: boolean;
@@ -12,6 +14,9 @@ interface GoogleSignInProps {
 const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/' }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [finalCallbackUrl, setFinalCallbackUrl] = useState(callbackUrl);
+  const user = useSelector((state: RootState) => state.user);
+  // Check if user is already a creator using the is_creator flag
+  const isCreator = user?.user?.is_creator ? true : false;
 
   // This hook will ensure the code is run only on the client-side (after mount)
   useEffect(() => {
@@ -20,7 +25,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
 
   // Use useRouter only after the component has mounted
   useEffect(() => {
-    if (isMounted) {
+    if (isMounted && !isCreator) {
       const currentUrl = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
       
