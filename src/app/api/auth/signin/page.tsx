@@ -6,13 +6,6 @@ import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
-import GoogleSignIn from "@/components/common/GoogleSignIn";
-import Image from "next/image";
-import guildup_logo from "./../../../../../public/svg/GuildUp_Logo_Light.svg";
-import Login_laptop from "./../../../../../public/Login_laptop.png";
-import Login_mobile from "./../../../../../public/Login_mobile.png";
-import { FaCheck } from "react-icons/fa";
-import CreatorForm from "@/components/signIn/CreatorForm";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {RightSection} from '@/components/signIn/RightSection'
