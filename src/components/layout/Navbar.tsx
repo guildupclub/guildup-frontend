@@ -242,10 +242,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
                         className={`h-6 w-6 ${
-                          isActive("/") ? "text-blue-600" : ""
+                          isActive("/") ? "text-primary" : ""
                         }`}
                       />
-                      <span className={isActive("/") ? "text-blue-600" : ""}>
+                      <span className={isActive("/") ? "text-primary" : ""}>
                         {StringConstants.EXPLORE}
                       </span>
                     </Link>
@@ -258,12 +258,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     >
                       <FileText
                         className={`h-6 w-6 ${
-                          isActive("/feeds") ? "text-blue-600" : ""
+                          isActive("/feeds") ? "text-primary" : ""
                         }`}
                       />
                       <span
                         className={`h-6 ${
-                          isActive("/feeds") ? "text-blue-600" : ""
+                          isActive("/feeds") ? "text-primary" : ""
                         }`}
                       >
                         {StringConstants.FEED}
@@ -281,13 +281,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     >
                       <Users
                         className={`w-6 h-6 ${
-                          isActive("/community") ? "text-blue-600" : ""
+                          isActive("/community") ? "text-primary" : ""
                         }`}
                       />
                       <span
-                        className={
-                          isActive("/community") ? "text-blue-600" : ""
-                        }
+                        className={isActive("/community") ? "text-primary" : ""}
                       >
                         {StringConstants.EXPERTS}
                       </span>
@@ -370,9 +368,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   // </Button>
 
                   <Button
-                    onClick={() => signIn(undefined, { 
-                      callbackUrl: `${window.location.origin}/?hero=2`
-                    })}
+                    onClick={() =>
+                      signIn(undefined, {
+                        callbackUrl: `${window.location.origin}/?hero=2`,
+                      })
+                    }
                   >
                     Sign In
                   </Button>
@@ -388,10 +388,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
           <Link href="/" className="flex flex-col items-center justify-center">
             <Compass
-              className={`w-6 h-6 ${isActive("/") ? "text-blue-600" : ""}`}
+              className={`w-6 h-6 ${isActive("/") ? "text-primary" : ""}`}
             />
             <span
-              className={`text-xs mt-1 ${isActive("/") ? "text-blue-600" : ""}`}
+              className={`text-xs mt-1 ${isActive("/") ? "text-primary" : ""}`}
             >
               {StringConstants.HOME}
             </span>
@@ -401,11 +401,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             className="flex flex-col items-center justify-center"
           >
             <FileText
-              className={`w-6 h-6 ${isActive("/feeds") ? "text-blue-600" : ""}`}
+              className={`w-6 h-6 ${isActive("/feeds") ? "text-primary" : ""}`}
             />
             <span
               className={`text-xs mt-1 ${
-                isActive("/feeds") ? "text-blue-600" : ""
+                isActive("/feeds") ? "text-primary" : ""
               }`}
             >
               {StringConstants.FEED}
@@ -425,12 +425,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             >
               <Users
                 className={`w-6 h-6 ${
-                  isActive("/community") ? "text-blue-600" : ""
+                  isActive("/community") ? "text-primary" : ""
                 }`}
               />
               <span
                 className={`text-xs mt-1 ${
-                  isActive("/community") ? "text-blue-600" : ""
+                  isActive("/community") ? "text-primary" : ""
                 }`}
               >
                 {StringConstants.EXPERTS}
@@ -443,12 +443,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             >
               <Users
                 className={`w-6 h-6 ${
-                  isActive("/no-community") ? "text-blue-600" : ""
+                  isActive("/no-community") ? "text-primary" : ""
                 }`}
               />
               <span
                 className={`text-xs mt-1 ${
-                  isActive("/no-community") ? "text-blue-600" : ""
+                  isActive("/no-community") ? "text-primary" : ""
                 }`}
               >
                 {StringConstants.EXPERTS}
