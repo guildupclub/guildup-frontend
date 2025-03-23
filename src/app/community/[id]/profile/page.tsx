@@ -22,7 +22,7 @@ export default function Page() {
   }, [communityId, dispatch]);
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-background grow max-w-screen w-full md:ml-6 md:py-24">
       <ProfileCard communityId={communityId} />
     </div>
   );
