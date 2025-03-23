@@ -241,7 +241,7 @@ export default function Testimonials() {
       ) : (
         <div className="text-center py-10 bg-gray-50 rounded-xl">
           <p className="text-gray-500">
-            No testimonials yet. Add some by clicking the button above.
+            No testimonials yet.
           </p>
         </div>
       )}
