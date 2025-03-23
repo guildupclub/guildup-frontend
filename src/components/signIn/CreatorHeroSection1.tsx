@@ -1,0 +1,34 @@
+import Image from "next/image";
+import guildup_logo from './../../../public/svg/GuildUp_Logo_Light.svg';
+import Login_laptop from "./../../../public/Login_laptop.png";
+
+export const CreatorHeroSection1: React.FC = () => {
+    return (
+      <div className="w-1/2 bg-white flex flex-col items-start justify-start p-8 gap-16 border border-background">
+        <div className="flex justify-center w-full">
+          <Image
+            src={guildup_logo || "/placeholder.svg"}
+            alt="GuildUp"
+            className="h-16 w-auto md:block"
+          />
+        </div>
+        {/* <div className="h-14 bg-red-500"></div> */}
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-3">
+            <h1 className="text-4xl font-bold">Be found. GuildUp makes it easy.</h1>
+            <p className="text-2xl font-normal">
+              Sign up on GuildUp and grow your Guild with thousands of users looking 
+              for top coaches, consultants, and professionals. <span className="font-semibold text-[#334BFF]">Build your custom community and start earning in under 30 minutes!</span>
+            </p>
+          </div>
+          <div className="flex justify-center">
+              <Image
+                src={Login_laptop || "/placeholder.svg"}
+                alt="GuildUp"
+                className="h-[360px] w-auto md:block -mt-4"
+                />
+          </div>
+        </div>
+      </div>
+    );
+  };
