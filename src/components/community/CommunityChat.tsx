@@ -118,7 +118,7 @@ function ChatContent() {
       {/* Channel Header */}
       <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
-          {StringConstants.HASHTAG} {activeChannel.name || "Unnamed Channel"}
+          {activeChannel.name || "Unnamed Channel"}
         </h1>
         <Settings className="h-5 w-5" />
       </div>
