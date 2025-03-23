@@ -12,6 +12,7 @@ import { RightSection } from '@/components/signIn/RightSection';
 import { UserHeroSection } from "@/components/signIn/UserHeroSection";
 import { CreatorHeroSection1 } from "@/components/signIn/CreatorHeroSection1";
 import { CreatorHeroSection2 } from "@/components/signIn/CreatorHeroSection2";
+import Loader from "@/components/Loader";
 
 function SignInContent() {
   const searchParams = useSearchParams();
@@ -90,7 +91,7 @@ export default function SignIn() {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <SignInContent />
     </Suspense>
   );

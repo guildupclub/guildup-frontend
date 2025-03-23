@@ -85,7 +85,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
           </svg>
           Continue with Google
         </Button>
-        <p>By creating an account, you agree to our <span className='text-[#334BFF]'>Terms of use</span> and <span className='text-[#334BFF]'>Privacy policy</span></p>
+        <p>By creating an account, you agree to our <span className='text-[#334BFF]'><a href='/terms-conditions'>Terms of use</a></span> and <span className='text-[#334BFF]'><a href='/privacy-policy'>Privacy policy</a></span></p>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ import { Dialog } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
+import FooterLinks from "../layout/sidebars/FootLinks";
 interface TrendingCategory {
   _id: string;
   name: string;
@@ -122,6 +123,7 @@ function TrendingSection() {
           </div>
         )}
       </div>
+       <FooterLinks />
     </div>
   );
 }
