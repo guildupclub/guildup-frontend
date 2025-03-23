@@ -127,7 +127,7 @@ export default function Home() {
         setIsModalOpen(true); // Open modal for topic selection
       }
     } else {
-      router.push("/"); // Redirect to sign-in page if not authenticated
+      router.push("/feeds");
     }
   }, [session, status, router]);
 
