@@ -423,48 +423,50 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
 
 
-  const joinCommunityMutate = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(   {
-          userId: user._id,
-          communityId: activeCommunityId,
-        }),
-      });
-      console.log("@JoinResponse",response.json())
-      if (!response.ok) throw new Error("Failed to send post");
-      return response.json();
-    },
-    onSuccess: (newPost) => {
-      queryClient.invalidateQueries({
-        queryKey: ["userCommunities", user._id]
-      });
-    },
-  });
-  // const handleJoinCommunity = async () => {
-  //   console.log("@user._id",user,activeCommunityId)
-  //   if (!user?._id || !activeCommunityId) return;
-
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
-  //       {
+  // const joinCommunityMutate = useMutation({
+  //   mutationFn: async () => {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(   {
   //         userId: user._id,
   //         communityId: activeCommunityId,
-  //       }
-  //     );
+  //       }),
+  //     });
+  //     console.log("@JoinResponse",response.data.data)
+  //     if (!response.ok) throw new Error("Failed to send post");
+  //     return response.json();
+  //   },
+  //   onSuccess: (newPost) => {
+  //     console.log("@newPost",newPost)
 
-  //     // Show toast notification if the response is successful
-  //     if (response.data.r === "s") {
-  //       toast.success("Successfully joined the community!");
-  //     }
-  //   } catch (err) {
-  //     console.error("Error joining community:", err);
-  //     toast.error("Failed to join the community. Please try again.");
-  //   }
-  // };
+  //     queryClient.setQueryData(['userCommunity'], oldCommuinty => [...oldCommuinty, response.data.data]);
+
+  //   },
+  // });
+
+  const handleJoinCommunity = async () => {
+    console.log("@user._id",user,activeCommunityId)
+    if (!user?._id || !activeCommunityId) return;
+
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
+        {
+          userId: user._id,
+          communityId: activeCommunityId,
+        }
+      );
+
+      // Show toast notification if the response is successful
+      if (response.data.r === "s") {
+        toast.success("Successfully joined the community!");
+      }
+    } catch (err) {
+      console.error("Error joining community:", err);
+      toast.error("Failed to join the community. Please try again.");
+    }
+  };
 
   const handleDeleteOffering = async (offeringId: string) => {
     try {
@@ -623,7 +625,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 variant="default"
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
-                onClick={()=>joinCommunityMutate.mutate()}
+                onClick={handleJoinCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
                 {StringConstants.FOLLOW}

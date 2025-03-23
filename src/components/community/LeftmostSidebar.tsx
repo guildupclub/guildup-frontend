@@ -605,7 +605,6 @@ export function LeftmostSidebar() {
     const currentPath = window.location.pathname;
     const pathSegments = currentPath.split('/');
     const currentPage = pathSegments[3] || 'profile'; // Default to profile if no page specified
-    console.log("@currentPage", path,communityId,currentPage);
 
     // If we're switching communities, maintain the same page
     if (currentPage =='channel') {
@@ -618,6 +617,7 @@ export function LeftmostSidebar() {
     } 
   };
 
+  console.log("@communityDataLeftMostSideBar",communities)
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
