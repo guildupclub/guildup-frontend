@@ -334,7 +334,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
-                        <Link href="/bookings">Bookings</Link>
+                        <Link href="/booking">Bookings</Link>
                       </DropdownMenuItem>
                       {isUser && (
                         <DropdownMenuItem
@@ -365,11 +365,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
+                  // <Button className="bg-primary-gradient" onClick={() => signIn()}>
+                  //   {StringConstants.SIGN_IN}
+                  // </Button>
+
                   <Button
-                    className="bg-primary-gradient"
-                    onClick={() => signIn()}
+                    onClick={() => signIn(undefined, { 
+                      callbackUrl: `${window.location.origin}/?hero=2`
+                    })}
                   >
-                    {StringConstants.SIGN_IN}
+                    Sign In
                   </Button>
                 )}
               </div>

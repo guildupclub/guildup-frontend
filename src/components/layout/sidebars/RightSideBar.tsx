@@ -70,12 +70,26 @@ export function RightSidebar() {
     fetchTrendingPosts();
   }, []);
 
+  // const handleCreatorButtonClick = () => {
+  //   if (!session) {
+  //     toast("Please sign in to Build your Guild", {
+  //       action: {
+  //         label: "Sign In",
+  //         onClick: () => signIn(),
+  //       },
+  //     });
+  //   } else {
+  //     setIsDialogOpen(true);
+  //   }
+  // };
   const handleCreatorButtonClick = () => {
     if (!session) {
       toast("Please sign in to Build your Guild", {
         action: {
           label: "Sign In",
-          onClick: () => signIn(),
+          onClick: () => signIn(undefined, {
+            callbackUrl: `${window.location.origin}?hero=1`
+          }),
         },
       });
     } else {
@@ -102,7 +116,7 @@ export function RightSidebar() {
               {StringConstants.CREATE_A_PAGE}
             </Button>
 
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
           </Dialog>
         </div>
       )}
