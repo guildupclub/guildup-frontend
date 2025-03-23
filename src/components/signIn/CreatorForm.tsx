@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface Category {
   _id: string;
@@ -33,6 +33,7 @@ export default function CreatorForm({onSuccess}: FormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
+  const router = useRouter();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -104,7 +105,6 @@ export default function CreatorForm({onSuccess}: FormProps) {
       return data;
     },
     onSuccess: () => {
-      const router = useRouter();
       toast.success("Community created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["communities"] });
       setFormData({

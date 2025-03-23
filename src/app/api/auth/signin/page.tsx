@@ -84,7 +84,7 @@ export default function SignIn() {
   };
   
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Left: Hero/Marketing */}
       {getHeroVersion() === 1 ? (
         session ? <CreatorHeroSection2 /> : <CreatorHeroSection1 />
