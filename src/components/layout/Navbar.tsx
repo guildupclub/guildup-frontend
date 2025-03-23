@@ -28,16 +28,18 @@ import { setCommunityData } from "@/redux/communitySlice";
 import React from "react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
+import axios from "axios";
+import { setUserFollowedCommunities } from "@/redux/userSlice";
 
-interface Community {
-  _id: string;
-  title: string;
-  name: string;
-  description: string;
-  subscription: boolean;
-  subscription_price: number;
-  num_member: number;
-}
+// interface Community {
+//   _id: string;
+//   title: string;
+//   name: string;
+//   description: string;
+//   subscription: boolean;
+//   subscription_price: number;
+//   num_member: number;
+// }
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_PROFILE_PATH= '/community/profile';
@@ -71,6 +73,24 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   } | null>(null);
 
   const [searchType, setSearchType] = useState("post");
+  const userId = user?._id;
+  useEffect(() => {
+    async function fetchCommunities() {
+      try {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+          {
+            userId: userId,
+          }
+        );
+
+        dispatch(setUserFollowedCommunities(res.data.data));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    // fetchCommunities();
+  }, []);
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );
@@ -251,26 +271,26 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                      {/* <DropdownMenuItem
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
                         <Link href="/profile">Profile</Link>
-                      </DropdownMenuItem> */}
-                      {/* <DropdownMenuItem
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
-                        <Link href="/bookings">Bookings</Link>
-                      </DropdownMenuItem> */}
-                      {/* {isUser && (
+                        <Link href="/booking">Bookings</Link>
+                      </DropdownMenuItem>
+                      {isUser && (
                         <DropdownMenuItem
                           asChild
                           className="hover:bg-primary-gradient border-b border-zinc-300"
                         >
                           <Link href="/payments">Payments</Link>
                         </DropdownMenuItem>
-                      )} */}
+                      )}
                       <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
@@ -389,6 +409,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           <div className="space-y-3 pb-8">
           {communities && communities.length > 0 ? (
             communities.map((community: any) => {
+              if(!community) return;
               const isActive = activeCommunityId === community._id
               return (
                 <button

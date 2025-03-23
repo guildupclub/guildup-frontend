@@ -5,17 +5,17 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   compiler: {
-    removeConsole: true,
+    removeConsole: false,
   },
   images: {
-    domains: [
+    domains : [
       "target.scene7.com",
       "lh3.googleusercontent.com",
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
       "storage.googleapis.com",
       "img.freepik.com",
-    ], // Correct usage for external domains
+    ] ,
     remotePatterns: [
       {
         protocol: "https",
@@ -27,6 +27,9 @@ const nextConfig: NextConfig = {
         hostname: "api.dicebear.com",
       },
     ],
+  },
+  env: {
+    NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
   },
 };
 

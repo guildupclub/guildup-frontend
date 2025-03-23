@@ -157,7 +157,7 @@ export default function Members({communityId}: MembersProps) {
             : members.map((member) => (
                 <div
                   key={member._id}
-                  className="flex items-center justify-between p-4 bg-card rounded-lg hover:bg-background transition-colors"
+                  className="flex items-center justify-between p-4 rounded-lg bg-background transition-colors"
                 >
                   <div className="flex items-center gap-4">
                     <Avatar>
@@ -168,7 +168,7 @@ export default function Members({communityId}: MembersProps) {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium truncate text-muted-foreground">
                           {member.user_id.user_name || member.user_id.email}
                         </p>

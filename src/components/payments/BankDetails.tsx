@@ -9,16 +9,22 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
 
 interface BankDetailsProps{
   onClose: ()=> void;
 }
 const BankDetails = ({ onClose }: BankDetailsProps) => {
+  const {user}= useSelector((state: RootState)=> state.user);
+  const userId= user?._id;
   const [bankDetails, setBankDetails] = React.useState({
-    accountHolderName: "",
+    benificiaryName: "",
     accountNumber: "",
-    ifscCode: "",
-    panCard: ""
+    ifsc: "",
+    pan: ""
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,9 +35,45 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     }));
   };
 
-  const handleSave = () => {
-    console.log("Bank Details:", bankDetails);
-    onClose();
+  const handleSave = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
+        {
+          user_id: userId,
+          bank_details: bankDetails,
+        }
+      );
+      
+      setBankDetails({
+        benificiaryName: "",
+        accountNumber: "",
+        ifsc: "",
+        pan: ""
+      })
+      if (response.data.r === "s") {
+        onClose();
+        toast.success(response.data.data);
+        return response.data.data;
+      } else if (response.data.r === "e") {
+        let errorMsg = "";
+        if (Array.isArray(response.data.e)) {
+          errorMsg = response.data.e.map((err: any) => err.message).join(", ");
+        } else {
+          errorMsg = response.data.e;
+        }
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
+      } else {
+        const fallbackError = "Unexpected response from server.";
+        toast.error(fallbackError);
+        throw new Error(fallbackError);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update bank details.");
+      console.error("Error updating bank details:", error);
+      throw error;
+    }
   };
 
   return (
@@ -45,8 +87,8 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
           <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Account holder’s name</label>
           <input
             type="text"
-            name="accountHolderName"
-            value={bankDetails.accountHolderName}
+            name="benificiaryName"
+            value={bankDetails.benificiaryName}
             onChange={handleChange}
             placeholder="Enter account holder’s name"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -71,8 +113,8 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
           <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">IFSC Code</label>
           <input
             type="text"
-            name="ifscCode"
-            value={bankDetails.ifscCode}
+            name="ifsc"
+            value={bankDetails.ifsc}
             onChange={handleChange}
             placeholder="Enter branch IFSC code"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -84,8 +126,8 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
           <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">PAN Card</label>
           <input
             type="text"
-            name="panCard"
-            value={bankDetails.panCard}
+            name="pan"
+            value={bankDetails.pan}
             onChange={handleChange}
             placeholder="Enter PAN Details"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -13,7 +13,7 @@ export default function FeedPage() {
   const activeChanneltype = activeChannel?.type || "discussion";
 
   return (
-    <div className="py-16">
+    <div className="md:py-16 w-full">
       {activeChanneltype == "discussion" ? (
         <CommunityChat />
       ) : (
