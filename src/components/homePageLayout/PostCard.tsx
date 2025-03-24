@@ -53,8 +53,8 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, ref, userID }: PostCardProps) {
-  const community_id = post.community_id._id;
-  const community_name = post.community_id.name;
+  const community_id = post.community_id?._id;
+  const community_name = post.community_id?.name;
   const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
   const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);

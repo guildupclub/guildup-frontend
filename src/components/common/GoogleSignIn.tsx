@@ -25,7 +25,8 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
 
   // Use useRouter only after the component has mounted
   useEffect(() => {
-    if (isMounted && !isCreator) {
+    if (isMounted) {
+    // if (isMounted && !isCreator) {
       const currentUrl = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
       
@@ -36,9 +37,9 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
 
       // Set the callbackUrl dynamically based on the `hero` query parameter
       const newCallbackUrl =
-        hero === '1'
-          ? currentUrl
-          : `${window.location.origin}/`;
+        hero === '2'
+          ? `${window.location.origin}/`
+          : currentUrl;
 
       setFinalCallbackUrl(newCallbackUrl);
     }
