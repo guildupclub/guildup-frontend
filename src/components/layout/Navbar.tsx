@@ -159,7 +159,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         })
       );
     }
-    router.push(COMMUNITY_PROFILE_PATH);
+    router.push(`/community/${community._id}/profile`);
     setIsSidebarOpen(false);
   }
 
