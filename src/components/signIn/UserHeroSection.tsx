@@ -68,7 +68,7 @@ export const UserHeroSection: React.FC = () => {
             <div className="flex flex-col gap-4">
               <div className="flex gap-3 items-center h-5">
                 <FaCheck />
-                <p className="font-normal text-2xl">Find experts who actually help.</p>
+                <p className="font-normal text-2xl">Find experts who can actually help.</p>
               </div>
               <div className="flex gap-3 items-center h-5">
                 <FaCheck />
