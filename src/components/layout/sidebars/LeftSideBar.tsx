@@ -190,7 +190,7 @@ export function LeftSidebar() {
         userId: userId,
       })
     );
-    router.push(COMMUNITY_PROFILE_PATH);
+    router.push(`/community/${community._id}/profile`);
   };
   function handleSelectChange(communityId: string) {
     setSelectedCommunities((prev) =>

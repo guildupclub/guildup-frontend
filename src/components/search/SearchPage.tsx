@@ -116,18 +116,18 @@ function SearchPageContent() {
 
       console.log("Navigating to /community/profile"); // ✅ Check if this appears
 
-      router.push("/community/profile");
+      router.push(`/community/${community.community._id}/profile`);
     },
     [dispatch, router]
   );
 
   return (
-    <div className="container mx-auto p-16 py-24 min-h-screen p-auto bg-background">
+    <div className="container mx-auto p-3 py-24 md:p-16 md:py-24 min-h-screen bg-background">
       {/* Loading State */}
       {loading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="w-[292px]">
+            <div key={i} className="w-full">
               <Skeleton className="h-[100px] w-full rounded-lg mb-4" />
               <Skeleton className="h-6 w-3/4 mb-2" />
               <Skeleton className="h-4 w-full mb-2" />

@@ -8,13 +8,14 @@ const nextConfig: NextConfig = {
     removeConsole: false,
   },
   images: {
-    domains: [
+    domains : [
       "target.scene7.com",
       "lh3.googleusercontent.com",
       "api.dicebear.com",
       "random-image-pepebigotes.vercel.app",
       "storage.googleapis.com",
-    ],
+      "img.freepik.com",
+    ] ,
     remotePatterns: [
       {
         protocol: "https",
