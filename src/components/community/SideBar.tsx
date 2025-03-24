@@ -36,11 +36,6 @@ import { StringConstants } from "../common/CommonText";
 import { useQuery } from "@tanstack/react-query";
 
 export function Sidebar() {
-  const COMMUNITY_PROFILE_PATH= '/community/profile';
-  const COMMUNITY_MEMBERS_PATH= '/community/members';
-  const COMMUNITY_CHANNEL_PATH= '/community/channel';
-  const COMMUNITY_PATH= '/community';
-  const FEED_PATH= '/feed';
   const dispatch = useDispatch();
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
@@ -67,6 +62,11 @@ export function Sidebar() {
     type: "discussion",
     is_locked: false,
   });
+  const COMMUNITY_PROFILE_PATH= `/community/${urlCommunityId}/profile`;
+  const COMMUNITY_MEMBERS_PATH= `/community/${urlCommunityId}/members`;
+  const COMMUNITY_CHANNEL_PATH= `/community/${urlCommunityId}/channel`;
+  const COMMUNITY_PATH= '/community';
+  const FEED_PATH= '/feed';
 
   // Add query for community details
   const {
@@ -244,7 +244,8 @@ export function Sidebar() {
   };
 
   return (
-    <div className="fixed h-screen w-80 bg-card p-4 py-24">
+    <>
+    <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
       <div className="flex items-center justify-between px-2">
         {isLoadingCommunity ? (
           <div className="h-6 w-32 bg-background animate-pulse rounded" />
@@ -257,13 +258,13 @@ export function Sidebar() {
         )}
 
         {/* {isAdmin && (
-          <button
-            className="p-1 rounded-md hover:bg-background transition"
-            onClick={() => setIsEditOpen(true)}
-          >
-            <FiEdit size={18} className="text-muted hover:text-primary" />
-          </button>
-        )} */}
+      <button
+        className="p-1 rounded-md hover:bg-background transition"
+        onClick={() => setIsEditOpen(true)}
+      >
+        <FiEdit size={18} className="text-muted hover:text-primary" />
+      </button>
+    )} */}
       </div>
 
       <Separator />
@@ -275,14 +276,12 @@ export function Sidebar() {
         </div>
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === `/community/${urlCommunityId}/profile`
+          className={`w-full justify-start gap-2 ${pathname === `/community/${urlCommunityId}/profile`
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
+              : "hover:bg-background text-muted-foreground"}`}
           onClick={() => {
             handleNavigation(`/community/${urlCommunityId}/profile`);
-          }}
+          } }
         >
           <FaUserAlt />
           {StringConstants.PROFILE}
@@ -290,14 +289,12 @@ export function Sidebar() {
 
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === `/community/${urlCommunityId}/feed`
+          className={`w-full justify-start gap-2 ${pathname === `/community/${urlCommunityId}/feed`
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
+              : "hover:bg-background text-muted-foreground"}`}
           onClick={() => {
             handleNavigation(`/community/${urlCommunityId}/feed`);
-          }}
+          } }
         >
           <Rss className="h-4 w-4" />
           {StringConstants.FEED}
@@ -305,14 +302,12 @@ export function Sidebar() {
 
         <Button
           variant="ghost"
-          className={`w-full justify-start gap-2 ${
-            pathname === `/community/${urlCommunityId}/members`
+          className={`w-full justify-start gap-2 ${pathname === `/community/${urlCommunityId}/members`
               ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-              : "hover:bg-background text-muted-foreground"
-          }`}
+              : "hover:bg-background text-muted-foreground"}`}
           onClick={() => {
             handleNavigation(`/community/${urlCommunityId}/members`);
-          }}
+          } }
         >
           <FaUserGroup />
           {StringConstants.MEMBER}
@@ -320,33 +315,33 @@ export function Sidebar() {
 
         {/* Announcements */}
         {/* <Button
-      variant="ghost"
-      className={`w-full justify-start gap-2 ${
-        pathname === "/community/announcements"
-          ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-          : "hover:bg-background text-muted-foreground"
-      }`}
-      onClick={() => handleNavigation("/community/announcements")}
-    >
-      <GrAnnounce />
-      Announcements
-    </Button> */}
+  variant="ghost"
+  className={`w-full justify-start gap-2 ${
+    pathname === "/community/announcements"
+      ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+      : "hover:bg-background text-muted-foreground"
+  }`}
+  onClick={() => handleNavigation("/community/announcements")}
+>
+  <GrAnnounce />
+  Announcements
+</Button> */}
         {/* <Button
-      variant="ghost"
-      className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
-      onClick={() => handleNavigation("/community/event")}
-    >
-      <FaCalendarAlt />
-      Events
-    </Button> */}
+  variant="ghost"
+  className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
+  onClick={() => handleNavigation("/community/event")}
+>
+  <FaCalendarAlt />
+  Events
+</Button> */}
         {/* <Button
-      variant="ghost"
-      className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
-      onClick={() => handleNavigation("/community/announcements")}
-    >
-      <GrAnnounce />
-      Announcements
-    </Button> */}
+  variant="ghost"
+  className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
+  onClick={() => handleNavigation("/community/announcements")}
+>
+  <GrAnnounce />
+  Announcements
+</Button> */}
 
         {/* {isAdmin && ( */}
         <Button
@@ -366,9 +361,7 @@ export function Sidebar() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`h-8 w-8 hover:bg-background ${
-                    isAdmin ? "" : "cursor-not-allowed opacity-50"
-                  }`}
+                  className={`h-8 w-8 hover:bg-background ${isAdmin ? "" : "cursor-not-allowed opacity-50"}`}
                   disabled={!isAdmin}
                 >
                   <Plus className="h-4 w-4 text-muted-foreground" />
@@ -385,19 +378,14 @@ export function Sidebar() {
                       id="name"
                       placeholder="Enter name"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      className="bg-card border-background "
-                    />
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="bg-card border-background " />
                   </div>
                   <div className="grid gap-2">
                     <Label>{StringConstants.CHANNEL_TYPE}</Label>
                     <Select
                       value={formData.type}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, type: value })
-                      }
+                      onValueChange={(value) => setFormData({ ...formData, type: value })}
                     >
                       <SelectTrigger className="bg-card border-background text-muted">
                         <SelectValue placeholder="Select your topics" />
@@ -424,12 +412,10 @@ export function Sidebar() {
                     </Label>
                     <RadioGroup
                       value={formData.is_locked.toString()}
-                      onValueChange={(value) =>
-                        setFormData({
-                          ...formData,
-                          is_locked: value === "true",
-                        })
-                      }
+                      onValueChange={(value) => setFormData({
+                        ...formData,
+                        is_locked: value === "true",
+                      })}
                       className="flex gap-4"
                     >
                       <div className="flex items-center space-x-2">
@@ -468,11 +454,9 @@ export function Sidebar() {
                 <Button
                   key={channel?.id}
                   variant="ghost"
-                  className={`w-full justify-start gap-2 ${
-                    activeChannel.id === channel.id
+                  className={`w-full justify-start gap-2 ${activeChannel.id === channel.id
                       ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                      : " hover:bg-background text-muted-foreground"
-                  }`}
+                      : " hover:bg-background text-muted-foreground"}`}
                   onClick={() => {
                     dispatch(
                       setActiveChannel({
@@ -484,7 +468,7 @@ export function Sidebar() {
                     handleNavigation(
                       `/community/${urlCommunityId}/channel/${channel.name}`
                     );
-                  }}
+                  } }
                 >
                   <Hash />
                   {channel.name}
@@ -499,9 +483,64 @@ export function Sidebar() {
       {isEditOpen && (
         <EditCommunityModal
           isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-        />
+          onClose={() => setIsEditOpen(false)} />
       )}
     </div>
+    
+    <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_PROFILE_PATH
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
+        >
+          {StringConstants.PROFILE}
+        </button>
+
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"}`}
+          onClick={() => {
+            if (urlCommunityId) {
+              handleNavigation(
+                `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
+              );
+            } else {
+              console.warn(
+                "Active Community ID is null or undefined. Navigation is not triggered."
+              );
+            }
+          } }
+        >
+          {StringConstants.FEED}
+        </button>
+
+        <button
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_MEMBERS_PATH
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"}`}
+          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
+        >
+          {StringConstants.MEMBER}
+        </button>
+
+        {/* Scrollable Channels */}
+        {channels.map((channel: any) => (
+          <button
+            key={channel?.id}
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              pathname === `${COMMUNITY_CHANNEL_PATH}/${channel.name}`
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                : "hover:text-gradient"}`}
+            onClick={() => {
+              dispatch(setActiveChannel(channel));
+              handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
+            } }
+          >
+            {channel.name}
+          </button>
+        ))}
+      </div></>
   );
 }
