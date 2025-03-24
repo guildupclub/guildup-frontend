@@ -50,7 +50,7 @@ export function Feed() {
 
   
   return (
-    <div className="max-w-4xl mx-auto h-screen overflow-scroll">
+    <div className="max-w-4xl mx-auto h-screen overflow-scroll scrollbar-hide">
       <Tabs defaultValue="feed" className="w-full">
         <TabsContent value="feed" className="mt-0 p-4">
           {posts.length === 0 ? (

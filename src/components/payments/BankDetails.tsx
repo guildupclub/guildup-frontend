@@ -42,6 +42,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         {
           user_id: userId,
           bank_details: bankDetails,
+          update: true,
         }
       );
       

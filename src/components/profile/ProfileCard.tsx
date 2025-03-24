@@ -214,96 +214,32 @@ const InfiniteMovingCards = ({
 
 import { motion } from "framer-motion";
 import Testimonials from "../testimonial/Testimonial";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export function ProfileCard() {
+export function ProfileCard({ communityId }: ProfileCardProps) {
   const dispatch = useDispatch();
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
+  console.log("@userFollowedCommunities", userFollowedCommunities);
   const user = useSelector((state: RootState) => state.user.user);
   const community = useSelector((state: RootState) => state.community);
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
   );
+  const queryClient = useQueryClient()
+  const [ loading, setLoading] = useState(false)
   const { data: session, status } = useSession();
-  const [profile, setProfile] = useState<CommunityProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setBgImgUrl] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOfferingModal, setSelectedOfferingModal] = useState(null);
-
-  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
-    null
-  );
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const activeCommunityId = community?.communityId;
+  const activeCommunityId = communityId || community?.communityId;
 
   // Add this state in ProfileCard component after other state declarations
-  const [testimonials, setTestimonials] = useState([
-    {
-      quote:
-        "This community has been transformative for my personal growth. The resources and support are unmatched!",
-      name: "Sarah Johnson",
-      title: "Community Member",
-      avatar:
-        "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Nnx8cGVvcGxlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-      content:
-        "I've been a member for over a year and the quality of content keeps getting better. Highly recommend!",
-      rating: 5,
-      id: "1",
-    },
-    {
-      quote:
-        "I've been a member for over a year and the quality of content keeps getting better. Highly recommend!",
-      name: "Michael Chen",
-      title: "Premium Subscriber",
-      avatar:
-        "https://images.unsplash.com/photo-1580489944761-15a19d674x?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      content:
-        "The workshops offered here have helped me advance my career in ways I never expected. Thank you!",
-      rating: 4,
-      id: "2",
-    },
-    {
-      quote:
-        "The workshops offered here have helped me advance my career in ways I never expected. Thank you!",
-      name: "Jessica Williams",
-      title: "Workshop Participant",
-      avatar:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad7d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      content:
-        "The sense of belonging I've found here is incredible. Everyone is so supportive and encouraging.",
-      rating: 5,
-      id: "3",
-    },
-    {
-      quote:
-        "The sense of belonging I've found here is incredible. Everyone is so supportive and encouraging.",
-      name: "David Rodriguez",
-      title: "Community Member",
-      avatar:
-        "https://images.unsplash.com/photo-1531427186534-742ad904efd8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      content:
-        "The courses offered here have completely changed my perspective. I've learned so much!",
-      rating: 4,
-      id: "4",
-    },
-    {
-      quote:
-        "The courses offered here have completely changed my perspective. I've learned so much!",
-      name: "Emma Thompson",
-      title: "Course Graduate",
-      avatar:
-        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTZ8fHBlb3BsZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60",
-      content:
-        "This community has been transformative for my personal growth. The resources and support are unmatched!",
-      rating: 5,
-      id: "5",
-    },
-  ]);
 
   // Add this ref and effect for the infinite scroll animation
   const testimonialRef = useRef<HTMLDivElement>(null);
@@ -346,19 +282,50 @@ export function ProfileCard() {
     memberDetails.is_owner === true &&
     memberDetails.community_id === community.communityId;
 
-  // Now button in the offering card
+  const {
+    data: profile,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['communityProfile', activeCommunityId],
+    queryFn: async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        { communityId: activeCommunityId }
+      );
+      console.log("@responseProfilePAge", response.data.data )
+      if (response.data.r === 's') {
+        // Update avatar and background images
+        if (response.data.data.community.image) {
+          setAvatarImgUrl(response.data.data.community.image);
+        } else {
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+          );
+        }
+        
+        if (response.data.data.community.background_image) {
+          setBgImgUrl(response.data.data.community.background_image);
+        } else {
+          setBgImgUrl(
+            "https://random-image-pepebigotes.vercel.app/api/random-image"
+          );
+        }
+        
+        return response.data.data;
+      }
+      throw new Error("Failed to fetch community profile");
+    },
+    enabled: !!activeCommunityId
+  });
 
-  // First, add the Offering interface
-
-  // Add offerings state to existing states
-
-  // Add fetchOfferings function
+  console.log("@profile",profile?.community.background_image)
   const fetchOfferings = useCallback(async () => {
-    if (!community.communityId) return;
+    if (!activeCommunityId) return;
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${community.communityId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${activeCommunityId}`
       );
 
       if (response.data.r === "s") {
@@ -371,20 +338,21 @@ export function ProfileCard() {
     } catch (error) {
       console.error("Error fetching offerings:", error);
     }
-  }, [community]);
+  }, [activeCommunityId]);
 
-  // Add useEffect to fetch offerings
-  // Add this section after the existing community info grid
+  useEffect(() => {
+    fetchOfferings();
+  }, [activeCommunityId, fetchOfferings]);
 
   const handleLeaveCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 
@@ -416,7 +384,6 @@ export function ProfileCard() {
 
         console.log("@response", response.data.data);
         if (response.data.r === "s") {
-          setProfile(response.data.data);
           if (response.data.data.community.image) {
             setAvatarImgUrl(response.data.data.community.image);
           } else {
@@ -444,7 +411,7 @@ export function ProfileCard() {
           );
         }
       } catch (error) {
-        setError("Failed to load community profile");
+        toast.error("Failed to load community profile");
         console.error("Error fetching profile data:", error);
       } finally {
         setLoading(false);
@@ -454,15 +421,40 @@ export function ProfileCard() {
     fetchProfileData();
   }, [community?.communityId]); // Dependency array includes communityId
 
+
+
+  // const joinCommunityMutate = useMutation({
+  //   mutationFn: async () => {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(   {
+  //         userId: user._id,
+  //         communityId: activeCommunityId,
+  //       }),
+  //     });
+  //     console.log("@JoinResponse",response.data.data)
+  //     if (!response.ok) throw new Error("Failed to send post");
+  //     return response.json();
+  //   },
+  //   onSuccess: (newPost) => {
+  //     console.log("@newPost",newPost)
+
+  //     queryClient.setQueryData(['userCommunity'], oldCommuinty => [...oldCommuinty, response.data.data]);
+
+  //   },
+  // });
+
   const handleJoinCommunity = async () => {
-    if (!user?._id || !community.communityId) return;
+    console.log("@user._id",user,activeCommunityId)
+    if (!user?._id || !activeCommunityId) return;
 
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
           userId: user._id,
-          communityId: community.communityId,
+          communityId: activeCommunityId,
         }
       );
 
@@ -523,7 +515,6 @@ export function ProfileCard() {
   };
 
   if (loading) return <div>{StringConstants.LOADING}</div>;
-  if (error) return <div>{error}</div>;
   if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
   console.log("@prifle", profile.user);
   return (
@@ -532,7 +523,7 @@ export function ProfileCard() {
         <div className="relative">
           <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
             <Image
-              src={bgImgUrl || "/placeholder.svg"}
+              src={profile?.community.background_image != undefined ? profile?.community.background_image :"https://img.freepik.com/free-vector/copy-space-violet-wavy-shapes-background_23-2148403375.jpg?t=st=1742123016~exp=1742126616~hmac=6c247e6cb6520700f598721d460efa004964af8dc65d1eb0a929a6a317584510&w=1380"}
               alt="Profile banner"
               width={1200}
               height={400}
@@ -543,7 +534,7 @@ export function ProfileCard() {
           <div className="absolute -bottom-16 left-8">
             <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
               <Image
-                src={avatarImgUrl || "/placeholder.svg"}
+                src={ profile?.community?.image ? profile?.community?.image:"/placeholder.svg"}
                 alt={profile.community.name}
                 width={100}
                 height={100}
@@ -581,7 +572,7 @@ export function ProfileCard() {
                   {profile.user.user_name}
                 </span>
               </p>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground my-2">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground my-2">
                 <div className="flex items-center gap-1.5">
                   <MdPeopleAlt className="h-5 w-5 text-green-500" />
                   <span className="font-medium text-foreground">
@@ -645,7 +636,7 @@ export function ProfileCard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-        <div className="p-4 ">
+        <div className="">
           <h2 className="text-2xl font-semibold text-foreground mb-4">
             {StringConstants.ABOUT}
           </h2>
@@ -654,7 +645,7 @@ export function ProfileCard() {
               {profile.community.description}
             </p>
             <div className="flex flex-wrap gap-2">
-              {profile.community.tags.map((tag) => (
+              {profile.community.tags.map((tag:any) => (
                 <span
                   key={tag}
                   className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"

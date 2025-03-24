@@ -63,6 +63,7 @@ export default {
     },
   },
   plugins: [
+    require('tailwind-scrollbar-hide'),
     require("tailwindcss-animate"),
     function ({ addUtilities }: any) {
       addUtilities({

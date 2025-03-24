@@ -150,7 +150,7 @@ export default function CreatorForm({onSuccess}: FormProps) {
       onSuccess?.();
 
       // Redirect to the new community's profile page
-      await router.push("/community/profile");
+      await router.push(`/community/${newCommunity._id}/profile`);
       setIsRedirecting(false); // Stop loading after redirect
     },
     onError: (error: any) => {

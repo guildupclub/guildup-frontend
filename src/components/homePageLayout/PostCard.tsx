@@ -53,7 +53,9 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, ref, userID }: PostCardProps) {
-  const COMMUNITY_PROFILE_PATH = "/community/profile";
+  const community_id = post.community_id?._id;
+  const community_name = post.community_id?.name;
+  const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
   const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
@@ -66,9 +68,6 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   const router = useRouter();
 
   const handleClickCommunity = useCallback(() => {
-    const community_id = post.community_id._id;
-    const community_name = post.community_id.name;
-
     if (!community_id) {
       console.error("Invalid community data:");
       return;
@@ -90,7 +89,6 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
       })
     );
 
-    console.log("donme");
     router.push(COMMUNITY_PROFILE_PATH);
   }, [dispatch, router, post]);
 
@@ -191,7 +189,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
               <div>
                 <h3
                   onClick={handleClickCommunity}
-                  className="font-medium text-muted cursor-pointer hover:underline"
+                  className="font-medium text-muted cursor-pointer"
                 >
                   {post?.community_id?.name}
                 </h3>
@@ -241,7 +239,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           </div>
         </div>
       </div>
-      <div className="flex items-center px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
+      <div className="flex items-center px-4 md:px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
         {/* Left Icon */}
         <button
           className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
