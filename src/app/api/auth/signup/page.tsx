@@ -12,6 +12,7 @@ import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "@/components/common/CommonText";
 
 export default function SignUp() {
+
   const router = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);

@@ -1,8 +1,10 @@
 "use client";
 
+// Add Loader to imports
+import Loader from "@/components/Loader";
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,29 +18,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
-import { DialogDescription } from "@radix-ui/react-dialog";
-
-interface CreatorFormProps {
-  onClose: () => void;
-  onSuccess?: () => void;
-}
+import { useRouter } from "next/navigation";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { setCommunityData } from "@/redux/communitySlice";
 
 interface Category {
   _id: string;
   name: string;
 }
 
-export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+interface FormProps {
+  onSuccess?: () => void;
+}
+
+export default function CreatorForm({onSuccess}: FormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
+  const router = useRouter();
+  const dispatch = useDispatch();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -49,6 +49,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   });
   const [categoryId, setCategoryId] = useState("");
   const [additionalTags] = useState([]);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Fetch categories dynamically
   const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
@@ -82,6 +83,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   // Mutation for creating community
   const createCommunity = useMutation({
     mutationFn: async () => {
+      setIsRedirecting(true); // Start loading
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/create`,
         {
@@ -101,17 +103,40 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       );
 
       const data = await response.json();
-
-      console.log(data);
-
-      if (!data && data.r !== "s")
-        console.log(data.e || "Failed to create community");
-
+      if (!response.ok) {
+        setIsRedirecting(false); // Stop loading on error
+        throw new Error(data.e || "Failed to create community");
+      }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      const newCommunity = data.data;
       toast.success("Community created successfully! 🎉");
-      queryClient.invalidateQueries({ queryKey: ["communities"] });
+      
+      // Update Redux state with the new community
+      dispatch(
+        setActiveCommunity({
+          id: newCommunity._id,
+          name: newCommunity.name,
+          image: newCommunity.image,
+          background_image: newCommunity.background_image,
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
+        })
+      );
+
+      dispatch(
+        setCommunityData({
+          communityId: newCommunity._id,
+          userId: userId,
+        })
+      );
+
+      // Invalidate queries to refresh data
+      await queryClient.invalidateQueries({ queryKey: ["communities"] });
+      await queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+
+      // Reset form
       setFormData({
         name: "",
         description: "",
@@ -120,12 +145,17 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         youtubeSubscribers: "",
       });
       setCategoryId("");
-      onClose();
+      
+      // Call success callback
       onSuccess?.();
+
+      // Redirect to the new community's profile page
+      await router.push("/community/profile");
+      setIsRedirecting(false); // Stop loading after redirect
     },
     onError: (error: any) => {
+      setIsRedirecting(false); // Stop loading on error
       toast.error(`Failed to create community: ${error.message}`);
-      onClose();
     },
   });
 
@@ -145,16 +175,16 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    (session && (
-      <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
-        <DialogHeader className="flex items-center justify-between py-2">
-          <DialogTitle className="text-xl font-semibold font-serif">
-            Let&apos;s Build your Guild!
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-          A Guild is your digital home for sharing expertise, building community, and earning money.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      {isRedirecting && <Loader />}
+      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
+        <div className="flex flex-col justify-start items-center pb-4">
+          <h2 className="text-xl font-semibold font-serif">Let&apos;s Build your Guild!</h2>
+          <p className="text-sm text-muted-foreground">
+            A Guild is your digital home for sharing expertise, building community, and earning money.
+          </p>
+        </div>
+
         <div className="space-y-5 ">
           <div className="space-y-2">
             <Label>
@@ -244,20 +274,13 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             />
           </div>
         </div>
-        <div className="flex justify-end gap-4 mt-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="text-muted bg-transparent border-gray-600 hover:bg-background"
-          >
-            {StringConstants.CANCEL}
-          </Button>
 
+        <div className="flex justify-end gap-4 mt-4">
           <Button className="text-white" onClick={handleSubmit}>
             {StringConstants.CREATE}
           </Button>
         </div>
-      </DialogContent>
-    ))
+      </div>
+    </>
   );
 }

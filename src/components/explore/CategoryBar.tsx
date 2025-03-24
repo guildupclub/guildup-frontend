@@ -32,7 +32,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
   return (
     <>
       {/* Desktop View (md and larger) */}
-      <div className="hidden md:block !bg-white backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 overflow-scroll scrollbar-none cursor-pointer lg:px-[100px]">
+      <div className="hidden md:block backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-20 overflow-x-auto scrollbar-none cursor-pointer lg:px-[100px] max-w-[calc(100vw-150px)]">
         <div className="flex gap-4">
           {categorys?.map((cat: Category) => (
             <button
@@ -55,7 +55,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
         <div className="flex gap-2 px-4">
           {categorys?.map((cat: Category) => (
             <button
-              className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              className={`py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
                 selectedCategory === cat._id
                   ? "text-gradient underline underline-offset-4 decoration-blue-500"
                   : "hover:text-gradient"

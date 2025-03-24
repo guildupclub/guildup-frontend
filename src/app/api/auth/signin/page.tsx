@@ -1,12 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
-import GoogleSignIn from "@/components/common/GoogleSignIn";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { RightSection } from '@/components/signIn/RightSection';
+import { UserHeroSection } from "@/components/signIn/UserHeroSection";
+import { CreatorHeroSection1 } from "@/components/signIn/CreatorHeroSection1";
+import { CreatorHeroSection2 } from "@/components/signIn/CreatorHeroSection2";
+import Loader from "@/components/Loader";
+
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  const callbackUrl = searchParams.get("callbackUrl");
+
+  const getHeroVersion = () => {
+    if (!callbackUrl) return 2;
+    try {
+      const url = new URL(callbackUrl);
+      return url.searchParams.get("hero") === "1" ? 1 : 2;
+    } catch {
+      return 2;
+    }
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      {getHeroVersion() === 1 ? (
+        session ? <CreatorHeroSection2 /> : <CreatorHeroSection1 />
+      ) : (
+        <UserHeroSection />
+      )}
+      <RightSection />
+    </div>
+  );
+}
 
 export default function SignIn() {
   const router = useRouter();
@@ -24,11 +57,6 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      // const result = await signIn("credentials", {
-      //   email,
-      //   password,
-      //   redirect: false,
-      // });
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,
         {
@@ -46,7 +74,7 @@ export default function SignIn() {
           accessToken: result.data.data.session,
         })
       );
-      console.log("@sininreust", result);
+
       if (result?.data?.e === "e") {
         setError(result.data.data);
       } else {
@@ -63,6 +91,8 @@ export default function SignIn() {
   };
 
   return (
-    <GoogleSignIn/>
+    <Suspense fallback={<Loader />}>
+      <SignInContent />
+    </Suspense>
   );
 }

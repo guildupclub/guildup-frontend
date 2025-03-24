@@ -60,12 +60,22 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/guildup_logo_final.png" type="image/png" />
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
+      <script>
+        {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-B3B9W8GRQP');
+        `}
+      </script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <NavbarClient />
           {children}
-          <Toaster />
+          <Toaster richColors position="top-center" />
         </Providers>
       </body>
     </html>

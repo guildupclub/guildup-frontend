@@ -3,8 +3,10 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface Community {
   id: string;
   name: string;
-  image:string,
-  background_image:string
+  image: string;
+  background_image: string;
+  user_isBankDetailsAdded: boolean;
+  user_iscalendarConnected: boolean;
 }
 
 interface Channel {
@@ -28,13 +30,24 @@ export const channelSlice = createSlice({
   initialState,
   reducers: {
     setActiveChannel: (state, action: PayloadAction<Channel>) => {
-      state.activeChannel = action.payload; // ✅ Update active channel
+      state.activeChannel = action.payload;
     },
     setActiveCommunity: (state, action: PayloadAction<Community>) => {
       state.activeCommunity = action.payload;
     },
+    setUserBankDetails: (state, action: PayloadAction<boolean>) => {
+      if (state.activeCommunity) {
+        state.activeCommunity.user_isBankDetailsAdded = action.payload;
+      }
+    },
+    setUserCalendarConnected: (state, action: PayloadAction<boolean>) => {
+      if (state.activeCommunity) {
+        state.activeCommunity.user_iscalendarConnected = action.payload;
+      }
+    },
   },
 });
 
-export const { setActiveChannel, setActiveCommunity } = channelSlice.actions;
+export const { setActiveChannel, setActiveCommunity, setUserBankDetails, setUserCalendarConnected } =
+  channelSlice.actions;
 export default channelSlice.reducer;

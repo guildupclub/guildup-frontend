@@ -35,11 +35,11 @@ import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
 
 export function Sidebar() {
-  const COMMUNITY_PROFILE_PATH= '/community/profile';
-  const COMMUNITY_MEMBERS_PATH= '/community/members';
-  const COMMUNITY_CHANNEL_PATH= '/community/channel';
-  const COMMUNITY_PATH= '/community';
-  const FEED_PATH= '/feed';
+  const COMMUNITY_PROFILE_PATH = "/community/profile";
+  const COMMUNITY_MEMBERS_PATH = "/community/members";
+  const COMMUNITY_CHANNEL_PATH = "/community/channel";
+  const COMMUNITY_PATH = "/community";
+  const FEED_PATH = "/feed";
   const dispatch = useDispatch();
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
@@ -213,14 +213,14 @@ export function Sidebar() {
 
   return (
     <>
-    {/* Desktop View */}
-    <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
-      <div className="flex items-center justify-between px-2">
-        <h2 className="text-lg text-muted-foreground font-semibold">
-          {activeCommunityName}
-        </h2>
+      {/* Desktop View */}
+      <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-lg text-muted-foreground font-semibold">
+            {activeCommunityName}
+          </h2>
 
-        {/* {isAdmin && (
+          {/* {isAdmin && (
           <button
             className="p-1 rounded-md hover:bg-background transition"
             onClick={() => setIsEditOpen(true)}
@@ -228,58 +228,68 @@ export function Sidebar() {
             <FiEdit size={18} className="text-muted hover:text-primary" />
           </button>
         )} */}
-      </div>
-
-      <Separator />
-      <div className="space-y-2">
-        <div className="border-b border-background py-2">
-          <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
-            <PostDialog />
-          </div>
         </div>
-        <Button
-          variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === COMMUNITY_PROFILE_PATH
-            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-            : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
-        >
-          <FaUserAlt />
-          {StringConstants.PROFILE}
-        </Button>
 
-        {/* Feed */}
-        <Button
-          variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
-            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-            : "hover:bg-background text-muted-foreground"}`}
+        <Separator />
+        <div className="space-y-2">
+          <div className="border-b border-background py-2">
+            <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
+              <PostDialog />
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            className={`w-full justify-start gap-2 ${
+              pathname === COMMUNITY_PROFILE_PATH
+                ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+                : "hover:bg-background text-muted-foreground"
+            }`}
+            onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
+          >
+            <FaUserAlt />
+            {StringConstants.PROFILE}
+          </Button>
+
+          {/* Feed */}
+          <Button
+            variant="ghost"
+            className={`w-full justify-start gap-2 ${
+              pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+                : "hover:bg-background text-muted-foreground"
+            }`}
             onClick={() => {
               if (activeCommunityId) {
-                handleNavigation(`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`);
+                handleNavigation(
+                  `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                );
               } else {
-                console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+                console.warn(
+                  "Active Community ID is null or undefined. Navigation is not triggered."
+                );
               }
-            }}            
-        >
-          <Rss className="h-4 w-4" />
-          {StringConstants.FEED}
-        </Button>
+            }}
+          >
+            <Rss className="h-4 w-4" />
+            {StringConstants.FEED}
+          </Button>
 
-        {/* Members */}
-        <Button
-          variant="ghost"
-          className={`w-full justify-start gap-2 ${pathname === COMMUNITY_MEMBERS_PATH
-            ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
-            : "hover:bg-background text-muted-foreground"}`}
-          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
-        >
-          <FaUserGroup />
-          {StringConstants.MEMBER}
-        </Button>
+          {/* Members */}
+          <Button
+            variant="ghost"
+            className={`w-full justify-start gap-2 ${
+              pathname === COMMUNITY_MEMBERS_PATH
+                ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+                : "hover:bg-background text-muted-foreground"
+            }`}
+            onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
+          >
+            <FaUserGroup />
+            {StringConstants.MEMBER}
+          </Button>
 
-        {/* Announcements */}
-        {/* <Button
+          {/* Announcements */}
+          {/* <Button
       variant="ghost"
       className={`w-full justify-start gap-2 ${
         pathname === "/community/announcements"
@@ -291,7 +301,7 @@ export function Sidebar() {
       <GrAnnounce />
       Announcements
     </Button> */}
-        {/* <Button
+          {/* <Button
       variant="ghost"
       className="w-full justify-start gap-2  text-muted-foreground hover:bg-background  "
       onClick={() => handleNavigation("/community/event")}
@@ -299,7 +309,7 @@ export function Sidebar() {
       <FaCalendarAlt />
       Events
     </Button> */}
-        {/* <Button
+          {/* <Button
       variant="ghost"
       className="w-full justify-start gap-2 text-muted-foreground hover:bg-background  "
       onClick={() => handleNavigation("/community/announcements")}
@@ -308,181 +318,222 @@ export function Sidebar() {
       Announcements
     </Button> */}
 
-        {/* {isAdmin && ( */}
-        <Button
-          className={`w-full text-white ${isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"}`}
-          onClick={() => handleNavigation("/creator-studio")}
-        >
-          {StringConstants.CREATOR_STUDIO}
-        </Button>
+          {/* {isAdmin && ( */}
+          <Button
+            className={`w-full text-white ${
+              isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
+            }`}
+            onClick={() => handleNavigation("/creator-studio")}
+            disabled={!isAdmin}
+          >
+            {StringConstants.CREATOR_STUDIO}
+          </Button>
 
-        {/* )} */}
+          {/* )} */}
 
-        <div className="px-2 py-2 border-t border-background p-2">
-          <div className="flex items-center justify-between mb-2 ">
-            <h2 className="text-lg font-semibold text-muted ">Channels</h2>
-            <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
-              {/* {
+          <div className="px-2 py-2 border-t border-background p-2">
+            <div className="flex items-center justify-between mb-2 ">
+              <h2 className="text-lg font-semibold text-muted ">Channels</h2>
+              <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
+                {/* {
       isAdmin && ( */}
 
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={`h-8 w-8 hover:bg-background ${isAdmin ? "" : "cursor-not-allowed opacity-50"}`}
-                  disabled={!isAdmin}
-                >
-                  <Plus className="h-4 w-4 text-muted-foreground" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] bg-background  border-none">
-                <DialogHeader>
-                  <DialogTitle>Create a New Channel</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-6 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Channel Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="Enter name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-card border-background " />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label>{StringConstants.CHANNEL_TYPE}</Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(value) => setFormData({ ...formData, type: value })}
-                    >
-                      <SelectTrigger className="bg-card border-background text-muted">
-                        <SelectValue placeholder="Select your topics" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-card border-background text-muted">
-                        <SelectItem value="discussion">{StringConstants.DISCUSSION}</SelectItem>
-                        <SelectItem value="chat">{StringConstants.CHAT}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label className="flex items-center gap-2">
-                      {StringConstants.LOCK_CHANNEL_MESSAGE}
-                      <div className="relative group">
-                        <Info className="w-4 h-4 text-muted cursor-pointer" />
-                        <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
-                          {StringConstants.PVT_CHANNEL_MESSAGE}
-                        </span>
-                      </div>
-                    </Label>
-                    <RadioGroup
-                      value={formData.is_locked.toString()}
-                      onValueChange={(value) => setFormData({
-                        ...formData,
-                        is_locked: value === "true",
-                      })}
-                      className="flex gap-4"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="true" id="yes" />
-                        <Label htmlFor="yes">{StringConstants.YES}</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="false" id="no" />
-                        <Label htmlFor="no">{StringConstants.NO}</Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-4">
+                <DialogTrigger asChild>
                   <Button
-                    variant="outline"
-                    onClick={() => setIsChannelOpen(false)}
-                    className="bg-transparent border-background hover:bg-background text-muted-foreground"
+                    variant="ghost"
+                    size="icon"
+                    className={`h-8 w-8 hover:bg-background ${
+                      isAdmin ? "" : "cursor-not-allowed opacity-50"
+                    }`}
+                    disabled={!isAdmin}
                   >
-                    {StringConstants.CANCEL}
+                    <Plus className="h-4 w-4 text-muted-foreground" />
                   </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px] bg-background  border-none">
+                  <DialogHeader>
+                    <DialogTitle>Create a New Channel</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-6 py-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="name">Channel Name</Label>
+                      <Input
+                        id="name"
+                        placeholder="Enter name"
+                        value={formData.name}
+                        onChange={(e) =>
+                          setFormData({ ...formData, name: e.target.value })
+                        }
+                        className="bg-card border-background "
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label>{StringConstants.CHANNEL_TYPE}</Label>
+                      <Select
+                        value={formData.type}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, type: value })
+                        }
+                      >
+                        <SelectTrigger className="bg-card border-background text-muted">
+                          <SelectValue placeholder="Select your topics" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-background text-muted">
+                          <SelectItem value="discussion">
+                            {StringConstants.DISCUSSION}
+                          </SelectItem>
+                          <SelectItem value="chat">
+                            {StringConstants.CHAT}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="grid gap-2">
+                      <Label className="flex items-center gap-2">
+                        {StringConstants.LOCK_CHANNEL_MESSAGE}
+                        <div className="relative group">
+                          <Info className="w-4 h-4 text-muted cursor-pointer" />
+                          <span className="absolute left-6 w-40 top-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform origin-left bg-zinc-800 text-zinc-200 text-xs rounded-md px-2 py-1 shadow-lg">
+                            {StringConstants.PVT_CHANNEL_MESSAGE}
+                          </span>
+                        </div>
+                      </Label>
+                      <RadioGroup
+                        value={formData.is_locked.toString()}
+                        onValueChange={(value) =>
+                          setFormData({
+                            ...formData,
+                            is_locked: value === "true",
+                          })
+                        }
+                        className="flex gap-4"
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="true" id="yes" />
+                          <Label htmlFor="yes">{StringConstants.YES}</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="false" id="no" />
+                          <Label htmlFor="no">{StringConstants.NO}</Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsChannelOpen(false)}
+                      className="bg-transparent border-background hover:bg-background text-muted-foreground"
+                    >
+                      {StringConstants.CANCEL}
+                    </Button>
+                    <Button
+                      onClick={handleCreateChannel}
+                      disabled={isCreating}
+                      className="bg-primary-gradient text-white"
+                    >
+                      {isCreating ? "Creating..." : "Create"}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="space-y-1">
+              {channels &&
+                channels.map((channel: any) => (
                   <Button
-                    onClick={handleCreateChannel}
-                    disabled={isCreating}
-                    className="bg-primary-gradient text-white"
+                    key={channel?.id}
+                    variant="ghost"
+                    className={`w-full justify-start gap-2 ${
+                      activeChannel.id === channel.id
+                        ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
+                        : " hover:bg-background text-muted-foreground"
+                    }`}
+                    onClick={() => {
+                      dispatch(
+                        setActiveChannel({
+                          id: channel.id,
+                          name: channel.name,
+                          type: channel.type,
+                        })
+                      );
+                      handleNavigation(
+                        `${COMMUNITY_CHANNEL_PATH}/${channel.name}`
+                      );
+                    }}
                   >
-                    {isCreating ? "Creating..." : "Create"}
+                    <Hash />
+                    {channel.name}
+                    {channel.locked && (
+                      <Lock className="h-3 w-3 ml-auto opacity-50" />
+                    )}
                   </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <div className="space-y-1">
-            {channels &&
-              channels.map((channel: any) => (
-                <Button
-                  key={channel?.id}
-                  variant="ghost"
-                  className={`w-full justify-start gap-2 ${activeChannel.id === channel.id
-                    ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                    : " hover:bg-background text-muted-foreground"}`}
-                  onClick={() => {
-                    dispatch(
-                      setActiveChannel({
-                        id: channel.id,
-                        name: channel.name,
-                        type: channel.type,
-                      })
-                    );
-                    handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
-                  }}
-                >
-                  <Hash />
-                  {channel.name}
-                  {channel.locked && (
-                    <Lock className="h-3 w-3 ml-auto opacity-50" />
-                  )}
-                </Button>
-              ))}
+                ))}
+            </div>
           </div>
         </div>
+        {isEditOpen && (
+          <EditCommunityModal
+            isOpen={isEditOpen}
+            onClose={() => setIsEditOpen(false)}
+          />
+        )}
       </div>
-      {isEditOpen && (
-        <EditCommunityModal
-          isOpen={isEditOpen}
-          onClose={() => setIsEditOpen(false)} />
-      )}
-    </div>
-    
-    {/* Mobile View */}
+
+      {/* Mobile View */}
       <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_PROFILE_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+            pathname === COMMUNITY_PROFILE_PATH
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"
+          }`}
           onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
         >
           {StringConstants.PROFILE}
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}` ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+            pathname === `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"
+          }`}
           onClick={() => {
             if (activeCommunityId) {
-              handleNavigation(`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`);
+              handleNavigation(
+                `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+              );
             } else {
-              console.warn("Active Community ID is null or undefined. Navigation is not triggered.");
+              console.warn(
+                "Active Community ID is null or undefined. Navigation is not triggered."
+              );
             }
-          }}          
+          }}
         >
           {StringConstants.FEED}
         </button>
 
         <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${pathname === COMMUNITY_MEMBERS_PATH ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+            pathname === COMMUNITY_MEMBERS_PATH
+              ? "text-gradient underline underline-offset-4 decoration-blue-500"
+              : "hover:text-gradient"
+          }`}
           onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
         >
           {StringConstants.MEMBER}
         </button>
 
         {/* Scrollable Channels */}
-        {channels.map((channel :any) => (
+        {channels.map((channel: any) => (
           <button
             key={channel?.id}
-            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${activeChannel.id === channel?.id ? "text-gradient underline underline-offset-4 decoration-blue-500" : "hover:text-gradient"}`}
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              activeChannel.id === channel?.id
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                : "hover:text-gradient"
+            }`}
             onClick={() => {
               dispatch(setActiveChannel(channel));
               handleNavigation(`${COMMUNITY_CHANNEL_PATH}/${channel.name}`);
@@ -491,6 +542,7 @@ export function Sidebar() {
             {channel.name}
           </button>
         ))}
-      </div></>
+      </div>
+    </>
   );
 }

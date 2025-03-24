@@ -1,7 +1,10 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { Button } from '../ui/button';
+import Link from 'next/link';
+import { ChevronLeft } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 
 interface GoogleSignInProps {
   isLoading?: boolean;
@@ -9,9 +12,51 @@ interface GoogleSignInProps {
 }
 
 const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/' }) => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [finalCallbackUrl, setFinalCallbackUrl] = useState(callbackUrl);
+  const user = useSelector((state: RootState) => state.user);
+  // Check if user is already a creator using the is_creator flag
+  const isCreator = user?.user?.is_creator ? true : false;
+
+  // This hook will ensure the code is run only on the client-side (after mount)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Use useRouter only after the component has mounted
+  useEffect(() => {
+    if (isMounted && !isCreator) {
+      const currentUrl = window.location.href;
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      const param = urlParams.get('callbackUrl');
+      const hero= param?.split('=')[1]
+      
+      
+
+      // Set the callbackUrl dynamically based on the `hero` query parameter
+      const newCallbackUrl =
+        hero === '1'
+          ? currentUrl
+          : `${window.location.origin}/`;
+
+      setFinalCallbackUrl(newCallbackUrl);
+    }
+  }, [isMounted]);
+
+  if (!isMounted) {
+    return null;
+  }
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex items-center justify-center bg-background w-full h-full">
       <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
+        <Link 
+          href="/"
+          className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+        </Link>
+
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold text-accent">Welcome</h1>
           <p className="text-muted-foreground">Sign in to your account</p>
@@ -20,7 +65,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: finalCallbackUrl })}
           disabled={isLoading}
         >
           <svg
@@ -40,6 +85,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
           </svg>
           Continue with Google
         </Button>
+        <p>By creating an account, you agree to our <span className='text-[#334BFF]'><a href='/terms-conditions'>Terms of use</a></span> and <span className='text-[#334BFF]'><a href='/privacy-policy'>Privacy policy</a></span></p>
       </div>
     </div>
   );

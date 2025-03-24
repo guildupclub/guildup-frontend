@@ -9,6 +9,8 @@ import { FaYoutube } from "react-icons/fa";
 import { ArrowRight } from "lucide-react";
 import { BookingDialog } from "../booking/Bookingdialog"; // Ensure correct import path
 import { useSession, signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { access } from "fs";
 
 interface CommunityCardProps {
   community: any; 
@@ -111,7 +113,14 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
             onClick={(e) => {
               if (!session) {
-                signIn("google");
+                toast('Please sign in to book the offering', {
+                  action: {
+                    label: "Sign In",
+                    onClick: () => signIn(undefined, {
+                      callbackUrl: `${window.location.origin}?hero=1`
+                    }),
+                  },
+                });
                 return;
               }
               setSelectedOffering(firstOffering);

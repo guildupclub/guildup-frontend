@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, FileText, Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
+import {
+  FileText,
+  Compass,
+  Users,
+  ChevronDown,
+  Search,
+  Plus,
+} from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -16,41 +23,43 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
-import Guildup_logo_mobile from './../../../public/GuildUp_logo_mobile.svg'
+import Guildup_logo_mobile from "./../../../public/GuildUp_logo_mobile.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
-import { EditCommunityModal } from "../form/editCommunity";
+import type { RootState } from "@/redux/store";
 import { StringConstants } from "../common/CommonText";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { setCommunityData } from "@/redux/communitySlice";
-import React from "react";
+import type React from "react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
+import axios from "axios";
+import { setUserFollowedCommunities } from "@/redux/userSlice";
 
-interface Community {
-  _id: string;
-  title: string;
-  name: string;
-  description: string;
-  subscription: boolean;
-  subscription_price: number;
-  num_member: number;
-}
+// interface Community {
+//   _id: string;
+//   title: string;
+//   name: string;
+//   description: string;
+//   subscription: boolean;
+//   subscription_price: number;
+//   num_member: number;
+// }
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
-  const COMMUNITY_PROFILE_PATH= '/community/profile';
-  const COMMUNITY_MEMBERS_PATH= '/community/members';
-  const COMMUNITY_CHANNEL_PATH= '/community/channel';
-  const COMMUNITY_FEED_PATH= '/community/feed';
-  const COMMUNITY_PATH= '/community';
-  const FEED_PATH= '/feed';
+  const COMMUNITY_PROFILE_PATH = "/community/profile";
+  const COMMUNITY_MEMBERS_PATH = "/community/members";
+  const COMMUNITY_CHANNEL_PATH = "/community/channel";
+  const COMMUNITY_FEED_PATH = "/community/feed";
+  const COMMUNITY_PATH = "/community";
+  const FEED_PATH = "/feed";
   const { data: session } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
-  const [isUser, setIsUser] = useState(true)
+  const [isUser, setIsUser] = useState(true);
   // useEffect(() => {
   //   if ('isNewUser' in user) {
   //     setIsUser(false);
@@ -59,7 +68,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   // }, [user]);
   // Assume communities are stored in state.community.communities (an array of Community)
   // const communities = useSelector((state: RootState) => state?.community?.communities);
-  const [isCreatorFormOpen, setIsCreatorFormOpen]= useState(false);
+  const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
@@ -71,6 +80,24 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   } | null>(null);
 
   const [searchType, setSearchType] = useState("post");
+  const userId = user?._id;
+  useEffect(() => {
+    async function fetchCommunities() {
+      try {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+          {
+            userId: userId,
+          }
+        );
+
+        dispatch(setUserFollowedCommunities(res.data.data));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    // fetchCommunities();
+  }, []);
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );
@@ -80,15 +107,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: RootState) => state?.user?.userFollowedCommunities
   );
   const getInitials = (name: string) => {
-    return name
-      // [0].toUpperCase();
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return (
+      name
+        // [0].toUpperCase();
+        .split(" ")
+        .map((word) => word[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    );
   };
-
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
@@ -143,6 +171,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     setIsSidebarOpen(false);
   }
 
+  // Function to check if a path is active
+  const isActive = (path: string) => {
+    if (path === "/" && pathname === "/") {
+      return true;
+    }
+    // For paths other than home, check if pathname starts with the path
+    return path !== "/" && pathname?.startsWith(path);
+  };
+
   return (
     <>
       <nav
@@ -161,11 +198,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <FaBars className="h-6 w-6" />
             </button>
             <Link href="/" className="flex items-center space-x-2 mr-6">
-            <Image
-              src={Guildup_logo_mobile}
-              alt="GuildUp logo"
-              className="h-8 w-auto md:hidden"
-            />
+              <Image
+                src={Guildup_logo_mobile || "/placeholder.svg"}
+                alt="GuildUp logo"
+                className="h-8 w-auto md:hidden"
+              />
               <Image
                 src={guildup_logo || "/placeholder.svg"}
                 alt="GuildUp"
@@ -201,16 +238,36 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <div className="hidden md:flex space-x-8 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
                 <ul className="flex items-center space-x-2 text-muted">
-                <li className="w-18  px-3 rounded-xl">
-                    <Link href="/explore" className="flex flex-col items-center">
-                      <Compass className="h-6 w-6" />
-                      <span className="">{StringConstants.EXPLORE}</span>
+                  <li className="w-18 px-3 rounded-xl">
+                    <Link href="/" className="flex flex-col items-center">
+                      <Compass
+                        className={`h-6 w-6 ${
+                          isActive("/") ? "text-primary" : ""
+                        }`}
+                      />
+                      <span className={isActive("/") ? "text-primary" : ""}>
+                        {StringConstants.EXPLORE}
+                      </span>
                     </Link>
                   </li>
+
                   <li className="w-18 px-3 rounded-xl">
-                    <Link href="/" className="flex flex-col items-center px-3 py-1.5">
-                      <FileText className="h-6 w-6" />
-                      <span className="h-6">{StringConstants.FEED}</span>
+                    <Link
+                      href="/feeds"
+                      className="flex flex-col items-center px-3 py-1.5"
+                    >
+                      <FileText
+                        className={`h-6 w-6 ${
+                          isActive("/feeds") ? "text-primary" : ""
+                        }`}
+                      />
+                      <span
+                        className={`h-6 ${
+                          isActive("/feeds") ? "text-primary" : ""
+                        }`}
+                      >
+                        {StringConstants.FEED}
+                      </span>
                     </Link>
                   </li>
                   <li className="w-18 px-3 rounded-xl">
@@ -222,8 +279,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       }
                       className="flex flex-col items-center justify-center"
                     >
-                      <Users className="w-6 h-6" />
-                      <span>{StringConstants.EXPERTS}</span>
+                      <Users
+                        className={`w-6 h-6 ${
+                          isActive("/community") ? "text-primary" : ""
+                        }`}
+                      />
+                      <span
+                        className={isActive("/community") ? "text-primary" : ""}
+                      >
+                        {StringConstants.EXPERTS}
+                      </span>
                     </Link>
                   </li>
                   {/* ss */}
@@ -235,10 +300,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
-                        <Button variant="ghost" className="relative h-8 w-8 rounded-full pb-3">
+                        <Button
+                          variant="ghost"
+                          className="relative h-8 w-8 rounded-full pb-3"
+                        >
                           <Avatar className="h-10 w-10">
                             {session?.user?.image ? (
-                              <AvatarImage src={session?.user?.image} alt="User" />
+                              <AvatarImage
+                                src={session?.user?.image}
+                                alt="User"
+                              />
                             ) : (
                               <AvatarFallback>AR</AvatarFallback>
                             )}
@@ -251,26 +322,26 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
                       align="end"
                     >
-                      {/* <DropdownMenuItem
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
                         <Link href="/profile">Profile</Link>
-                      </DropdownMenuItem> */}
-                      {/* <DropdownMenuItem
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         asChild
                         className="hover:bg-primary-gradient border-b border-zinc-300"
                       >
-                        <Link href="/bookings">Bookings</Link>
-                      </DropdownMenuItem> */}
-                      {/* {isUser && (
+                        <Link href="/booking">Bookings</Link>
+                      </DropdownMenuItem>
+                      {isUser && (
                         <DropdownMenuItem
                           asChild
                           className="hover:bg-primary-gradient border-b border-zinc-300"
                         >
                           <Link href="/payments">Payments</Link>
                         </DropdownMenuItem>
-                      )} */}
+                      )}
                       <DropdownMenuItem
                         className="hover:bg-primary-gradient"
                         onClick={handleSignOut}
@@ -289,12 +360,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         >
                           <Link href='/payments'>Payments</Link>
                         </DropdownMenuItem>} */}
-                     
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Button className="bg-primary-gradient" onClick={() => signIn()}>
-                    {StringConstants.SIGN_IN}
+                  // <Button className="bg-primary-gradient" onClick={() => signIn()}>
+                  //   {StringConstants.SIGN_IN}
+                  // </Button>
+
+                  <Button
+                    onClick={() =>
+                      signIn(undefined, {
+                        callbackUrl: `${window.location.origin}/?hero=2`,
+                      })
+                    }
+                  >
+                    Sign In
                   </Button>
                 )}
               </div>
@@ -307,15 +387,29 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
           <Link href="/" className="flex flex-col items-center justify-center">
-            <FileText className="w-6 h-6" />
-            <span className="text-xs mt-1">{StringConstants.HOME}</span>
+            <Compass
+              className={`w-6 h-6 ${isActive("/") ? "text-primary" : ""}`}
+            />
+            <span
+              className={`text-xs mt-1 ${isActive("/") ? "text-primary" : ""}`}
+            >
+              {StringConstants.HOME}
+            </span>
           </Link>
           <Link
-            href="/explore"
+            href="/feeds"
             className="flex flex-col items-center justify-center"
           >
-            <Compass className="w-6 h-6" />
-            <span className="text-xs mt-1">{StringConstants.EXPLORE}</span>
+            <FileText
+              className={`w-6 h-6 ${isActive("/feeds") ? "text-primary" : ""}`}
+            />
+            <span
+              className={`text-xs mt-1 ${
+                isActive("/feeds") ? "text-primary" : ""
+              }`}
+            >
+              {StringConstants.FEED}
+            </span>
           </Link>
           {/* <Link
             href="/snips"
@@ -329,16 +423,36 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               href={`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`}
               className="flex flex-col items-center justify-center"
             >
-              <Users className="w-6 h-6" />
-              <span className="text-xs mt-1">{StringConstants.EXPERTS}</span>
+              <Users
+                className={`w-6 h-6 ${
+                  isActive("/community") ? "text-primary" : ""
+                }`}
+              />
+              <span
+                className={`text-xs mt-1 ${
+                  isActive("/community") ? "text-primary" : ""
+                }`}
+              >
+                {StringConstants.EXPERTS}
+              </span>
             </Link>
           ) : (
             <Link
               href="/no-community"
               className="flex flex-col items-center justify-center"
             >
-              <Users className="w-6 h-6" />
-              <span className="text-xs mt-1">{StringConstants.EXPERTS}</span>
+              <Users
+                className={`w-6 h-6 ${
+                  isActive("/no-community") ? "text-primary" : ""
+                }`}
+              />
+              <span
+                className={`text-xs mt-1 ${
+                  isActive("/no-community") ? "text-primary" : ""
+                }`}
+              >
+                {StringConstants.EXPERTS}
+              </span>
             </Link>
           )}
 
@@ -348,10 +462,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               onClick={handleSignOut}
             >
               <Avatar className="h-6 w-6">
-                <AvatarImage
-                  src={session?.user?.image || ""}
-                  alt="User"
-                />
+                <AvatarImage src={session?.user?.image || ""} alt="User" />
                 <AvatarFallback>HHH</AvatarFallback>
               </Avatar>
               <span className="text-xs mt-1">{StringConstants.SIGN_OUT}</span>
@@ -387,56 +498,70 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       >
         <div className="px-1">
           <div className="space-y-3 pb-8">
-          {communities && communities.length > 0 ? (
-            communities.map((community: any) => {
-              const isActive = activeCommunityId === community._id
-              return (
-                <button
-                  key={community._id}
-                  className={cn(
-                    "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
-                    isActive
-                      ? "bg-blue-500/20"
-                      : "bg-card"
-                  )}
-                  onClick={() => handleSelectCommunity(community)}
-                >
-                  {/* Avatar */}
-                  <Avatar className={`w-10 h-10 rounded-lg ${isActive? "ring-2 ring-purple-500": 'null'}`}>
-                    <AvatarImage
-                      src={`/placeholder.svg?text=${getInitials(community.name)}`}
-                      alt={community.name}
-                      className="!rounded-lg"
-                    />
-                    <AvatarFallback className="!rounded-lg">
-                      {getInitials(community.name)}
-                    </AvatarFallback>
-                  </Avatar>
-    
-                  {/* Community Name */}
-                  <span
+            {communities && communities.length > 0 ? (
+              communities.map((community: any) => {
+                if (!community) return;
+                const isActive = activeCommunityId === community._id;
+                return (
+                  <button
+                    key={community._id}
                     className={cn(
-                      "font-medium text-sm",
-                      isActive ? "text-blue-600 " : "text-gray-800"
+                      "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
+                      isActive ? "bg-blue-500/20" : "bg-card"
                     )}
+                    onClick={() => handleSelectCommunity(community)}
                   >
-                    {community.name}
-                  </span>
-    
-                  {/* Subscription Star (optional) */}
-                  {community.subscription && (
-                    <span className="ml-auto text-yellow-500 text-sm">⭐</span>
-                  )}
-                </button>
-              )
-            })
-          ) : (
-            <p className="text-center">{StringConstants.NO_COMMUNITIES_AVAILABLE}</p>
-          )}
-        </div>
-        <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
-            <h4 className="text-base font-medium">{StringConstants.CREATE_A_PAGE}</h4>
-            <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+                    {/* Avatar */}
+                    <Avatar
+                      className={`w-10 h-10 rounded-lg ${
+                        isActive ? "ring-2 ring-purple-500" : "null"
+                      }`}
+                    >
+                      <AvatarImage
+                        src={`/placeholder.svg?text=${getInitials(
+                          community.name
+                        )}`}
+                        alt={community.name}
+                        className="!rounded-lg"
+                      />
+                      <AvatarFallback className="!rounded-lg">
+                        {getInitials(community.name)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    {/* Community Name */}
+                    <span
+                      className={cn(
+                        "font-medium text-sm",
+                        isActive ? "text-blue-600 " : "text-gray-800"
+                      )}
+                    >
+                      {community.name}
+                    </span>
+
+                    {/* Subscription Star (optional) */}
+                    {community.subscription && (
+                      <span className="ml-auto text-yellow-500 text-sm">
+                        ⭐
+                      </span>
+                    )}
+                  </button>
+                );
+              })
+            ) : (
+              <p className="text-center">
+                {StringConstants.NO_COMMUNITIES_AVAILABLE}
+              </p>
+            )}
+          </div>
+          <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
+            <h4 className="text-base font-medium">
+              {StringConstants.CREATE_A_PAGE}
+            </h4>
+            <Dialog
+              open={isCreatorFormOpen}
+              onOpenChange={setIsCreatorFormOpen}
+            >
               <DialogTrigger asChild>
                 <Button
                   variant="ghost"
@@ -448,10 +573,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </DialogTrigger>
               <CreatorForm
                 onClose={() => setIsCreatorFormOpen(false)}
-              // onSuccess={() => {
-              // Invalidate the cache when a new community is created
-              // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-              // }}
+                // onSuccess={() => {
+                // Invalidate the cache when a new community is created
+                // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+                // }}
               />
             </Dialog>
           </div>
