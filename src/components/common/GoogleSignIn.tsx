@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { Button } from '../ui/button';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
+import React, { useEffect, useState } from "react";
+import { signIn } from "next-auth/react";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface GoogleSignInProps {
   isLoading?: boolean;
   callbackUrl?: string;
 }
 
-const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/' }) => {
+const GoogleSignIn: React.FC<GoogleSignInProps> = ({
+  isLoading,
+  callbackUrl = "/",
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const [finalCallbackUrl, setFinalCallbackUrl] = useState(callbackUrl);
   const user = useSelector((state: RootState) => state.user);
@@ -26,20 +29,16 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
   // Use useRouter only after the component has mounted
   useEffect(() => {
     if (isMounted) {
-    // if (isMounted && !isCreator) {
+      // if (isMounted && !isCreator) {
       const currentUrl = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
-      
-      const param = urlParams.get('callbackUrl');
-      const hero= param?.split('=')[1]
-      
-      
+
+      const param = urlParams.get("callbackUrl");
+      const hero = param?.split("=")[1];
 
       // Set the callbackUrl dynamically based on the `hero` query parameter
       const newCallbackUrl =
-        hero === '2'
-          ? `${window.location.origin}/`
-          : currentUrl;
+        hero === "2" ? `${window.location.origin}/` : currentUrl;
 
       setFinalCallbackUrl(newCallbackUrl);
     }
@@ -49,9 +48,9 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
     return null;
   }
   return (
-    <div className="flex items-center justify-center bg-background w-full h-full">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-card">
-        <Link 
+    <div className="flex items-center justify-center bg-background w-full h-full rounded-lg">
+      <div className="w-full   p-6 lg:p-8 space-y-6 rounded-lg shadow-lg bg-card">
+        <Link
           href="/"
           className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors"
         >
@@ -66,7 +65,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl: finalCallbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: "/" })}
           disabled={isLoading}
         >
           <svg
@@ -86,7 +85,16 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({ isLoading, callbackUrl = '/
           </svg>
           Continue with Google
         </Button>
-        <p>By creating an account, you agree to our <span className='text-[#334BFF]'><a href='/terms-conditions'>Terms of use</a></span> and <span className='text-[#334BFF]'><a href='/privacy-policy'>Privacy policy</a></span></p>
+        <p>
+          By creating an account, you agree to our{" "}
+          <span className="text-[#334BFF]">
+            <a href="/terms-conditions">Terms of use</a>
+          </span>{" "}
+          and{" "}
+          <span className="text-[#334BFF]">
+            <a href="/privacy-policy">Privacy policy</a>
+          </span>
+        </p>
       </div>
     </div>
   );
