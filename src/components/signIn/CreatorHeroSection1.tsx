@@ -4,7 +4,7 @@ import Login_laptop from "./../../../public/Login_laptop.png";
 
 export const CreatorHeroSection1: React.FC = () => {
     return (
-      <div className="w-1/2 bg-white flex flex-col items-center justify-start p-8 gap-16 border border-background">
+      <div className="md:w-1/2 bg-white flex flex-col items-center justify-start p-8 gap-16 border border-background">
         <div className="flex justify-center w-full">
           <Image
             src={guildup_logo || "/placeholder.svg"}
@@ -14,7 +14,7 @@ export const CreatorHeroSection1: React.FC = () => {
         </div>
 
         <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
-          <div className="flex flex-col gap-3 text-center w-3/4">
+          <div className="flex flex-col gap-3 text-center">
             <h1 className="text-4xl font-bold">
               Be found. GuildUp makes it easy.
             </h1>

@@ -5,7 +5,7 @@ import Login_mobile from "./../../../public/Login_mobile.png";
 
 export const CreatorHeroSection2: React.FC = () => {
   return (
-    <div className="w-1/2 bg-white flex flex-col items-center p-8 gap-8 border border-background overflow-hidden">
+    <div className="md:w-1/2 bg-white flex flex-col items-center p-8 gap-8 border border-background overflow-hidden">
       <div className="max-w-2xl w-full flex flex-col items-center gap-8">
         <Image
           src={guildup_logo || "/placeholder.svg"}

@@ -52,7 +52,7 @@ import Login_laptop from "./../../../public/Login_laptop.png";
 
 export const UserHeroSection: React.FC = () => {
     return (
-      <div className="min-h-screen w-1/2 bg-white flex flex-col items-start justify-between p-8 gap-8 border border-background">
+      <div className="md:min-h-screen md:w-1/2 bg-white flex flex-col items-start justify-between p-8 gap-8 border border-background">
         <div className="flex justify-center w-full">
           <Image
             src={guildup_logo || "/placeholder.svg"}

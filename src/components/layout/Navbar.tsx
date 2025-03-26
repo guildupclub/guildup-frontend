@@ -370,7 +370,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <Button
                     onClick={() =>
                       signIn(undefined, {
-                        callbackUrl: `${window.location.origin}/?hero=2`,
+                        callbackUrl: `${window.location.origin}?hero=2`,
                       })
                     }
                   >

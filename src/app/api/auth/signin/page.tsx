@@ -23,14 +23,14 @@ function SignInContent() {
     if (!callbackUrl) return 2;
     try {
       const url = new URL(callbackUrl);
-      return url.searchParams.get("hero") === "1" ? 1 : 2;
+      return url.searchParams.get("hero") === "2" ? 2 : 1;
     } catch {
       return 2;
     }
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen md:overflow-hidden">
       {getHeroVersion() === 1 ? (
         session ? <CreatorHeroSection2 /> : <CreatorHeroSection1 />
       ) : (
