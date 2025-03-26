@@ -262,14 +262,17 @@ export default function Testimonials() {
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Close
                 </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteTestimonial}
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </Button>
+                {
+                  isAdmin && (
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteTestimonial}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                      Delete
+                    </Button>
+                  )
+                }
               </DialogFooter>
             </div>
           )}

@@ -215,6 +215,7 @@ const InfiniteMovingCards = ({
 import { motion } from "framer-motion";
 import Testimonials from "../testimonial/Testimonial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loader from "../Loader";
 
 export function ProfileCard({ communityId }: ProfileCardProps) {
   const dispatch = useDispatch();
@@ -227,14 +228,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
   );
-  const queryClient = useQueryClient()
-  const [ loading, setLoading] = useState(false)
+  const queryClient = useQueryClient();
+  const [loading, setLoading] = useState(false);
   const { data: session, status } = useSession();
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [bgImgUrl, setBgImgUrl] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedOfferingModal, setSelectedOfferingModal] = useState(null);
-  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = communityId || community?.communityId;
@@ -285,25 +288,25 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const {
     data: profile,
     isLoading,
-    error
+    error,
   } = useQuery({
-    queryKey: ['communityProfile', activeCommunityId],
+    queryKey: ["communityProfile", activeCommunityId],
     queryFn: async () => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
         { communityId: activeCommunityId }
       );
-      console.log("@responseProfilePAge", response.data.data )
-      if (response.data.r === 's') {
+      console.log("@responseProfilePAge", response.data.data);
+      if (response.data.r === "s") {
         // Update avatar and background images
-        if (response.data.data.community.image) {
+        if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
           setAvatarImgUrl(
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
           );
         }
-        
+
         if (response.data.data.community.background_image) {
           setBgImgUrl(response.data.data.community.background_image);
         } else {
@@ -311,15 +314,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             "https://random-image-pepebigotes.vercel.app/api/random-image"
           );
         }
-        
+
         return response.data.data;
       }
       throw new Error("Failed to fetch community profile");
     },
-    enabled: !!activeCommunityId
+    enabled: !!activeCommunityId,
   });
 
-  console.log("@profile",profile?.community.background_image)
+  console.log("@profile", profile?.community.background_image);
+
   const fetchOfferings = useCallback(async () => {
     if (!activeCommunityId) return;
 
@@ -369,59 +373,57 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     fetchOfferings();
   }, [community.communityId, fetchOfferings]);
 
-  useEffect(() => {
-    if (!community?.communityId) return; // Ensure communityId is set before fetching
+  // useEffect(() => {
+  //   if (!community?.communityId) return; // Ensure communityId is set before fetching
 
-    const fetchProfileData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-          {
-            communityId: community.communityId,
-          }
-        );
+  //   const fetchProfileData = async () => {
+  //     try {
+  //       setLoading(true);
+  //       const response = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+  //         {
+  //           communityId: community.communityId,
+  //         }
+  //       );
 
-        console.log("@response", response.data.data);
-        if (response.data.r === "s") {
-          if (response.data.data.community.image) {
-            setAvatarImgUrl(response.data.data.community.image);
-          } else {
-            setAvatarImgUrl(
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-            );
-          }
-          if (response.data.data.community.background_image) {
-            setBgImgUrl(response.data.data.community.background_image);
-          } else {
-            setBgImgUrl(
-              "https://random-image-pepebigotes.vercel.app/api/random-image"
-            );
-          }
+  //       console.log("@response", response.data.data);
+  //       if (response.data.r === "s") {
+  //         if (response.data.data.community.image) {
+  //           setAvatarImgUrl(response.data.data.community.image);
+  //         } else {
+  //           setAvatarImgUrl(
+  //             `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+  //           );
+  //         }
+  //         if (response.data.data.community.background_image) {
+  //           setBgImgUrl(response.data.data.community.background_image);
+  //         } else {
+  //           setBgImgUrl(
+  //             "https://random-image-pepebigotes.vercel.app/api/random-image"
+  //           );
+  //         }
 
-          dispatch(
-            setUserBankDetails(
-              response.data.data.user.user_isBankDetailsAdded || false
-            )
-          );
-          dispatch(
-            setUserCalendarConnected(
-              response.data.data.user.user_iscalendarConnected || false
-            )
-          );
-        }
-      } catch (error) {
-        toast.error("Failed to load community profile");
-        console.error("Error fetching profile data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //         dispatch(
+  //           setUserBankDetails(
+  //             response.data.data.user.user_isBankDetailsAdded || false
+  //           )
+  //         );
+  //         dispatch(
+  //           setUserCalendarConnected(
+  //             response.data.data.user.user_iscalendarConnected || false
+  //           )
+  //         );
+  //       }
+  //     } catch (error) {
+  //       toast.error("Failed to load community profile");
+  //       console.error("Error fetching profile data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchProfileData();
-  }, [community?.communityId]); // Dependency array includes communityId
-
-
+  //   fetchProfileData();
+  // }, [community?.communityId]); // Dependency array includes communityId
 
   // const joinCommunityMutate = useMutation({
   //   mutationFn: async () => {
@@ -446,7 +448,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // });
 
   const handleJoinCommunity = async () => {
-    console.log("@user._id",user,activeCommunityId)
+    console.log("@user._id", user, activeCommunityId);
     if (!user?._id || !activeCommunityId) return;
 
     try {
@@ -514,16 +516,34 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       ));
   };
 
-  if (loading) return <div>{StringConstants.LOADING}</div>;
-  if (!profile) return <div>{StringConstants.NO_PROFILE_DATA}</div>;
-  console.log("@prifle", profile.user);
+  // if (loading) return <div>{StringConstants.LOADING}</div>;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader />
+      </div>
+    );
+  }
+  if (!profile)
+    return (
+      <div className="text-center h-screen items-center text-2xl font-semibold">
+        {StringConstants.NO_PROFILE_DATA}
+      </div>
+    );
+  // console.log("@prifle", profile.user);
+  console.log("ekjrwhjkgkje", avatarImgUrl);
   return (
     <div className="w-full max-w-6xl py-2 px-3 md:px-0">
       <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
         <div className="relative">
           <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
             <Image
-              src={profile?.community.background_image != undefined ? profile?.community.background_image :"https://img.freepik.com/free-vector/copy-space-violet-wavy-shapes-background_23-2148403375.jpg?t=st=1742123016~exp=1742126616~hmac=6c247e6cb6520700f598721d460efa004964af8dc65d1eb0a929a6a317584510&w=1380"}
+              src={
+                profile?.community.background_image != undefined
+                  ? profile?.community.background_image
+                  : "https://img.freepik.com/free-vector/copy-space-violet-wavy-shapes-background_23-2148403375.jpg?t=st=1742123016~exp=1742126616~hmac=6c247e6cb6520700f598721d460efa004964af8dc65d1eb0a929a6a317584510&w=1380"
+              }
               alt="Profile banner"
               width={1200}
               height={400}
@@ -534,13 +554,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           <div className="absolute -bottom-16 left-8">
             <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
               <Image
-                src={ profile?.community?.image ? profile?.community?.image:"/placeholder.svg"}
-                alt={profile.community.name}
+                src={
+                  profile?.community?.image ||
+                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user.user_name}`
+                }
+                alt={profile?.community?.name || "Community Avatar"}
                 width={100}
                 height={100}
                 className="w-24 h-24 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
                 unoptimized
               />
+
               {/* <AvatarFallback className="text-primary text-3xl w-32 h-32 bg-primary/5">
                 {profile.user.user_name[0]}
               </AvatarFallback> */}
@@ -645,7 +669,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               {profile.community.description}
             </p>
             <div className="flex flex-wrap gap-2">
-              {profile.community.tags.map((tag:any) => (
+              {profile.community.tags.map((tag: any) => (
                 <span
                   key={tag}
                   className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
