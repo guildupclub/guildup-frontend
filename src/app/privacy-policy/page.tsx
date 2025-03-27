@@ -206,6 +206,9 @@ export default function PrivacyPolicy() {
                   and operational improvements to optimize the efficiency of the Platform.
                 </li>
               </ul>
+              <h2 className="text-2xl font-bold text-primary mb-4">Use of Google Workspace API Data</h2>
+              <p>We do not use Google user data obtained through Google Workspace APIs to develop, improve, or train generalized AI or machine learning models. Such data is used strictly for enabling core user-facing features like authentication and account management.
+              </p>
             </section>
 
             <section>
