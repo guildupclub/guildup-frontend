@@ -159,66 +159,51 @@ export default function PrivacyPolicy() {
             <section>
               <h2 className="text-2xl font-bold text-primary mb-4">3. How We Use Your Information</h2>
               <p className="text-muted-foreground">
-                We collect and process personal data to provide a seamless, secure, and
-                efficient user experience. [cite: 37] The primary purposes of using your
-                information include but are not limited to: [cite: 37, 38]
+                We collect and process personal data to provide a seamless, secure, and efficient user experience.
+                The primary purposes of using your information include but are not limited to:
               </p>
               <ul className="text-muted-foreground">
                 <li>
-                  Facilitating Account Management: We use your information to create,
-                  manage, and verify your user account, ensuring that you can access
-                  and use the Platform&apos;s features effectively. [cite: 38]
+                  Facilitating Account Management: We use your information to create, manage, and verify your user account,
+                  ensuring that you can access and use the Platform&apos;s features effectively.
                 </li>
                 <li>
-                  Providing and Improving Services: Data collected helps us deliver core
-                  functionalities, enhance usability, and develop new features to
-                  improve user experience. [cite: 39]
+                  Providing and Improving Services: Data collected helps us deliver core functionalities, enhance usability,
+                  and develop new features to improve user experience.
                 </li>
                 <li>
-                  Communication and Customer Support: We may use your data to respond
-                  to inquiries, provide support, send administrative emails, service
-                  updates, and notify users about changes to our policies and terms.
-                  [cite: 40]
+                  Communication and Customer Support: We may use your data to respond to inquiries, provide support, send
+                  administrative emails, service updates, and notify users about changes to our policies and terms.
                 </li>
                 <li>
-                  Security and Fraud Prevention: Your information is analyzed to
-                  prevent unauthorized access, detect fraudulent activities, enforce
-                  security measures, and protect the integrity of the Platform. [cite: 41]
+                  Security and Fraud Prevention: Your information is analyzed to prevent unauthorized access, detect fraudulent
+                  activities, enforce security measures, and protect the integrity of the Platform.
                 </li>
                 <li>
-                  Compliance with Legal and Regulatory Obligations: We may process
-                  your data to comply with applicable laws, court orders, law
-                  enforcement requests, or to exercise legal rights. [cite: 42]
+                  Compliance with Legal and Regulatory Obligations: We may process your data to comply with applicable laws,
+                  court orders, law enforcement requests, or to exercise legal rights.
                 </li>
                 <li>
-                  Personalization and Analytics: By analyzing user interactions,
-                  preferences, and behavior, we personalize your experience by showing
-                  relevant content, recommendations, and targeted advertisements.
-                  [cite: 43]
+                  User Experience Analytics: We may analyze user interactions and usage trends solely to improve the functionality,
+                  design, and performance of the Platform. We do not use any Google user data for targeted or personalized advertisements.
                 </li>
                 <li>
-                  Transaction Processing: If applicable, your financial data is used to
-                  process payments, subscriptions, refunds, and manage billing-related
-                  activities. [cite: 45]
+                  Transaction Processing: If applicable, your financial data is used to process payments, subscriptions, refunds,
+                  and manage billing-related activities.
                 </li>
                 <li>
-                  Research and Development: We may use aggregated and anonymized data
-                  for analytics, research, trend analysis, and business intelligence to
-                  improve our services and offerings. [cite: 46]
+                  Research and Development: We may use aggregated and anonymized data for analytics, research, trend analysis,
+                  and business intelligence to improve our services and offerings.
                 </li>
                 <li>
-                  Marketing and Promotions: Where permitted by law and subject to your
-                  preferences, we may send promotional content, newsletters, and
-                  advertisements about our services and third-party partnerships.
-                  [cite: 47] Users can opt out of marketing communications at any time
-                  using unsubscribe options in emails. [cite: 48] However, GuildUp
-                  reserves the right to send non-promotional service notifications,
-                  such as policy updates, security alerts, or legal notices. [cite: 49]
+                  Marketing and Promotions: Where permitted by law and subject to your preferences, we may send general announcements,
+                  feature updates, or promotional content related to our services. We do not serve interest-based or targeted advertisements using
+                  Google user data. Users can opt out of marketing communications at any time using unsubscribe options in emails. However, GuildUp
+                  reserves the right to send non-promotional service notifications, such as policy updates, security alerts, or legal notices.
                 </li>
                 <li>
-                  Internal Business Operations: Data is utilized for internal audits,
-                  troubleshooting, quality control, and operational improvements to
-                  optimize the efficiency of the Platform. [cite: 50]
+                  Internal Business Operations: Data is utilized for internal audits, troubleshooting, quality control,
+                  and operational improvements to optimize the efficiency of the Platform.
                 </li>
               </ul>
             </section>
@@ -521,7 +506,7 @@ export default function PrivacyPolicy() {
                 Parents or legal guardians who become aware that their child has
                 provided personal information without consent should contact us at
                 hello@guildup.club, and we will take steps to remove such data promptly.
-              
+
               </p>
 
               <h3 className="text-xl font-semibold text-primary/80 mb-3">B. Limited Data Collection</h3>
@@ -573,7 +558,7 @@ export default function PrivacyPolicy() {
                 <li>
                   If we make significant changes to this Policy, we will provide notice
                   through email or by displaying a prominent notice on our Platform.
-                
+
                 </li>
                 <li>
                   Users are encouraged to review this Policy regularly to stay informed
@@ -609,7 +594,7 @@ export default function PrivacyPolicy() {
                 or advice provided by experts. Users engage with experts
                 at their own discretion and risk. GuildUp is not responsible
                 for any disputes, claims, or liabilities arising from such interactions.
-              
+
               </p>
 
               <h3 className="text-xl font-semibold text-primary/80 mb-3">B. Refund & Cancellation Policy</h3>
