@@ -4,13 +4,12 @@ import Members from "@/components/community/members/Members";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
+import { useParams } from "next/navigation";
 
 export default function MembersPage() {
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
 
-  const activeCommunityId = activeCommunity?.id;
+  const params= useParams()
+  const activeCommunityId = params.id as string;
 
   return (
     <div className="min-h-screen bg-background md:py-20 text-center ps-2 w-full">

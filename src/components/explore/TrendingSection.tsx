@@ -52,6 +52,7 @@ function TrendingSection() {
   const handleCreatorButtonClick = () => {
     if (!session) {
       toast("Sign in required", {
+
         action: {
           label: "Sign In",
           onClick: () => signIn(),

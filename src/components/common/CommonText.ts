@@ -34,6 +34,7 @@ export const StringConstants = {
     ERROR: 'Error',
     BACK_HOME: 'Go back to Home',
     SIGN_IN: 'Sign in',
+    SIGN_IN_REQUIRED: 'Sign in required',
     ALREADY_AN_ACCOUNT: 'Already have an account ?',
     CONTINUE_WITH_GOOGLE: 'Continue with Google.',
     OR_CONTINUE_WITH: 'Or continue with',
