@@ -14,7 +14,7 @@ export const RightSection: React.FC = () => {
   };
 
   return (
-    <div className="w-1/2 flex items-center justify-center bg-gradient-to-br from-[#9900FA] to-[#334BFF] p-8">
+    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-[#9900FA] to-[#334BFF]  lg:p-8">
       {session && isFormOpen ? (
         <CreatorForm onSuccess={handleSuccess} /> // when logged in show creator form
       ) : (
