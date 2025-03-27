@@ -321,6 +321,18 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     },
     enabled: !!activeCommunityId,
   });
+  useEffect(() => {
+    if (profile?.community) {
+      setAvatarImgUrl(
+        profile.community.image ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user?.user_name}`
+      );
+      setBgImgUrl(
+        profile.community.background_image ||
+          "https://random-image-pepebigotes.vercel.app/api/random-image"
+      );
+    }
+  }, [profile?.community]);
 
   console.log("@profile", profile?.community.background_image);
 
@@ -542,7 +554,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               src={
                 profile?.community.background_image != undefined
                   ? profile?.community.background_image
-                  : "https://img.freepik.com/free-vector/copy-space-violet-wavy-shapes-background_23-2148403375.jpg?t=st=1742123016~exp=1742126616~hmac=6c247e6cb6520700f598721d460efa004964af8dc65d1eb0a929a6a317584510&w=1380"
+                  : bgImgUrl
               }
               alt="Profile banner"
               width={1200}
@@ -554,10 +566,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           <div className="absolute -bottom-16 left-8">
             <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
               <Image
-                src={
-                  profile?.community?.image ||
-                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user.user_name}`
-                }
+                src={profile?.community?.image || avatarImgUrl}
                 alt={profile?.community?.name || "Community Avatar"}
                 width={100}
                 height={100}

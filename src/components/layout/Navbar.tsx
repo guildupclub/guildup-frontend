@@ -463,8 +463,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage src={session?.user?.image || ""} alt="User" />
-                <AvatarFallback>HH</AvatarFallback>
+                <AvatarFallback>
+                  {session?.user?.name?.charAt(0)}
+                </AvatarFallback>
               </Avatar>
+
               <span className="text-xs mt-1">{StringConstants.SIGN_OUT}</span>
             </button>
           ) : (

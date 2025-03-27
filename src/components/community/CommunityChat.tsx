@@ -20,7 +20,7 @@ interface Post {
   likes: number;
   comments: number;
   avatar: string;
-  name:string;
+  name: string;
 }
 
 function ChatContent() {
@@ -66,7 +66,7 @@ function ChatContent() {
             comments: item.reply_count || 0,
             author: userData.user_name || "Unknown",
             avatar: userData.image || "",
-            name:userData.name||"",
+            name: userData.name || "",
           };
         }) || []
       );
@@ -91,7 +91,7 @@ function ChatContent() {
     },
     onSuccess: (newPost) => {
       queryClient.invalidateQueries({
-        queryKey: ["channelPosts", activeChannelId]
+        queryKey: ["channelPosts", activeChannelId],
       });
       setPostBody("");
     },
@@ -105,11 +105,15 @@ function ChatContent() {
     );
   }
 
-  if (isLoading) return <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>;
+  if (isLoading)
+    return (
+      <div className="text-center py-10">{StringConstants.LOADING_POSTS}</div>
+    );
   if (error)
     return (
       <div className="text-center py-10 text-red-500">
-        {StringConstants.ERROR} {(error as Error).message}. {StringConstants.PLEASE_TRY_AGAIN}
+        {StringConstants.ERROR} {(error as Error).message}.{" "}
+        {StringConstants.PLEASE_TRY_AGAIN}
       </div>
     );
 
@@ -128,16 +132,18 @@ function ChatContent() {
         <ScrollArea className="h-full">
           <div className="px-2 py-4 pb-24 space-y-6">
             {posts.length > 0 ? (
-              posts.map((post:any) => <PostCard key={post.id} {...post} />)
+              posts.map((post: any) => <PostCard key={post.id} {...post} />)
             ) : (
-              <div className="text-center text-muted">{StringConstants.NO_POSTS_YET}</div>
+              <div className="text-center text-muted">
+                {StringConstants.NO_POSTS_YET}
+              </div>
             )}
           </div>
         </ScrollArea>
       </div>
 
       {/* Input Box */}
-      <div className="fixed bottom-16 w-full md:bottom-0 md:w-[calc(100%-34rem)] px-3 py-2">
+      <div className="fixed bottom-16 w-full md:bottom-0 md:w-[calc(100%-32rem)] px-3 py-2">
         <div className="flex items-center gap-2 rounded-lg p-1 bg-card border border-background">
           <input
             type="text"
