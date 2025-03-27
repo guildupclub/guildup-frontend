@@ -30,17 +30,17 @@ const NoCommunitySelected = () => {
       </p>
       <div className="mt-4 flex gap-4">
         <Link
-          href="/explore"
+          href="/"
           className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
         >
           Explore Communities
         </Link>
-        <button
+        {/* <button
           onClick={handleCreateCommunity}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           Create Community
-        </button>
+        </button> */}
       </div>
     </div>
   );
