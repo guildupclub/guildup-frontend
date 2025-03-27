@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
     removeConsole: false,
   },
   images: {
+    unoptimized: true,
     domains : [
       "target.scene7.com",
       "lh3.googleusercontent.com",
