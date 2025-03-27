@@ -1,3 +1,0 @@
-    on:
-      push:
-        branches: [dev] # Replace with the branch you want to trigger on
