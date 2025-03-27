@@ -108,11 +108,11 @@ function SearchPageContent() {
       );
 
       dispatch(
-              setActiveCommunity({
-                id: community.community._id,
-                name: community.community.name, 
-              })
-            );
+        setActiveCommunity({
+          id: community.community._id,
+          name: community.community.name,
+        })
+      );
 
       console.log("Navigating to /community/profile"); // ✅ Check if this appears
 
@@ -122,7 +122,7 @@ function SearchPageContent() {
   );
 
   return (
-    <div className="container mx-auto p-3 py-24 md:p-16 md:py-24 min-h-screen bg-background">
+    <div className="w-full px-4 py-24 md:px-16 md:py-24 min-h-screen bg-background">
       {/* Loading State */}
       {loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3">
@@ -155,10 +155,12 @@ function SearchPageContent() {
           {results.length === 0 ? (
             <div className="text-center text-gray-400 p-8">
               <p>{StringConstants.NO_RESULTS_FOUND}</p>
-              <p className="text-sm">{StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}</p>
+              <p className="text-sm">
+                {StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {results.map((result) => (
                 <CommunityCard
                   key={result._id}
