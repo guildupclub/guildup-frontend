@@ -37,14 +37,14 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
         {
           user_id: userId,
           bank_details: bankDetails,
-          update: true,
         }
       );
+      console.log("thsi is handle save response ",response.data);
       
       setBankDetails({
         benificiaryName: "",
