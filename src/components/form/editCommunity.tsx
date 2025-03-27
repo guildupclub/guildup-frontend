@@ -207,9 +207,9 @@ export function EditCommunityModal({
         formDataToSend.append("background_image", bgImageFile);
       }
 
-      if (bgImageFile) {
-        formDataToSend.append("background_image", bgImageFile);
-      }
+      // if (bgImageFile) {
+      //   formDataToSend.append("background_image", bgImageFile);
+      // }
 
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
