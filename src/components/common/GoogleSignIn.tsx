@@ -65,7 +65,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: finalCallbackUrl })}
           disabled={isLoading}
         >
           <svg
