@@ -37,7 +37,7 @@ interface AddOfferingDialogProps {
 export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(1);
   const user = useSelector((state: RootState) => state.user.user);
   const communityId = useSelector(
     (state: RootState) => state.community.communityId
