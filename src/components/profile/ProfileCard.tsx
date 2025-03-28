@@ -674,18 +674,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             {StringConstants.ABOUT}
           </h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
-            {profile.community.description
-              .split("\n")
-              .map((line: string, index: number) => (
-                <p
-                  key={index}
-                  className="text-muted-foreground leading-relaxed mb-4"
-                >
-                  {line}
-                </p>
-              ))}
-
-            <div className="flex flex-wrap gap-2">
+            <p className="text-muted-foreground  whitespace-pre-line">
+              {profile.community.description}
+            </p>
+            <div className="flex flex-wrap gap-2 my-2">
               {profile.community.tags.map((tag: any) => (
                 <span
                   key={tag}
@@ -727,7 +719,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
                         {offering.title}
                       </h3>
-                      <p className="text-sm text-gray-500 mt-1 max-w-xl">
+                      <p className="text-sm text-muted-foreground mt-1 max-w-xl whitespace-pre-line">
                         {offering.description}
                       </p>
                     </div>
