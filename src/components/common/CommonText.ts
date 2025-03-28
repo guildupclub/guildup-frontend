@@ -108,6 +108,7 @@ export const StringConstants = {
     EXPLORE_CREATOR: 'Explore Creators',
     TOP_PAGES: 'Top Pages',
     POSTING_IN: 'Posting in',
+    UPDATE_PROFILE_PICTURE_DESCRIPTION: 'Upload a new image to update your profile picture.',
 
     ADD_OFFERING: 'Add Offering',
     CREATE_NEW_OFFERING: 'Create New Offering',

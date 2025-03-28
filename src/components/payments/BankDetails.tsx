@@ -24,7 +24,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     benificiaryName: "",
     accountNumber: "",
     ifsc: "",
-    pan: ""
+    // pan: "ABCDE1234F"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +37,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
   const handleSave = async () => {
     try {
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
@@ -45,12 +46,13 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
           update: true,
         }
       );
+      console.log("thsi is handle save response ",response.data);
       
       setBankDetails({
         benificiaryName: "",
         accountNumber: "",
         ifsc: "",
-        pan: ""
+        // pan: "ABCDE1234F"
       })
       if (response.data.r === "s") {
         onClose();
@@ -123,7 +125,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         </div>
 
         {/* PAN Card */}
-        <div>
+        {/* <div>
           <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">PAN Card</label>
           <input
             type="text"
@@ -133,7 +135,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
             placeholder="Enter PAN Details"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Save Button */}

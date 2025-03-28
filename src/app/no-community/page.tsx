@@ -35,12 +35,12 @@ const NoCommunitySelected = () => {
         >
           Explore Communities
         </Link>
-        <button
+        {/* <button
           onClick={handleCreateCommunity}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
         >
           Create Community
-        </button>
+        </button> */}
       </div>
     </div>
   );

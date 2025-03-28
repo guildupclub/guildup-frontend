@@ -123,7 +123,7 @@ function Chat() {
     );
 
   return (
-    <div className="flex flex-col h-screen pb-20 w-full">
+    <div className="flex flex-col h-screen pb-20 w-full ">
       {/* Channel Header */}
       <div className="flex items-center justify-between bg-card border-b border-background px-6 py-3 my-3 mx-2">
         <h1 className="text-lg font-medium">
@@ -163,7 +163,7 @@ function Chat() {
       </div>
 
       {/* Input Box */}
-      <div className="fixed bottom-0 w-[calc(100%-20rem)] px-3 pr-28 py-2">
+      <div className="fixed bottom-0 md:w-[calc(100%-28rem)]  px-3 pr-28 py-2">
         <div className="flex items-center gap-2 rounded-lg p-1 bg-card border border-background">
           <input
             type="text"

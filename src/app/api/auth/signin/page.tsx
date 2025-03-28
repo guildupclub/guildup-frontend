@@ -8,7 +8,7 @@ import { setUser } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { RightSection } from '@/components/signIn/RightSection';
+import { RightSection } from "@/components/signIn/RightSection";
 import { UserHeroSection } from "@/components/signIn/UserHeroSection";
 import { CreatorHeroSection1 } from "@/components/signIn/CreatorHeroSection1";
 import { CreatorHeroSection2 } from "@/components/signIn/CreatorHeroSection2";
@@ -23,20 +23,28 @@ function SignInContent() {
     if (!callbackUrl) return 2;
     try {
       const url = new URL(callbackUrl);
-      return url.searchParams.get("hero") === "1" ? 1 : 2;
+      return url.searchParams.get("hero") === "2" ? 2 : 1;
     } catch {
       return 2;
     }
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {getHeroVersion() === 1 ? (
-        session ? <CreatorHeroSection2 /> : <CreatorHeroSection1 />
-      ) : (
-        <UserHeroSection />
-      )}
-      <RightSection />
+    <div className="flex md:flex-row h-screen md:overflow-hidden">
+      <div className="hidden lg:block w-1/2">
+        {getHeroVersion() === 1 ? (
+          session ? (
+            <CreatorHeroSection2 />
+          ) : (
+            <CreatorHeroSection1 />
+          )
+        ) : (
+          <UserHeroSection />
+        )}
+      </div>
+      <div className="lg:w-1/2">
+        <RightSection />
+      </div>
     </div>
   );
 }

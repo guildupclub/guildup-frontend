@@ -36,8 +36,6 @@ export function PostCard({
   image,
   onComment,
 }: PostCardProps) {
-  const [isRecording, setIsRecording] = useState(false);
-  const [duration, setDuration] = useState("0:00");
   const [message, setMessage] = useState("");
   const [isLiked, setIsLiked] = useState(false);
 
@@ -98,53 +96,28 @@ export function PostCard({
         </div>
 
         <div className="ml-14 flex items-center gap-2 bg-background rounded-lg p-1">
-          {isRecording ? (
-            <div className="flex-1 flex items-center gap-2 text-sm">
-              <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-              {duration}
-            </div>
-          ) : (
-            <Input
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type..."
-              className="flex-1 bg-transparent border-0 text-sm  placeholder:text-zinc-400 focus-visible:ring-0 px-0"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-          )}
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type..."
+            className="flex-1 bg-transparent border-0 text-sm  placeholder:text-zinc-400 focus-visible:ring-0 px-0"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+          />
           <div className="flex gap-2">
             <Button
               size="icon"
               variant="ghost"
-              className="h-8 w-8 hover:bg-zinc-800"
-              onClick={() => setIsRecording(!isRecording)}
+              className="h-8 w-8"
+              onClick={handleSendMessage}
+              disabled={!message.trim()}
             >
-              <Mic className="h-4 w-4" />
+              <Send className="h-4 w-4" />
             </Button>
-            {isRecording ? (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 hover:bg-zinc-800"
-              >
-                <Play className="h-4 w-4" />
-              </Button>
-            ) : (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 hover:bg-zinc-800"
-                onClick={handleSendMessage}
-                disabled={!message.trim()}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            )}
           </div>
         </div>
       </div>

@@ -54,7 +54,7 @@ function TrendingSection() {
       toast("Sign in required", {
 
         action: {
-          label: "Sign In",
+          label: StringConstants.SIGN_IN,
           onClick: () => signIn(),
         },
       });
