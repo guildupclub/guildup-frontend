@@ -37,11 +37,17 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
   const handleSave = async () => {
     try {
+      // no need for pan details, will have to chnage in BE
+      const bankDetailsWithDummyPan = {
+        ...bankDetails,
+        pan: "ABCDE1234F" // dummy pan
+      };
+
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
         {
           user_id: userId,
-          bank_details: bankDetails,
+          bank_details: bankDetailsWithDummyPan,
         }
       );
       console.log("thsi is handle save response ",response.data);
