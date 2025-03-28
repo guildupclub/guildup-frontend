@@ -39,7 +39,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     try {
 
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
           user_id: userId,
           bank_details: bankDetails,
