@@ -674,9 +674,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             {StringConstants.ABOUT}
           </h2>
           <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
-            <p className="text-muted-foreground leading-relaxed mb-6">
-              {profile.community.description}
-            </p>
+            {profile.community.description
+              .split("\n")
+              .map((line: string, index: number) => (
+                <p
+                  key={index}
+                  className="text-muted-foreground leading-relaxed mb-4"
+                >
+                  {line}
+                </p>
+              ))}
+
             <div className="flex flex-wrap gap-2">
               {profile.community.tags.map((tag: any) => (
                 <span
