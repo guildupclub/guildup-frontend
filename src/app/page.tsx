@@ -80,6 +80,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import CreatorForm from "@/components/form/CreatorForm";
 import { Dialog } from "@/components/ui/dialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 function Page() {
   const [category, setCategory] = useState<any>([]);
@@ -89,6 +91,8 @@ function Page() {
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const user = useSelector((state: RootState) => state.user);
+  const isCreator = user?.user?.is_creator ? true : false;
 
   // Set isMounted to true after the component is mounted on the client
   useEffect(() => {
@@ -151,30 +155,32 @@ function Page() {
   return (
     <div className="bg-background pb-16">
       <CategoryBar categorys={category} selectCategory={setSelectedCategory} />
-      <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
-        <h2 className="text-2xl font-semibold">Join or create a community to start interacting with other members.</h2>
-        <div className="flex gap-4 mt-4">
-          <button
-            onClick={handleScroll}
-            className="px-2 py-1 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
-            >
-            Explore Communities
-          </button>
-          <Dialog
-            open={session ? isDialogOpen : false}
-            onOpenChange={setIsDialogOpen}
-            >
+      {(!isCreator) && (
+        <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
+          <h2 className="text-2xl font-semibold">Join or create a community to start interacting with other members.</h2>
+          <div className="flex gap-4 mt-4">
             <button
-              className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              onClick={handleCreatorButtonClick}
+              onClick={handleScroll}
+              className="px-2 py-1 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
               >
-              {StringConstants.CREATE_A_PAGE}
+              Explore Communities
             </button>
+            <Dialog
+              open={session ? isDialogOpen : false}
+              onOpenChange={setIsDialogOpen}
+              >
+              <button
+                className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                onClick={handleCreatorButtonClick}
+                >
+                {StringConstants.CREATE_A_PAGE}
+              </button>
 
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
-          </Dialog>
-            </div>
-      </div>
+              {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
+            </Dialog>
+          </div>
+        </div>
+      )}
       <Header />
       <div className="w-full lg:px-[100px] ">
         <div className="p-6 sm:px-0">
