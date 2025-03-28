@@ -37,7 +37,7 @@ interface AddOfferingDialogProps {
 export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(3);
   const user = useSelector((state: RootState) => state.user.user);
   const communityId = useSelector(
     (state: RootState) => state.community.communityId
@@ -381,7 +381,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
         {/* Step 1: Bank Details */}
         {currentStep === 1 && (
-          <div className="flex">
+          <><div className="hidden md:flex">
             <div className="w-1/2 pr-4">
               <div className="flex items-start">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
@@ -436,15 +436,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <Input
                     id="accountHolderName"
                     value={bankDetails.accountHolderName}
-                    onChange={(e) =>
-                      setBankDetails({
-                        ...bankDetails,
-                        accountHolderName: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setBankDetails({
+                      ...bankDetails,
+                      accountHolderName: e.target.value,
+                    })}
                     placeholder="Enter account holder's name"
-                    required
-                  />
+                    required />
                 </div>
 
                 <div className="space-y-2">
@@ -454,15 +451,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <Input
                     id="accountNumber"
                     value={bankDetails.accountNumber}
-                    onChange={(e) =>
-                      setBankDetails({
-                        ...bankDetails,
-                        accountNumber: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setBankDetails({
+                      ...bankDetails,
+                      accountNumber: e.target.value,
+                    })}
                     placeholder="Enter your account number"
-                    required
-                  />
+                    required />
                 </div>
 
                 <div className="space-y-2">
@@ -472,15 +466,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <Input
                     id="ifscCode"
                     value={bankDetails.ifscCode}
-                    onChange={(e) =>
-                      setBankDetails({
-                        ...bankDetails,
-                        ifscCode: e.target.value,
-                      })
-                    }
+                    onChange={(e) => setBankDetails({
+                      ...bankDetails,
+                      ifscCode: e.target.value,
+                    })}
                     placeholder="Enter branch IFSC code"
-                    required
-                  />
+                    required />
                 </div>
 
                 {/* <div className="space-y-2">
@@ -511,11 +502,104 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </form>
             </div>
           </div>
+          <div className="md:hidden flex flex-col items-center justify-center space-y-4 py-8">
+              <div className="">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                    1
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Get Paid Easily</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your bank details to receive earnings from your
+                      consultations and digital services.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t w-full">
+                <form onSubmit={handleBankDetailsSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="accountHolderName">
+                      Account holder&apos;s name &nbsp;
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="accountHolderName"
+                      value={bankDetails.accountHolderName}
+                      onChange={(e) => setBankDetails({
+                        ...bankDetails,
+                        accountHolderName: e.target.value,
+                      })}
+                      placeholder="Enter account holder's name"
+                      required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="accountNumber">
+                      Account number &nbsp;<span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="accountNumber"
+                      value={bankDetails.accountNumber}
+                      onChange={(e) => setBankDetails({
+                        ...bankDetails,
+                        accountNumber: e.target.value,
+                      })}
+                      placeholder="Enter your account number"
+                      required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ifscCode">
+                      IFSC Code &nbsp;<span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="ifscCode"
+                      value={bankDetails.ifscCode}
+                      onChange={(e) => setBankDetails({
+                        ...bankDetails,
+                        ifscCode: e.target.value,
+                      })}
+                      placeholder="Enter branch IFSC code"
+                      required />
+                  </div>
+
+                  {/* <div className="space-y-2">
+                    <Label htmlFor="panCard">PAN Card</Label>
+                    <Input
+                      id="panCard"
+                      value={bankDetails.panCard}
+                      onChange={(e) =>
+                        setBankDetails({
+                          ...bankDetails,
+                          panCard: e.target.value,
+                        })
+                      }
+                      placeholder="Enter PAN Details"
+                      required
+                    />
+                  </div> */}
+
+                  <div className="flex justify-end">
+                    <Button
+                      type="submit"
+                      className="bg-primary text-white"
+                      disabled={loading}
+                    >
+                      {loading ? "Verifying..." : "Save"}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div></>
         )}
 
         {/* Step 2: Calendar Integration */}
         {currentStep === 2 && (
-          <div className="flex">
+          <>
+          <div className="hidden mid:flex">
             <div className="w-1/3 pr-4">
               <div className="flex items-start opacity-50">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
@@ -588,8 +672,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       <img
                         src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                         alt="Google"
-                        className="w-5 h-5 mr-2"
-                      />
+                        className="w-5 h-5 mr-2" />
                       Connect with Google
                     </Button>
                   )}
@@ -614,11 +697,82 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </form>
             </div>
           </div>
+          <div className="flex flex-col mid:hidden items-center justify-center space-y-4 py-8">
+              <div className="">
+                <div className="mt-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                      2
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Manage Bookings Seamlessly</h3>
+                      <p className="text-sm text-muted-foreground">
+                        We&apos;ll automatically sync appointments to your Google
+                        Calendar. Stay organized effortlessly.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t">
+                <form onSubmit={handleCalendarSubmit} className="space-y-4">
+                  <div className="text-center space-y-4 py-8">
+                    <h2 className="text-xl font-semibold">Link your Calendar</h2>
+                    <p className="text-muted-foreground">
+                      for better and seamless booking
+                    </p>
+
+                    {calendarConnected ? (
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                          <Check className="w-6 h-6 text-green-600" />
+                        </div>
+                        <p className="text-green-600 font-medium">
+                          Successfully connected with Google
+                        </p>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        onClick={handleCalendarConnect}
+                        className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                        disabled={loading}
+                      >
+                        <img
+                          src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                          alt="Google"
+                          className="w-5 h-5 mr-2" />
+                        Connect with Google
+                      </Button>
+                    )}
+                  </div>
+
+                  <div className="flex justify-end pt-4">
+                    {/* <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setCurrentStep(1)}
+                    >
+                      Back
+                    </Button> */}
+                    <Button
+                      type="submit"
+                      className="bg-primary text-white"
+                      disabled={!calendarConnected}
+                    >
+                      Continue
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div></>
         )}
 
         {/* Step 3: Create Offering */}
         {currentStep === 3 && (
-          <div className="flex">
+          <>
+          <div className="hidden md:flex">
             <div className="w-1/3 pr-4">
               <div className="flex items-start opacity-50">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
@@ -671,12 +825,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     placeholder="Enter offering title"
-                    required
-                  />
+                    required />
                 </div>
 
                 <div className="space-y-2">
@@ -684,21 +835,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Describe your offerings"
-                    required
-                  />
+                    required />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="type">Type</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) =>
-                      setFormData({ ...formData, type: value })
-                    }
+                    onValueChange={(value) => setFormData({ ...formData, type: value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select your offering type" />
@@ -717,9 +863,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Input
                       id="price"
                       type="number"
-                      value={
-                        formData.price.amount === 0 ? "" : formData.price.amount
-                      }
+                      value={formData.price.amount === 0 ? "" : formData.price.amount}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData({
@@ -730,9 +874,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                           },
                           is_free: value === "" || Number(value) === 0,
                         });
-                      }}
-                      required
-                    />
+                      } }
+                      required />
                   </div>
 
                   <div className="space-y-2">
@@ -742,20 +885,17 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Input
                       id="discounted_price"
                       type="number"
-                      value={
-                        formData.discounted_price === 0
-                          ? ""
-                          : formData.discounted_price
-                      }
+                      value={formData.discounted_price === 0
+                        ? ""
+                        : formData.discounted_price}
                       onChange={(e) => {
                         const value = e.target.value;
                         setFormData({
                           ...formData,
                           discounted_price: value === "" ? 0 : Number(value),
                         });
-                      }}
-                      required
-                    />
+                      } }
+                      required />
                   </div>
                 </div>
 
@@ -768,15 +908,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       id="duration"
                       type="number"
                       value={formData.duration}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          duration: Number(e.target.value),
-                        })
-                      }
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        duration: Number(e.target.value),
+                      })}
                       min="15"
-                      required
-                    />
+                      required />
                   </div>
 
                   <div className="space-y-2">
@@ -786,11 +923,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Input
                       id="tags"
                       value={formData.tags}
-                      onChange={(e) =>
-                        setFormData({ ...formData, tags: e.target.value })
-                      }
-                      placeholder="e.g., Design, Technology, Business"
-                    />
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      placeholder="e.g., Design, Technology, Business" />
                   </div>
                 </div>
 
@@ -813,6 +947,153 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </form>
             </div>
           </div>
+          <div className="md:hidden flex flex-col items-center justify-center space-y-4">
+              <div className="">
+                <div className="mt-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="font-medium">Publish Your First Offering</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Enter your bank details to receive earnings from your
+                        consultations and digital services.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t">
+                <form onSubmit={handleOfferingSubmit} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="title">Title</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                      placeholder="Enter offering title"
+                      required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Description</Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Describe your offerings"
+                      required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="type">Type</Label>
+                    <Select
+                      value={formData.type}
+                      onValueChange={(value) => setFormData({ ...formData, type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your offering type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="consultation">
+                          {OFFERING_TYPES.CONSULTATION}
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="price">{StringConstants.PRICE} (INR)</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={formData.price.amount === 0 ? "" : formData.price.amount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData({
+                            ...formData,
+                            price: {
+                              ...formData.price,
+                              amount: value === "" ? 0 : Number(value),
+                            },
+                            is_free: value === "" || Number(value) === 0,
+                          });
+                        } }
+                        required />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="discounted_price">
+                        {StringConstants.DISCOUNTED_PRICE} (INR)
+                      </Label>
+                      <Input
+                        id="discounted_price"
+                        type="number"
+                        value={formData.discounted_price === 0
+                          ? ""
+                          : formData.discounted_price}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData({
+                            ...formData,
+                            discounted_price: value === "" ? 0 : Number(value),
+                          });
+                        } }
+                        required />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="duration">
+                        {StringConstants.DURATION} (Mins)
+                      </Label>
+                      <Input
+                        id="duration"
+                        type="number"
+                        value={formData.duration}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          duration: Number(e.target.value),
+                        })}
+                        min="15"
+                        required />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tags">
+                        {StringConstants.TAGS} (Comma - Separate)
+                      </Label>
+                      <Input
+                        id="tags"
+                        value={formData.tags}
+                        onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                        placeholder="e.g., Design, Technology, Business" />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setCurrentStep(2)}
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="bg-primary text-white"
+                      disabled={loading}
+                    >
+                      {loading ? "Creating..." : "Create offerings"}
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div></>
         )}
       </DialogContent>
     </Dialog>
