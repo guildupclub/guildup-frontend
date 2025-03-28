@@ -60,7 +60,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     accountHolderName: "",
     accountNumber: "",
     ifscCode: "",
-    panCard: "",
+    // panCard: "",
   });
 
   // Calendar integration state
@@ -144,7 +144,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             benificiaryName: bankDetails.accountHolderName,
             accountNumber: bankDetails.accountNumber,
             ifsc: bankDetails.ifscCode,
-            pan: bankDetails.panCard,
+            // pan: bankDetails.panCard,
           },
         }
       );
@@ -271,7 +271,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           accountHolderName: "",
           accountNumber: "",
           ifscCode: "",
-          panCard: "",
+          // panCard: "",
         });
         setCalendarConnected(false);
         setFormData({
@@ -314,7 +314,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       accountHolderName: "",
       accountNumber: "",
       ifscCode: "",
-      panCard: "",
+      // panCard: "",
     });
 
     // Only reset calendar connected if not already connected in Redux
@@ -483,7 +483,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   />
                 </div>
 
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <Label htmlFor="panCard">PAN Card</Label>
                   <Input
                     id="panCard"
@@ -497,7 +497,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     placeholder="Enter PAN Details"
                     required
                   />
-                </div>
+                </div> */}
 
                 <div className="flex justify-end">
                   <Button
