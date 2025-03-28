@@ -137,7 +137,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       // Send bank details to verification endpoint
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
           user_id: user._id,
           bank_details: {

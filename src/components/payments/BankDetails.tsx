@@ -24,7 +24,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     benificiaryName: "",
     accountNumber: "",
     ifsc: "",
-    pan: "ABCDE1234F"
+    // pan: "ABCDE1234F"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,7 +38,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
   const handleSave = async () => {
     try {
 
-      const response = await axios.patch(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
         {
           user_id: userId,
@@ -51,7 +51,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         benificiaryName: "",
         accountNumber: "",
         ifsc: "",
-        pan: "ABCDE1234F"
+        // pan: "ABCDE1234F"
       })
       if (response.data.r === "s") {
         onClose();
