@@ -73,9 +73,17 @@ import axios from "axios";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
-import React, { useEffect, useState } from "react";
-import Header from "@/components/explore/Header";
 import { useDispatch } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
+import Header from "@/components/explore/Header";
+import Link from "next/link";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import CreatorForm from "@/components/form/CreatorForm";
+import { Dialog } from "@/components/ui/dialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+
 
 function Page() {
   const { data: session, status } = useSession();
@@ -85,6 +93,10 @@ function Page() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const targetRef = useRef<HTMLDivElement | null>(null);
+  const user = useSelector((state: RootState) => state.user);
+  const isCreator = user?.user?.is_creator ? true : false;
 
 
   useEffect(() => {
@@ -146,14 +158,61 @@ function Page() {
     return <div>{StringConstants.LOADING}</div>;
   }
 
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () => signIn(undefined, {
+            callbackUrl: `${window.location.origin}?hero=1`
+          }),
+        },
+      });
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
+
+  const handleScroll = () => {
+    if (targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="bg-background pb-16">
       <CategoryBar categorys={category} selectCategory={setSelectedCategory} />
+      {(!isCreator) && (
+        <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
+          <h2 className="text-2xl font-semibold">Join or create a community to start interacting with other members.</h2>
+          <div className="flex gap-4 mt-4">
+            <button
+              onClick={handleScroll}
+              className="px-2 py-1 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+              >
+              Explore Communities
+            </button>
+            <Dialog
+              open={session ? isDialogOpen : false}
+              onOpenChange={setIsDialogOpen}
+              >
+              <button
+                className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                onClick={handleCreatorButtonClick}
+                >
+                {StringConstants.CREATE_A_PAGE}
+              </button>
+
+              {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
+            </Dialog>
+          </div>
+        </div>
+      )}
       <Header />
       <div className="w-full lg:px-[100px] ">
         <div className="p-6 sm:px-0">
           <div className="flex gap-6 md:justify-between">
-            <div className="w-full">
+            <div className="w-full" ref={targetRef}>
               <h1 className="text-xl lg:text-2xl font-bold mb-4">
                 {StringConstants.TOP_PAGES}
               </h1>
