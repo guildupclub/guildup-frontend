@@ -473,7 +473,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           ) : (
             <button
               className="flex flex-col items-center justify-center bg-primary-gradient"
-              onClick={() => signIn()}
+              onClick={() =>
+                signIn(undefined, {
+                  callbackUrl: `${window.location.origin}?hero=2`,
+                })
+              }
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage src="/placeholder.svg" alt="User" />
