@@ -117,6 +117,7 @@ export const StringConstants = {
     DISCOUNTED_PRICE:'Discounted Price',
     TITLE: 'Title',
     TYPE: 'Type',
+    INR: 'INR',
 
     SUBSCRIBERS:"Subscribers",
     FOLLOWERS:"Followers",
