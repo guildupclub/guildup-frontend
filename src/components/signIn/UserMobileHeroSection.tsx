@@ -28,7 +28,7 @@ export const UserMobileHeroSection: React.FC = () => {
               Explore & Book Experts Seamlessly
             </h1>
 
-            <p className="text-base">Sign up on GuildUp and grow your Guild with thousands of users looking for top coaches, consultants, and professionals. <span className="font-semibold text-[#334BFF]">Build your custom community and start earning in under 30 minutes!</span></p>
+            <p className="text-base">Sign up on GuildUp and grow your Guild with thousands of users looking for top coaches, consultants, and professionals.</p>
           </div>
 
           <div className="w-full flex justify-center">
