@@ -55,7 +55,9 @@ function TrendingSection() {
 
         action: {
           label: StringConstants.SIGN_IN,
-          onClick: () => signIn(),
+          onClick: () => signIn(undefined, {
+            callbackUrl: `${window.location.origin}?hero=1`
+          }),
         },
       });
     } else {
