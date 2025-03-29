@@ -418,44 +418,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <Video className="w-6 h-6" />
             <span className="text-xs mt-1">Snips</span>
           </Link> */}
-          {activeCommunityId ? (
-            <Link
-              href={`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`}
-              className="flex flex-col items-center justify-center"
-            >
-              <Users
-                className={`w-6 h-6 ${
-                  isActive("/community") ? "text-primary" : ""
-                }`}
-              />
-              <span
-                className={`text-xs mt-1 ${
-                  isActive("/community") ? "text-primary" : ""
-                }`}
-              >
-                {StringConstants.EXPERTS}
-              </span>
-            </Link>
-          ) : (
-            <Link
-              href="/no-community"
-              className="flex flex-col items-center justify-center"
-            >
-              <Users
-                className={`w-6 h-6 ${
-                  isActive("/no-community") ? "text-primary" : ""
-                }`}
-              />
-              <span
-                className={`text-xs mt-1 ${
-                  isActive("/no-community") ? "text-primary" : ""
-                }`}
-              >
-                {StringConstants.EXPERTS}
-              </span>
-            </Link>
-          )}
-
+          <Link
+            href={
+              activeCommunityId
+                ? `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                : `${COMMUNITY_FEED_PATH}`
+            }
+            className="flex flex-col items-center justify-center"
+          >
+            <Users
+              className={`w-6 h-6 ${
+                isActive("/community") ? "text-primary" : ""
+              }`}
+            />
+            <span className={isActive("/community") ? "text-primary" : ""}>
+              {StringConstants.EXPERTS}
+            </span>
+          </Link>
           {user?._id ? (
             <button
               className="flex flex-col items-center justify-center"
