@@ -24,8 +24,8 @@ export const CreatorMobileHeroSection1: React.FC = () => {
     <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen overflow-hidden gap-6">
       <div className="w-full flex justify-center pt-6">
         <Image
-          src={guildup_logo || "/placeholder.svg"}
-          alt="GuildUp"
+          src={guildup_logo}
+          alt="GuildUp Logo"
           width={160}
           height={40}
           className="h-10 w-auto"
@@ -84,7 +84,7 @@ export const CreatorMobileHeroSection1: React.FC = () => {
             {!session && (<div className="w-full flex justify-center">
               <div className="relative w-full max-w-md h-[220px] ">
                 <Image
-                  src={Login_laptop || "/placeholder.svg"}
+                  src={Login_laptop}
                   alt="GuildUp Platform"
                   className="object-contain"
                   // width={600}

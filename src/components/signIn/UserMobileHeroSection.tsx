@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import guildup_logo from "./../../../public/svg/GuildUp_Logo_Light.svg";
 import Login_laptop from "./../../../public/Login_laptop.png";
 import GoogleSignIn from "../common/GoogleSignIn";
+import { signIn } from "next-auth/react";
 
 export const UserMobileHeroSection: React.FC = () => {
   return (
     <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen overflow-hidden gap-6">
       <div className="w-full flex justify-center pt-6">
         <Image
-          src={guildup_logo || "/placeholder.svg"}
-          alt="GuildUp"
+          src={guildup_logo}
+          alt="GuildUp Logo"
           width={160}
           height={40}
           className="h-10 w-auto"
@@ -33,7 +34,7 @@ export const UserMobileHeroSection: React.FC = () => {
           <div className="w-full flex justify-center">
             <div className="relative w-full max-w-md h-[220px] ">
               <Image
-                src={Login_laptop || "/placeholder.svg"}
+                src={Login_laptop}
                 alt="GuildUp Platform"
                 className="object-contain"
                 // width={600}
@@ -47,7 +48,9 @@ export const UserMobileHeroSection: React.FC = () => {
             Are you an expert looking to create a page?
           </p>
           <span className="font-semibold text-color-[#334BFF]">
-            <Link href="#">Become a Creator</Link>
+            <button onClick={() => signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`
+            })}>Become a Creator</button>
           </span>
         </div>
       </div>
