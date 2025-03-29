@@ -37,7 +37,7 @@ interface AddOfferingDialogProps {
 export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(3);
   const user = useSelector((state: RootState) => state.user.user);
   const communityId = useSelector(
     (state: RootState) => state.community.communityId
@@ -821,27 +821,27 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             <div className="w-2/3 border-l pl-4">
               <form onSubmit={handleOfferingSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="title">Title<span className="text-red-500">*</span></Label>
                   <Input
                     id="title"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="Enter offering title"
+                    placeholder="Discovery Call"
                     required />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">Description<span className="text-red-500">*</span></Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe your offerings"
+                    placeholder="In this offering we will discuss about...."
                     required />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="type">Type</Label>
+                  <Label htmlFor="type">Type<span className="text-red-500">*</span></Label>
                   <Select
                     value={formData.type}
                     onValueChange={(value) => setFormData({ ...formData, type: value })}
@@ -859,7 +859,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="price">{StringConstants.PRICE} (INR)</Label>
+                    <Label htmlFor="price">{StringConstants.PRICE} ({StringConstants.INR})<span className="text-red-500">*</span></Label>
                     <Input
                       id="price"
                       type="number"
@@ -880,7 +880,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
                   <div className="space-y-2">
                     <Label htmlFor="discounted_price">
-                      {StringConstants.DISCOUNTED_PRICE} (INR)
+                      {StringConstants.DISCOUNTED_PRICE} ({StringConstants.INR})<span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="discounted_price"
@@ -902,7 +902,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="duration">
-                      {StringConstants.DURATION} (Mins)
+                      {StringConstants.DURATION} (Mins)<span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="duration"
@@ -912,11 +912,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                         ...formData,
                         duration: Number(e.target.value),
                       })}
-                      min="15"
                       required />
                   </div>
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label htmlFor="tags">
                       {StringConstants.TAGS} (Comma - Separate)
                     </Label>
@@ -925,7 +924,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       value={formData.tags}
                       onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                       placeholder="e.g., Design, Technology, Business" />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex justify-between pt-4">
@@ -968,7 +967,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               <div className="border-t">
                 <form onSubmit={handleOfferingSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">Title<span className="text-red-500">*</span></Label>
                     <Input
                       id="title"
                       value={formData.title}
@@ -978,7 +977,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">Description<span className="text-red-500">*</span></Label>
                     <Textarea
                       id="description"
                       value={formData.description}
@@ -988,7 +987,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="type">Type</Label>
+                    <Label htmlFor="type">Type<span className="text-red-500">*</span></Label>
                     <Select
                       value={formData.type}
                       onValueChange={(value) => setFormData({ ...formData, type: value })}
@@ -1006,7 +1005,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="price">{StringConstants.PRICE} (INR)</Label>
+                      <Label htmlFor="price">{StringConstants.PRICE} ({StringConstants.INR})<span className="text-red-500">*</span></Label>
                       <Input
                         id="price"
                         type="number"
@@ -1017,9 +1016,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                             ...formData,
                             price: {
                               ...formData.price,
-                              amount: value === "" ? 0 : Number(value),
+                              amount: Number(value),
                             },
-                            is_free: value === "" || Number(value) === 0,
+                            is_free: Number(value) === 0,
                           });
                         } }
                         required />
@@ -1027,7 +1026,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
                     <div className="space-y-2">
                       <Label htmlFor="discounted_price">
-                        {StringConstants.DISCOUNTED_PRICE} (INR)
+                        {StringConstants.DISCOUNTED_PRICE} ({StringConstants.INR})<span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="discounted_price"
@@ -1039,7 +1038,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                           const value = e.target.value;
                           setFormData({
                             ...formData,
-                            discounted_price: value === "" ? 0 : Number(value),
+                            discounted_price: Number(value),
                           });
                         } }
                         required />
@@ -1049,7 +1048,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="duration">
-                        {StringConstants.DURATION} (Mins)
+                        {StringConstants.DURATION} (Mins)<span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="duration"
@@ -1059,11 +1058,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                           ...formData,
                           duration: Number(e.target.value),
                         })}
-                        min="15"
                         required />
                     </div>
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <Label htmlFor="tags">
                         {StringConstants.TAGS} (Comma - Separate)
                       </Label>
@@ -1072,7 +1070,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                         value={formData.tags}
                         onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                         placeholder="e.g., Design, Technology, Business" />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="flex justify-between pt-4">
