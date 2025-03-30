@@ -37,7 +37,7 @@ interface AddOfferingDialogProps {
 export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(1);
   const user = useSelector((state: RootState) => state.user.user);
   const communityId = useSelector(
     (state: RootState) => state.community.communityId
@@ -151,7 +151,30 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
       if (response.data.r === "s") {
         // If successful, proceed to step 2
-        setCurrentStep(2);
+        // setCurrentStep(2);
+        setOpen(false);
+        // Reset form and step
+        setCurrentStep(1);
+        setBankDetails({
+          accountHolderName: "",
+          accountNumber: "",
+          ifscCode: "",
+          // panCard: "",
+        });
+        setCalendarConnected(false);
+        setFormData({
+          title: "",
+          description: "",
+          type: "consultation",
+          price: {
+            amount: 0,
+            currency: "INR",
+          },
+          discounted_price: 0,
+          duration: 60,
+          is_free: false,
+          tags: "",
+        });
       } else {
         // Handle error
         toast.error("Failed to verify bank details. Please try again.");
@@ -263,30 +286,31 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       }
 
       if (response.data.r === "s") {
-        setOpen(false);
-        onOfferingAdded();
-        // Reset form and step
-        setCurrentStep(1);
-        setBankDetails({
-          accountHolderName: "",
-          accountNumber: "",
-          ifscCode: "",
-          // panCard: "",
-        });
-        setCalendarConnected(false);
-        setFormData({
-          title: "",
-          description: "",
-          type: "consultation",
-          price: {
-            amount: 0,
-            currency: "INR",
-          },
-          discounted_price: 0,
-          duration: 60,
-          is_free: false,
-          tags: "",
-        });
+        setCurrentStep(2);
+        // setOpen(false);
+        // onOfferingAdded();
+        // // Reset form and step
+        // setCurrentStep(1);
+        // setBankDetails({
+        //   accountHolderName: "",
+        //   accountNumber: "",
+        //   ifscCode: "",
+        //   // panCard: "",
+        // });
+        // setCalendarConnected(false);
+        // setFormData({
+        //   title: "",
+        //   description: "",
+        //   type: "consultation",
+        //   price: {
+        //     amount: 0,
+        //     currency: "INR",
+        //   },
+        //   discounted_price: 0,
+        //   duration: 60,
+        //   is_free: false,
+        //   tags: "",
+        // });
       }
     } catch (error) {
       toast.error("Error creating offering. Please try again.");
@@ -345,9 +369,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       <DialogContent className="sm:max-w-[900px] bg-card">
         <DialogHeader>
           <DialogTitle>
-            {currentStep === 1 && "Your Bank Details"}
+            {currentStep === 3 && "Your Bank Details"}
             {currentStep === 2 && "Link your Calendar"}
-            {currentStep === 3 && StringConstants.CREATE_NEW_OFFERING}
+            {currentStep === 1 && StringConstants.CREATE_NEW_OFFERING}
           </DialogTitle>
         </DialogHeader>
 
@@ -379,11 +403,52 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           </div>
         </div> */}
 
-        {/* Step 1: Bank Details */}
-        {currentStep === 1 && (
+        {/* Step 3: Bank Details */}
+        {currentStep === 3 && (
           <><div className="hidden md:flex">
             <div className="w-1/2 pr-4">
-              <div className="flex items-start">
+              <div className="flex items-start opacity-50">
+                <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
+                  <Check className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Publish Your First Offering</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Create your first offering and start earning.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 opacity-50">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Manage Bookings Seamlessly</h3>
+                    <p className="text-sm text-muted-foreground">
+                      We&apos;ll automatically sync appointments to your Google
+                      Calendar. Stay organized effortlessly.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                    3
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Get Paid Easily</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your bank details to receive earnings from your
+                      consultations and digital services.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {/* <div className="flex items-start">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
                   1
                 </div>
@@ -423,7 +488,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     </p>
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             <div className="w-1/2 border-l pl-4">
@@ -599,17 +664,17 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         {/* Step 2: Calendar Integration */}
         {currentStep === 2 && (
           <>
-          <div className="hidden mid:flex">
+          {/* Web View */}
+          <div className="hidden md:flex">
             <div className="w-1/3 pr-4">
               <div className="flex items-start opacity-50">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
                   <Check className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Get Paid Easily</h3>
+                  <h3 className="font-medium">Publish Your First Offering</h3>
                   <p className="text-sm text-muted-foreground">
-                    Enter your bank details to receive earnings from your
-                    consultations and digital services.
+                    Create your first offering and start earning.
                   </p>
                 </div>
               </div>
@@ -635,7 +700,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     3
                   </div>
                   <div>
-                    <h3 className="font-medium">Publish Your First Offering</h3>
+                    <h3 className="font-medium">Get Paid Easily</h3>
                     <p className="text-sm text-muted-foreground">
                       Enter your bank details to receive earnings from your
                       consultations and digital services.
@@ -678,14 +743,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   )}
                 </div>
 
-                <div className="flex justify-end pt-4">
-                  {/* <Button
+                <div className="flex justify-between pt-4">
+                  <Button
                     type="button"
                     variant="outline"
                     onClick={() => setCurrentStep(1)}
                   >
                     Back
-                  </Button> */}
+                  </Button>
                   <Button
                     type="submit"
                     className="bg-primary text-white"
@@ -697,7 +762,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </form>
             </div>
           </div>
-          <div className="flex flex-col mid:hidden items-center justify-center space-y-4 py-8">
+          {/* Mobile View */}
+          <div className="flex flex-col md:hidden items-center justify-center space-y-4 py-8">
               <div className="">
                 <div className="mt-6">
                   <div className="flex items-start">
@@ -715,7 +781,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
               </div>
 
-              <div className="border-t">
+              <div className="w-full">
                 <form onSubmit={handleCalendarSubmit} className="space-y-4">
                   <div className="text-center space-y-4 py-8">
                     <h2 className="text-xl font-semibold">Link your Calendar</h2>
@@ -748,14 +814,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     )}
                   </div>
 
-                  <div className="flex justify-end pt-4">
-                    {/* <Button
+                  <div className="flex justify-between pt-4">
+                    <Button
                       type="button"
                       variant="outline"
                       onClick={() => setCurrentStep(1)}
                     >
                       Back
-                    </Button> */}
+                    </Button>
                     <Button
                       type="submit"
                       className="bg-primary text-white"
@@ -769,28 +835,28 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             </div></>
         )}
 
-        {/* Step 3: Create Offering */}
-        {currentStep === 3 && (
+        {/* Step 1: Create Offering */}
+        {currentStep === 1 && (
           <>
+          {/* Web View */}
           <div className="hidden md:flex">
             <div className="w-1/3 pr-4">
-              <div className="flex items-start opacity-50">
-                <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
                   <Check className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-medium">Get Paid Easily</h3>
+                  <h3 className="font-medium">Publish Your First Offering</h3>
                   <p className="text-sm text-muted-foreground">
-                    Enter your bank details to receive earnings from your
-                    consultations and digital services.
+                    Create your first offering and start earning.
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 opacity-50">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
-                    <Check className="w-4 h-4" />
+                <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-300 text-gray-500 mr-2">
+                    2
                   </div>
                   <div>
                     <h3 className="font-medium">Manage Bookings Seamlessly</h3>
@@ -802,13 +868,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                 </div>
               </div>
 
-              <div className="mt-6">
+              <div className="mt-6 opacity-50">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                  <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full border-2 border-gray-300 text-gray-500 mr-2">
                     3
                   </div>
                   <div>
-                    <h3 className="font-medium">Publish Your First Offering</h3>
+                    <h3 className="font-medium">Get Paid Easily</h3>
                     <p className="text-sm text-muted-foreground">
                       Enter your bank details to receive earnings from your
                       consultations and digital services.
@@ -927,14 +993,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   </div> */}
                 </div>
 
-                <div className="flex justify-between pt-4">
-                  <Button
+                <div className="flex justify-end pt-4">
+                  {/* <Button
                     type="button"
                     variant="outline"
                     onClick={() => setCurrentStep(2)}
                   >
                     Back
-                  </Button>
+                  </Button> */}
                   <Button
                     type="submit"
                     className="bg-primary text-white"
@@ -946,18 +1012,18 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </form>
             </div>
           </div>
-          <div className="md:hidden flex flex-col items-center justify-center space-y-4">
+          {/* Mobile View */}
+          <div className="md:hidden flex flex-col justify-center space-y-4">
               <div className="">
                 <div className="mt-6">
-                  <div className="flex items-start">
+                  <div className="flex ">
                     <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
-                      3
+                      1
                     </div>
                     <div>
                       <h3 className="font-medium">Publish Your First Offering</h3>
                       <p className="text-sm text-muted-foreground">
-                        Enter your bank details to receive earnings from your
-                        consultations and digital services.
+                        Create your first offering and start earning.
                       </p>
                     </div>
                   </div>
@@ -1073,14 +1139,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     </div> */}
                   </div>
 
-                  <div className="flex justify-between pt-4">
-                    <Button
+                  <div className="flex justify-end pt-4">
+                    {/* <Button
                       type="button"
                       variant="outline"
                       onClick={() => setCurrentStep(2)}
                     >
                       Back
-                    </Button>
+                    </Button> */}
                     <Button
                       type="submit"
                       className="bg-primary text-white"
