@@ -482,8 +482,34 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="px-1">
-          <div className="space-y-3 pb-8">
+        <div className="px-1 flex flex-col overflow-y-auto">
+          <div className="flex gap-2 px-2 justify-between w-full border-b border-gray-300 pb-2 mb-2">
+            <h4 className="text-base font-medium">
+              {StringConstants.CREATE_A_PAGE}
+            </h4>
+            <Dialog
+              open={isCreatorFormOpen}
+              onOpenChange={setIsCreatorFormOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </DialogTrigger>
+              <CreatorForm
+                onClose={() => setIsCreatorFormOpen(false)}
+                // onSuccess={() => {
+                // Invalidate the cache when a new community is created
+                // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+                // }}
+              />
+            </Dialog>
+          </div>
+          <div className="space-y-3 pb-16">
             {communities && communities.length > 0 ? (
               communities.map((community: any) => {
                 if (!community) return;
@@ -539,32 +565,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 {StringConstants.NO_COMMUNITIES_AVAILABLE}
               </p>
             )}
-          </div>
-          <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
-            <h4 className="text-base font-medium">
-              {StringConstants.CREATE_A_PAGE}
-            </h4>
-            <Dialog
-              open={isCreatorFormOpen}
-              onOpenChange={setIsCreatorFormOpen}
-            >
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
-                >
-                  <Plus className="h-6 w-6" />
-                </Button>
-              </DialogTrigger>
-              <CreatorForm
-                onClose={() => setIsCreatorFormOpen(false)}
-                // onSuccess={() => {
-                // Invalidate the cache when a new community is created
-                // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-                // }}
-              />
-            </Dialog>
           </div>
         </div>
       </div>
