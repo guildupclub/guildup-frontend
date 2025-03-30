@@ -65,9 +65,9 @@ const ProfilePage = () => {
             setAvatarImgUrl(response.data.data.avatar);
           } else if(response.data.data.image){
             setAvatarImgUrl(response.data.data.image);
-          }else {
+          } else {
             setAvatarImgUrl(
-              `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.name}`
+              `https://api.dicebear.com/9.x/thumbs/svg`
             );
           }
         }
