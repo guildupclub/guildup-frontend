@@ -39,7 +39,7 @@ export const CreatorMobileHeroSection1: React.FC = () => {
               {/* Step 1 */}
               <div className="flex items-center space-x-2">
                 <div
-                  className={`w-14 h-14 flex items-center justify-center rounded-full text-white text-lg font-bold bg-[#334BFF]`
+                  className={`w-10 h-10 flex items-center justify-center rounded-full text-white text-lg font-bold bg-[#334BFF]`
                   }
                 >
                   {session? <FaCheck/> : "1"}
@@ -48,16 +48,16 @@ export const CreatorMobileHeroSection1: React.FC = () => {
               {!session ? (
                 <div className="flex items-center space-x-3 px-2">
                   <div
-                    className={`h-1 w-14 ${ "bg-[#334BFF]" }`}
+                    className={`h-1 w-12 ${ "bg-[#334BFF]" }`}
                   ></div>
                   <div
-                    className={`h-1 w-14 ${ "bg-[#334BFF]" }`}
+                    className={`h-1 w-12 ${ "bg-[#334BFF]" }`}
                   ></div>
                   <div
-                    className={`h-1 w-14 ${ "bg-[#334BFF]" }`}
+                    className={`h-1 w-12 ${ "bg-[#334BFF]" }`}
                   ></div>
                   <div
-                    className={`h-1 w-14 ${ "bg-[#334BFF]" }`}
+                    className={`h-1 w-12 ${ "bg-[#334BFF]" }`}
                   ></div>
                 </div>
                 ) : (
@@ -66,7 +66,7 @@ export const CreatorMobileHeroSection1: React.FC = () => {
               }
               {/* Step 2 */}
               <div
-                className={`w-14 h-14 flex items-center justify-center rounded-full  text-lg font-bold ${
+                className={`w-10 h-10 flex items-center justify-center rounded-full  text-lg font-bold ${
                   session ? "bg-[#334BFF] text-white" : "border-dashed border-2 border-[#334BFF] text-[#334BFF]"
                 }`}
               >
@@ -81,7 +81,7 @@ export const CreatorMobileHeroSection1: React.FC = () => {
 
               <p className="text-base">Create your Guild where you can <span className="font-semibold text-[#334BFF]">offer</span> paid consultations, <span className="font-semibold text-[#334BFF]">build</span> your following, get <span className="font-semibold text-[#334BFF]">discovered</span></p>
             </div>
-            {!session && (<div className="w-full flex justify-center">
+            {/* {!session && (<div className="w-full flex justify-center">
               <div className="relative w-full max-w-md h-[220px] ">
                 <Image
                   src={Login_laptop}
@@ -91,14 +91,14 @@ export const CreatorMobileHeroSection1: React.FC = () => {
                   // height={300}
                 />
               </div>
-            </div>)}
+            </div>)} */}
           </div>
       </div>
 
       {session && isFormOpen ? (
         <CreatorForm onSuccess={handleSuccess} />
       ) : (
-        <div className="flex justify-center mt-4 border-t border-background">
+        <div className="flex justify-center mt-4 border-background">
           <LoginContainer/>
         </div>
       )}

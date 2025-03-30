@@ -275,8 +275,8 @@ export default function CreatorForm({onSuccess}: FormProps) {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 mt-4">
-          <Button className="text-white" onClick={handleSubmit}>
+        <div className="flex justify-end gap-4 mt-4 w-full">
+          <Button className="text-white w-full" onClick={handleSubmit}>
             {StringConstants.CREATE}
           </Button>
         </div>
