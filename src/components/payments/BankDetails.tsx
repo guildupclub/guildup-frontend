@@ -20,6 +20,7 @@ interface BankDetailsProps{
 const BankDetails = ({ onClose }: BankDetailsProps) => {
   const {user}= useSelector((state: RootState)=> state.user);
   const userId= user?._id;
+  const user_isBankDetailsAdded= user?.isBankDetailsAdded;
   const [bankDetails, setBankDetails] = React.useState({
     benificiaryName: "",
     accountNumber: "",
@@ -37,17 +38,27 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
   const handleSave = async () => {
     try {
-
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details-verify`,
-        {
-          user_id: userId,
-          bank_details: bankDetails,
-          update: true,
-        }
-      );
-      console.log("thsi is handle save response ",response.data);
-      
+      let response;
+      // Check if bank details are already added
+      if(user_isBankDetailsAdded){
+        response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
+          {
+            user_id: userId,
+            bank_details: bankDetails,
+          }
+        );
+        console.log("thsi is handle save response ",response.data);
+      }else{
+        response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
+          {
+            user_id: userId,
+            bank_details: bankDetails,
+          }
+        );
+        console.log("thsi is handle save response ",response.data);
+      }
       setBankDetails({
         benificiaryName: "",
         accountNumber: "",
