@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "@/components/Loader";
 import { StringConstants } from "@/components/common/CommonText";
+import { PostDialog } from "../Event/CreateEventDialouge";
 
 interface Post {
   _id: string;
@@ -104,9 +105,9 @@ export function Feed({ communityId }: FeedProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden w-7 h-7 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+              className="md:hidden w-24 h-8 rounded-md bg-background hover:bg-zinc-300 text-zinc-300 flex justify-end px-2"
             >
-              <Plus className="h-5 w-5" />
+              <PostDialog />
             </Button>
           </div>
         </div>
