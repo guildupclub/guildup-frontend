@@ -495,7 +495,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+                  className="w-8 h-8 rounded-lg bg-primary hover:bg-zinc-300 text-zinc-300"
                 >
                   <Plus className="h-6 w-6" />
                 </Button>
