@@ -98,6 +98,8 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
         name: community_name,
         image: post.community_id.image,
         background_image: post.community_id.background_image,
+        user_isBankDetailsAdded: false,
+        user_iscalendarConnected: false,
       })
     );
 
@@ -247,13 +249,13 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     <div className="bg-card rounded-xl mb-4" ref={ref}>
       <div className="p-4">
         <div className="flex gap-3">
-          <Avatar className="h-10 w-10  border-2 border-purple-500">
-            <AvatarImage src={post?.community_id?.image} />
-            <AvatarFallback>
+          <div className="flex-shrink-0 w-10">
+            <Avatar className="h-10 w-10 border-2 border-purple-500">
+              <AvatarImage src={post?.community_id?.image} />
               <AvatarFallback>{fallbackLetter}</AvatarFallback>
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
+            </Avatar>
+          </div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between">
               <div>
                 <h3
@@ -262,89 +264,93 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
                 >
                   {post?.community_id?.name}
                 </h3>
-
                 <div className="flex items-center gap-1 mt-1">
                   <span className="text-xs text-muted-foreground">
                     {moment(post.created_At).format("YYYY MMM DD, hh:mm A")}
                   </span>
-                  {/* <span className="text-xs  text-muted-foreground">•</span> */}
-                  {/* <span className="text-xs  text-muted-foreground ">
-                    Public
-                  </span> */}
                 </div>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8  hover:bg-background"
+                className="h-8 w-8 hover:bg-background"
               >
-                <MoreVertical className="h-5 w-5  " />
+                <MoreVertical className="h-5 w-5" />
               </Button>
             </div>
-            <p
-              className="text-sm text-accent mt-2"
-              dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-            />
+          </div>
+        </div>
+      </div>
 
-            {post?.media?.publicUrl && post?.media?.fileType === "image" && (
+      {/* Post content with bottom padding */}
+      <div className="px-4 pb-6">
+        <p
+          className="text-sm text-accent"
+          dangerouslySetInnerHTML={{ __html: sanitizedBody }}
+        />
+
+        {post?.media?.publicUrl && (
+          <div className="mt-4">
+            {post?.media?.fileType === "image" && (
               <Image
                 src={post.media.publicUrl || "/placeholder.svg"}
                 alt="Post Image"
-                width={500} // Specify the width
-                height={400} // Specify the height
-                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+                width={500}
+                height={400}
+                className="w-full max-h-[400px] rounded-lg object-contain"
               />
             )}
-
-            {/* Video Placeholder */}
-            {post?.media?.publicUrl && post?.media?.fileType === "video" && (
+            {post?.media?.fileType === "video" && (
               <video
                 controls
-                className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+                className="w-full max-h-[400px] rounded-lg object-contain"
               >
                 <source src={post?.media?.publicUrl} type="video/mp4" />
               </video>
             )}
           </div>
-        </div>
+        )}
       </div>
-      <div className="flex items-center px-4 md:px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
-        {/* Left Icon */}
-        <button
-          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
-          onClick={handleLikeClick}
-        >
-          <Heart
-            className={`h-5 w-5 ${isLiked ? "text-red-500 fill-red-500" : ""}`}
-          />
-          <span className="text-sm">
-            {formatNumber(postData?.up_votes || 0)} Like
-          </span>
-        </button>
 
-        {/* Middle Icon */}
-        <button
-          className="flex items-center gap-2 text-muted-foreground"
-          onClick={() => setShowComments(!showComments)}
-        >
-          <MessageCircleMore className="h-5 w-5" />
-          <span className="text-sm">
-            {formatNumber(postData?.replies?.length || 0)} Comment
-          </span>
-        </button>
+      {/* Action buttons with top padding */}
+      <div className="px-4 py-4 border-t border-zinc-300/50">
+        <div className="flex items-center justify-between">
+          <button
+            className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
+            onClick={handleLikeClick}
+          >
+            <Heart
+              className={`h-5 w-5 ${
+                isLiked ? "text-red-500 fill-red-500" : ""
+              }`}
+            />
+            <span className="text-sm">
+              {formatNumber(postData?.up_votes || 0)} Like
+            </span>
+          </button>
 
-        {/* Right Icon */}
-        <button
-          className="flex items-center gap-2 text-muted-foreground"
-          onClick={handleShareClick}
-        >
-          <Send className="h-5 w-5" /> Share
-        </button>
+          <button
+            className="flex items-center gap-2 text-muted-foreground"
+            onClick={() => setShowComments(!showComments)}
+          >
+            <MessageCircleMore className="h-5 w-5" />
+            <span className="text-sm">
+              {formatNumber(postData?.replies?.length || 0)} Comment
+            </span>
+          </button>
+
+          <button
+            className="flex items-center gap-2 text-muted-foreground"
+            onClick={handleShareClick}
+          >
+            <Send className="h-5 w-5" /> Share
+          </button>
+        </div>
       </div>
 
       {showComments && (
         <div className="border-t border-zinc-300/50">
-          <div className="p-4">
+          <div className="px-4 py-4">
             <div className="flex gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder.svg" />
@@ -385,9 +391,9 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="px-4">
-            {showComments && <CommentSection postId={post._id} />}
+            <div className="px-4">
+              {showComments && <CommentSection postId={post._id} />}
+            </div>
           </div>
         </div>
       )}
