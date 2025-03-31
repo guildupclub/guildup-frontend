@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import type { RootState } from "@/redux/store";
 import { Avatar } from "@radix-ui/react-avatar";
 import axios from "axios";
