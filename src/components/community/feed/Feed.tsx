@@ -69,7 +69,7 @@ export function Feed({ communityId }: FeedProps) {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/explore"
+              href="/"
               className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
             >
              {StringConstants.EXPLORE_COMMUNITY} 
@@ -159,7 +159,7 @@ export function Feed({ communityId }: FeedProps) {
         {/* Error state */}
         {error && (
           <div className="py-8 text-center">
-            <p className="text-red-500">`${StringConstants.ERROR_LOADING_POSTS} ${StringConstants.PLEASE_TRY_AGAIN}`</p>
+            <p className="text-red-500">{StringConstants.ERROR_LOADING_POSTS} {StringConstants.PLEASE_TRY_AGAIN}</p>
           </div>
         )}
 
