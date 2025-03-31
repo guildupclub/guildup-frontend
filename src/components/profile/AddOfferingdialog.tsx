@@ -29,6 +29,7 @@ import {
   StringConstants,
 } from "@/components/common/CommonText";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -361,6 +362,47 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     }
   };
 
+  const handleSkipClick = () => {
+    if (!user?._id) return;
+    setOpen(false);
+    // Reset form and step
+    setCurrentStep(1);
+    setBankDetails({
+      accountHolderName: "",
+      accountNumber: "",
+      ifscCode: "",
+      // panCard: "",
+    });
+    setCalendarConnected(false);
+    setFormData({
+      title: "",
+      description: "",
+      type: "consultation",
+      price: {
+        amount: 0,
+        currency: "INR",
+      },
+      discounted_price: 0,
+      duration: 60,
+      is_free: false,
+      tags: "",
+    });
+
+    toast.info(
+      <span className="text-md">
+        Users are unable to access your offerings until you add bank details.{" "}
+        <Link
+          href="/payments"
+          className="underline text-blue-500"
+          rel="noopener noreferrer"
+        >
+          Click here
+        </Link>{" "}
+        to set up your bank details or you can add them later from payments page.
+      </span>
+    );
+  };
+
   return (
     <Dialog
       open={open}
@@ -419,8 +461,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
         {/* Step 3: Bank Details */}
         {currentStep === 3 && (
-          <><div className="hidden md:flex">
-            <div className="w-1/2 pr-4">
+          <>
+          <div className="hidden md:flex">
+            <div className="w-1/2 pr-4 pt-4">
               <div className="flex items-start opacity-50">
                 <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-green-500 text-white mr-2">
                   <Check className="w-4 h-4" />
@@ -506,6 +549,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             </div>
 
             <div className="w-1/2 border-l pl-4">
+              <div className="underline italic text-blue-500 items-end flex flex-row-reverse pb-4 hover:cursor-pointer" onClick={handleSkipClick}>Skip</div>
               <form onSubmit={handleBankDetailsSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="accountHolderName">
@@ -583,9 +627,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           </div>
           <div className="md:hidden flex flex-col items-center justify-center space-y-4 py-8">
               <div className="">
+                <div className="underline italic text-blue-500 items-end flex flex-row-reverse pb-4 hover:cursor-pointer" onClick={handleSkipClick}>Skip</div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
-                    1
+                    3
                   </div>
                   <div>
                     <h3 className="font-medium">Get Paid Easily</h3>
