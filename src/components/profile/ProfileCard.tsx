@@ -678,11 +678,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <Button
                 variant="destructive"
                 size="lg"
-                className="bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
                 onClick={handleLeaveCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                {StringConstants.UNFOLLOW}
+                {StringConstants.FOLLOWING}
               </Button>
             ) : (
               <Button
