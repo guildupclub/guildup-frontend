@@ -6,26 +6,22 @@ import { Button } from "@/components/ui/button";
 import {
   Heart,
   MessageCircle,
-  Share2,
   MoreVertical,
-  Eye,
   Plus,
   Send,
   MessageCircleMore,
 } from "lucide-react";
-import { Comment } from "./Comment";
-import CommentSection from "./CommentSection/CommentSection";
 import { useSelector, useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { FaRegCommentDots, FaShare } from "react-icons/fa";
 import Image from "next/image";
 import { API_FRONTEND_URL } from "@/config/constants";
 import moment from "moment";
-import { StringConstants } from "../common/CommonText";
 import DOMPurify from "dompurify";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import CommentSection from "./CommentSection/CommentSection";
 
 interface PostCardProps {
   post: {
@@ -56,16 +52,32 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   const community_id = post.community_id?._id;
   const community_name = post.community_id?.name;
   const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
-  const [likeCount, setLikeCount] = useState(post.up_votes);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const { user } = useSelector((state: any) => state.user);
-  const [isLiked, setIsLiked] = useState(
-    post.upvote_userId?.some((id: string) => id === user?.id) || false
-  );
+  const queryClient = useQueryClient();
 
   const dispatch = useDispatch();
   const router = useRouter();
+
+  // Use React Query to fetch post data including likes and comments
+  const { data: postData } = useQuery({
+    queryKey: ["post", post._id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${post._id}`
+      );
+      return response.data.data;
+    },
+    // Use the initial post data as placeholder
+    initialData: post,
+    // Don't refetch on window focus to avoid unnecessary requests
+    refetchOnWindowFocus: false,
+  });
+
+  // Check if the current user has liked the post
+  const isLiked =
+    postData?.upvote_userId?.some((id: string) => id === user?._id) || false;
 
   const handleClickCommunity = useCallback(() => {
     if (!community_id) {
@@ -92,18 +104,35 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     router.push(COMMUNITY_PROFILE_PATH);
   }, [dispatch, router, post]);
 
-  const handleSendComment = async () => {
-    console.log("@user", user);
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
-      {
-        postId: post._id,
-        comment: newComment,
-        userId: user?._id,
-      }
-    );
-    console.log("@commentResponse", response);
+  // Update the comment submission function to use React Query
+
+  // Add comment mutation
+  const commentMutation = useMutation({
+    mutationFn: async (comment: string) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
+        {
+          postId: post._id,
+          comment,
+          userId: user?._id,
+        }
+      );
+      return response.data.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch comments
+      queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
+      // Also invalidate post data to update comment count
+      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+    },
+  });
+
+  const handleSendComment = () => {
+    if (!newComment.trim() || !user?._id) return;
+    commentMutation.mutate(newComment);
+    setNewComment("");
   };
+
   // Existing functions remain the same
   const formatTimeAgo = (date: string) => {
     const now = new Date();
@@ -137,19 +166,59 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     );
   };
 
-  const handleLikeClick = async () => {
-    setIsLiked(!isLiked);
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,
-      {
-        userId: user._id,
-        postId: post._id,
-        action: isLiked ? "down_vote" : "up_vote",
-        communityId: post.community_id,
+  // Use React Query mutation for likes
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,
+        {
+          userId: user._id,
+          postId: post._id,
+          action: isLiked ? "down_vote" : "up_vote",
+          communityId: post.community_id,
+        }
+      );
+      return response.data;
+    },
+    onMutate: async () => {
+      // Cancel any outgoing refetches to avoid overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: ["post", post._id] });
+
+      // Snapshot the previous value
+      const previousPost = queryClient.getQueryData(["post", post._id]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["post", post._id], (old: any) => {
+        const newUpVotes = isLiked ? old.up_votes - 1 : old.up_votes + 1;
+        const newUpvoteUserIds = isLiked
+          ? old.upvote_userId.filter((id: string) => id !== user._id)
+          : [...old.upvote_userId, user._id];
+
+        return {
+          ...old,
+          up_votes: newUpVotes,
+          upvote_userId: newUpvoteUserIds,
+        };
+      });
+
+      // Return the previous value so we can roll back if something goes wrong
+      return { previousPost };
+    },
+    onError: (err, variables, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousPost) {
+        queryClient.setQueryData(["post", post._id], context.previousPost);
       }
-    );
-    console.log("@resposneVote", response);
-    setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the correct data
+      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+    },
+  });
+
+  const handleLikeClick = () => {
+    if (!user?._id) return;
+    likeMutation.mutate();
   };
 
   const handleShareClick = async () => {
@@ -219,7 +288,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
 
             {post?.media?.publicUrl && post?.media?.fileType === "image" && (
               <Image
-                src={post.media.publicUrl}
+                src={post.media.publicUrl || "/placeholder.svg"}
                 alt="Post Image"
                 width={500} // Specify the width
                 height={400} // Specify the height
@@ -248,7 +317,9 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           <Heart
             className={`h-5 w-5 ${isLiked ? "text-red-500 fill-red-500" : ""}`}
           />
-          <span className="text-sm">{formatNumber(post.up_votes)} Like</span>
+          <span className="text-sm">
+            {formatNumber(postData?.up_votes || 0)} Like
+          </span>
         </button>
 
         {/* Middle Icon */}
@@ -258,7 +329,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
         >
           <MessageCircleMore className="h-5 w-5" />
           <span className="text-sm">
-            {formatNumber(post?.replies?.length)} Comment
+            {formatNumber(postData?.replies?.length || 0)} Comment
           </span>
         </button>
 
@@ -306,11 +377,8 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-purple-500"
-                    onClick={() => {
-                      // Handle comment submission
-                      handleSendComment();
-                      setNewComment("");
-                    }}
+                    onClick={handleSendComment}
+                    disabled={commentMutation.isPending}
                   >
                     <Send className="h-4 w-4" />
                   </Button>
