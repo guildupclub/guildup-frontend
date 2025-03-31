@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import type { RootState } from "@/redux/store";
 import { Avatar } from "@radix-ui/react-avatar";
 import axios from "axios";
@@ -23,10 +22,7 @@ import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
-import {
-  setUserBankDetails,
-  setUserCalendarConnected,
-} from "@/redux/channelSlice";
+// Add this state in ProfileCard component
 
 interface CommunityProfile {
   user: {
@@ -275,9 +271,31 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     };
   }, []);
 
-  const isCommunityFollowed = userFollowedCommunities.some(
-    (c) => c?._id === activeCommunityId
-  );
+  // Add this near the top of your component, after other useQuery hooks
+  const { data: followedCommunitiesData } = useQuery({
+    queryKey: ["userFollowedCommunities"],
+    queryFn: async () => {
+      if (!user?._id) return [];
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/user/followed-communities/${user._id}`
+      );
+      if (response.data.r === "s") {
+        return response.data.data || [];
+      }
+      return [];
+    },
+    enabled: !!user?._id,
+  });
+
+  // Update the isCommunityFollowed check to use the query data
+  const isCommunityFollowed = React.useMemo(() => {
+    if (followedCommunitiesData) {
+      return followedCommunitiesData.some(
+        (c: any) => c?._id === activeCommunityId
+      );
+    }
+    return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
+  }, [followedCommunitiesData, userFollowedCommunities, activeCommunityId]);
 
   const isOwner =
     memberDetails &&
@@ -375,6 +393,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     onSuccess: (data) => {
       if (data.r === "s") {
         toast.success("Successfully left the community!");
+        // Update the cache to remove the unfollowed community
         queryClient.setQueryData(
           ["userFollowedCommunities"],
           (oldData: any) => {
@@ -382,6 +401,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             return oldData.filter((c: any) => c?._id !== activeCommunityId);
           }
         );
+        // Invalidate the query to refetch the data
         queryClient.invalidateQueries({
           queryKey: ["userFollowedCommunities"],
         });
@@ -666,11 +686,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <Button
                 variant="destructive"
                 size="lg"
-                className="bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
                 onClick={handleLeaveCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                {StringConstants.UNFOLLOW}
+                {StringConstants.FOLLOWING}
               </Button>
             ) : (
               <Button
