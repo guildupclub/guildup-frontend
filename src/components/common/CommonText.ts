@@ -123,6 +123,7 @@ export const StringConstants = {
     FOLLOWERS:"Followers",
     NO_COMMUNITIES_AVAILABLE: 'No communities available',
     PUBLIC: 'Public',
+    SAVE: 'Save'
 
 }
 

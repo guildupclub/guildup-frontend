@@ -85,12 +85,12 @@ const ProfilePage = () => {
         toast.error(response.data.message)
         setProfile(profileCopy)
       } else {
-        toast.success("Signed in successfully!");
+        toast.success("Profile Updated Successfully!");
         setProfile(response.data.data.user);
         setProfileCopy(response.data.data.user)
       }
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error updating profile:", error);
     }
   };
 
@@ -160,72 +160,72 @@ const ProfilePage = () => {
 
   if (!profile) return <p>Loading...</p>;
   return (
-    <div className="flex bg-[#f2f2f2]">
-      <div className="flex grow flex-col w-full gap-6 px-20 mx-5 mt-6">
-        <div className="flex flex-row justify-between">
-          <div className='h-30 flex flex-row items-center gap-3'>
-            <div><FaArrowLeft /></div>
-            <h1 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">My Profile</h1>
-          </div>
-          {/* <h1 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">X My Profile</h1> */}
-          <button className="text-red-600 border border-red-600 px-4 py-1 rounded-lg hover:bg-red-600 hover:text-white transition">
-            Delete Account
-          </button>
+    <div className="min-h-screen bg-[#f2f2f2] pb-16"> {/* Added pb-16 for bottom nav spacing */}
+      {/* Header with proper spacing */}
+      <div className="fixed top-0 left-0 right-0 h-16 md:h-20 bg-white z-10">
+        <div className="flex items-center h-full px-4 md:px-20">
+          <FaArrowLeft className="cursor-pointer mr-3" />
+          <h1 className="text-xl md:text-2xl font-semibold">My Profile</h1>
         </div>
-        <div className="flex flex-col w-full bg-card shadow-md p-6 rounded-lg relative gap-12">
-          <div className="flex items-center gap-4">
-          <Dialog>
-            {/* Use DialogTrigger to wrap the Image, so clicking opens the modal */}
-            <DialogTrigger asChild>
-              <Image
-                src={avatarImgUrl}
-                alt="Profile Picture"
-                width={80}
-                height={80}
-                className="rounded-full hover:cursor-pointer"
-              />
-            </DialogTrigger>
+      </div>
 
-            {/* Dialog Content */}
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Update Profile Picture</DialogTitle>
-                <DialogDescription>
-                  {StringConstants.UPDATE_PROFILE_PICTURE_DESCRIPTION ||
-                    "Upload a new image to update your profile picture."}
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="mt-4 flex flex-col space-y-4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:bg-gray-100 file:hover:bg-gray-200"
+      {/* Main content with adjusted spacing */}
+      <div className="pt-20 md:pt-24 px-4 md:px-20">
+        <div className="flex flex-col w-full bg-card shadow-md p-4 md:p-6 rounded-lg relative gap-8 md:gap-12">
+          {/* Profile section */}
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Image
+                  src={avatarImgUrl}
+                  alt="Profile Picture"
+                  width={80}
+                  height={80}
+                  className="rounded-full hover:cursor-pointer"
                 />
-              </div>
-
-              {/* Footer with a close button */}
-              <DialogFooter>
-                <DialogClose asChild>
-                  <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    {StringConstants.CLOSE}
-                  </button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-            <div>
-              <h2 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">{profile.name}</h2>
-              <p className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">{profile.email}</p>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Update Profile Picture</DialogTitle>
+                  <DialogDescription>
+                    {StringConstants.UPDATE_PROFILE_PICTURE_DESCRIPTION ||
+                      "Upload a new image to update your profile picture."}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4 flex flex-col space-y-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-gray-300 file:text-sm file:bg-gray-100 file:hover:bg-gray-200"
+                  />
+                </div>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                      {StringConstants.CLOSE}
+                    </button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <div className="text-center md:text-left">
+              <h2 className="font-semibold text-xl md:text-2xl leading-7">{profile.name}</h2>
+              <p className="text-[#19191A] text-sm md:text-base leading-7">{profile.email}</p>
             </div>
-            <button className={`ml-auto bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700 transition ${isEditable ? 'bg-gray-500 pointer-events-none' : 'null'}`}
-              onClick={() => setIsEditable(true)} disabled={isEditable}>
+            <button 
+              className={`md:ml-auto w-full md:w-auto bg-[#334bff] text-white px-10 py-2 rounded-lg hover:bg-[#334bff] transition ${
+                isEditable ? 'bg-gray-500 pointer-events-none' : ''
+              }`}
+              onClick={() => setIsEditable(true)} 
+              disabled={isEditable}
+            >
               Edit
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* Form fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
                 label="Name"
                 name="name"
@@ -234,14 +234,6 @@ const ProfilePage = () => {
                 onChange={handleChange}
                 disabled={!isEditable}
               />
-            {/* <InputField
-              label="Last Name"
-              name="lastName"
-              placeholder="Enter your last name"
-              value={profile.lastName}
-              onChange={handleChange}
-              disabled={!isEditable}
-            /> */}
             <InputField
               label="Email ID"
               type="email"
@@ -265,9 +257,11 @@ const ProfilePage = () => {
           <div className="flex justify-start">
             <button
               onClick={handleSave}
-              className={`bg-blue-600 text-white px-14 py-2 rounded-lg hover:bg-blue-700 transition ${isEditable ? 'null' : 'bg-gray-500 pointer-events-none'}`}
+              className={`w-full md:w-auto bg-[#334bff] text-white px-14 py-2 rounded-lg hover:bg-[#334bff] transition ${
+                isEditable ? '' : 'bg-gray-500 pointer-events-none'
+              }`}
             >
-              Save
+             {StringConstants.SAVE}
             </button>
           </div>
         </div>
