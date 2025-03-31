@@ -28,6 +28,22 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     // pan: "ABCDE1234F"
   });
 
+  React.useEffect(() => {
+    fetchBankDetails();
+  }, [userId]);
+  const fetchBankDetails = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details?user_id=${userId}`
+      );
+      if(response.data.r === "s") {
+        setBankDetails(response.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching bank details:", error);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setBankDetails((prevDetails) => ({
