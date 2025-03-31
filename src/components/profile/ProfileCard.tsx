@@ -653,23 +653,29 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   {StringConstants.POSTS}
                 </div>
 
-                <div className="w-1 h-1 rounded-full bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <GrInstagram className="h-5 w-5 text-pink-500" />
-                  <span className="font-medium text-foreground">
-                    {formatNumber(profile.community?.instagram_followers)}
-                  </span>
-                  {StringConstants.FOLLOWERS}
-                </div>
+                {profile.community?.instagram_followers > 0 && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-border" />
+                    <div className="flex items-center gap-1.5">
+                      <GrInstagram className="h-5 w-5 text-pink-500" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.instagram_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
+                  </>
+                )}
 
-                <div className="w-1 h-1 rounded-full bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <BsYoutube className="h-5 w-5 text-red-500" />
-                  <span className="font-medium text-foreground">
-                    {formatNumber(profile.community?.youtube_followers)}
-                  </span>
-                  {StringConstants.SUBSCRIBERS}
-                </div>
+                {profile.community?.youtube_followers > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 rounded-full bg-border" />
+                    <BsYoutube className="h-5 w-5 text-red-500" />
+                    <span className="font-medium text-foreground">
+                      {formatNumber(profile.community?.youtube_followers)}
+                    </span>
+                    {StringConstants.SUBSCRIBERS}
+                  </div>
+                )}
               </div>
             </div>
             {isOwner ? (
