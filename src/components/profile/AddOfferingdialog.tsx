@@ -584,12 +584,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   </div>
 
                   <div className="flex justify-between">
-                    <Button
+                  <Button
                       type="button"
                       variant="outline"
-                      onClick={() => setCurrentStep(calendarConnected ? 2 : 1)}
+                      onClick={handleSkipClick}
                     >
-                      Back
+                     Skip
                     </Button>
                     <Button
                       type="submit"
@@ -604,10 +604,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             </div>
             <div className="md:hidden flex flex-col items-center justify-center space-y-4 py-8">
               <div className="">
-                <div className="underline italic text-blue-500 items-end flex flex-row-reverse pb-4 hover:cursor-pointer" onClick={handleSkipClick}>Skip</div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
-                    3
                     3
                   </div>
                   <div>
@@ -682,9 +680,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => setCurrentStep(calendarConnected ? 2 : 1)}
+                      onClick={handleSkipClick}
                     >
-                      Back
+                     Skip
                     </Button>
                     <Button
                       type="submit"
