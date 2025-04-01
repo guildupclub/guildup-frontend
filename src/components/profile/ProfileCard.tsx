@@ -22,7 +22,11 @@ import { GrInstagram } from "react-icons/gr";
 import { BsLinkedin, BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
-// Add this state in ProfileCard component
+import { motion } from "framer-motion";
+import Testimonials from "../testimonial/Testimonial";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loader from "../Loader";
+import { useRouter } from "next/router";
 
 interface CommunityProfile {
   user: {
@@ -828,7 +832,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
               {selectedOffering && (
                 <BookingDialog
-                  offering={selectedOffering}
+                  offering={{
+                    ...selectedOffering,
+                    discounted_price: selectedOffering.discounted_price ? Number(selectedOffering.discounted_price) : 0
+                  }}
                   isOpen={!!selectedOffering}
                   onClose={() => setSelectedOffering(null)}
                 />

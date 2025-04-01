@@ -366,13 +366,21 @@ export function EditCommunityModal({
             <Label>{StringConstants.PROFILE_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.image && (
-                <Image
-                  src={formData.image}
-                  alt="Profile"
-                  width={64}
-                  height={64}
-                  className="h-16 w-16 object-cover rounded"
-                />
+                <div className="relative">
+                  <Image
+                    src={formData.image}
+                    alt="Profile"
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => handleRemoveImage("profile")}
+                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="h-3 w-3 text-white" />
+                  </button>
+                </div>
               )}
               <Input
                 type="file"
@@ -389,13 +397,21 @@ export function EditCommunityModal({
             <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
             <div className="flex items-center gap-4">
               {formData.bgImage && (
-                <Image
-                  src={formData.bgImage}
-                  alt="Background"
-                  width={128}
-                  height={64}
-                  className="h-16 w-32 object-cover rounded"
-                />
+                <div className="relative">
+                  <Image
+                    src={formData.bgImage}
+                    alt="Background"
+                    width={128}
+                    height={64}
+                    className="h-16 w-32 object-cover rounded"
+                  />
+                  <button
+                    onClick={() => handleRemoveImage("background")}
+                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="h-3 w-3 text-white" />
+                  </button>
+                </div>
               )}
               <Input
                 type="file"

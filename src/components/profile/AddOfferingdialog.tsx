@@ -29,6 +29,7 @@ import {
   StringConstants,
 } from "@/components/common/CommonText";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -384,6 +385,47 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     });
   };
 
+  const handleSkipClick = () => {
+    if (!user?._id) return;
+    setOpen(false);
+    // Reset form and step
+    setCurrentStep(1);
+    setBankDetails({
+      accountHolderName: "",
+      accountNumber: "",
+      ifscCode: "",
+      // panCard: "",
+    });
+    setCalendarConnected(false);
+    setFormData({
+      title: "",
+      description: "",
+      type: "consultation",
+      price: {
+        amount: 0,
+        currency: "INR",
+      },
+      discounted_price: 0,
+      duration: 60,
+      is_free: false,
+      tags: "",
+    });
+
+    toast.info(
+      <span className="text-md">
+        Users are unable to access your offerings until you add bank details.{" "}
+        <Link
+          href="/payments"
+          className="underline text-blue-500"
+          rel="noopener noreferrer"
+        >
+          Click here
+        </Link>{" "}
+        to set up your bank details or you can add them later from payments page.
+      </span>
+    );
+  };
+
   return (
     <Dialog
       open={open}
@@ -562,8 +604,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             </div>
             <div className="md:hidden flex flex-col items-center justify-center space-y-4 py-8">
               <div className="">
+                <div className="underline italic text-blue-500 items-end flex flex-row-reverse pb-4 hover:cursor-pointer" onClick={handleSkipClick}>Skip</div>
                 <div className="flex items-start">
                   <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white mr-2">
+                    3
                     3
                   </div>
                   <div>

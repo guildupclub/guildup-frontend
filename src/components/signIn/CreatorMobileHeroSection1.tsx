@@ -21,7 +21,7 @@ export const CreatorMobileHeroSection1: React.FC = () => {
     setIsFormOpen(false);
   };
   return (
-    <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen overflow-hidden gap-6">
+    <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen gap-6">
       <div className="w-full flex justify-center pt-6">
         <Image
           src={guildup_logo}
