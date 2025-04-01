@@ -167,6 +167,7 @@ export function BookingDialog({
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
           offering_id: offering._id,
+          user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
         }
