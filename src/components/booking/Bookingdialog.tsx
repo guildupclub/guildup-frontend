@@ -167,6 +167,7 @@ export function BookingDialog({
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
           offering_id: offering._id,
+          user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
         }
@@ -332,12 +333,12 @@ export function BookingDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="flex justify-center items-center">
-        <DialogContent className="sm:max-w-[1000px] p-0 overflow-hidden  text-muted  border border-border/50 rounded-xl shadow-xl">
+      <div className="flex justify-center items-center  ">
+        <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted  border border-border/50 rounded-xl shadow-xl  ">
           <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0 ">
             {/* Left Section - Welcome Panel */}
             <div className="p-8 flex flex-col items-center text-center space-y-6 border-r border-border/20">
-              <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm">
+              <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm h-auto">
                 {/* Title */}
                 <h1 className="text-muted font-bold text-2xl">
                   Hello {user?.name}
@@ -368,7 +369,7 @@ export function BookingDialog({
                 </div>
 
                 {/* Details (Duration & Price) */}
-                <div className="flex justify-between items-center w-full px-4">
+                <div className="flex justify-between items-center w-full px-4 py-6">
                   {/* Duration */}
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-blue-500" />
@@ -393,12 +394,7 @@ export function BookingDialog({
                   </div>
                 </div>
 
-                {/* Description */}
-                {/* <p className="text-sm text-muted-foreground leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Totam, nulla dolorem aspernatur doloribus officia asperiores.
-                </p> */}
-                <p>{offering?.description}</p>
+                {/* <p>{offering?.description}</p> */}
               </div>
             </div>
 
@@ -511,9 +507,10 @@ export function BookingDialog({
                           <FileText className="w-5 h-5 text-primary" />
                           Offering Details
                         </h3>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground whitespace-pre-line">
                           {offering.description}
                         </p>
+
                         <div className="grid grid-cols-2 gap-2 pt-2">
                           <div className="bg-background/50 p-3 rounded-md flex items-center gap-2">
                             <Clock className="w-4 h-4 text-primary/70" />

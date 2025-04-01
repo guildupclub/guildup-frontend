@@ -177,7 +177,7 @@ export default function CreatorForm({onSuccess}: FormProps) {
   return (
     <>
       {isRedirecting && <Loader />}
-      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg p-6">
+      <div className="w-full max-w-lg bg-white rounded-lg shadow-lg px-6 pb-6">
         <div className="flex flex-col justify-start items-center pb-4">
           <h2 className="text-xl font-semibold font-serif">Let&apos;s Build your Guild!</h2>
           <p className="text-sm text-muted-foreground">
@@ -275,8 +275,8 @@ export default function CreatorForm({onSuccess}: FormProps) {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 mt-4">
-          <Button className="text-white" onClick={handleSubmit}>
+        <div className="flex justify-end gap-4 mt-4 w-full">
+          <Button className="text-white w-full" onClick={handleSubmit}>
             {StringConstants.CREATE}
           </Button>
         </div>

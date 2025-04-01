@@ -102,35 +102,6 @@ export default function Home() {
     setIsModalOpen(false); // Close modal after topic selection
   };
 
-  useEffect(() => {
-    if (status === "loading") {
-      return; // Show loading state while the session is being fetched
-    }
-
-    if (session) {
-      async function fetchCommunities() {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-            {
-              userId: session?.user._id,
-            }
-          );
-          dispatch(setUserFollowedCommunities(res.data.data));
-        } catch (error) {
-          console.error(error);
-        }
-      }
-      fetchCommunities();
-      // If the user is new, open the modal
-      if (session.user?.isNewUser) {
-        setIsModalOpen(true); // Open modal for topic selection
-      }
-    } else {
-      router.push("/feeds");
-    }
-  }, [session, status, router]);
-
   if (status === "loading") {
     return <div>Loading...</div>; // Optionally, show a loading spinner
   }

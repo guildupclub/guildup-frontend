@@ -10,6 +10,8 @@ import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { RightSection } from "@/components/signIn/RightSection";
 import { UserHeroSection } from "@/components/signIn/UserHeroSection";
+import { UserMobileHeroSection } from "@/components/signIn/UserMobileHeroSection";
+import { CreatorMobileHeroSection1 } from "@/components/signIn/CreatorMobileHeroSection1";
 import { CreatorHeroSection1 } from "@/components/signIn/CreatorHeroSection1";
 import { CreatorHeroSection2 } from "@/components/signIn/CreatorHeroSection2";
 import Loader from "@/components/Loader";
@@ -31,7 +33,7 @@ function SignInContent() {
 
   return (
     <div className="flex md:flex-row h-screen md:overflow-hidden">
-      <div className="hidden lg:block w-1/2">
+      <div className="hidden md:block w-1/2">
         {getHeroVersion() === 1 ? (
           session ? (
             <CreatorHeroSection2 />
@@ -42,7 +44,14 @@ function SignInContent() {
           <UserHeroSection />
         )}
       </div>
-      <div className="lg:w-1/2">
+      <div className="block w-full md:hidden">
+        {getHeroVersion() === 1 ? (
+          <CreatorMobileHeroSection1 />
+        ) : (
+          <UserMobileHeroSection />
+        )}
+      </div>
+      <div className="hidden md:block md:w-1/2">
         <RightSection />
       </div>
     </div>

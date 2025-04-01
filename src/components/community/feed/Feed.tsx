@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "@/components/Loader";
 import { StringConstants } from "@/components/common/CommonText";
+import { PostDialog } from "../Event/CreateEventDialouge";
 
 interface Post {
   _id: string;
@@ -69,7 +70,7 @@ export function Feed({ communityId }: FeedProps) {
           </p>
           <div className="flex gap-4">
             <Link
-              href="/explore"
+              href="/"
               className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
             >
              {StringConstants.EXPLORE_COMMUNITY} 
@@ -104,9 +105,9 @@ export function Feed({ communityId }: FeedProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden w-7 h-7 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
+              className="md:hidden w-24 h-8 rounded-md bg-background hover:bg-zinc-300 text-zinc-300 flex justify-end px-2"
             >
-              <Plus className="h-5 w-5" />
+              <PostDialog />
             </Button>
           </div>
         </div>
@@ -159,7 +160,7 @@ export function Feed({ communityId }: FeedProps) {
         {/* Error state */}
         {error && (
           <div className="py-8 text-center">
-            <p className="text-red-500">`${StringConstants.ERROR_LOADING_POSTS} ${StringConstants.PLEASE_TRY_AGAIN}`</p>
+            <p className="text-red-500">{StringConstants.ERROR_LOADING_POSTS} {StringConstants.PLEASE_TRY_AGAIN}</p>
           </div>
         )}
 

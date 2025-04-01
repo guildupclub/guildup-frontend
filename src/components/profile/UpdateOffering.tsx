@@ -20,6 +20,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { StringConstants } from "../common/CommonText";
+import { toast } from "sonner";
 
 const EditOfferingModal = ({
   offering,
@@ -42,6 +43,18 @@ const EditOfferingModal = ({
     //   alert("You are not authorized to edit this offering.");
     //   return;
     // }
+    if (formData.discounted_price > formData.price.amount) {
+      toast.error("Discounted price cannot be greater than the original price.");
+      return;
+    }
+    if (formData.discounted_price < 0) {
+      toast.error("Discounted price cannot be negative.");
+      return;
+    }
+    if (formData.price.amount < 0) {
+      toast.error("Price cannot be negative.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -118,13 +131,12 @@ const EditOfferingModal = ({
                 onChange={(e) =>
                   setFormData({ ...formData, duration: Number(e.target.value) })
                 }
-                min="15"
                 required
               />
             </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label htmlFor="price">Price (INR)</label>
+              <label htmlFor="price">Price ({StringConstants.INR})</label>
               <Input
                 id="price"
                 type="number"
@@ -145,7 +157,7 @@ const EditOfferingModal = ({
             </div>
             <div className="space-y-2">
               <label htmlFor="discounted_price">
-                {StringConstants.DISCOUNTED_PRICE} (INR)
+                {StringConstants.DISCOUNTED_PRICE} ({StringConstants.INR})
               </label>
               <Input
                 id="discoounted_price"
@@ -164,7 +176,7 @@ const EditOfferingModal = ({
             </div>
           
           </div>
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label htmlFor="tags">Tags (comma-separated)</label>
             <Input
               id="tags"
@@ -174,7 +186,7 @@ const EditOfferingModal = ({
               }
               placeholder="e.g., Design, Technology, Business"
             />
-          </div>
+          </div> */}
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onClose}>
               Cancel

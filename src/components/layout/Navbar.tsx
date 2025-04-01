@@ -54,6 +54,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/community/feed";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
+  const PROFILE_PATH = '/profile'
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -156,6 +157,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       setActiveCommunity({
         id: community._id,
         name: community.name,
+        image: "",
+        background_image: "",
+        user_isBankDetailsAdded: false,
+        user_iscalendarConnected: false
       })
     );
 
@@ -274,7 +279,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <Link
                       href={
                         activeCommunityId
-                          ? `${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`
+                          ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
                           : `${COMMUNITY_FEED_PATH}`
                       }
                       className="flex flex-col items-center justify-center"
@@ -291,7 +296,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  {/* ss */}
                 </ul>
               </div>
 
@@ -348,25 +352,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       >
                         {StringConstants.SIGN_OUT}
                       </DropdownMenuItem>
-                      {/* <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
-                        <Link href='/profile'>Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-primary-gradient border-b border-zinc-300">
-                      <Link href='/bookings'>Bookings</Link>
-                      </DropdownMenuItem> */}
-                      {/* {isMounted && isUser &&
-                        <DropdownMenuItem
-                          className="hover:bg-primary-gradient border-b border-zinc-300"
-                        >
-                          <Link href='/payments'>Payments</Link>
-                        </DropdownMenuItem>} */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  // <Button className="bg-primary-gradient" onClick={() => signIn()}>
-                  //   {StringConstants.SIGN_IN}
-                  // </Button>
-
                   <Button
                     onClick={() =>
                       signIn(undefined, {
@@ -383,103 +371,122 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </nav>
 
-      {/* Mobile Nav */}
       <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
-          <Link href="/" className="flex flex-col items-center justify-center">
-            <Compass
-              className={`w-6 h-6 ${isActive("/") ? "text-primary" : ""}`}
-            />
+          <Link
+            href="/"
+            className="flex flex-col items-center justify-center gap-1"
+          >
+            <div className="w-6 h-6 flex items-center justify-center">
+              <Compass
+                className={`w-5 h-5 ${isActive("/") ? "text-primary" : ""}`}
+              />
+            </div>
             <span
-              className={`text-xs mt-1 ${isActive("/") ? "text-primary" : ""}`}
+              className={`text-[10px] ${isActive("/") ? "text-primary" : ""}`}
             >
               {StringConstants.HOME}
             </span>
           </Link>
+
           <Link
             href="/feeds"
-            className="flex flex-col items-center justify-center"
+            className="flex flex-col items-center justify-center gap-1"
           >
-            <FileText
-              className={`w-6 h-6 ${isActive("/feeds") ? "text-primary" : ""}`}
-            />
+            <div className="w-6 h-6 flex items-center justify-center">
+              <FileText
+                className={`w-5 h-5 ${isActive("/feeds") ? "text-primary" : ""}`}
+              />
+            </div>
             <span
-              className={`text-xs mt-1 ${
+              className={`text-[10px] ${
                 isActive("/feeds") ? "text-primary" : ""
               }`}
             >
               {StringConstants.FEED}
             </span>
           </Link>
-          {/* <Link
-            href="/snips"
-            className="flex flex-col items-center justify-center"
+
+          <Link
+            href={
+              activeCommunityId
+                ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
+                : `${COMMUNITY_FEED_PATH}`
+            }
+            className="flex flex-col items-center justify-center gap-1"
           >
-            <Video className="w-6 h-6" />
-            <span className="text-xs mt-1">Snips</span>
-          </Link> */}
-          {activeCommunityId ? (
-            <Link
-              href={`${COMMUNITY_PATH}/${activeCommunityId}${FEED_PATH}`}
-              className="flex flex-col items-center justify-center"
-            >
+            <div className="w-6 h-6 flex items-center justify-center">
               <Users
-                className={`w-6 h-6 ${
+                className={`w-5 h-5 ${
                   isActive("/community") ? "text-primary" : ""
                 }`}
               />
-              <span
-                className={`text-xs mt-1 ${
-                  isActive("/community") ? "text-primary" : ""
-                }`}
-              >
-                {StringConstants.EXPERTS}
-              </span>
-            </Link>
-          ) : (
-            <Link
-              href="/no-community"
-              className="flex flex-col items-center justify-center"
+            </div>
+            <span
+              className={`text-[10px] ${
+                isActive("/community") ? "text-primary" : ""
+              }`}
             >
-              <Users
-                className={`w-6 h-6 ${
-                  isActive("/no-community") ? "text-primary" : ""
-                }`}
-              />
-              <span
-                className={`text-xs mt-1 ${
-                  isActive("/no-community") ? "text-primary" : ""
-                }`}
-              >
-                {StringConstants.EXPERTS}
-              </span>
-            </Link>
-          )}
+              {StringConstants.EXPERTS}
+            </span>
+          </Link>
 
           {user?._id ? (
-            <button
-              className="flex flex-col items-center justify-center"
-              onClick={handleSignOut}
-            >
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={session?.user?.image || ""} alt="User" />
-                <AvatarFallback>
-                  {session?.user?.name?.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-
-              <span className="text-xs mt-1">{StringConstants.SIGN_OUT}</span>
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex flex-col items-center justify-center gap-1">
+                  <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
+                    <Avatar className="h-4 w-4">
+                      <AvatarImage src={session?.user?.image || ""} alt="User" />
+                      <AvatarFallback>
+                        {session?.user?.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <span className="text-[10px]">My Account</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="bg-background/95 backdrop-blur border-gray-700"
+                align="end"
+                side="top"
+                sideOffset={40}
+              >
+                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                  <Link href="/booking">Bookings</Link>
+                </DropdownMenuItem>
+                {isUser && (
+                  <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                    <Link href="/payments">Payments</Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  className="hover:bg-primary-gradient"
+                  onClick={handleSignOut}
+                >
+                  {StringConstants.SIGN_OUT}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <button
-              className="flex flex-col items-center justify-center bg-primary-gradient"
-              onClick={() => signIn()}
+              className="flex flex-col items-center justify-center gap-1"
+              onClick={() =>
+                signIn(undefined, {
+                  callbackUrl: `${window.location.origin}?hero=2`,
+                })
+              }
             >
-              <Avatar className="h-6 w-6">
-                <AvatarImage src="/placeholder.svg" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-              <span className="text-xs mt-1">{StringConstants.SIGN_IN}</span>
+              <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
+                <Avatar className="h-4 w-4">
+                  <AvatarImage src="/placeholder.svg" alt="User" />
+                  <AvatarFallback>U</AvatarFallback>
+                </Avatar>
+              </div>
+              <span className="text-[10px]">{StringConstants.SIGN_IN}</span>
             </button>
           )}
         </div>
@@ -499,8 +506,30 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="px-1">
-          <div className="space-y-3 pb-8">
+        <div className="px-1 flex flex-col overflow-y-auto">
+          <div className="flex gap-2 px-2 justify-between w-full border-b border-gray-300 pb-2 mb-2">
+            <h4 className="text-base font-medium">
+              {StringConstants.CREATE_A_PAGE}
+            </h4>
+            <Dialog
+              open={isCreatorFormOpen}
+              onOpenChange={setIsCreatorFormOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-8 h-8 rounded-lg bg-primary hover:bg-zinc-300 text-zinc-300"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </DialogTrigger>
+              <CreatorForm
+                onClose={() => setIsCreatorFormOpen(false)}
+              />
+            </Dialog>
+          </div>
+          <div className="space-y-3 pb-16">
             {communities && communities.length > 0 ? (
               communities.map((community: any) => {
                 if (!community) return;
@@ -514,7 +543,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     )}
                     onClick={() => handleSelectCommunity(community)}
                   >
-                    {/* Avatar */}
                     <Avatar
                       className={`w-10 h-10 rounded-lg ${
                         isActive ? "ring-2 ring-purple-500" : "null"
@@ -532,7 +560,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </AvatarFallback>
                     </Avatar>
 
-                    {/* Community Name */}
                     <span
                       className={cn(
                         "font-medium text-sm",
@@ -542,7 +569,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       {community.name}
                     </span>
 
-                    {/* Subscription Star (optional) */}
                     {community.subscription && (
                       <span className="ml-auto text-yellow-500 text-sm">
                         ⭐
@@ -557,74 +583,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </p>
             )}
           </div>
-          <div className="fixed left-0 bottom-20 z-10 flex gap-2 px-2 justify-between w-full">
-            <h4 className="text-base font-medium">
-              {StringConstants.CREATE_A_PAGE}
-            </h4>
-            <Dialog
-              open={isCreatorFormOpen}
-              onOpenChange={setIsCreatorFormOpen}
-            >
-              <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-8 h-8 rounded-lg bg-background hover:bg-zinc-300 text-zinc-300"
-                >
-                  <Plus className="h-6 w-6" />
-                </Button>
-              </DialogTrigger>
-              <CreatorForm
-                onClose={() => setIsCreatorFormOpen(false)}
-                // onSuccess={() => {
-                // Invalidate the cache when a new community is created
-                // queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
-                // }}
-              />
-            </Dialog>
-          </div>
         </div>
       </div>
-
-      {/* Render community drop list if flag is true */}
-      {/* {showCommunityList && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded p-4 max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Select a Community</h3>
-            <ul className="space-y-2">
-              {communities && communities.length > 0 ? (
-                communities.map((comm: { _id: string; name: string }) => (
-                  <li key={comm._id}>
-                    <button
-                      className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded"
-                      onClick={() => handleCommunitySelect(comm)}
-                    >
-                      {comm.name}
-                    </button>
-                  </li>
-                ))
-              ) : (
-                <li className="text-center text-sm text-gray-500">No community available</li>
-              )}
-            </ul>
-            <div className="mt-4 text-right">
-              <Button variant="ghost" onClick={() => setShowCommunityList(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )} */}
-
-      {/* Render EditCommunityModal if showEditCommunity is true.
-          Pass in the selectedCommunity as a prop if needed. */}
-      {/* {showEditCommunity && (
-        <EditCommunityModal
-          isOpen={showEditCommunity}
-          onClose={() => setShowEditCommunity(false)}
-          community={selectedCommunity}
-        />
-      )} */}
     </>
   );
 }
