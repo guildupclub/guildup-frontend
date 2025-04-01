@@ -27,14 +27,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     ifsc: "",
     // pan: "ABCDE1234F"
   });
-  const [initialBankDetails, setInitialBankDetails] = React.useState({
-    benificiaryName: "",
-    accountNumber: "",
-    ifsc: "",
-    // pan: "ABCDE1234F"
-  });
-  const [isChanged, setIsChanged] = React.useState(false);
-  
+
   React.useEffect(() => {
     fetchBankDetails();
   }, [userId]);
@@ -44,9 +37,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details?user_id=${userId}`
       );
       if(response.data.r === "s") {
-        setInitialBankDetails(response.data.data);
         setBankDetails(response.data.data);
-        setIsChanged(false);
       }
     } catch (error) {
       console.error("Error fetching bank details:", error);
@@ -55,14 +46,10 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setBankDetails((prevDetails) => {
-      const updatedDetails = {
-        ...prevDetails,
-        [name]: value
-      };
-      setIsChanged(JSON.stringify(updatedDetails) !== JSON.stringify(initialBankDetails));
-      return updatedDetails;
-    });
+    setBankDetails((prevDetails) => ({
+      ...prevDetails,
+      [name]: value
+    }));
   };
 
   const handleSave = async () => {
@@ -88,7 +75,12 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         );
         console.log("thsi is handle save response ",response.data);
       }
-      fetchBankDetails();
+      setBankDetails({
+        benificiaryName: "",
+        accountNumber: "",
+        ifsc: "",
+        // pan: "ABCDE1234F"
+      })
       if (response.data.r === "s") {
         onClose();
         toast.success(response.data.data);
@@ -178,9 +170,8 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
         <Button
           onClick={handleSave}
           className="bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700 transition"
-          disabled={!isChanged}
         >
-          Update
+          Save
         </Button>
       </div>
 
