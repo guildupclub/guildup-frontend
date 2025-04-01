@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Heart, MessageCircle, Share2, MoreVertical } from "lucide-react"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 interface PostProps {
   title: string
@@ -16,12 +17,13 @@ interface PostProps {
 }
 
 export function Post({ title, body, created_At, up_votes, reply_count, post_type, mediaUrl }: PostProps) {
+  const { data: session } = useSession();
   return (
     <div className="p-4 border-b border-zinc-800">
       <div className="flex items-start gap-3">
         <Avatar className="h-10 w-10">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback>U</AvatarFallback>
+          <AvatarImage src={session?.user?.image} alt="User" />
+          <AvatarFallback>{session?.user?.name?.charAt(0)?.toUpperCase()}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center justify-between">

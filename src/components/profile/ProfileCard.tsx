@@ -1,7 +1,6 @@
 "use client";
 
-import type React from "react";
-
+import React from "react";
 import type { RootState } from "@/redux/store";
 import { Avatar } from "@radix-ui/react-avatar";
 import axios from "axios";
@@ -20,14 +19,15 @@ import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
 import { StringConstants } from "../common/CommonText";
 import { GrInstagram } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
+import { BsLinkedin, BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
-import {
-  setUserBankDetails,
-  setUserCalendarConnected,
-} from "@/redux/channelSlice";
-// Add this state in ProfileCard component
+import { motion } from "framer-motion";
+import Testimonials from "../testimonial/Testimonial";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loader from "../Loader";
+import { FaLinkedinIn } from "react-icons/fa6";
+import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 
 interface CommunityProfile {
   user: {
@@ -212,11 +212,6 @@ const InfiniteMovingCards = ({
   );
 };
 
-import { motion } from "framer-motion";
-import Testimonials from "../testimonial/Testimonial";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Loader from "../Loader";
-
 export function ProfileCard({ communityId }: ProfileCardProps) {
   const dispatch = useDispatch();
   const userFollowedCommunities = useSelector(
@@ -276,9 +271,21 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     };
   }, []);
 
-  const isCommunityFollowed = userFollowedCommunities.some(
-    (c) => c?._id === activeCommunityId
-  );
+  // Add this near the top of your component, after other useQuery hooks
+  const { data: followedCommunitiesData } = useQuery({
+    queryKey: ["userFollowedCommunities"],
+    enabled: !!user?._id,
+  });
+
+  // Update the isCommunityFollowed check to use the query data
+  const isCommunityFollowed = React.useMemo(() => {
+    if (followedCommunitiesData) {
+      return followedCommunitiesData.some(
+        (c: any) => c?._id === activeCommunityId
+      );
+    }
+    return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
+  }, [followedCommunitiesData, userFollowedCommunities, activeCommunityId]);
 
   const isOwner =
     memberDetails &&
@@ -294,11 +301,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     queryFn: async () => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-        { communityId: activeCommunityId }
+        {
+          communityId: activeCommunityId,
+        }
       );
       console.log("@responseProfilePAge", response.data.data);
       if (response.data.r === "s") {
-        // Update avatar and background images
         if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
@@ -333,6 +341,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
     }
   }, [profile?.community]);
+  useEffect(() => {
+    if (profile?.user) {
+      dispatch(setIsBankAdded(profile.user.user_isBankDetailsAdded));
+      dispatch(setIsCalendarConnected(profile.user.user_iscalendarConnected));
+    }
+  }, [profile?.user, dispatch]);
 
   console.log("@profile", profile?.community.background_image);
 
@@ -360,10 +374,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     fetchOfferings();
   }, [activeCommunityId, fetchOfferings]);
 
-  const handleLeaveCommunity = async () => {
-    if (!user?._id || !activeCommunityId) return;
-
-    try {
+  const unfollowMutation = useMutation({
+    mutationFn: async () => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/leave`,
         {
@@ -371,14 +383,34 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           communityId: activeCommunityId,
         }
       );
-
-      if (response.data.r === "s") {
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.r === "s") {
         toast.success("Successfully left the community!");
+        // Update the cache to remove the unfollowed community
+        queryClient.setQueryData(
+          ["userFollowedCommunities"],
+          (oldData: any) => {
+            if (!oldData) return [];
+            return oldData.filter((c: any) => c?._id !== activeCommunityId);
+          }
+        );
+        // Invalidate the query to refetch the data
+        queryClient.invalidateQueries({
+          queryKey: ["userFollowedCommunities"],
+        });
       }
-    } catch (err) {
-      console.error("Error leaving community:", err);
+    },
+    onError: (error) => {
+      console.error("Error leaving community:", error);
       toast.error("Failed to leave the community. Please try again.");
-    }
+    },
+  });
+
+  const handleLeaveCommunity = () => {
+    if (!user?._id || !activeCommunityId) return;
+    unfollowMutation.mutate();
   };
 
   useEffect(() => {
@@ -437,33 +469,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   //   fetchProfileData();
   // }, [community?.communityId]); // Dependency array includes communityId
 
-  // const joinCommunityMutate = useMutation({
-  //   mutationFn: async () => {
-  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify(   {
-  //         userId: user._id,
-  //         communityId: activeCommunityId,
-  //       }),
-  //     });
-  //     console.log("@JoinResponse",response.data.data)
-  //     if (!response.ok) throw new Error("Failed to send post");
-  //     return response.json();
-  //   },
-  //   onSuccess: (newPost) => {
-  //     console.log("@newPost",newPost)
-
-  //     queryClient.setQueryData(['userCommunity'], oldCommuinty => [...oldCommuinty, response.data.data]);
-
-  //   },
-  // });
-
-  const handleJoinCommunity = async () => {
-    console.log("@user._id", user, activeCommunityId);
-    if (!user?._id || !activeCommunityId) return;
-
-    try {
+  const followMutation = useMutation({
+    mutationFn: async () => {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/join`,
         {
@@ -471,15 +478,34 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           communityId: activeCommunityId,
         }
       );
-
-      // Show toast notification if the response is successful
-      if (response.data.r === "s") {
+      return response.data;
+    },
+    onSuccess: (data) => {
+      if (data.r === "s") {
         toast.success("Successfully joined the community!");
+        // Update the cache to reflect the new followed community
+        queryClient.setQueryData(
+          ["userFollowedCommunities"],
+          (oldData: any) => {
+            if (!oldData) return [{ _id: activeCommunityId }];
+            return [...oldData, { _id: activeCommunityId }];
+          }
+        );
+        // Invalidate the query to refetch the data
+        queryClient.invalidateQueries({
+          queryKey: ["userFollowedCommunities"],
+        });
       }
-    } catch (err) {
-      console.error("Error joining community:", err);
+    },
+    onError: (error) => {
+      console.error("Error joining community:", error);
       toast.error("Failed to join the community. Please try again.");
-    }
+    },
+  });
+
+  const handleJoinCommunity = () => {
+    if (!user?._id || !activeCommunityId) return;
+    followMutation.mutate();
   };
 
   const handleDeleteOffering = async (offeringId: string) => {
@@ -622,22 +648,34 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   {StringConstants.POSTS}
                 </div>
 
-                <div className="w-1 h-1 rounded-full bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <GrInstagram className="h-5 w-5 text-pink-500" />
-                  <span className="font-medium text-foreground">
-                    {formatNumber(profile.community?.instagram_followers)}
-                  </span>
-                  {StringConstants.FOLLOWERS}
-                </div>
+                {profile.community?.instagram_followers > 0 && (
+                  <>
+                    <div className="w-1 h-1 rounded-full bg-border" />
+                    <div className="flex items-center gap-1.5">
+                      <GrInstagram className="h-5 w-5 text-pink-500" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.instagram_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
+                  </>
+                )}
+
+                {profile.community?.youtube_followers > 0 && (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 rounded-full bg-border" />
+                    <BsYoutube className="h-5 w-5 text-red-500" />
+                    <span className="font-medium text-foreground">
+                      {formatNumber(profile.community?.youtube_followers)}
+                    </span>
+                    {StringConstants.SUBSCRIBERS}
+                  </div>
+                )}
 
                 <div className="w-1 h-1 rounded-full bg-border" />
-                <div className="flex items-center gap-1.5">
-                  <BsYoutube className="h-5 w-5 text-red-500" />
-                  <span className="font-medium text-foreground">
-                    {formatNumber(profile.community?.youtube_followers)}
-                  </span>
-                  {StringConstants.SUBSCRIBERS}
+                <div className="flex items-center gap-1.5 cursor-pointer">
+                  <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                  {/* <BsLinkedin className="h-5 w-5 text-blue-800" /> */}
                 </div>
               </div>
             </div>
@@ -647,11 +685,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <Button
                 variant="destructive"
                 size="lg"
-                className="bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
                 onClick={handleLeaveCommunity}
               >
                 <HiMiniUserGroup className="h-8 w-8" />
-                {StringConstants.UNFOLLOW}
+                {StringConstants.FOLLOWING}
               </Button>
             ) : (
               <Button
@@ -788,7 +826,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
               {selectedOffering && (
                 <BookingDialog
-                  offering={selectedOffering}
+                  offering={{
+                    ...selectedOffering,
+                    discounted_price: selectedOffering.discounted_price
+                      ? Number(selectedOffering.discounted_price)
+                      : 0,
+                  }}
                   isOpen={!!selectedOffering}
                   onClose={() => setSelectedOffering(null)}
                 />

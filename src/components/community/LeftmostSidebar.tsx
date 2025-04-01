@@ -513,6 +513,8 @@ export function LeftmostSidebar() {
           name: validCommunities[0].name,
           image: validCommunities[0].image,
           background_image: validCommunities[0].background_image,
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
     }
@@ -658,6 +660,8 @@ export function LeftmostSidebar() {
                       name: community.name,
                       image: community.image,
                       background_image: community.background_image,
+                      user_isBankDetailsAdded: false,
+                      user_iscalendarConnected: false
                     })
                   );
                   dispatch(
@@ -714,7 +718,7 @@ export function LeftmostSidebar() {
             />
           </Dialog>
 
-          <Link href="/explore">
+          <Link href="/">
             <Button
               variant="ghost"
               size="icon"

@@ -1,23 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Session } from "next-auth";
 
-
 interface Community {
   [x: string]: string | null;
   id: string;
   name: string;
 }
 interface UserState {
-  user: Session["user"] | null; 
+  user: Session["user"] | null;
   sessionId: string | null;
-  userFollowedCommunities: Community[]; 
+  userFollowedCommunities: Community[];
+  isBankAdded: boolean;
+  isCalendarConnected: boolean;
 }
 const initialState: UserState = {
   user: null,
-  sessionId: null, 
-  userFollowedCommunities: [], 
+  sessionId: null,
+  userFollowedCommunities: [],
+  isBankAdded: false,
+  isCalendarConnected: false,
 };
-
 
 export const userSlice = createSlice({
   name: "user",
@@ -32,13 +34,28 @@ export const userSlice = createSlice({
     setUserFollowedCommunities: (state, action: PayloadAction<Community[]>) => {
       state.userFollowedCommunities = action.payload; // Store user-followed communities
     },
+    setIsBankAdded: (state, action: PayloadAction<boolean>) => {
+      state.isBankAdded = action.payload;
+    },
+    setIsCalendarConnected: (state, action: PayloadAction<boolean>) => {
+      state.isCalendarConnected = action.payload;
+    },
     clearUser: (state) => {
       state.user = null;
       state.sessionId = null; // Clear sessionId when the user is cleared
       state.userFollowedCommunities = [];
+      state.isBankAdded = false;
+      state.isCalendarConnected = false;
     },
   },
 });
 
-export const { setUser, setSessionId, setUserFollowedCommunities, clearUser } = userSlice.actions;
+export const {
+  setUser,
+  setSessionId,
+  setUserFollowedCommunities,
+  clearUser,
+  setIsBankAdded,
+  setIsCalendarConnected,
+} = userSlice.actions;
 export default userSlice.reducer;

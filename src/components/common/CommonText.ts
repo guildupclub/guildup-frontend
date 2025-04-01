@@ -17,7 +17,8 @@ export const StringConstants = {
     MEMBER: 'Members',
     POSTS: 'Posts',
     ERROR_LOADING_POSTS: 'Error loading posts',
-    UNFOLLOW: 'Unfollow',
+    // UNFOLLOW: 'Unfollow',
+    FOLLOWING: 'Following',
     FOLLOW: 'Follow',
     OFFERINGS: 'Offerings',
     NO_OFFERINGS: 'No offerings available yet',
@@ -123,6 +124,7 @@ export const StringConstants = {
     FOLLOWERS:"Followers",
     NO_COMMUNITIES_AVAILABLE: 'No communities available',
     PUBLIC: 'Public',
+    SAVE: 'Save'
 
 }
 

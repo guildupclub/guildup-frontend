@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      animation: {
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
@@ -60,6 +63,16 @@ export default {
         "primary-gradient":
           "linear-gradient(to bottom right, hsl(270, 100%, 49%), hsl(224, 100%, 60%))",
       },
+      keyframes: {
+        pulse: {
+          '0%, 100%': {
+            opacity: '1',
+          },
+          '50%': {
+            opacity: '0.5',
+          },
+        }
+      }
     },
   },
   plugins: [
