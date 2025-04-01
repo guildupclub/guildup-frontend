@@ -189,20 +189,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       setLoading(false);
     }
   };
-
   const handleCalendarConnect = async () => {
     if (!user?._id) return;
 
     setLoading(true);
     let newTab: Window | null = null;
     try {
-      // Redirect to calendar access endpoint
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/calendar-access/${user._id}`
       );
-      console.log(response);
 
-      // Check if calendar is already connected
       if (
         response.data.r === "s" &&
         response.data.data === "Calendar already connected"
@@ -211,39 +207,39 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         setCalendarConnected(true);
         setLoading(false);
         toast.success("Calendar already connected.");
-
-        // Always proceed to bank details after calendar connection
         setCurrentStep(3);
         return;
       }
 
-      console.log(response.data.data.authUrl);
       if (response.data.data.authUrl) {
-        toast.info("Redirecting...");
-        console.log("Redirecting...");
-        newTab = window.open(response.data.data.authUrl, "_blank");
+        toast.info("Opening calendar authorization...");
+        const width = window.innerWidth * 0.9;
+        const height = window.innerHeight * 0.9;
+        const left = (window.innerWidth - width) / 2;
+        const top = (window.innerHeight - height) / 2;
+
+        newTab = window.open(
+          response.data.data.authUrl,
+          "_blank",
+          `width=${width},height=${height},top=${top},left=${left}`
+        );
+
         if (!newTab) {
           toast.warning("Pop-up blocked! Please allow pop-ups for this site.");
           setLoading(false);
           return;
         }
 
-        // Set flag that auth window is open
         setAuthWindowOpen(true);
 
-        // Start polling to check if the popup window is closed
-        const interval = setInterval(async () => {
-          // Check if the popup window is closed
+        const interval = setInterval(() => {
           if (newTab && newTab.closed) {
             clearInterval(interval);
             setPollingInterval(null);
             setAuthWindowOpen(false);
             setLoading(false);
-
-            setCalendarConnected(true); // Assume connection was successful if window was closed
+            setCalendarConnected(true);
             toast.success("Calendar connected successfully!");
-
-            // Always proceed to bank details after calendar connection
             setCurrentStep(3);
           }
         }, 1000);
@@ -421,7 +417,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         >
           Click here
         </Link>{" "}
-        to set up your bank details or you can add them later from payments page.
+        to set up your bank details or you can add them later from payments
+        page.
       </span>
     );
   };
@@ -584,12 +581,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   </div>
 
                   <div className="flex justify-between">
-                  <Button
+                    <Button
                       type="button"
                       variant="outline"
                       onClick={handleSkipClick}
                     >
-                     Skip
+                      Skip
                     </Button>
                     <Button
                       type="submit"
@@ -682,7 +679,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       variant="outline"
                       onClick={handleSkipClick}
                     >
-                     Skip
+                      Skip
                     </Button>
                     <Button
                       type="submit"
