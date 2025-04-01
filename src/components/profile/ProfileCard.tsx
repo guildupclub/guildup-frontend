@@ -19,7 +19,7 @@ import { EditCommunityModal } from "../form/editCommunity";
 import EditOfferingModal from "./UpdateOffering";
 import { StringConstants } from "../common/CommonText";
 import { GrInstagram } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
+import { BsLinkedin, BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import numbro from "numbro";
 // Add this state in ProfileCard component
@@ -211,6 +211,8 @@ import { motion } from "framer-motion";
 import Testimonials from "../testimonial/Testimonial";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../Loader";
+import { FaLinkedinIn } from "react-icons/fa6";
+import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 
 export function ProfileCard({ communityId }: ProfileCardProps) {
   const dispatch = useDispatch();
@@ -274,16 +276,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // Add this near the top of your component, after other useQuery hooks
   const { data: followedCommunitiesData } = useQuery({
     queryKey: ["userFollowedCommunities"],
-    queryFn: async () => {
-      if (!user?._id) return [];
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/user/followed-communities/${user._id}`
-      );
-      if (response.data.r === "s") {
-        return response.data.data || [];
-      }
-      return [];
-    },
     enabled: !!user?._id,
   });
 
@@ -317,7 +309,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
       console.log("@responseProfilePAge", response.data.data);
       if (response.data.r === "s") {
-        // Update avatar and background images
         if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
@@ -352,6 +343,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
     }
   }, [profile?.community]);
+  useEffect(() => {
+    if (profile?.user) {
+      dispatch(setIsBankAdded(profile.user.user_isBankDetailsAdded));
+      dispatch(setIsCalendarConnected(profile.user.user_iscalendarConnected));
+    }
+  }, [profile?.user, dispatch]);
 
   console.log("@profile", profile?.community.background_image);
 
@@ -676,6 +673,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {StringConstants.SUBSCRIBERS}
                   </div>
                 )}
+
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <div className="flex items-center gap-1.5 cursor-pointer">
+                  <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                  {/* <BsLinkedin className="h-5 w-5 text-blue-800" /> */}
+                </div>
               </div>
             </div>
             {isOwner ? (
