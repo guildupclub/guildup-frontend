@@ -22,6 +22,7 @@ import moment from "moment";
 import DOMPurify from "dompurify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CommentSection from "./CommentSection/CommentSection";
+import { StringConstants } from "../common/CommonText";
 
 interface PostCardProps {
   post: {
@@ -63,15 +64,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   // Use React Query to fetch post data including likes and comments
   const { data: postData } = useQuery({
     queryKey: ["post", post._id],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${post._id}`
-      );
-      return response.data.data;
-    },
-    // Use the initial post data as placeholder
     initialData: post,
-    // Don't refetch on window focus to avoid unnecessary requests
     refetchOnWindowFocus: false,
   });
 
@@ -311,41 +304,38 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           </div>
         )}
       </div>
+      <div className="flex items-center px-4 md:px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
+        {/* Left Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
+          onClick={handleLikeClick}
+        >
+          <Heart
+            className={`h-5 w-5 ${isLiked ? "text-red-500 fill-red-500" : ""}`}
+          />
+          <span className="text-sm">
+            {formatNumber(postData?.up_votes || 0)} {StringConstants.LIKE}
+          </span>
+        </button>
 
-      {/* Action buttons with top padding */}
-      <div className="px-4 py-4 border-t border-zinc-300/50">
-        <div className="flex items-center justify-between">
-          <button
-            className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
-            onClick={handleLikeClick}
-          >
-            <Heart
-              className={`h-5 w-5 ${
-                isLiked ? "text-red-500 fill-red-500" : ""
-              }`}
-            />
-            <span className="text-sm">
-              {formatNumber(postData?.up_votes || 0)} Like
-            </span>
-          </button>
+        {/* Middle Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground"
+          onClick={() => setShowComments(!showComments)}
+        >
+          <MessageCircleMore className="h-5 w-5" />
+          <span className="text-sm">
+            {post.reply_count} {StringConstants.COMMENT}
+          </span>
+        </button>
 
-          <button
-            className="flex items-center gap-2 text-muted-foreground"
-            onClick={() => setShowComments(!showComments)}
-          >
-            <MessageCircleMore className="h-5 w-5" />
-            <span className="text-sm">
-              {formatNumber(postData?.replies?.length || 0)} Comment
-            </span>
-          </button>
-
-          <button
-            className="flex items-center gap-2 text-muted-foreground"
-            onClick={handleShareClick}
-          >
-            <Send className="h-5 w-5" /> Share
-          </button>
-        </div>
+        {/* Right Icon */}
+        <button
+          className="flex items-center gap-2 text-muted-foreground"
+          onClick={handleShareClick}
+        >
+          <Send className="h-5 w-5" /> {StringConstants.SHARE}
+        </button>
       </div>
 
       {showComments && (

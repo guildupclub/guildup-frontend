@@ -462,7 +462,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             }))
           }
           placeholder="Write a reply..."
-          className="w-full bg-background rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         <Button
           variant="ghost"
