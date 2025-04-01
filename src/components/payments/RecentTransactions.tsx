@@ -57,7 +57,7 @@ const TransactionRow: FC<TransactionRowProps> = ({ transaction }) => {
         </div>
         <div className="text-center">
           <p className='font-normal text-sm leading-5 decoration-[#4A4A4A]'>
-            ₹{transaction.amount}
+            ₹{(transaction.amount/100).toFixed(2)}
           </p>
         </div>
         <div className="text-right">
@@ -99,7 +99,7 @@ const TransactionRow: FC<TransactionRowProps> = ({ transaction }) => {
         </div>
         <div className="text-center">
           <p className='font-normal text-sm md:text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
-            ₹{transaction.amount}
+            ₹{(transaction.amount/100).toFixed(2)}
           </p>
         </div>
         <div className="text-right">
