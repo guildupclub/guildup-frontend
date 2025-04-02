@@ -6,7 +6,7 @@ import * as React from "react";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import FooterLinks from "./FootLinks";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ import axios from "axios";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 import { toast } from "sonner";
 import DOMPurify from "dompurify";
@@ -29,6 +29,10 @@ interface TrendingPost {
     name: string;
     image: string | null;
     background_image: string | null;
+  };
+  media: {
+    publicUrl: string;
+    fileType: string;
   };
   body: string;
   up_votes: number;
@@ -51,7 +55,10 @@ export function RightSidebar() {
         setIsLoading(true);
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/trending`,
-          { page: 0, limit: 5 }
+          {
+            page: 0,
+            limit: 5,
+          }
         );
 
         if (response && response.data && response.data.r === "s") {
@@ -87,9 +94,10 @@ export function RightSidebar() {
       toast("Sign in required", {
         action: {
           label: "Sign In",
-          onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}?hero=1`
-          }),
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
         },
       });
     } else {
@@ -99,7 +107,6 @@ export function RightSidebar() {
 
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
-      {/* Creator Box - Only show if user is not already a creator */}
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
           <h1 className="font-semibold  font-sans">
@@ -116,19 +123,17 @@ export function RightSidebar() {
               {StringConstants.CREATE_A_PAGE}
             </Button>
 
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} /> }
+            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
           </Dialog>
         </div>
       )}
 
-      {/* Trending Posts Box */}
-      <div className="bg-card rounded-xl shadow-sm border border-zinc-200/30">
-        <h2 className="text-lg font-semibold px-4 py-3 border-b border-zinc-200/50">
+      <div className="bg-card rounded-xl shadow-sm border border-zinc-200/30 hover:shadow-md transition-shadow">
+        <h2 className="text-lg font-semibold px-4 py-1 border-b border-zinc-200/50">
           {StringConstants.TRENDING_POSTS}
         </h2>
         <div className="max-h-[470px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
           {isLoading ? (
-            // Loading skeleton UI
             Array(3)
               .fill(0)
               .map((_, index) => (
@@ -155,11 +160,11 @@ export function RightSidebar() {
             trendingPosts.map((post) => (
               <div
                 key={post._id}
-                className="px-4 py-3 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
+                className="px-4 py-2 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
               >
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8 ring-1 ring-zinc-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Avatar className="h-6 w-6 ring-1 ring-zinc-200/50 shadow-sm">
                       {post?.community_id?.image ? (
                         <AvatarImage
                           src={post?.community_id?.image}
@@ -178,22 +183,52 @@ export function RightSidebar() {
                     </span>
                   </div>
 
-                  <p
-                    className="text-sm line-clamp-4 font-normal text-foreground/90"
-                    dangerouslySetInnerHTML={{
-                      __html: DOMPurify.sanitize(
-                        post.body.startsWith('"') && post.body.endsWith('"')
-                          ? post.body.slice(1, -1)
-                          : post.body
-                      ),
-                    }}
-                  />
-                  {/* <div className="flex items-center text-xs text-muted-foreground pt-1">
-                    <div className="flex items-center gap-1 group">
-                      <Heart className="h-3.5 w-3.5 group-hover:text-red-500 transition-colors" />
-                      <span>{post.up_votes}</span>
+                  <div className="flex flex-row gap-3 justify-between">
+                    {/* Description on the left */}
+                    <div
+                      className={`${
+                        post?.media?.publicUrl ? "flex-1" : "w-full"
+                      }`}
+                    >
+                      <p
+                        className="text-sm line-clamp-4 font-normal text-foreground/90"
+                        dangerouslySetInnerHTML={{
+                          __html: DOMPurify.sanitize(
+                            post.body.startsWith('"') && post.body.endsWith('"')
+                              ? post.body.slice(1, -1)
+                              : post.body
+                          ),
+                        }}
+                      />
+                      <div className="text-sm text-accent mt-2" />
                     </div>
-                  </div> */}
+                    {post?.media?.publicUrl && (
+                      <div className="flex-shrink-0 ml-2">
+                        {post?.media?.fileType === "image" && (
+                          <img
+                            src={post.media.publicUrl || "/placeholder.svg"}
+                            alt="Post Image"
+                            className="w-24 h-12 rounded-lg object-cover shadow-sm"
+                          />
+                        )}
+                        {post?.media?.fileType === "video" && (
+                          <video
+                            className="w-24 h-12 rounded-lg object-cover shadow-sm"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            disableRemotePlayback
+                          >
+                            <source
+                              src={post?.media?.publicUrl}
+                              type="video/mp4"
+                            />
+                          </video>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,10 @@ import {
 import { useSession } from "next-auth/react";
 import { StringConstants } from "../common/CommonText";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useRouter } from "next/navigation";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { setCommunityData } from "@/redux/communitySlice";
+
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -36,6 +40,8 @@ interface Category {
 }
 
 export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
@@ -109,9 +115,28 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async(data) => {
+      const newCommunity = data.data;
       toast.success("Community created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["communities"] });
+       dispatch(
+              setActiveCommunity({
+                id: newCommunity._id,
+                name: newCommunity.name,
+                image: newCommunity.image,
+                background_image: newCommunity.background_image,
+                user_isBankDetailsAdded: false,
+                user_iscalendarConnected: false
+              })
+            );
+            dispatch(
+              setCommunityData({
+                communityId: newCommunity._id,
+                userId: userId,
+              })
+            );
+            await queryClient.invalidateQueries({ queryKey: ["communities"] });
+            await queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
       setFormData({
         name: "",
         description: "",
@@ -122,6 +147,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       setCategoryId("");
       onClose();
       onSuccess?.();
+      await router.push(`/community/${newCommunity._id}/profile`);
+      
+      // setIsRedirecting(false); 
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
