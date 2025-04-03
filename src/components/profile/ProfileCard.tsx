@@ -769,7 +769,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </span> */}
                     <div className="flex items-center justify-between gap-2">
                       {isOwner && (
-                        <div className="flex gap-2">
+                        <div className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}>
                           <Button
                             size="sm"
                             variant="outline"
@@ -793,6 +793,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       )}
 
                       {/* Book Now button */}
+                      {!isOwner && (
                       <Button
                         size="sm"
                         className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
@@ -818,7 +819,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           <span>₹{offering.price.amount}</span>
                         ) : null}
                         <ArrowRight className="w-4 h-4" />
-                      </Button>
+                      </Button>)}
                     </div>
                   </div>
                 </div>
@@ -842,7 +843,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
         {/* Testimonials Section */}
         <div className="col-span-1 lg:col-span-2 mt-8">
-          <div className="rounded-xl px-4 py-2 shadow-sm ">
+          <div className="rounded-xl shadow-sm ">
             <Testimonials />
           </div>
         </div>
