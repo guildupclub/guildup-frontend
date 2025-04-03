@@ -45,7 +45,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   const queryClient = useQueryClient();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const { data: session } = useSession();
-  
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -115,28 +115,28 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
       return data;
     },
-    onSuccess: async(data) => {
+    onSuccess: async (data) => {
       const newCommunity = data.data;
       toast.success("Community created successfully! 🎉");
       queryClient.invalidateQueries({ queryKey: ["communities"] });
-       dispatch(
-              setActiveCommunity({
-                id: newCommunity._id,
-                name: newCommunity.name,
-                image: newCommunity.image,
-                background_image: newCommunity.background_image,
-                user_isBankDetailsAdded: false,
-                user_iscalendarConnected: false
-              })
-            );
-            dispatch(
-              setCommunityData({
-                communityId: newCommunity._id,
-                userId: userId,
-              })
-            );
-            await queryClient.invalidateQueries({ queryKey: ["communities"] });
-            await queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
+      dispatch(
+        setActiveCommunity({
+          id: newCommunity._id,
+          name: newCommunity.name,
+          image: newCommunity.image,
+          background_image: newCommunity.background_image,
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false,
+        })
+      );
+      dispatch(
+        setCommunityData({
+          communityId: newCommunity._id,
+          userId: userId,
+        })
+      );
+      await queryClient.invalidateQueries({ queryKey: ["communities"] });
+      await queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
       setFormData({
         name: "",
         description: "",
@@ -148,8 +148,8 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       onClose();
       onSuccess?.();
       await router.push(`/community/${newCommunity._id}/profile`);
-      
-      // setIsRedirecting(false); 
+
+      // setIsRedirecting(false);
     },
     onError: (error: any) => {
       toast.error(`Failed to create community: ${error.message}`);
@@ -173,14 +173,15 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   };
 
   return (
-    (session && (
+    session && (
       <DialogContent className="sm:max-w-[470px] bg-card text-muted border-none">
         <DialogHeader className="flex items-center justify-between py-2">
           <DialogTitle className="text-xl font-semibold font-serif">
             Let&apos;s Build your Guild!
           </DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-          A Guild is your digital home for sharing expertise, building community, and earning money.
+            A Guild is your digital home for sharing expertise, building
+            community, and earning money.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-5 ">
@@ -261,7 +262,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </div> */}
 
           <div className="space-y-2">
-            <Label>{StringConstants.ABOUT_THE_PAGE}&nbsp;<span className="text-red-500">*</span>
+            <Label>
+              {StringConstants.ABOUT_THE_PAGE}&nbsp;
+              <span className="text-red-500">*</span>
             </Label>
             <Textarea
               name="description"
@@ -286,6 +289,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </Button>
         </div>
       </DialogContent>
-    ))
+    )
   );
 }
