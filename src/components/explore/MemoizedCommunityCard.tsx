@@ -1,65 +1,72 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { IoVideocam } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
-import { FaYoutube } from "react-icons/fa";
-import { ArrowRight } from "lucide-react";
-import { BookingDialog } from "../booking/Bookingdialog"; // Ensure correct import path
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { access } from "fs";
 
 interface CommunityCardProps {
-  community: any; 
+  community: any;
   onClick: () => void;
 }
 
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
-
+  const [avatarImgUrl, setAvatarImgUrl] = useState("");
+  const [bgImgUrl, setBgImgUrl] = useState("");
   const tags: string[] = community?.community?.tags?.[0]?.includes(",")
     ? community.community.tags[0].split(",").map((tag: string) => tag.trim())
     : community?.community?.tags || [];
 
-
   const communityDetails = community?.community;
   const OfferingDetails = community?.offerings;
 
-  const firstOffering = OfferingDetails.length > 0 ? OfferingDetails[0] : null;
+  const firstOffering = OfferingDetails?.length > 0 ? OfferingDetails[0] : null;
 
-  // console.log("@communityDetails", communityDetails, community);
+  useEffect(() => {
+    if (community) {
+      const seedValue =
+        community._id ||
+        communityDetails?._id ||
+        (communityDetails?.name &&
+          `${communityDetails.name}-${
+            communityDetails?.user_id || Date.now()
+          }`);
+
+      setAvatarImgUrl(
+        communityDetails?.image ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`
+      );
+
+      setBgImgUrl(
+        communityDetails?.background_image ||
+          "https://random-image-pepebigotes.vercel.app/api/random-image"
+      );
+    }
+  }, [community, communityDetails]);
+
   return (
     <Card
       onClick={onClick}
       className="relative w-full border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
     >
-      {/* Background Image */}
       <div className="relative h-[80px] w-full bg-gray-200">
         <Image
-          src={
-            community.community.background_image &&
-            community.community.background_image !== ""
-              ? community.community.background_image
-              : "/defaultCommunityIcon.png"
-          }
+          src={bgImgUrl }
           alt="Background"
           fill
           className="object-cover"
         />
       </div>
-
-      {/* Profile Image */}
       <div className="absolute left-4 top-[50px] rounded-full border border-white">
         <Image
-          src={
-            community.community.image && community.community.image !== ""
-              ? community.community.image
-              : "/defaultCommunityIcon.png"
-          }
+          src={avatarImgUrl}
           alt="Profile"
           width={64}
           height={64}
@@ -67,9 +74,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
         />
       </div>
 
-      {/* Card Content */}
       <div className="p-4 pt-10 flex-1">
-        {/* Name & Stats */}
         <h3 className="font-semibold text-gray-800 text-lg">
           {communityDetails?.name}
         </h3>
@@ -78,9 +83,6 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             <ImUsers className="text-blue-600 h-4 w-4" />{" "}
             {communityDetails?.num_member}+
           </span>
-          {/* <span className="flex items-center gap-1 mx-2">
-            <FaYoutube className="text-red-600 h-4 w-4" /> 4K+
-          </span> */}
         </div>
 
         {/* Tags */}
@@ -112,13 +114,15 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             size="sm"
             className="text-white px-6 py-2 rounded-lg flex items-center gap-2 bg-primary"
             onClick={(e) => {
+              e.stopPropagation(); // Prevent card click when clicking the button
               if (!session) {
-                toast('Please sign in to book the offering', {
+                toast("Please sign in to book the offering", {
                   action: {
                     label: "Sign In",
-                    onClick: () => signIn(undefined, {
-                      callbackUrl: `${window.location.origin}?hero=1`
-                    }),
+                    onClick: () =>
+                      signIn(undefined, {
+                        callbackUrl: `${window.location.origin}?hero=1`,
+                      }),
                   },
                 });
                 return;
@@ -143,32 +147,8 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           <p className="text-muted font-medium">No Offering Available</p>
         </div>
       )}
-
-      {/* {selectedOffering && (
-        <BookingDialog
-          offering={selectedOffering}
-          isOpen={!!selectedOffering}
-          onClose={() => setSelectedOffering(null)}
-        />
-      )} */}
     </Card>
   );
 }
 
 export default React.memo(CommunityCard);
-
-
-{
-  /* <Button className="text-sm font-semibold text-white bg-primary px-4 py-1 rounded-lg">
-{OfferingDetails?.[0]?.price?.amount ? (
-  <>
-    <span className="line-through text-xs opacity-60">
-      ₹{OfferingDetails[0].price.amount + 1000}
-    </span>{" "}
-  </>
-) : null}
-{OfferingDetails?.[0]?.price?.amount
-  ? `₹${OfferingDetails[0].price.amount}`
-  : "FREE"}
-</Button> */
-}
