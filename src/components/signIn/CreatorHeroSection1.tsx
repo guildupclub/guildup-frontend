@@ -4,7 +4,7 @@ import Login_laptop from "./../../../public/Login_laptop.png";
 
 export const CreatorHeroSection1: React.FC = () => {
   return (
-    <div className="w-full bg-white flex flex-col items-center justify-start p-8 gap-16 border border-background">
+    <div className="w-full bg-white flex flex-col items-center justify-start p-8 gap-16 border border-background min-h-screen">
       <div className="flex justify-center w-full">
         <Image
           src={guildup_logo || "/placeholder.svg"}
