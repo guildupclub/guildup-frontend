@@ -18,7 +18,7 @@ export function Stepper({ steps }: StepperProps) {
               {/* Step Circle & Label */}
               <div className="relative flex flex-col items-center z-10 w-1/4 sm:w-auto">
                 <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step.completed
                       ? "bg-green-500 text-white"
                       : step.active
