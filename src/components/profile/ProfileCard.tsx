@@ -805,63 +805,66 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       {/* <span className="text-xl font-semibold text-gray-900 pl-12">
                       ₹{offering.price.amount}
                     </span> */}
-                    <div className="flex items-center justify-between gap-2">
-                      {isOwner && (
-                        <div className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        {isOwner && (
+                          <div
+                            className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}
+                          >
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-3 py-2 rounded-lg flex items-center gap-1"
+                              onClick={() => handleEditClick(offering)}
+                            >
+                              <Edit className="w-4 h-4" />
+                              <span>{StringConstants.EDIT}</span>
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              onClick={() => handleDeleteOffering(offering._id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              <span>{StringConstants.DELETE}</span>
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Book Now button */}
+                        {!isOwner && (
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="px-3 py-2 rounded-lg flex items-center gap-1"
-                            onClick={() => handleEditClick(offering)}
+                            className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                              !isOwner ? "ml-auto" : ""
+                            }`}
+                            onClick={() => {
+                              if (!session) {
+                                signIn("google");
+                                return;
+                              }
+                              setSelectedOffering(offering);
+                            }}
                           >
-                            <Edit className="w-4 h-4" />
-                            <span>{StringConstants.EDIT}</span>
+                            {offering?.discounted_price &&
+                            offering?.price?.amount ? (
+                              <>
+                                <span className="line-through text-xs opacity-60">
+                                  ₹{offering.price.amount}
+                                </span>
+                                <span> ₹{offering.discounted_price}</span>
+                              </>
+                            ) : offering?.price?.amount ? (
+                              <span>₹{offering.price.amount}</span>
+                            ) : null}
+                            <ArrowRight className="w-4 h-4" />
                           </Button>
-
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
-                            onClick={() => handleDeleteOffering(offering._id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            <span>{StringConstants.DELETE}</span>
-                          </Button>
-                        </div>
-                      )}
-
-                      {/* Book Now button */}
-                      {!isOwner && (
-                      <Button
-                        size="sm"
-                        className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                          !isOwner ? "ml-auto" : ""
-                        }`}
-                        onClick={() => {
-                          if (!session) {
-                            signIn("google");
-                            return;
-                          }
-                          setSelectedOffering(offering);
-                        }}
-                      >
-                        {offering?.discounted_price &&
-                        offering?.price?.amount ? (
-                          <>
-                            <span className="line-through text-xs opacity-60">
-                              ₹{offering.price.amount}
-                            </span>
-                            <span> ₹{offering.discounted_price}</span>
-                          </>
-                        ) : offering?.price?.amount ? (
-                          <span>₹{offering.price.amount}</span>
-                        ) : null}
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>)}
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
                 {selectedOffering && (
                   <BookingDialog
@@ -879,22 +882,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             )}
           </div>
 
-        {/* Testimonials Section */}
-        <div className="col-span-1 lg:col-span-2 mt-8">
-          <div className="rounded-xl shadow-sm ">
-            <Testimonials />
-          </div>
-        </div>
-        {isEditOpen && (
-          <EditCommunityModal
-            profile={profile}
-            isOpen={isEditOpen}
-            onClose={() => setIsEditOpen(false)}
-          />
-        )}
           {/* Testimonials Section */}
           <div className="col-span-1 lg:col-span-2 mt-8">
-            <div className="rounded-xl px-4 py-2 shadow-sm ">
+            <div className="rounded-xl shadow-sm ">
               <Testimonials />
             </div>
           </div>
@@ -905,8 +895,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               onClose={() => setIsEditOpen(false)}
             />
           )}
-
-
           {isEditModalOpen && selectedOfferingModal && (
             <EditOfferingModal
               offering={selectedOfferingModal}
@@ -916,12 +904,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               onUpdate={fetchOfferings}
             />
           )}
-        {/* Testimonials Section */}
-        <div className="col-span-1 lg:col-span-2 mt-8">
-          <div className="rounded-xl shadow-sm ">
-            <Testimonials />
-          </div>
-
         </div>
       </div>
     </div>
