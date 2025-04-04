@@ -818,17 +818,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                             <span>{StringConstants.EDIT}</span>
                           </Button>
 
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
-                              onClick={() => handleDeleteOffering(offering._id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              <span>{StringConstants.DELETE}</span>
-                            </Button>
-                          </div>
-                        )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            onClick={() => handleDeleteOffering(offering._id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>{StringConstants.DELETE}</span>
+                          </Button>
+                        </div>
+                      )}
 
                       {/* Book Now button */}
                       {!isOwner && (
@@ -906,6 +906,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             />
           )}
 
+
           {isEditModalOpen && selectedOfferingModal && (
             <EditOfferingModal
               offering={selectedOfferingModal}
@@ -915,6 +916,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               onUpdate={fetchOfferings}
             />
           )}
+        {/* Testimonials Section */}
+        <div className="col-span-1 lg:col-span-2 mt-8">
+          <div className="rounded-xl shadow-sm ">
+            <Testimonials />
+          </div>
+
         </div>
       </div>
     </div>
