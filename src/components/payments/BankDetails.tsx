@@ -25,13 +25,11 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     benificiaryName: "",
     accountNumber: "",
     ifsc: "",
-    // pan: "ABCDE1234F"
   });
   const [initialBankDetails, setInitialBankDetails] = React.useState({
     benificiaryName: "",
     accountNumber: "",
     ifsc: "",
-    // pan: "ABCDE1234F"
   });
   const [isChanged, setIsChanged] = React.useState(false);
   
@@ -77,7 +75,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
             bank_details: bankDetails,
           }
         );
-        console.log("thsi is handle save response ",response.data);
+        console.log("this is handle save response ",response.data);
       }else{
         response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
@@ -86,7 +84,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
             bank_details: bankDetails,
           }
         );
-        console.log("thsi is handle save response ",response.data);
+        console.log("this is handle save response ",response.data);
       }
       fetchBankDetails();
       if (response.data.r === "s") {
