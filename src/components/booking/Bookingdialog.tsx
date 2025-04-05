@@ -23,10 +23,10 @@ import {
   ChevronLeft,
   Check,
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
@@ -49,6 +49,7 @@ interface BookingDialogProps {
     };
     discounted_price: number;
     duration: number;
+    is_free: boolean;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -181,17 +182,22 @@ export function BookingDialog({
         }
       );
 
-      if (response.data.success) {
-        console.log("Order Created:", response.data.order);
-
+      if (response.data.r === "s") {
+        console.log("Order Created:", response.data.data);
+        if(offering.is_free){
+          toast.success("Booking confirmed successfully!");
+          setIsProcessing(false);
+          onClose();
+          return;
+        }
         // Start Razorpay payment process
         const razorpayOptions = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
-          amount: response.data.order.amount, // Amount in paisa (100 INR = 10000)
-          currency: response.data.order.currency || "INR",
+          amount: response.data.data.amount, // Amount in paisa (100 INR = 10000)
+          currency: response.data.data.currency || "INR",
           name: "GuildUp", // Your business name
           description: "Slot Booking Payment",
-          order_id: response.data.order.id, // Razorpay order ID from backend
+          order_id: response.data.data.id, // Razorpay order ID from backend
           handler: async function (paymentResponse: any) {
             console.log("Payment Success:", paymentResponse);
             // After successful payment, call your backend to verify the payment
@@ -203,7 +209,7 @@ export function BookingDialog({
             );
             const startTime = dateObject.toISOString().slice(0, 19);
 
-            await axios.post(
+            const response = await axios.post(
               `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
               {
                 razorpay_order_id: paymentResponse.razorpay_order_id,
@@ -214,9 +220,18 @@ export function BookingDialog({
                 startTime,
               }
             );
-            console.log("Payment Verified");
-            // toast.success("Payment Successful! Booking confirmed.");
-            alert("Payment Successful! Booking confirmed.");
+
+            if (response.data.r === "s") {
+              onClose();
+              setIsProcessing(false);
+              setTimeout(() => {
+                toast.success("Booking confirmed successfully!");
+              }, 300);
+              console.log("Booking confirmed successfully!");
+              // alert("Booking confirmed successfully!");
+            } else {
+              toast.error("Payment verification failed");
+            }
           },
           theme: {
             color: "#3399cc",
@@ -275,7 +290,7 @@ export function BookingDialog({
   };
 
   const handlePaymentVerification = async (
-    paymentResponse: RazorpayResponse
+    paymentResponse: any
   ) => {
     try {
       console.log("Payment response:", paymentResponse);
