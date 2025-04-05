@@ -847,7 +847,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               setSelectedOffering(offering);
                             }}
                           >
-                            {offering?.discounted_price &&
+                            {offering.is_free ? (
+                              <span>Free</span>
+                            ):(offering?.discounted_price &&
                             offering?.price?.amount ? (
                               <>
                                 <span className="line-through text-xs opacity-60">
@@ -857,7 +859,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               </>
                             ) : offering?.price?.amount ? (
                               <span>₹{offering.price.amount}</span>
-                            ) : null}
+                            ) : null)}
                             <ArrowRight className="w-4 h-4" />
                           </Button>
                         )}

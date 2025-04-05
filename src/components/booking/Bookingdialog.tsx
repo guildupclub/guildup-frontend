@@ -163,6 +163,13 @@ export function BookingDialog({
 
     try {
       // Add your booking API call here
+      const dateObject = new Date(selectedSlot.start);
+
+      // Adjust for IST (UTC +5:30)
+      dateObject.setMinutes(
+        dateObject.getMinutes() - dateObject.getTimezoneOffset()
+      );
+      const startTime = dateObject.toISOString().slice(0, 19);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
@@ -170,6 +177,7 @@ export function BookingDialog({
           user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
+          startTime
         }
       );
 
