@@ -88,7 +88,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     },
     discounted_price: 0,
     duration: 60,
-    is_free: false,
+    is_free : true,
     tags: "",
   });
 
@@ -175,7 +175,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           },
           discounted_price: 0,
           duration: 60,
-          is_free: false,
+          is_free : true,
           tags: "",
         });
       } else {
@@ -331,7 +331,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             },
             discounted_price: 0,
             duration: 60,
-            is_free: false,
+            is_free : true,
             tags: "",
           });
           setOfferingCreated(false);
@@ -376,7 +376,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free: false,
+      is_free : true,
       tags: "",
     });
   };
@@ -403,7 +403,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free: false,
+      is_free : true,
       tags: "",
     });
 
@@ -1039,20 +1039,16 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                       <Input
                         id="price"
                         type="number"
-                        value={
-                          formData.price.amount === 0
-                            ? ""
-                            : formData.price.amount
-                        }
+                        value={formData.price.amount}
                         onChange={(e) => {
                           const value = e.target.value;
                           setFormData({
                             ...formData,
                             price: {
                               ...formData.price,
-                              amount: value === "" ? 0 : Number(value),
+                              amount: Number(value),
                             },
-                            is_free: value === "" || Number(value) === 0,
+                            is_free: Number(value) === 0,
                           });
                         }}
                         required
@@ -1069,15 +1065,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                         id="discounted_price"
                         type="number"
                         value={
-                          formData.discounted_price === 0
-                            ? ""
-                            : formData.discounted_price
+                          formData.discounted_price
                         }
                         onChange={(e) => {
                           const value = e.target.value;
                           setFormData({
                             ...formData,
-                            discounted_price: value === "" ? 0 : Number(value),
+                            discounted_price: Number(value),
+                            is_free: Number(value) === 0,
                           });
                         }}
                         required
@@ -1206,9 +1201,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                         id="price"
                         type="number"
                         value={
-                          formData.price.amount === 0
-                            ? ""
-                            : formData.price.amount
+                          formData.price.amount
                         }
                         onChange={(e) => {
                           const value = e.target.value;
@@ -1235,15 +1228,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                         id="discounted_price"
                         type="number"
                         value={
-                          formData.discounted_price === 0
-                            ? ""
-                            : formData.discounted_price
+                          formData.discounted_price
                         }
                         onChange={(e) => {
                           const value = e.target.value;
                           setFormData({
                             ...formData,
                             discounted_price: Number(value),
+                            is_free: Number(value) === 0,
                           });
                         }}
                         required
