@@ -6,7 +6,7 @@ import { FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
-
+import { Availablity } from '@/components/booking/Availablity';
 
 interface Booking {
   _id: string;
@@ -39,33 +39,35 @@ interface Booking {
 
 const BookingPage = () => {
   const [error, setError]= useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'completed'>('upcoming');
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'availability'>('upcoming');
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [completedBookings, setCompletedBookings] = useState<Booking[]>([]);
   const {user}= useSelector((state: RootState)=> state.user);
   const userId= user?._id;
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${userId}`);
-        // For testing
-        // const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/67d05e56d43e443ee256c756`);
-        const data: Booking[] = response.data.bookings;
-        console.log("this is data ",data);
+
+  const fetchBookings = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${userId}`);
+      // For testing
+      // const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/67d05e56d43e443ee256c756`);
+      const data: Booking[] = response.data.data;
+      console.log("this is data ",data);
+      
+      if(response.data.r=== 's'){
+        const upcoming = data.filter((booking) => booking.status !== 'completed');
+        const completed = data.filter((booking) => booking.status === 'completed');
         
-        if(response.data.success=== true){
-          const upcoming = data.filter((booking) => booking.status !== 'completed');
-          const completed = data.filter((booking) => booking.status === 'completed');
-          
-          setUpcomingBookings(upcoming);
-          setCompletedBookings(completed);
-        }else{
-          setError(true)
-        }
-      } catch (error) {
-        console.error('Error fetching bookings:', error);
+        setUpcomingBookings(upcoming);
+        setCompletedBookings(completed);
+      }else{
+        setError(true)
       }
-    };
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+    }
+  };
+
+  useEffect(() => {
     fetchBookings();
   }, []);
 
@@ -94,10 +96,16 @@ const BookingPage = () => {
           >
             Completed
           </button>
+          <button
+            className={`pb-2 ${activeTab === 'availability' ? 'text-blue-600 border-blue-600 border-b-2' : 'text-gray-500'}`}
+            onClick={() => setActiveTab('availability')}
+          >
+            Set Availability
+          </button>
         </div>
 
         <div className="space-y-4">
-          {(activeTab === 'upcoming' ? upcomingBookings : completedBookings).map((booking: Booking) => (
+          {activeTab !== 'availability' && (activeTab === 'upcoming' ? upcomingBookings : completedBookings).map((booking: Booking) => (
             <BookingCard
             key={booking._id}
             profileImage='/default-profile.jpg'
@@ -110,6 +118,7 @@ const BookingPage = () => {
             amount={booking.offering_id.price.amount}
           />
           ))}
+          {activeTab === 'availability' && <Availablity userId={userId}/>}
         </div>
       </div>
     </div>
