@@ -1,9 +1,13 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {toast} from "sonner";
+
+interface AvailabilityProps {
+    userId: string;
+}
 
 interface AvailabilityRowProps {
     day: string;
@@ -26,11 +30,12 @@ const timeOptions = [
     '21:00', '22:00',
 ];
 
-const handlesetAvailability = async (availability: Record<string, DayAvailability>) => {
+
+const handlesetAvailability = async (userId: string, availability: Record<string, DayAvailability>) => {
   try {
     const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/health`,
-      { availability} // Replace with actual availability data
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/availability/${userId}`,
+      { availability}
     );
     if (response.data.r === "s") {
       toast.success("Availability saved successfully!");
@@ -44,14 +49,33 @@ const handlesetAvailability = async (availability: Record<string, DayAvailabilit
 };
 
 
-export const Availablity = () => {
+const getAvailability = async (userId: string) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/availability/${userId}`
+    );
+    if (response.data.r === "s") {
+      return response.data.data;
+    } else {
+      toast.error("Failed to fetch availability.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching availability:", error);
+    toast.error("An error occurred while fetching availability.");
+    return null;
+  }
+}
+
+
+export const Availablity = ({userId}:AvailabilityProps) => {
   const [availability, setAvailability] = useState(() => {
        const initial: Record<string, DayAvailability> = {};
         days.forEach((day) => {
           initial[day] = {
             enabled: day === "Saturday" || day === "Sunday",
-            start: "9:00",
-            end: "5:00",
+            start: "09:00",
+            end: "17:00",
           };
         });
         return initial;
@@ -63,7 +87,7 @@ export const Availablity = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Availability</h1>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-md"
-        onClick={() => handlesetAvailability(availability)}
+        onClick={() => handlesetAvailability(userId, availability)}
         >
             Save
         </button>

@@ -105,7 +105,7 @@ const BookingPage = () => {
         </div>
 
         <div className="space-y-4">
-          {(activeTab === 'upcoming' ? upcomingBookings : completedBookings).map((booking: Booking) => (
+          {activeTab !== 'availability' && (activeTab === 'upcoming' ? upcomingBookings : completedBookings).map((booking: Booking) => (
             <BookingCard
             key={booking._id}
             profileImage='/default-profile.jpg'
@@ -118,7 +118,7 @@ const BookingPage = () => {
             amount={booking.offering_id.price.amount}
           />
           ))}
-          {activeTab === 'availability' && <Availablity />}
+          {activeTab === 'availability' && <Availablity userId={userId}/>}
         </div>
       </div>
     </div>
