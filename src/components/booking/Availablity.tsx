@@ -57,7 +57,6 @@ const getAvailability = async (userId: string) => {
     if (response.data.r === "s") {
       return response.data.data;
     } else {
-      toast.error("Failed to fetch availability.");
       return null;
     }
   } catch (error) {
@@ -80,7 +79,33 @@ export const Availablity = ({userId}:AvailabilityProps) => {
         });
         return initial;
       });
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      setLoading(true);
+      const data = await getAvailability(userId);
+      if (data && typeof data === 'object') {
+        // Check if data has the expected structure
+        const hasValidStructure = days.every(day => 
+          data[day] && 
+          typeof data[day].enabled === 'boolean' &&
+          typeof data[day].start === 'string' && 
+          typeof data[day].end === 'string'
+        );
+
+        if (hasValidStructure) {
+          setAvailability(data);
+        } else {
+          console.warn("Retrieved availability data has invalid structure", data);
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchAvailability();
+  }, [userId]);
+    
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
@@ -88,14 +113,18 @@ export const Availablity = ({userId}:AvailabilityProps) => {
         <h1 className="text-2xl font-semibold">Availability</h1>
         <button className="bg-blue-600 text-white px-4 py-2 rounded-md"
         onClick={() => handlesetAvailability(userId, availability)}
+        disabled={loading}
         >
-            Save
+           {loading ? "Loading..." : "Save"}
         </button>
        </div>
         <p className="text-sm text-gray-500">
           Set your availability for the selected service.
         </p>
       </div>
+      {loading ? (
+        <div className="py-4 text-center text-gray-500">Loading your availability...</div>
+      ) : (
       <div className="flex flex-col gap-4">
       {days.map((day) => (
         <AvailabilityRow
@@ -111,6 +140,7 @@ export const Availablity = ({userId}:AvailabilityProps) => {
         />
       ))}
       </div>
+      )}
     </div>
   );
 }
