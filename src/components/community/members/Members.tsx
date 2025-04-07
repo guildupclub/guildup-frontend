@@ -79,7 +79,6 @@ export default function Members({ communityId }: MembersProps) {
 
         const data: MembersResponse = await response.json();
         setMembers(data.data);
-        console.log("Members data:", data.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load members");
       } finally {
