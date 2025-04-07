@@ -808,7 +808,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <div className="flex items-center justify-between gap-2">
                         {isOwner && (
                           <div
-                            className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}
+                            className={`flex gap-2`}
                           >
                             <Button
                               size="sm"
@@ -833,18 +833,18 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
 
                         {/* Book Now button */}
-                        {!isOwner && (
                           <Button
                             size="sm"
+                            disabled={isOwner ?? false}
                             className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                              !isOwner ? "ml-auto" : ""
+                              !isOwner? "cursor-pointer" : "cursor-not-allowed opacity-50"
                             }`}
                             onClick={() => {
                               if (!session) {
                                 signIn("google");
                                 return;
                               }
-                              setSelectedOffering(offering);
+                              if(!isOwner)  setSelectedOffering(offering);
                             }}
                           >
                             {offering.is_free ? (
@@ -862,7 +862,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                             ) : null)}
                             <ArrowRight className="w-4 h-4" />
                           </Button>
-                        )}
                       </div>
                     </div>
                   </div>

@@ -25,8 +25,8 @@ import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 
 interface User {
+  name: string;
   _id: string;
-  user_name?: string;
   email: string;
   avatar: string | null;
 }
@@ -79,6 +79,8 @@ export default function Members({communityId}: MembersProps) {
 
         const data: MembersResponse = await response.json();
         setMembers(data.data);
+        console.log("this is members",data.data);
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load members");
       } finally {
@@ -163,14 +165,14 @@ export default function Members({communityId}: MembersProps) {
                     <Avatar>
                       <AvatarImage src={member.user_id.avatar || undefined} />
                       <AvatarFallback className="bg-card text-muted-foreground">
-                        {member.user_id.user_name?.[0]?.toUpperCase() ||
+                        {member.user_id.name?.[0]?.toUpperCase() ||
                           member.user_id.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium truncate text-muted-foreground">
-                          {member.user_id.user_name || member.user_id.email}
+                          {member.user_id.name || member.user_id.email}
                         </p>
                         <div className="flex gap-1">
                           {member.is_owner && (
