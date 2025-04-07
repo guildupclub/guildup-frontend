@@ -199,7 +199,7 @@ export default function Testimonials() {
               ) : (
                 <>
                   <span>Add Testimonial</span>
-                  <Plus className="w-5 h-5" />
+                  {/* <Plus className="w-5 h-5" /> */}
                 </>
               )}
             </Button>
