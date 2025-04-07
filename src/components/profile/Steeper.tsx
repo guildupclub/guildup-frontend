@@ -18,11 +18,11 @@ export function Stepper({ steps }: StepperProps) {
               {/* Step Circle & Label */}
               <div className="relative flex flex-col items-center z-10 w-1/4 sm:w-auto">
                 <div
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  className={`w-6 h-6  rounded-full flex items-center justify-center text-sm font-medium ${
                     step.completed
-                      ? "bg-green-500 text-white"
+                      ? "bg-blue-500 text-white"
                       : step.active
-                      ? "border-2 border-green-500 bg-white text-green-500"
+                      ? "border-2 border-blue-500 bg-white text-blue-500"
                       : "bg-gray-200 text-gray-500"
                   }`}
                 >
@@ -46,11 +46,11 @@ export function Stepper({ steps }: StepperProps) {
                   )}
                 </div>
                 <span
-                  className={`mt-2 text-xs text-center sm:text-sm ${
+                  className={`mt-2 text-xs text-center  ${
                     step.completed
-                      ? "text-green-500 font-medium"
+                      ? "text-accent-muted font-medium"
                       : step.active
-                      ? "text-green-500 font-medium"
+                      ? "text-muted font-medium"
                       : "text-gray-500"
                   }`}
                 >
@@ -63,7 +63,7 @@ export function Stepper({ steps }: StepperProps) {
                   <div
                     className={`flex-grow h-0.5 ${
                       steps[index + 1].completed || step.completed
-                        ? "bg-green-500"
+                        ? "bg-blue-500"
                         : "bg-gray-200"
                     }`}
                   />
