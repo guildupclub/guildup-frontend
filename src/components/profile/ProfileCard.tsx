@@ -686,13 +686,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {StringConstants.POSTS}
                   </div>
 
-                  {profile.community?.linkedin_followers > 0 && (
+                  {profile.community?.instagram_followers > 0 && (
                     <>
                       <div className="w-1 h-1 rounded-full bg-border" />
                       <div className="flex items-center gap-1.5">
                         <GrInstagram className="h-5 w-5 text-pink-500" />
                         <span className="font-medium text-foreground">
-                          {formatNumber(profile.community?.linkedin_followers)}
+                          {formatNumber(profile.community?.instagram_followers)}
                         </span>
                         {StringConstants.FOLLOWERS}
                       </div>
