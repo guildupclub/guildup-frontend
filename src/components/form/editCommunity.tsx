@@ -59,6 +59,7 @@ export function EditCommunityModal({
     bgImage: profile?.community?.bgImage || "",
     instagram_followers: profile?.community?.instagram_followers || "",
     youtube_followers: profile?.community?.youtube_followers || "",
+    linkedin_followers: profile?.community?.linkedin_followers || "",
   });
 
   // Add state for file objects
@@ -126,6 +127,10 @@ export function EditCommunityModal({
           profile?.community?.youtube_followers ||
           communityData?.youtube_followers ||
           "",
+        linkedin_followers:
+          profile?.community?.linkedin_followers ||
+          communityData?.linkedin_followers ||
+          "",
       }));
     }
   }, [isOpen, profile, communityData]);
@@ -187,6 +192,7 @@ export function EditCommunityModal({
         formData.instagram_followers
       );
       formDataToSend.append("youtube_followers", formData.youtube_followers);
+      formDataToSend.append("linkedin_followers", formData.linkedin_followers);
 
       // Add rules if available
       if (formData.rules) {
@@ -321,11 +327,11 @@ export function EditCommunityModal({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>
-                {StringConstants.FOLLOWERS}{" "}
-                <span className="text-red-500">*</span>
+                {StringConstants.INSTAGRAMFOLLOWERS}{" "}
+                {/* <span className="text-red-500">*</span> */}
               </Label>
               <Input
                 name="instaFollowers"
@@ -343,8 +349,8 @@ export function EditCommunityModal({
             </div>
             <div className="space-y-2">
               <Label>
-                {StringConstants.SUBSCRIBERS}{" "}
-                <span className="text-red-500">*</span>
+                {StringConstants.YOUTUBE_SUBSCRIBERS}{" "}
+                {/* <span className="text-red-500">*</span> */}
               </Label>
               <Input
                 name="youtubeSubscribers"
@@ -357,6 +363,25 @@ export function EditCommunityModal({
                   })
                 }
                 placeholder="Enter YouTube Subscribers"
+                className="bg-background border-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>
+                {StringConstants.LINKEDIN_FOLLOWERS}{" "}
+                {/* <span className="text-red-500">*</span> */}
+              </Label>
+              <Input
+                name="linkedinFollowers"
+                type="number"
+                value={formData.linkedin_followers}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    linkedin_followers: e.target.value,
+                  })
+                }
+                placeholder="Enter Linkedin Followers"
                 className="bg-background border-none"
               />
             </div>
