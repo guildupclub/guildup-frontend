@@ -48,6 +48,7 @@ interface CommunityProfile {
     background_image: string;
     youtube_followers: string;
     instagram_followers: string;
+    linkedin_followers: string;
   };
 }
 
@@ -571,41 +572,40 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       </div>
     );
   // console.log("@prifle", profile.user);
-  console.log("ekjrwhjkgkje", avatarImgUrl);
+  // console.log("ekjrwhjkgkje", avatarImgUrl);
+  const isBankConnected = profile?.user?.user_isBankDetailsAdded;
+  const isCalendarConnected = profile?.user?.user_iscalendarConnected;
   return (
     <div className="w-full">
-      {isOwner && (
+      {isOwner && (!isCalendarConnected || !isBankConnected) && (
         <Stepper
           steps={[
             {
-              label: "Create Community",
+              label: "Build Guild",
               completed: true,
             },
             {
-              label: "Create Profile",
+              label: "Complete Profile",
               completed: true,
             },
             {
-              label: "Create Course",
+              label: "Create Offering",
               completed: offerings && offerings.length > 0,
               active: offerings && offerings.length === 0,
             },
             {
               label: "Link Calendar",
-              completed: profile?.user?.user_iscalendarConnected,
-              active:
-                offerings &&
-                offerings.length > 0 &&
-                !profile?.user?.user_iscalendarConnected,
+              completed: isCalendarConnected,
+              active: offerings && offerings.length > 0 && !isCalendarConnected,
             },
             {
-              label: "Link Bank",
-              completed: profile?.user?.user_isBankDetailsAdded,
+              label: "Add Bank",
+              completed: isBankConnected,
               active:
                 offerings &&
                 offerings.length > 0 &&
-                profile?.user?.user_iscalendarConnected &&
-                !profile?.user?.user_isBankDetailsAdded,
+                isCalendarConnected &&
+                !isBankConnected,
             },
           ]}
         />
@@ -686,13 +686,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {StringConstants.POSTS}
                   </div>
 
-                  {profile.community?.instagram_followers > 0 && (
+                  {profile.community?.linkedin_followers > 0 && (
                     <>
                       <div className="w-1 h-1 rounded-full bg-border" />
                       <div className="flex items-center gap-1.5">
                         <GrInstagram className="h-5 w-5 text-pink-500" />
                         <span className="font-medium text-foreground">
-                          {formatNumber(profile.community?.instagram_followers)}
+                          {formatNumber(profile.community?.linkedin_followers)}
                         </span>
                         {StringConstants.FOLLOWERS}
                       </div>
@@ -710,11 +710,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </div>
                   )}
 
-                  <div className="w-1 h-1 rounded-full bg-border" />
-                  <div className="flex items-center gap-1.5 cursor-pointer">
-                    <FaLinkedinIn className="h-5 w-5 text-blue-800" />
-                    {/* <BsLinkedin className="h-5 w-5 text-blue-800" /> */}
-                  </div>
+                  {profile.community?.linkedin_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.linkedin_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
+                  )}
                 </div>
               </div>
               {isOwner ? (
@@ -748,6 +753,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           <div className="">
             <h2 className="text-2xl font-semibold text-foreground mb-4">
               {StringConstants.ABOUT}
+              {isOwner && (
+                <button
+                  className="p-1 rounded-md hover:bg-background transition mx-2"
+                  onClick={() => setIsEditOpen(true)}
+                >
+                  <Pencil size={18} className="text-muted hover:text-primary" />
+                </button>
+              )}
             </h2>
             <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
               <p className="text-muted-foreground  whitespace-pre-line">

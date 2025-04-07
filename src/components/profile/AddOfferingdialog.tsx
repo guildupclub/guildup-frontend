@@ -431,17 +431,19 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         else setOpen(true);
       }}
     >
-      <DialogTrigger asChild>
-        <Button
-          variant="default"
-          className={`text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
-            isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
-          }`}
-          disabled={!isAdmin}
-        >
-          {StringConstants.ADD_OFFERING}
-        </Button>
-      </DialogTrigger>
+      {isAdmin && (
+        <DialogTrigger asChild>
+          <Button
+            variant="default"
+            className={`text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
+              isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
+            }`}
+            disabled={!isAdmin}
+          >
+            {StringConstants.ADD_OFFERING}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[900px] bg-card">
         <DialogHeader>
           <DialogTitle>

@@ -15,6 +15,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useParams } from "next/navigation";
 
 type Testimonial = {
   _id: string;
@@ -24,11 +25,12 @@ type Testimonial = {
 
 export default function Testimonials() {
   const dispatch = useDispatch();
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
+  const params = useParams();
+  const communityId = params?.id as string;
+  // const activeCommunity = useSelector(
+  //   (state: RootState) => state.channel.activeCommunity
+  // );
   const user = useSelector((state: RootState) => state.user.user);
-  const communityId = activeCommunity?.id;
   const userId = user?._id;
   const memberDetails = useSelector(
     (state: RootState) => state.member.memberDetails
@@ -44,7 +46,7 @@ export default function Testimonials() {
   const { toast } = useToast();
 
   const fetchTestimonials = async () => {
-    if (!communityId || !userId) return;
+    if (!communityId) return;
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/testimonials/${communityId}`,
@@ -75,12 +77,12 @@ export default function Testimonials() {
   };
 
   useEffect(() => {
-    if (communityId && userId) {
+    if (communityId) {
       fetchTestimonials();
     } else {
-      setIsLoading(false); // Stop loading if no community/user
+      setIsLoading(false);
     }
-  }, [communityId, userId]);
+  }, [communityId]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (
@@ -185,21 +187,23 @@ export default function Testimonials() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Testimonials</h2>
         <div className="relative">
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            // disabled={isUploading || !communityId || !userId}
-            disabled={!isAdmin}
-            className="flex items-center gap-2 text-white"
-          >
-            {isUploading ? (
-              "Uploading..."
-            ) : (
-              <>
-                <span>Add Testimonial</span>
-                <Plus className="w-5 h-5" />
-              </>
-            )}
-          </Button>
+          {isAdmin && (
+            <Button
+              onClick={() => fileInputRef.current?.click()}
+              // disabled={isUploading || !communityId || !userId}
+              disabled={!isAdmin}
+              className="flex items-center gap-2 text-white"
+            >
+              {isUploading ? (
+                "Uploading..."
+              ) : (
+                <>
+                  <span>Add Testimonial</span>
+                  <Plus className="w-5 h-5" />
+                </>
+              )}
+            </Button>
+          )}
 
           <input
             type="file"
@@ -240,9 +244,7 @@ export default function Testimonials() {
         </div>
       ) : (
         <div className="text-center py-10 bg-gray-50 rounded-xl">
-          <p className="text-gray-500">
-            No testimonials yet.
-          </p>
+          <p className="text-gray-500">No testimonials yet.</p>
         </div>
       )}
 
@@ -262,17 +264,15 @@ export default function Testimonials() {
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Close
                 </Button>
-                {
-                  isAdmin && (
-                    <Button
-                      variant="destructive"
-                      onClick={handleDeleteTestimonial}
-                    >
-                      <Trash2 className="w-5 h-5" />
-                      Delete
-                    </Button>
-                  )
-                }
+                {isAdmin && (
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteTestimonial}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    Delete
+                  </Button>
+                )}
               </DialogFooter>
             </div>
           )}
