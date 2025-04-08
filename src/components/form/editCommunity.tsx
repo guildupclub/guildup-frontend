@@ -259,8 +259,9 @@ export function EditCommunityModal({
           <DialogTitle>{StringConstants.EDIT_PAGE}</DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto pr-2">
-          <div className="grid gap-4 py-4">
+        {/* Updated container with proper padding and no scrollbar */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="grid gap-4 py-4 px-6"> {/* Added px-6 for consistent padding */}
             <div className="grid gap-2">
               <Label htmlFor="name">
                 {StringConstants.PAGE_NAME}
@@ -318,11 +319,10 @@ export function EditCommunityModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <Label>
-                  {StringConstants.FOLLOWERS}{" "}
-                  <span className="text-red-500">*</span>
+                  {StringConstants.INSTAGRAMFOLLOWERS}
                 </Label>
                 <Input
                   name="instaFollowers"
@@ -338,10 +338,10 @@ export function EditCommunityModal({
                   className="bg-background border-none"
                 />
               </div>
+              
               <div className="space-y-2">
                 <Label>
-                  {StringConstants.SUBSCRIBERS}{" "}
-                  <span className="text-red-500">*</span>
+                  {StringConstants.YOUTUBE_SUBSCRIBERS}
                 </Label>
                 <Input
                   name="youtubeSubscribers"
@@ -357,98 +357,58 @@ export function EditCommunityModal({
                   className="bg-background border-none"
                 />
               </div>
+              
+              <div className="space-y-2">
+                <Label>
+                  {StringConstants.LINKEDIN_FOLLOWERS}
+                </Label>
+                <Input
+                  name="linkedinFollowers"
+                  type="number"
+                  value={formData.linkedin_followers}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      linkedin_followers: e.target.value,
+                    })
+                  }
+                  placeholder="Enter Linkedin Followers"
+                  className="bg-background border-none"
+                />
+              </div>
             </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label>
-                {StringConstants.INSTAGRAMFOLLOWERS}{" "}
-                {/* <span className="text-red-500">*</span> */}
-              </Label>
-              <Input
-                name="instaFollowers"
-                type="number"
-                value={formData.instagram_followers}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    instagram_followers: e.target.value,
-                  })
-                }
-                placeholder="Enter Instagram Followers"
-                className="bg-background border-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>
-                {StringConstants.YOUTUBE_SUBSCRIBERS}{" "}
-                {/* <span className="text-red-500">*</span> */}
-              </Label>
-              <Input
-                name="youtubeSubscribers"
-                type="number"
-                value={formData.youtube_followers}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    youtube_followers: e.target.value,
-                  })
-                }
-                placeholder="Enter YouTube Subscribers"
-                className="bg-background border-none"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>
-                {StringConstants.LINKEDIN_FOLLOWERS}{" "}
-                {/* <span className="text-red-500">*</span> */}
-              </Label>
-              <Input
-                name="linkedinFollowers"
-                type="number"
-                value={formData.linkedin_followers}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    linkedin_followers: e.target.value,
-                  })
-                }
-                placeholder="Enter Linkedin Followers"
-                className="bg-background border-none"
-              />
-            </div>
-          </div>
 
-          <div className="grid gap-2">
-            <Label>{StringConstants.PROFILE_IMAGE}</Label>
-            <div className="flex items-center gap-4">
-              {formData.image && (
-                <div className="relative">
-                  <Image
-                    src={formData.image}
-                    alt="Profile"
-                    width={64}
-                    height={64}
-                    className="h-16 w-16 object-cover rounded"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage("profile")}
-                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              )}
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  e.target.files?.[0] &&
-                  handleImageSelect(e.target.files[0], "profile")
-                }
-                key={formData.image}
-              />
+            <div className="grid gap-2">
+              <Label>{StringConstants.PROFILE_IMAGE}</Label>
+              <div className="flex items-center gap-4">
+                {formData.image && (
+                  <div className="relative">
+                    <Image
+                      src={formData.image}
+                      alt="Profile"
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-cover rounded"
+                    />
+                    <button
+                      onClick={() => handleRemoveImage("profile")}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </button>
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    e.target.files?.[0] &&
+                    handleImageSelect(e.target.files[0], "profile")
+                  }
+                  key={formData.image}
+                />
+              </div>
             </div>
-          </div>
 
             <div className="grid gap-2">
               <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
@@ -485,7 +445,7 @@ export function EditCommunityModal({
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-4 border-t mt-4">
+        <div className="flex justify-end gap-4 pt-4 border-t mt-4 px-6">
           <Button variant="outline" onClick={onClose}>
             {StringConstants.CANCEL}
           </Button>
