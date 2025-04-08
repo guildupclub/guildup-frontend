@@ -59,6 +59,7 @@ export function EditCommunityModal({
     bgImage: profile?.community?.bgImage || "",
     instagram_followers: profile?.community?.instagram_followers || "",
     youtube_followers: profile?.community?.youtube_followers || "",
+    linkedin_followers: profile?.community?.linkedin_followers || "",
   });
 
   // Add state for file objects
@@ -74,39 +75,6 @@ export function EditCommunityModal({
   const communityData = community?.communityData;
   const userId = user?._id;
 
-  // Load community data when modal opens, prioritizing profile prop if available
-  // useEffect(() => {
-  //   if (isOpen) {
-  //     // First try to use the profile prop data
-  //     if (profile) {
-  //       setFormData({
-  //         name: profile?.community?.name || "",
-  //         description: profile?.community?.description || "",
-  //         category: profile?.community?.category || "",
-  //         rules: profile?.community?.rules || "",
-  //         tags: profile?.community?.tags || [],
-  //         image: profile?.community?.image || "",
-  //         bgImage: profile?.community?.bgImage || "",
-  //         instagram_followers: profile?.community?.instagram_followers || "",
-  //         youtube_followers: profile?.community?.youtube_followers || "",
-  //       });
-  //     }
-  //     // If no profile prop or it's missing data, fall back to communityData from Redux
-  //     else if (communityData) {
-  //       setFormData({
-  //         name: communityData.name || "",
-  //         description: communityData.description || "",
-  //         category: communityData.category || "",
-  //         rules: communityData.rules || "",
-  //         tags: communityData.additional_tags || [],
-  //         image: communityData.image || "",
-  //         bgImage: communityData.bgImage || "",
-  //         instagram_followers: communityData?.instagram_followers || "",
-  //         youtube_followers: communityData?.youtube_followers || "",
-  //       });
-  //     }
-  //   }
-  // }, [isOpen, profile, communityData]);
   useEffect(() => {
     if (isOpen) {
       setFormData((prev) => ({
@@ -125,6 +93,10 @@ export function EditCommunityModal({
         youtube_followers:
           profile?.community?.youtube_followers ||
           communityData?.youtube_followers ||
+          "",
+        linkedin_followers:
+          profile?.community?.linkedin_followers ||
+          communityData?.linkedin_followers ||
           "",
       }));
     }
@@ -146,6 +118,33 @@ export function EditCommunityModal({
         ...formData,
         bgImage: URL.createObjectURL(file),
       });
+    }
+  };
+
+  // Add this function after handleImageSelect
+  const handleRemoveImage = (type: "profile" | "background") => {
+    if (type === "profile") {
+      setImageFile(null);
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+    } else {
+      setBgImageFile(null);
+      setFormData((prev) => ({
+        ...prev,
+        bgImage: "",
+      }));
+    }
+
+    // Reset the file input by creating a new one
+    const fileInput = document.querySelector(
+      `input[type="file"][accept="image/*"]${
+        type === "profile" ? ":not([data-bg])" : "[data-bg]"
+      }`
+    ) as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
@@ -187,6 +186,7 @@ export function EditCommunityModal({
         formData.instagram_followers
       );
       formDataToSend.append("youtube_followers", formData.youtube_followers);
+      formDataToSend.append("linkedin_followers", formData.linkedin_followers);
 
       // Add rules if available
       if (formData.rules) {
@@ -206,10 +206,6 @@ export function EditCommunityModal({
       if (bgImageFile) {
         formDataToSend.append("background_image", bgImageFile);
       }
-
-      // if (bgImageFile) {
-      //   formDataToSend.append("background_image", bgImageFile);
-      // }
 
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
@@ -258,186 +254,198 @@ export function EditCommunityModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-white text-black">
+      <DialogContent className="sm:max-w-[600px] bg-white text-black max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{StringConstants.EDIT_PAGE}</DialogTitle>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">
-              {StringConstants.PAGE_NAME}
-              <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="description">
-              {StringConstants.PAGE_DESCRIPTION}
-              <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label>
-              {StringConstants.TAGS}
-              <span className="text-red-500">*</span>
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                placeholder="Add a tag"
-              />
-              <Button onClick={handleAddTag}>{StringConstants.ADD}</Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.tags.map((tag: any) => (
-                <div
-                  key={tag}
-                  className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                >
-                  {tag}
-                  <X
-                    className="h-4 w-4 cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>
-                {StringConstants.FOLLOWERS}{" "}
+        {/* Updated container with proper padding and no scrollbar */}
+        <div className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="grid gap-4 py-4 px-6"> {/* Added px-6 for consistent padding */}
+            <div className="grid gap-2">
+              <Label htmlFor="name">
+                {StringConstants.PAGE_NAME}
                 <span className="text-red-500">*</span>
               </Label>
               <Input
-                name="instaFollowers"
-                type="number"
-                value={formData.instagram_followers}
+                id="name"
+                value={formData.name}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    instagram_followers: e.target.value,
-                  })
+                  setFormData({ ...formData, name: e.target.value })
                 }
-                placeholder="Enter Instagram Followers"
-                className="bg-background border-none"
               />
             </div>
-            <div className="space-y-2">
-              <Label>
-                {StringConstants.SUBSCRIBERS}{" "}
+
+            <div className="grid gap-2">
+              <Label htmlFor="description">
+                {StringConstants.PAGE_DESCRIPTION}
                 <span className="text-red-500">*</span>
               </Label>
-              <Input
-                name="youtubeSubscribers"
-                type="number"
-                value={formData.youtube_followers}
+              <Textarea
+                id="description"
+                value={formData.description}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    youtube_followers: e.target.value,
-                  })
+                  setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Enter YouTube Subscribers"
-                className="bg-background border-none"
               />
             </div>
-          </div>
 
-          <div className="grid gap-2">
-            <Label>{StringConstants.PROFILE_IMAGE}</Label>
-            <div className="flex items-center gap-4">
-              {formData.image && (
-                <div className="relative">
-                  <Image
-                    src={formData.image}
-                    alt="Profile"
-                    width={64}
-                    height={64}
-                    className="h-16 w-16 object-cover rounded"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage("profile")}
-                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+            <div className="grid gap-2">
+              <Label>
+                {StringConstants.TAGS}
+                <span className="text-red-500">*</span>
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Add a tag"
+                />
+                <Button onClick={handleAddTag}>{StringConstants.ADD}</Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.tags.map((tag: any) => (
+                  <div
+                    key={tag}
+                    className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded"
                   >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              )}
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  e.target.files?.[0] &&
-                  handleImageSelect(e.target.files[0], "profile")
-                }
-              />
+                    {tag}
+                    <X
+                      className="h-4 w-4 cursor-pointer"
+                      onClick={() => handleRemoveTag(tag)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>
+                  {StringConstants.INSTAGRAMFOLLOWERS}
+                </Label>
+                <Input
+                  name="instaFollowers"
+                  type="number"
+                  value={formData.instagram_followers}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      instagram_followers: e.target.value,
+                    })
+                  }
+                  placeholder="Enter Instagram Followers"
+                  className="bg-background border-none"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>
+                  {StringConstants.YOUTUBE_SUBSCRIBERS}
+                </Label>
+                <Input
+                  name="youtubeSubscribers"
+                  type="number"
+                  value={formData.youtube_followers}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      youtube_followers: e.target.value,
+                    })
+                  }
+                  placeholder="Enter YouTube Subscribers"
+                  className="bg-background border-none"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>
+                  {StringConstants.LINKEDIN_FOLLOWERS}
+                </Label>
+                <Input
+                  name="linkedinFollowers"
+                  type="number"
+                  value={formData.linkedin_followers}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      linkedin_followers: e.target.value,
+                    })
+                  }
+                  placeholder="Enter Linkedin Followers"
+                  className="bg-background border-none"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>{StringConstants.PROFILE_IMAGE}</Label>
+              <div className="flex items-center gap-4">
+                {formData.image && (
+                  <div className="relative">
+                    <Image
+                      src={formData.image}
+                      alt="Profile"
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 object-cover rounded"
+                    />
+                    <button
+                      onClick={() => handleRemoveImage("profile")}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </button>
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    e.target.files?.[0] &&
+                    handleImageSelect(e.target.files[0], "profile")
+                  }
+                  key={formData.image}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
+              <div className="flex items-center gap-4">
+                {formData.bgImage && (
+                  <div className="relative">
+                    <Image
+                      src={formData.bgImage}
+                      alt="Background"
+                      width={128}
+                      height={64}
+                      className="h-16 w-32 object-cover rounded"
+                    />
+                    <button
+                      onClick={() => handleRemoveImage("background")}
+                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </button>
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  data-bg
+                  onChange={(e) =>
+                    e.target.files?.[0] &&
+                    handleImageSelect(e.target.files[0], "background")
+                  }
+                  key={formData.bgImage}
+                />
+              </div>
             </div>
           </div>
-
-          <div className="grid gap-2">
-            <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
-            <div className="flex items-center gap-4">
-              {formData.bgImage && (
-                <div className="relative">
-                  <Image
-                    src={formData.bgImage}
-                    alt="Background"
-                    width={128}
-                    height={64}
-                    className="h-16 w-32 object-cover rounded"
-                  />
-                  <button
-                    onClick={() => handleRemoveImage("background")}
-                    className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
-                  >
-                    <X className="h-3 w-3 text-white" />
-                  </button>
-                </div>
-              )}
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  e.target.files?.[0] &&
-                  handleImageSelect(e.target.files[0], "background")
-                }
-              />
-            </div>
-          </div>
-
-          {/* removing it for the demo purposes */}
-          {/* <div className="grid gap-2">
-            <Label htmlFor="rules">{StringConstants.PAGE_RULES}</Label>
-            <Textarea
-              id="rules"
-              value={formData.rules}
-              onChange={(e) =>
-                setFormData({ ...formData, rules: e.target.value })
-              }
-            />
-          </div> */}
         </div>
 
-        <div className="flex justify-end gap-4">
+        <div className="flex justify-end gap-4 pt-4 border-t mt-4 px-6">
           <Button variant="outline" onClick={onClose}>
             {StringConstants.CANCEL}
           </Button>

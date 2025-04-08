@@ -31,7 +31,7 @@ export const UserMobileHeroSection: React.FC = () => {
             <p className="text-base">Sign up on GuildUp and grow your Guild with thousands of users looking for top coaches, consultants, and professionals.</p>
           </div>
 
-          <div className="w-full flex justify-center">
+          {/* <div className="w-full flex justify-center">
             <div className="relative w-full max-w-md h-[220px] ">
               <Image
                 src={Login_laptop}
@@ -41,9 +41,9 @@ export const UserMobileHeroSection: React.FC = () => {
                 // height={300}
               />
             </div>
-          </div>
+          </div> */}
         </div>
-        <div className="text-center mt-8 border-t border-background">
+        {/* <div className="text-center mt-8 border-t border-background">
           <p className="text-muted-foreground text-sm">
             Are you an expert looking to create a page?
           </p>
@@ -52,7 +52,7 @@ export const UserMobileHeroSection: React.FC = () => {
               callbackUrl: `${window.location.origin}?hero=1`
             })}>Become a Creator</button>
           </span>
-        </div>
+        </div> */}
       </div>
 
       {/* LoginContainer Section */}

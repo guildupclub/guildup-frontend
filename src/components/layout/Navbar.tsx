@@ -36,6 +36,7 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
 import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
+import { toast } from "sonner";
 
 // interface Community {
 //   _id: string;
@@ -183,6 +184,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
     // For paths other than home, check if pathname starts with the path
     return path !== "/" && pathname?.startsWith(path);
+  };
+
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () => signIn(undefined, {
+            callbackUrl: `${window.location.origin}?hero=1`
+          }),
+        },
+      });
+    } else {
+      setIsCreatorFormOpen(true);
+    }
   };
 
   return (
@@ -519,7 +535,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 rounded-lg bg-primary hover:bg-zinc-300 text-zinc-300"
+                  className="w-8 h-8 rounded-lg bg-primary hover:bg-blue-900 text-zinc-300"
+                  onClick={handleCreatorButtonClick}
                 >
                   <Plus className="h-6 w-6" />
                 </Button>
@@ -545,7 +562,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   >
                     <Avatar
                       className={`w-10 h-10 rounded-lg ${
-                        isActive ? "ring-2 ring-purple-500" : "null"
+                        isActive ? "ring-2 ring-purple-500" : ""
                       }`}
                     >
                       <AvatarImage
@@ -578,9 +595,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 );
               })
             ) : (
-              <p className="text-center">
+              <div className=""> 
                 {StringConstants.NO_COMMUNITIES_AVAILABLE}
-              </p>
+                {!session && (
+                  <p className="mt-2">Sign in to create or join communities</p>
+                )}
+              </div>
             )}
           </div>
         </div>

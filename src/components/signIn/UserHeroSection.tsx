@@ -67,14 +67,14 @@ export const UserHeroSection: React.FC = () => {
           </div>
         </div>
 
-        <div className="text-center mt-4 pt-4 border-t border-background">
+        {/* <div className="text-center mt-4 pt-4 border-t border-background">
           <p className="text-muted-foreground mb-2 text-sm">
             Are you an expert looking to create a page?
           </p>
           <Button variant="outline" asChild className="font-medium">
             <Link href="#">Become a Creator</Link>
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
