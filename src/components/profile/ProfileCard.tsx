@@ -772,6 +772,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     key={tag}
                     className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
                   >
+                    
                     {tag}
                   </span>
                 ))}
