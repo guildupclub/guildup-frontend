@@ -786,7 +786,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <AddOfferingDialog onOfferingAdded={fetchOfferings} />
             </div>
 
-            {offerings.length === 0 ? (
+            {!isBankConnected || offerings.length === 0 ? (
               <div className="text-center py-16 bg-card rounded-xl border border-border/5">
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
