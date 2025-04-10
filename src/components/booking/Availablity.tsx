@@ -107,46 +107,47 @@ export const Availablity = ({userId}:AvailabilityProps) => {
   }, [userId]);
     
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full p-4">
       <div className="flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">Availability</h1>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md"
-        onClick={() => handlesetAvailability(userId, availability)}
-        disabled={loading}
-        >
-           {loading ? "Loading..." : "Save"}
-        </button>
-       </div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+          <h1 className="text-xl sm:text-2xl font-semibold">Availability</h1>
+          <button 
+            className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md"
+            onClick={() => handlesetAvailability(userId, availability)}
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Save"}
+          </button>
+        </div>
         <p className="text-sm text-gray-500">
           Set your availability for the selected service.
         </p>
       </div>
+
       {loading ? (
         <div className="py-4 text-center text-gray-500">Loading your availability...</div>
       ) : (
-      <div className="flex flex-col gap-4">
-      {days.map((day) => (
-        <AvailabilityRow
-            key={day}
-            day={day}
-            value={availability[day]} // pass values for this day
-            onChange={(val) =>
-            setAvailability((prev) => ({
-                ...prev,
-                [day]: val,
-            }))
-            }
-        />
-      ))}
-      </div>
+        <div className="flex flex-col gap-4">
+          {days.map((day) => (
+            <AvailabilityRow
+              key={day}
+              day={day}
+              value={availability[day]}
+              onChange={(val) =>
+                setAvailability((prev) => ({
+                  ...prev,
+                  [day]: val,
+                }))
+              }
+            />
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange}) => {
-  
+const AvailabilityRow: React.FC<AvailabilityRowProps> = ({ day, value, onChange}) => {
   const formatTime = (time: string) => {
     const [hour, minute] = time.split(':');
     const h = parseInt(hour);
@@ -154,49 +155,49 @@ const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange
     const formattedHour = h % 12 === 0 ? 12 : h % 12;
     return `${formattedHour}:${minute} ${suffix}`;
   };
-  
+
   return (
-    <div className="flex items-center gap-20 py-2">
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-20 py-2">
+      <div className="flex items-center gap-2">
         <input
-        type="checkbox"
-        id={day}
-        checked={value.enabled}
-        onChange={() => onChange({ ...value, enabled: !value.enabled })}
-        className="w-4 h-4 accent-green-600"
+          type="checkbox"
+          id={day}
+          checked={value.enabled}
+          onChange={() => onChange({ ...value, enabled: !value.enabled })}
+          className="w-4 h-4 accent-green-600"
         />
-        <label htmlFor={day} className="w-24 font-medium">{day}</label>
-        </div>
-        {!value.enabled ? (
-        <span className="text-gray-500">Unavailable</span>
-      ) : (
-        <div className="flex items-center gap-2">
-        <select
-          className="border rounded px-3 py-1"
-          value={value.start}
-          onChange={(e) => onChange({ ...value, start: e.target.value })}
-        >
-          {timeOptions.map((time) => (
-            <option key={time} value={time}>
-              {formatTime(time)}
-            </option>
-          ))}
-        </select>
-
-        <span>-</span>
-
-        <select
-          className="border rounded px-3 py-1"
-          value={value.end}
-          onChange={(e) => onChange({ ...value, end: e.target.value })}
-        >
-          {timeOptions.map((time) => (
-            <option key={time} value={time}>
-              {formatTime(time)}
-            </option>
-          ))}
-        </select>
+        <label htmlFor={day} className="w-20 sm:w-24 font-medium">{day}</label>
       </div>
+      {!value.enabled ? (
+        <span className="text-gray-500 ml-6 sm:ml-0">Unavailable</span>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 ml-6 sm:ml-0">
+          <select
+            className="w-32 sm:w-auto border rounded px-3 py-1"
+            value={value.start}
+            onChange={(e) => onChange({ ...value, start: e.target.value })}
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {formatTime(time)}
+              </option>
+            ))}
+          </select>
+
+          <span>-</span>
+
+          <select
+            className="w-32 sm:w-auto border rounded px-3 py-1"
+            value={value.end}
+            onChange={(e) => onChange({ ...value, end: e.target.value })}
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {formatTime(time)}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
     </div>
   );

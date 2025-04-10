@@ -1,3 +1,4 @@
+import { DM_Sans } from "next/font/google";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -9,8 +10,15 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        dmSans: ['DM Sans', 'sans-serif']
+      },
       animation: {
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        shine: 'shimmer 8s ease-in-out infinite',
+        'float': 'float 3s ease-in-out infinite',
+        'glow': 'glow 2s ease-in-out infinite',
+        'scale': 'scaleText 3s ease-in-out infinite',
       },
       colors: {
         background: "hsl(var(--background))",
@@ -62,6 +70,7 @@ export default {
       backgroundImage: {
         "primary-gradient":
           "linear-gradient(to bottom right, hsl(270, 100%, 49%), hsl(224, 100%, 60%))",
+        'gradient-shine': 'linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent)',
       },
       keyframes: {
         pulse: {
@@ -71,6 +80,22 @@ export default {
           '50%': {
             opacity: '0.5',
           },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+        glow: {
+          '0%, 100%': { textShadow: '0 0 4px rgba(66, 133, 244, 0)' },
+          '50%': { textShadow: '0 0 4px rgba(66, 133, 244, 0.3)' },
+        },
+        scaleText: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
         }
       }
     },

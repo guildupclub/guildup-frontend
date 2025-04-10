@@ -254,207 +254,228 @@ export function EditCommunityModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-white text-black max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>{StringConstants.EDIT_PAGE}</DialogTitle>
+      <DialogContent className="sm:max-w-[640px] h-[85vh] bg-gradient-to-b from-white to-gray-50/95 backdrop-blur-xl border border-white/20 shadow-2xl rounded-2xl">
+        <DialogHeader className="px-6 pt-4">
+          <DialogTitle className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
+            {StringConstants.EDIT_PAGE}
+          </DialogTitle>
         </DialogHeader>
 
-        {/* Updated container with proper padding and no scrollbar */}
         <div className="flex-1 overflow-y-auto no-scrollbar">
-          <div className="grid gap-4 py-4 px-6"> {/* Added px-6 for consistent padding */}
-            <div className="grid gap-2">
-              <Label htmlFor="name">
-                {StringConstants.PAGE_NAME}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-              />
+          <div className="space-y-6 px-6">
+            {/* Basic Info Section */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  {StringConstants.PAGE_NAME}
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
+                <Input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="h-11 px-4 rounded-xl border border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                  placeholder="Enter your page name"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  {StringConstants.PAGE_DESCRIPTION}
+                  <span className="text-red-500 ml-1">*</span>
+                </Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="min-h-[120px] px-4 py-3 rounded-xl border border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                  placeholder="Describe what your page is about..."
+                />
+              </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="description">
-                {StringConstants.PAGE_DESCRIPTION}
-                <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label>
+            {/* Tags Section */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">
                 {StringConstants.TAGS}
-                <span className="text-red-500">*</span>
+                <span className="text-red-500 ml-1">*</span>
               </Label>
               <div className="flex gap-2">
                 <Input
                   value={newTag}
                   onChange={(e) => setNewTag(e.target.value)}
-                  placeholder="Add a tag"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
+                  placeholder="Type and press enter"
+                  className="h-11 px-4 rounded-xl border border-gray-200 focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
                 />
-                <Button onClick={handleAddTag}>{StringConstants.ADD}</Button>
+                <Button 
+                  onClick={handleAddTag}
+                  className="px-6 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-white hover:shadow-md transition-all duration-200"
+                >
+                  {StringConstants.ADD}
+                </Button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.tags.map((tag: any) => (
-                  <div
+                {formData.tags.map((tag: string) => (
+                  <span
                     key={tag}
-                    className="flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm 
+                      bg-blue-50 text-blue-600 border border-blue-100 group hover:bg-blue-100 transition-colors"
                   >
                     {tag}
-                    <X
-                      className="h-4 w-4 cursor-pointer"
+                    <button
                       onClick={() => handleRemoveTag(tag)}
-                    />
-                  </div>
+                      className="opacity-50 hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </span>
                 ))}
               </div>
             </div>
 
-            <div className="space-y-4">
+            {/* Social Stats Section */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
               <div className="space-y-2">
-                <Label>
+                <Label className="text-sm font-medium text-gray-700">
                   {StringConstants.INSTAGRAMFOLLOWERS}
                 </Label>
                 <Input
-                  name="instaFollowers"
                   type="number"
                   value={formData.instagram_followers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      instagram_followers: e.target.value,
-                    })
-                  }
-                  placeholder="Enter Instagram Followers"
-                  className="bg-background border-none"
+                  onChange={(e) => setFormData({ ...formData, instagram_followers: e.target.value })}
+                  className="h-11 rounded-xl bg-white"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label>
+                <Label className="text-sm font-medium text-gray-700">
                   {StringConstants.YOUTUBE_SUBSCRIBERS}
                 </Label>
                 <Input
-                  name="youtubeSubscribers"
                   type="number"
                   value={formData.youtube_followers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      youtube_followers: e.target.value,
-                    })
-                  }
-                  placeholder="Enter YouTube Subscribers"
-                  className="bg-background border-none"
+                  onChange={(e) => setFormData({ ...formData, youtube_followers: e.target.value })}
+                  className="h-11 rounded-xl bg-white"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label>
+                <Label className="text-sm font-medium text-gray-700">
                   {StringConstants.LINKEDIN_FOLLOWERS}
                 </Label>
                 <Input
-                  name="linkedinFollowers"
                   type="number"
                   value={formData.linkedin_followers}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      linkedin_followers: e.target.value,
-                    })
-                  }
-                  placeholder="Enter Linkedin Followers"
-                  className="bg-background border-none"
+                  onChange={(e) => setFormData({ ...formData, linkedin_followers: e.target.value })}
+                  className="h-11 rounded-xl bg-white"
                 />
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label>{StringConstants.PROFILE_IMAGE}</Label>
-              <div className="flex items-center gap-4">
-                {formData.image && (
-                  <div className="relative">
-                    <Image
-                      src={formData.image}
-                      alt="Profile"
-                      width={64}
-                      height={64}
-                      className="h-16 w-16 object-cover rounded"
-                    />
-                    <button
-                      onClick={() => handleRemoveImage("profile")}
-                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </button>
+            {/* Images Section */}
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-700">
+                  {StringConstants.PROFILE_IMAGE}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-20 h-20 rounded-xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                    {formData.image ? (
+                      <>
+                        <Image
+                          src={formData.image}
+                          alt="Profile"
+                          width={80}
+                          height={80}
+                          className="object-cover"
+                        />
+                        <button
+                          onClick={() => handleRemoveImage("profile")}
+                          className="absolute top-1 right-1 bg-black/50 rounded-full p-1 hover:bg-black/70 transition-colors"
+                        >
+                          <X className="h-3 w-3 text-white" />
+                        </button>
+                      </>
+                    ) : (
+                      <Upload className="h-6 w-6 text-gray-400" />
+                    )}
                   </div>
-                )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    e.target.files?.[0] &&
-                    handleImageSelect(e.target.files[0], "profile")
-                  }
-                  key={formData.image}
-                />
+                  <div className="flex-1">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => e.target.files?.[0] && handleImageSelect(e.target.files[0], "profile")}
+                      className="h-11 rounded-xl"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Recommended size: 400x400px</p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="grid gap-2">
-              <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
-              <div className="flex items-center gap-4">
-                {formData.bgImage && (
-                  <div className="relative">
-                    <Image
-                      src={formData.bgImage}
-                      alt="Background"
-                      width={128}
-                      height={64}
-                      className="h-16 w-32 object-cover rounded"
-                    />
-                    <button
-                      onClick={() => handleRemoveImage("background")}
-                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </button>
+              <div className="space-y-3">
+                <Label className="text-sm font-medium text-gray-700">
+                  {StringConstants.BACKGROUND_IMAGE}
+                </Label>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-32 h-20 rounded-xl bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden">
+                    {formData.bgImage ? (
+                      <>
+                        <Image
+                          src={formData.bgImage}
+                          alt="Background"
+                          width={128}
+                          height={80}
+                          className="object-cover"
+                        />
+                        <button
+                          onClick={() => handleRemoveImage("background")}
+                          className="absolute top-1 right-1 bg-black/50 rounded-full p-1 hover:bg-black/70 transition-colors"
+                        >
+                          <X className="h-3 w-3 text-white" />
+                        </button>
+                      </>
+                    ) : (
+                      <Upload className="h-6 w-6 text-gray-400" />
+                    )}
                   </div>
-                )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  data-bg
-                  onChange={(e) =>
-                    e.target.files?.[0] &&
-                    handleImageSelect(e.target.files[0], "background")
-                  }
-                  key={formData.bgImage}
-                />
+                  <div className="flex-1">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      data-bg
+                      onChange={(e) => e.target.files?.[0] && handleImageSelect(e.target.files[0], "background")}
+                      className="h-11 rounded-xl"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Recommended size: 1200x400px</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-4 border-t mt-4 px-6">
-          <Button variant="outline" onClick={onClose}>
+        {/* Footer Actions */}
+        <div className="flex justify-end gap-3 pt-4 px-6 border-t border-gray-100">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="px-6 rounded-xl hover:bg-gray-50"
+          >
             {StringConstants.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className="bg-blue-600 text-white"
+            className="px-6 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-white 
+              hover:shadow-lg hover:shadow-primary/20 transition-all duration-200"
           >
-            {isLoading ? "Saving..." : "Save Changes"}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Saving...
+              </div>
+            ) : (
+              'Save Changes'
+            )}
           </Button>
         </div>
       </DialogContent>

@@ -1,46 +1,53 @@
 import Link from "next/link";
-import { ShieldCheck, FileText, Mail, Phone } from "lucide-react";
+import { ShieldCheck, FileText, Mail } from "lucide-react";
 
 const FooterLinks = () => {
   return (
-    <div className="border-t border-gray-300 mt-6 pt-4 text-sm text-gray-600 text-center">
-      <div className="flex flex-wrap justify-center gap-4">
-        <Link
-          href="/privacy-policy"
-          className="flex items-center gap-1 hover:text-gray-900 transition-colors"
-          target="_blank"
-        >
-          <ShieldCheck size={16} />
-          Privacy Policy
-        </Link>
+    <div className="mt-4 text-xs">
+      {/* Links Section */}
+      <div className="space-y-2">
+        <div className="grid grid-cols-1 gap-2">
+          <Link
+            href="/privacy-policy"
+            className="flex items-center gap-2 p-1.5 rounded-lg transition-colors group"
+            target="_blank"
+          >
+            <ShieldCheck size={14} className="text-gray-400 group-hover:text-gray-600" />
+            <span className="text-gray-400 group-hover:text-gray-600">
+              Privacy Policy
+            </span>
+          </Link>
 
-        <span className="text-gray-400">|</span>
+          <Link
+            href="/terms-conditions"
+            className="flex items-center gap-2 p-1.5 rounded-lg transition-colors group"
+            target="_blank"
+          >
+            <FileText size={14} className="text-gray-400 group-hover:text-gray-600" />
+            <span className="text-gray-400 group-hover:text-gray-600">
+              Terms & Conditions
+            </span>
+          </Link>
 
-        <Link
-          href="/terms-conditions"
-          className="flex items-center gap-1 hover:text-gray-900 transition-colors"
-          target="_blank"
-        >
-          <FileText size={16} />
-          Terms & Conditions
-        </Link>
+          <Link
+            href="/contact-us"
+            className="flex items-center gap-2 p-1.5 rounded-lg transition-colors group"
+            target="_blank"
+          >
+            <Mail size={14} className="text-gray-400 group-hover:text-gray-600" />
+            <span className="text-gray-400 group-hover:text-gray-600">
+              Contact Us
+            </span>
+          </Link>
+        </div>
 
-        <span className="text-gray-400">|</span>
-
-        <Link
-          href="/contact-us"
-          className="flex items-center gap-1 hover:text-gray-900 transition-colors"
-          target="_blank"
-        >
-          <Mail size={16} />
-          Contact Us
-        </Link>
+        {/* Copyright Section */}
+        <div className="pt-2 text-center">
+          <p className="text-[10px] text-gray-400">
+            © 2025 GuildUp Communities
+          </p>
+        </div>
       </div>
-
-      <p className="mt-3 text-xs text-gray-500">
-        &copy; 2025 GuildUp Communities Pvt Ltd <br />
-        All rights reserved.
-      </p>
     </div>
   );
 };

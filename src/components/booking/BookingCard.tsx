@@ -26,17 +26,25 @@ const BookingCard: React.FC<BookingCardProps> = ({
 }) => {
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 gap-3 flex flex-col w-full border">
-      <div className="flex items-center space-x-4">
-        <img
-          src={profileImage}
-          alt={name}
-          className="w-12 h-12 rounded-full object-cover bg-red-500"
-        />
-        <div className='flex flex-col'>
-          <h3 className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">{name}</h3>
-          <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{role}</p>
+      {/* Header with name and amount */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <img
+            src={profileImage}
+            alt={name}
+            className="w-12 h-12 rounded-full object-cover bg-red-500"
+          />
+          <div className='flex flex-col'>
+            <h3 className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">{name}</h3>
+            <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{role}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-lg font-bold">₹{amount}</p>
         </div>
       </div>
+
+      {/* Rest of the content */}
       <div className="mt-4 text-sm gap-2 flex flex-row justify-between">
         <div className='flex flex-col gap-2'>
           <div className="flex flex-col">
@@ -59,11 +67,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         </div>
       </div>
-      <div className="mt-4 flex justify-between items-center">
-        <p className="font-bold">Amount: ₹{amount}</p>
+
+      {/* Remove the amount from bottom */}
+      <div className="mt-4 flex justify-end items-center">
         <div className="space-x-4">
-          <button className="w-[80px] h-[40px] md:w-[120px] md:h-[42px] rounded-lg border border-[#334BFF] py-2 px-3 animate-[ease-in_300ms] text-center">Cancel</button>
-          <button className="md:w-[120px] md:h-[42px] rounded-lg border bg-[#334BFF] text-white py-2 px-3 animate-[ease-in_300ms] text-center">Reschedule</button>
+          {/* <button className="w-[80px] h-[40px] md:w-[120px] md:h-[42px] rounded-lg border border-[#334BFF] py-2 px-3 animate-[ease-in_300ms] text-center">Cancel</button> */}
+          {/* <button className="md:w-[120px] md:h-[42px] rounded-lg border bg-[#334BFF] text-white py-2 px-3 animate-[ease-in_300ms] text-center">Reschedule</button> */}
           {/* <Button className='bg-card '>Cancel</Button>
           <Button>Reschedule</Button> */}
         </div>

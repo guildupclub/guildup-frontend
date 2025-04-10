@@ -105,13 +105,13 @@ export default function CreatorForm({onSuccess}: FormProps) {
       const data = await response.json();
       if (!response.ok) {
         setIsRedirecting(false); // Stop loading on error
-        throw new Error(data.e || "Failed to create community");
+        throw new Error(data.e || "Failed to create Guild");
       }
       return data;
     },
     onSuccess: async (data) => {
       const newCommunity = data.data;
-      toast.success("Community created successfully! 🎉");
+      toast.success("Successfully created your Guild! 🎉");
       
       // Update Redux state with the new community
       dispatch(

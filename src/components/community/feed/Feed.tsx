@@ -57,7 +57,7 @@ export function Feed({ communityId }: FeedProps) {
   // Show message for non-signed in users or users without communities
   if (!session ) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-premium p-4">
         <div className="flex flex-col items-center space-y-6 max-w-md text-center">
           <FaUsers className="w-16 h-16 text-muted-foreground" />
           <h1 className="text-2xl font-semibold">

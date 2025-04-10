@@ -111,6 +111,10 @@ function SearchPageContent() {
         setActiveCommunity({
           id: community.community._id,
           name: community.community.name,
+          image: "",
+          background_image: "",
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
 

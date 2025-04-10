@@ -11,6 +11,8 @@ import Loader from "../Loader";
 import { setActiveCommunity } from "@/redux/channelSlice";
 
 interface Community {
+  community: any;
+  offerings: any;
   _id: string;
   user_id: string;
   name: string;
@@ -23,7 +25,7 @@ interface CommunitySectionProps {
 }
 
 const CommunitySection: React.FC<CommunitySectionProps> = ({
-  activeCategory,
+  activeCategory
 }) => {
   const loggedInUserId = useSelector(
     (state: RootState) => state.user.user?._id
@@ -96,6 +98,10 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setActiveCommunity({
           id: community._id,
           name: community.name,
+          image: "",
+          background_image: "",
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
 
@@ -104,12 +110,15 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
     [dispatch, router]
   );
 
+  
   return (
-    <div className="bg-background min-h-screen lg:py-4">
+    <div className="bg-transparent min-h-screen py-4">
       {loading ? (
-        <p className="text-center mt-4">Loading...</p>
+        <div className="flex justify-center items-center py-8">
+          <Loader />
+        </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pb-8 z-0 lg:pb-0">
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {communities.length > 0 ? (
             communities.map((communityWrapper) => (
               <MemoizedCommunityCard
@@ -119,8 +128,8 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
               />
             ))
           ) : (
-            <p className="text-center col-span-3 py-8 text-muted-foreground">
-              No communities found for this category
+            <p className="text-center col-span-full py-8 text-muted-foreground">
+              No communities found
             </p>
           )}
         </div>
