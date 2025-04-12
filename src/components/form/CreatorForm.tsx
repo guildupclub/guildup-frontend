@@ -121,6 +121,8 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     onSuccess: async (data) => {
       const newCommunity = data.data;
       toast.success("Community created successfully! 🎉");
+      setShowCelebration(true);
+
       queryClient.invalidateQueries({ queryKey: ["communities"] });
       setFormData({
         name: "",
@@ -135,7 +137,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       await router.push(`/community/${newCommunity._id}/profile`);
 
 
-      setShowCelebration(true);
       
       // Hide celebration after 4 seconds
       setTimeout(() => {

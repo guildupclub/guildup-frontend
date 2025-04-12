@@ -201,4 +201,28 @@
     background-position: top center;
     mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
   }
+
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, rgb(55 65 81 / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(55 65 81 / 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .bg-gradient-radial {
+    background-image: radial-gradient(
+      circle at center,
+      var(--tw-gradient-from) 0%,
+      var(--tw-gradient-via) 50%,
+      var(--tw-gradient-to) 100%
+    );
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

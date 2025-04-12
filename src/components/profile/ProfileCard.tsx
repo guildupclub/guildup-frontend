@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { ArrowRight, Edit, Trash2, Pencil } from "lucide-react";
+import { ArrowRight, Edit, Trash2, Pencil, Plus } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
@@ -29,6 +29,11 @@ import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { Stepper } from "./Steeper";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { usePathname, useRouter } from "next/navigation";
+import Members from "../community/members/Members";
+import { Feed } from "../community/feed/Feed";
+import { Channel } from "./Channel";
 
 interface CommunityProfile {
   user: {
@@ -238,6 +243,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = communityId || community?.communityId;
+  const router = useRouter();
 
   // Add this state in ProfileCard component after other state declarations
 
@@ -274,9 +280,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   }, []);
 
   // Add this near the top of your component, after other useQuery hooks
-  const { data: followedCommunitiesData = [] } = useQuery<any[]>({
+  const { data: followedCommunitiesData } = useQuery<any[]>({
     queryKey: ["userFollowedCommunities"],
     enabled: !!user?._id,
+    initialData: [],
   });
 
   // Update the isCommunityFollowed check to use the query data
@@ -419,58 +426,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     fetchOfferings();
   }, [community.communityId, fetchOfferings]);
 
-  // useEffect(() => {
-  //   if (!community?.communityId) return; // Ensure communityId is set before fetching
-
-  //   const fetchProfileData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post(
-  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-  //         {
-  //           communityId: community.communityId,
-  //         }
-  //       );
-
-  //       console.log("@response", response.data.data);
-  //       if (response.data.r === "s") {
-  //         if (response.data.data.community.image) {
-  //           setAvatarImgUrl(response.data.data.community.image);
-  //         } else {
-  //           setAvatarImgUrl(
-  //             `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-  //           );
-  //         }
-  //         if (response.data.data.community.background_image) {
-  //           setBgImgUrl(response.data.data.community.background_image);
-  //         } else {
-  //           setBgImgUrl(
-  //             "https://random-image-pepebigotes.vercel.app/api/random-image"
-  //           );
-  //         }
-
-  //         dispatch(
-  //           setUserBankDetails(
-  //             response.data.data.user.user_isBankDetailsAdded || false
-  //           )
-  //         );
-  //         dispatch(
-  //           setUserCalendarConnected(
-  //             response.data.data.user.user_iscalendarConnected || false
-  //           )
-  //         );
-  //       }
-  //     } catch (error) {
-  //       toast.error("Failed to load community profile");
-  //       console.error("Error fetching profile data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchProfileData();
-  // }, [community?.communityId]); // Dependency array includes communityId
-
   const followMutation = useMutation({
     mutationFn: async () => {
       const response = await axios.post(
@@ -556,204 +511,421 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       ));
   };
 
-  // if (loading) return <div>{StringConstants.LOADING}</div>;
-
-  if (loading) {
+  if (isLoading || loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="w-full min-h-screen flex justify-center items-center">
         <Loader />
       </div>
     );
   }
-  if (!profile)
+
+  if (!profile) {
     return (
-      <div className="text-center h-screen items-center text-2xl font-semibold">
-        {StringConstants.NO_PROFILE_DATA}
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <p className="text-xl font-semibold text-muted-foreground">
+          {StringConstants.NO_PROFILE_DATA}
+        </p>
       </div>
     );
-  // console.log("@prifle", profile.user);
-  // console.log("ekjrwhjkgkje", avatarImgUrl);
+  }
+
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
   return (
     <div className="w-full">
-      {/* Progress Stepper (if needed) */}
       {isOwner && (!isCalendarConnected || !isBankConnected) && (
-        <Stepper steps={[
-          { label: 'Connect Calendar', completed: isCalendarConnected },
-          { label: 'Add Bank Account', completed: isBankConnected }
-        ]} />
+        <Stepper
+          steps={[
+            {
+              label: "Build Guild",
+              completed: true,
+            },
+            {
+              label: "Complete Profile",
+              completed: true,
+            },
+            {
+              label: "Create Offering",
+              completed: offerings && offerings.length > 0,
+              active: offerings && offerings.length === 0,
+            },
+            {
+              label: "Link Calendar",
+              completed: isCalendarConnected,
+              active: offerings && offerings.length > 0 && !isCalendarConnected,
+            },
+            {
+              label: "Add Bank",
+              completed: isBankConnected,
+              active:
+                offerings &&
+                offerings.length > 0 &&
+                isCalendarConnected &&
+                !isBankConnected,
+            },
+          ]}
+        />
       )}
-
       <div className="max-w-6xl mx-auto py-2 px-3 md:px-0">
-        {/* Hero Section with Curved Cover */}
-        <div className="bg-card rounded-t-[32px] shadow-lg overflow-hidden border border-border/5">
-          {/* Cover Image */}
-          <div className="relative h-[300px]">
-            <Image
-              src={profile?.community.background_image || bgImgUrl}
-              alt="Profile banner"
-              width={1200}
-              height={400}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/50" />
-
-            {/* Centered Profile Picture */}
-            <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-              <div className="relative">
-                <Avatar className="w-32 h-32 ring-4 ring-background shadow-xl">
-                  <Image
-                    src={profile?.community?.image || avatarImgUrl}
-                    alt={profile?.community?.name || "Community Avatar"}
-                    width={128}
-                    height={128}
-                    className="w-32 h-32 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
-                    unoptimized
-                  />
-                </Avatar>
-                {isOwner && (
-                  <button
-                    className="absolute bottom-0 right-0 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 transition"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    <Pencil size={16} className="text-gray-600" />
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Profile Info Section */}
-          <div className="pt-20 pb-6 px-8 text-center">
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">
-              {profile?.community?.name}
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              {StringConstants.CREATED_BY}{" "}
-              <span className="text-foreground">{profile.user.user_name}</span>
-            </p>
-
-            {/* Social Stats */}
-            <div className="flex flex-wrap items-center justify-center gap-6 mt-6">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
-                <MdPeopleAlt className="h-5 w-5 text-green-500" />
-                <span className="font-medium">
-                  {profile.community.num_member.toLocaleString()}{" "}
-                  {StringConstants.MEMBER}
-                </span>
-              </div>
-
-              {profile.community?.instagram_followers > 0 && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
-                  <GrInstagram className="h-5 w-5 text-pink-500" />
-                  <span className="font-medium">
-                    {formatNumber(profile.community?.instagram_followers)}{" "}
-                    {StringConstants.FOLLOWERS}
-                  </span>
-                </div>
-              )}
-
-              {profile.community?.youtube_followers > 0 && (
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full">
-                  <BsYoutube className="h-5 w-5 text-red-500" />
-                  <span className="font-medium">
-                    {formatNumber(profile.community?.youtube_followers)}{" "}
-                    {StringConstants.SUBSCRIBERS}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Follow Button */}
-            {!isOwner && (
-              <div className="mt-6">
-                <Button
-                  size="lg"
-                  className={`rounded-full px-8 py-6 text-white transition-all duration-300 ${
-                    isCommunityFollowed
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-primary hover:bg-primary/90"
-                  }`}
-                  onClick={
-                    isCommunityFollowed
-                      ? handleLeaveCommunity
-                      : handleJoinCommunity
-                  }
-                >
-                  <HiMiniUserGroup className="h-6 w-6 mr-2" />
-                  {isCommunityFollowed
-                    ? StringConstants.FOLLOWING
-                    : StringConstants.FOLLOW}
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Offerings Section */}
-        <div className="mt-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-foreground">
-              {StringConstants.OFFERINGS}
-            </h2>
-            {isOwner && <AddOfferingDialog onOfferingAdded={fetchOfferings} />}
-          </div>
-
+        <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
           <div className="relative">
-            <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
-              {offerings.length === 0 ? (
-                <div className="flex-shrink-0 w-full max-w-sm bg-card rounded-xl p-6 border border-border/5">
-                  <p className="text-muted-foreground text-center">
-                    {StringConstants.NO_OFFERINGS}
-                  </p>
-                </div>
-              ) : (
-                offerings.map((offering) => (
-                  <div
-                    key={offering._id}
-                    className="flex-shrink-0 w-[350px] bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-gray-100"
-                  >
-                    {/* Offering card content */}
-                    {/* ... existing offering card content ... */}
+            <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+              <Image
+                src={
+                  profile?.community.background_image != undefined
+                    ? profile?.community.background_image
+                    : bgImgUrl
+                }
+                alt="Profile banner"
+                width={1200}
+                height={400}
+                className="w-full h-full object-cover opacity-90 transition-transform duration-500 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+            </div>
+            <div className="absolute -bottom-16 left-8">
+              <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
+                <Image
+                  src={profile?.community?.image || avatarImgUrl}
+                  alt={profile?.community?.name || "Community Avatar"}
+                  width={100}
+                  height={100}
+                  className="w-24 h-24 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
+                  unoptimized
+                />
+
+                {/* <AvatarFallback className="text-primary text-3xl w-32 h-32 bg-primary/5">
+                {profile.user.user_name[0]}
+              </AvatarFallback> */}
+              </Avatar>
+            </div>
+          </div>
+
+          <div className="pt-16 pb-4 px-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-3">
+                  {profile?.community?.name}
+                  {isOwner && (
+                    <button
+                      className="p-2 rounded-lg hover:bg-primary/10 transition-all duration-200 
+        group inline-flex items-center justify-center"
+                      onClick={() => setIsEditOpen(true)}
+                    >
+                      <Pencil
+                        size={20}
+                        className="text-muted-foreground group-hover:text-primary transition-colors"
+                      />
+                    </button>
+                  )}
+                </h1>
+
+                <p className="text-muted-foreground text-lg">
+                  {StringConstants.CREATED_BY}{" "}
+                  <span className="text-foreground">
+                    {profile.user.user_name}
+                  </span>
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground my-2">
+                  <div className="flex items-center gap-1.5">
+                    <MdPeopleAlt className="h-5 w-5 text-green-500" />
+                    <span className="font-medium text-foreground">
+                      {profile.community.num_member.toLocaleString()}
+                    </span>
+                    {StringConstants.MEMBER}
                   </div>
-                ))
+                  <div className="w-1 h-1 rounded-full bg-border" />
+                  <div className="flex items-center gap-1.5">
+                    <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
+                    <span className="font-medium text-foreground">
+                      {profile?.community?.post_count}
+                    </span>
+                    {StringConstants.POSTS}
+                  </div>
+
+                  {profile.community?.instagram_followers > 0 && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <div className="flex items-center gap-1.5">
+                        <GrInstagram className="h-5 w-5 text-pink-500" />
+                        <span className="font-medium text-foreground">
+                          {formatNumber(profile.community?.instagram_followers)}
+                        </span>
+                        {StringConstants.FOLLOWERS}
+                      </div>
+                    </>
+                  )}
+
+                  {profile.community?.youtube_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <BsYoutube className="h-5 w-5 text-red-500" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.youtube_followers)}
+                      </span>
+                      {StringConstants.SUBSCRIBERS}
+                    </div>
+                  )}
+
+                  {profile.community?.linkedin_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.linkedin_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {isOwner ? (
+                ""
+              ) : isCommunityFollowed ? (
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  onClick={handleLeaveCommunity}
+                >
+                  <HiMiniUserGroup className="h-8 w-8" />
+                  {StringConstants.FOLLOWING}
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  onClick={handleJoinCommunity}
+                >
+                  <HiMiniUserGroup className="h-8 w-8" />
+                  {StringConstants.FOLLOW}
+                </Button>
               )}
             </div>
           </div>
         </div>
 
-        {/* About Section */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">
-            {StringConstants.ABOUT}
-          </h2>
-          <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5">
-            <p className="text-muted-foreground whitespace-pre-line">
-              {profile.community.description}
-            </p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {profile.community.tags.map((tag: string) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary"
-                >
-                  {tag}
-                </span>
-              ))}
+        <div className="mt-8">
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="w-full justify-start border-b rounded-none h-12 bg-transparent p-0">
+              <TabsTrigger
+                value="profile"
+                className={`px-4 py-2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary`}
+              >
+                Profile
+              </TabsTrigger>
+              <TabsTrigger
+                value="feed"
+                className={`px-4 py-2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary`}
+              >
+                Feed
+              </TabsTrigger>
+              <TabsTrigger
+                value="members"
+                className={`px-4 py-2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary`}
+              >
+                Members
+              </TabsTrigger>
+              <TabsTrigger
+                value="channels"
+                className={`px-4 py-2 data-[state=active]:text-primary data-[state=active]:border-b-2 data-[state=active]:border-primary`}
+              >
+                Channels
+              </TabsTrigger>
+            </TabsList>
+
+            <div className="mt-6">
+              {/* Tab Content */}
+              <TabsContent value="profile" className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="">
+                    <div className="flex items-center gap-2 mb-4">
+                      <h2 className="text-2xl font-semibold text-foreground">
+                        {StringConstants.ABOUT}
+                      </h2>
+                      {isOwner && (
+                        <button
+                          className="p-2 rounded-lg hover:bg-primary/10 transition-all duration-200 
+        group inline-flex items-center justify-center"
+                          onClick={() => setIsEditOpen(true)}
+                        >
+                          <Pencil
+                            size={18}
+                            className="text-muted-foreground group-hover:text-primary transition-colors"
+                          />
+                        </button>
+                      )}
+                    </div>
+                    <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
+                      <p className="text-muted-foreground  whitespace-pre-line">
+                        {profile.community.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2 my-2">
+                        {profile.community.tags.map((tag: any) => (
+                          <span
+                            key={tag}
+                            className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-xl transition-all duration-300 border border-border/5">
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="text-2xl font-semibold text-foreground">
+                        {StringConstants.OFFERINGS}
+                      </h2>
+                      <AddOfferingDialog onOfferingAdded={fetchOfferings} />
+                    </div>
+
+                    {offerings.length === 0 ? (
+                      <div className="text-center py-16 bg-card rounded-xl border border-border/5">
+                        <p className="text-lg text-muted-foreground">
+                          {StringConstants.NO_OFFERINGS}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4">
+                        {offerings.map((offering) => (
+                          <div
+                            key={offering._id || Math.random()}
+                            className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
+                          >
+                            <div className="flex items-start gap-4">
+                              <div className="p-2 bg-blue-50 rounded-lg">
+                                <IoVideocam className="text-primary h-6 w-6" />
+                              </div>
+                              <div>
+                                <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                                  {offering.title}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1 max-w-xl whitespace-pre-line">
+                                  {offering.description}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 px-2">
+                              <div className="flex items-center justify-between gap-2">
+                                {isOwner && (
+                                  <div
+                                    className={`flex gap-2 ${
+                                      isOwner ? "ml-auto" : ""
+                                    }`}
+                                  >
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="px-3 py-2 rounded-lg flex items-center gap-1"
+                                      onClick={() => handleEditClick(offering)}
+                                    >
+                                      <Edit className="w-4 h-4" />
+                                      <span>{StringConstants.EDIT}</span>
+                                    </Button>
+
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                      onClick={() =>
+                                        handleDeleteOffering(offering._id)
+                                      }
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      <span>{StringConstants.DELETE}</span>
+                                    </Button>
+                                  </div>
+                                )}
+
+                                {!isOwner && (
+                                  <Button
+                                    size="sm"
+                                    className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                                      !isOwner ? "ml-auto" : ""
+                                    }`}
+                                    onClick={() => {
+                                      if (!session) {
+                                        signIn("google");
+                                        return;
+                                      }
+                                      setSelectedOffering(offering);
+                                    }}
+                                  >
+                                    {offering.is_free ? (
+                                      <span>Free</span>
+                                    ) : offering?.discounted_price &&
+                                      offering?.price?.amount ? (
+                                      <>
+                                        <span className="line-through text-xs opacity-60">
+                                          ₹{offering.price.amount}
+                                        </span>
+                                        <span> ₹{offering.discounted_price}</span>
+                                      </>
+                                    ) : offering?.price?.amount ? (
+                                      <span>₹{offering.price.amount}</span>
+                                    ) : null}
+                                    <ArrowRight className="w-4 h-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        {selectedOffering && (
+                          <BookingDialog
+                            offering={{
+                              ...selectedOffering,
+                              discounted_price: selectedOffering.discounted_price
+                                ? Number(selectedOffering.discounted_price)
+                                : 0,
+                            }}
+                            isOpen={!!selectedOffering}
+                            onClose={() => setSelectedOffering(null)}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-xl shadow-sm">
+                  {/* <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold text-foreground">
+                      {StringConstants.TESTIMONIALS}
+                    </h2>
+                    {isOwner && (
+                      <Button
+                        onClick={() => setAddTestimonialOpen(true)}
+                        className="bg-primary/10 text-primary hover:bg-primary/20"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Testimonial
+                      </Button>
+                    )}
+                  </div> */}
+                  <Testimonials />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="feed">
+                {activeCommunityId && <Feed communityId={activeCommunityId} />}
+              </TabsContent>
+
+              <TabsContent value="members">
+                {activeCommunityId && <Members communityId={activeCommunityId} />}
+              </TabsContent>
+
+              <TabsContent value="channels">
+               {activeCommunityId && <Channel communityId={activeCommunityId} />}
+              </TabsContent>
             </div>
-          </div>
+          </Tabs>
         </div>
 
-        {/* Testimonials Section */}
-        <div className="mt-12 mb-8">
-          <h2 className="text-2xl font-semibold text-foreground mb-6">
-            What People Say
-          </h2>
-          <Testimonials />
-        </div>
-
-        {/* Modals */}
         {isEditOpen && (
           <EditCommunityModal
             profile={profile}

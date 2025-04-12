@@ -101,7 +101,7 @@ function Page() {
   // };
 
   return (
-    <div className="min-h-screen mesh-gradient relative">
+    <div className="min-h-[75vh] mesh-gradient relative"> {/* Changed from min-h-screen to min-h-[75vh] */}
       <div className="absolute inset-0 grid-overlay pointer-events-none" />
       
       <Header />

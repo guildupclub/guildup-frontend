@@ -187,7 +187,7 @@ export function PostDialog() {
           >
             <Plus />
           </div>
-          {StringConstants.CREATE}
+          {StringConstants.CREATE_POST}
         </button>
       </DialogTrigger>
 

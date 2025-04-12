@@ -7,19 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import {
   Heart,
   MessageCircleMore,
-  MessageSquare,
   Send,
-  Share2,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { CommentSection } from "./CommentSection";
-import { FaShare } from "react-icons/fa";
 import { StringConstants } from "@/components/common/CommonText";
 import { useSession } from "next-auth/react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import DOMPurify from "dompurify";
-import he from "he";
+
 interface PostCardProps {
   post: {
     _id: string;

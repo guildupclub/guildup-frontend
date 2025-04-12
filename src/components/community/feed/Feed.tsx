@@ -2,15 +2,6 @@
 
 import { useState } from "react";
 import { PostCard } from "./PostCard";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { FileText, Plus, Settings } from "lucide-react";
 import { useCommunityPosts } from "@/hook/queries/useCommunityQueries";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -54,129 +45,83 @@ export function Feed({ communityId }: FeedProps) {
     error 
   } = useCommunityPosts(communityId);
 
-  // Show message for non-signed in users or users without communities
-  if (!session ) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-premium p-4">
-        <div className="flex flex-col items-center space-y-6 max-w-md text-center">
-          <FaUsers className="w-16 h-16 text-muted-foreground" />
-          <h1 className="text-2xl font-semibold">
-            {!session ? "Sign in to view community posts" : "No Communities Joined"}
-          </h1>
-          <p className="text-muted-foreground">
-            {!session 
-              ? "Please sign in to view and interact with community posts"
-              : "Join some communities to start seeing posts"}
+  return (
+    <div className="space-y-6 px-4">
+      {/* Header Section - More elegant styling */}
+      <div className="flex items-center justify-between py-4 border-b border-gray-100">
+        <h2 className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
+          Feed
+        </h2>
+        <div className="ml-auto">
+          <PostDialog />
+        </div>
+      </div>
+
+      {/* Error Message - Refined styling */}
+      {error && (
+        <div className="flex items-center justify-center p-4 bg-red-50 rounded-xl">
+          <p className="text-red-600 font-medium">
+            {StringConstants.ERROR_LOADING_POSTS} {StringConstants.PLEASE_TRY_AGAIN}
+          </p>
+        </div>
+      )}
+
+      {/* Posts List - Enhanced styling */}
+      <div className="space-y-6">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-3 border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 bg-gray-50/50 rounded-xl">
+            <p className="text-lg font-medium text-gray-600">
+              {StringConstants.NO_POST_AVAILABLE}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <div
+                key={post._id}
+                className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden"
+              >
+                <div className="p-6">
+                  <PostCard post={post} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Sign In State - Premium styling */}
+      {!session && (
+        <div className="flex flex-col items-center justify-center min-h-[400px] rounded-xl bg-gradient-to-b from-white to-gray-50 border border-gray-100 shadow-sm p-12">
+          <div className="bg-primary/5 p-4 rounded-full mb-6">
+            <FaUsers className="w-12 h-12 text-primary" />
+          </div>
+          <h2 className="text-2xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">
+            Sign in to view community posts
+          </h2>
+          <p className="text-gray-600 mb-8 text-center max-w-md">
+            Please sign in to view and interact with community posts
           </p>
           <div className="flex gap-4">
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+              className="px-6 py-2.5 border border-gray-200 rounded-lg text-gray-700 bg-white shadow-sm transition-colors duration-200"
             >
-             {StringConstants.EXPLORE_COMMUNITY} 
+              {StringConstants.EXPLORE_COMMUNITY}
             </Link>
-            {!session && (
-              <Link
-                href="/api/auth/signin"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                {StringConstants.SIGN_IN}
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen grow py-2 md:py-24">
-      <div className="max-w-5xl px-2 md:ps-6 flex flex-col gap-6">
-        {/* Header */}
-        <div className="flex items-center justify-between rounded-xl border-b border-zinc-300 bg-card px-6 py-3">
-          <div className="flex items-center text-muted gap-2">
-            <FileText className="w-5 h-5" />
-            <h1 className="text-xl font-semibold">{StringConstants.FEED}</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="hidden md:block">
-              <Settings className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden w-24 h-8 rounded-md bg-background hover:bg-zinc-300 text-zinc-300 flex justify-end px-2"
+            <Link
+              href="/api/auth/signin"
+              className="px-6 py-2.5 bg-primary text-white rounded-lg shadow-sm transition-colors duration-200"
             >
-              <PostDialog />
-            </Button>
+              {StringConstants.SIGN_IN}
+            </Link>
           </div>
         </div>
-
-        {/* Filter Bar */}
-        {/* <div className="flex items-center gap-4 py-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span className="">Showing:</span>
-            <Select value={filter} onValueChange={setFilter}>
-              <SelectTrigger className="w-[140px] h-8 bg-transparent border-zinc-400">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-background hover:bg-card border-zinc-400">
-                <SelectItem value="Your Activity">Your Activity</SelectItem>
-                <SelectItem value="All Posts">All Posts</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="">Channel:</span>
-            <Select value={channel} onValueChange={setChannel}>
-              <SelectTrigger className="w-[180px] h-8 bg-transparent border-zinc-400">
-                <span className="flex items-center gap-1">
-                  <span className="">#</span>
-                  <SelectValue />
-                </span>
-              </SelectTrigger>
-              <SelectContent className="bg-background border-zinc-400">
-                <SelectItem value="Open Discussion">Open Discussion</SelectItem>
-                <SelectItem value="General">General</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <span className="">Sorted By:</span>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] h-8 bg-transparent border-zinc-800">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-background border-zinc-400">
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="popular">Popular</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div> */}
-
-        {/* Error state */}
-        {error && (
-          <div className="py-8 text-center">
-            <p className="text-red-500">{StringConstants.ERROR_LOADING_POSTS} {StringConstants.PLEASE_TRY_AGAIN}</p>
-          </div>
-        )}
-
-        {/* Posts */}
-        <div className="space-y-6">
-          {isLoading ? (
-            <div className="flex justify-center py-4">
-              <Loader />
-            </div>
-          ) : posts.length === 0 ? (
-            <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
-          ) : (
-            posts.map((post) => <PostCard key={post._id} post={post} />)
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
