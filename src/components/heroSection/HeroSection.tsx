@@ -50,7 +50,7 @@ export default function Hero() {
             Level up faster with strong community support.
           </motion.p>
 
-          <motion.div
+          {/* <motion.div
             className="mt-10 flex flex-col sm:flex-row gap-4 justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -65,7 +65,7 @@ export default function Hero() {
             <Button variant="outline" size="lg" className="w-full sm:w-auto">
               Learn more
             </Button>
-          </motion.div>
+          </motion.div> */}
           <motion.div
             className="mt-10 "
             initial={{ opacity: 0 }}
