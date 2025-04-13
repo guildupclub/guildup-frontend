@@ -55,7 +55,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/community/feed";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
-  const PROFILE_PATH = '/profile'
+  const PROFILE_PATH = "/profile";
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -161,7 +161,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         image: "",
         background_image: "",
         user_isBankDetailsAdded: false,
-        user_iscalendarConnected: false
+        user_iscalendarConnected: false,
       })
     );
 
@@ -191,9 +191,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       toast("Sign in required", {
         action: {
           label: "Sign In",
-          onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}?hero=1`
-          }),
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
         },
       });
     } else {
@@ -234,13 +235,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
           <div className="flex grow items-center justify-between">
             {/* Searchbar */}
-            <div className="flex flex-1 items-center">
-              <div className="relative w-full max-w-xl">
+            <div className="flex flex-1 items-center  px-32">
+              <div className="relative w-full max-w-[400px]">
                 <div className="flex border-none">
                   <Input
                     type="search"
                     placeholder="Search..."
-                    className="w-full bg-background border-none pr-24 text-muted"
+                    className="w-full shadow-lg border-none  text-muted p-2"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -411,7 +412,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           >
             <div className="w-6 h-6 flex items-center justify-center">
               <FileText
-                className={`w-5 h-5 ${isActive("/feeds") ? "text-primary" : ""}`}
+                className={`w-5 h-5 ${
+                  isActive("/feeds") ? "text-primary" : ""
+                }`}
               />
             </div>
             <span
@@ -453,7 +456,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <button className="flex flex-col items-center justify-center gap-1">
                   <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
                     <Avatar className="h-4 w-4">
-                      <AvatarImage src={session?.user?.image || ""} alt="User" />
+                      <AvatarImage
+                        src={session?.user?.image || ""}
+                        alt="User"
+                      />
                       <AvatarFallback>
                         {session?.user?.name?.charAt(0)}
                       </AvatarFallback>
@@ -468,14 +474,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 side="top"
                 sideOffset={40}
               >
-                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
                   <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
                   <Link href="/booking">Bookings</Link>
                 </DropdownMenuItem>
                 {isUser && (
-                  <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                  <DropdownMenuItem
+                    asChild
+                    className="hover:bg-primary-gradient border-b border-zinc-300"
+                  >
                     <Link href="/payments">Payments</Link>
                   </DropdownMenuItem>
                 )}
@@ -541,9 +556,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <Plus className="h-6 w-6" />
                 </Button>
               </DialogTrigger>
-              <CreatorForm
-                onClose={() => setIsCreatorFormOpen(false)}
-              />
+              <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
             </Dialog>
           </div>
           <div className="space-y-3 pb-16">
@@ -595,7 +608,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 );
               })
             ) : (
-              <div className=""> 
+              <div className="">
                 {StringConstants.NO_COMMUNITIES_AVAILABLE}
                 {!session && (
                   <p className="mt-2">Sign in to create or join communities</p>
