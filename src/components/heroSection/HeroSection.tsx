@@ -14,7 +14,7 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto"
         >
-          <div className="mb-4  bg-gradient-to-r from-[#5b6be1] to-[#357fe0] w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
+          <div className="mb-8  bg-gradient-to-r from-[#5b6be1] to-[#357fe0] w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
             <img
               alt="stars icon"
               src="https://conqrr.vercel.app/_next/static/media/bi_stars.7e13c393.svg"
@@ -23,7 +23,7 @@ export default function Hero() {
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
             <motion.span
-              className="text-gradient block mb-2"
+              className="text-primary block mb-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
