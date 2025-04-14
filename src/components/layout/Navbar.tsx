@@ -235,13 +235,35 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
           <div className="flex grow items-center justify-between">
             {/* Searchbar */}
-            <div className="flex flex-1 items-center  px-32">
+            {/* <div className="flex flex-1 items-center  px-32">
               <div className="relative w-full max-w-[400px]">
                 <div className="flex border-none">
                   <Input
                     type="search"
                     placeholder="Search..."
                     className="w-full shadow-lg border-none  text-muted p-2"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+
+                  <div
+                    className="absolute right-0 top-0 flex h-full w-12 items-center justify-center bg-[#334bff] rounded-tr-lg rounded-br-lg cursor-pointer"
+                    onClick={handleSearch}
+                  >
+                    <Search className="h-4 w-4 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div> */}
+
+            <div className="flex flex-1 items-center lg:px-40">
+              <div className="relative w-full max-w-xl md:max-w-[400px]">
+                <div className="flex border-none">
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="w-full bg-background border-none shadow-lg p-2 text-muted"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -378,6 +400,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         callbackUrl: `${window.location.origin}?hero=2`,
                       })
                     }
+                    className="text-white"
                   >
                     Sign In
                   </Button>

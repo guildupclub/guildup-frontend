@@ -39,7 +39,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
               key={cat._id}
               onClick={() => handleCategorySelect(cat._id)}
               className={`text-left px-5 py-3 rounded-xl text-sm transition-all duration-300 
-                relative group border border-transparent
+                relative group   border-b-2
                 ${
                   selectedCategory === cat._id
                     ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-semibold border-primary/20"

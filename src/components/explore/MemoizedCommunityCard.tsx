@@ -9,7 +9,11 @@ import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
-
+import { GrInstagram } from "react-icons/gr";
+import { BsYoutube } from "react-icons/bs";
+import { FaLinkedinIn } from "react-icons/fa6";
+import numbro from "numbro";
+import { StringConstants } from "../common/CommonText";
 interface CommunityCardProps {
   community: any;
   onClick: () => void;
@@ -68,6 +72,11 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     [session, firstOffering]
   );
 
+  const formatNumber = (num: any) => {
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
+  };
+
   return (
     <Card
       onClick={onClick}
@@ -102,9 +111,39 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
               <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
                 <ImUsers className="text-blue-600 h-4 w-4 flex-shrink-0" />
                 <span className="truncate">
-                  {communityDetails?.num_member}+ members
+                  {communityDetails?.num_member}+
                 </span>
               </span>
+              {communityDetails?.linkedin_followers > 0 && (
+                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
+                  <FaLinkedinIn className="text-blue-600 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">
+                    {formatNumber(communityDetails.linkedin_followers)}+
+                    {/* {StringConstants.FOLLOWERS} */}
+                  </span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+              {communityDetails?.instagram_followers > 0 && (
+                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
+                  <GrInstagram className="text-pink-500 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">
+                    {formatNumber(communityDetails?.instagram_followers)}+
+                    {/* {StringConstants.FOLLOWERS} */}
+                  </span>
+                </span>
+              )}
+              {communityDetails?.youtube_followers > 0 && (
+                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
+                  <BsYoutube className="text-red-600 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">
+                    {formatNumber(communityDetails.youtube_followers)}+
+                    {/* {StringConstants.SUBSCRIBERS} */}
+                  </span>
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -115,12 +154,12 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             {tags.map((tag: string, index: number) => (
               <Badge
                 key={index}
-                className="bg-gray-50/50 text-gray-600 px-2 py-0.5 text-[10px] rounded-full border border-gray-100/50 
-                  transition-all duration-300 hover:bg-primary/5 hover:text-primary hover:border-primary/10
-                  group-hover:translate-y-[-2px]"
-                style={{
-                  transitionDelay: `${index * 50}ms`,
-                }}
+                className="bg-gray-50/50 text-gray-600 px-2 py-0.5 text-[12px] rounded-full border border-gray-100/50 
+                  transition-all duration-300 hover:bg-primary/5 hover:text-primary hover:border-primary/10"
+                // group-hover:translate-y-[-2px]"
+                // style={{
+                //   transitionDelay: `${index * 50}ms`,
+                // }}
               >
                 {tag}
               </Badge>

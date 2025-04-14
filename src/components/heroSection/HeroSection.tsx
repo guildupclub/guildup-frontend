@@ -21,7 +21,7 @@ export default function Hero() {
             />
             Level Up with Experts
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
             <motion.span
               className="text-primary block mb-2"
               initial={{ opacity: 0, y: 20 }}

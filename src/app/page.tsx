@@ -153,7 +153,7 @@ function Page() {
               <h1 className="text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
                 {StringConstants.TOP_PAGES}
               </h1>
-              <p className="mt-2 text-gray-600 text-sm">
+              <p className="mt-2 text-gray-600 text-lg">
                 Discover expert communities curated just for you
               </p>
             </div>

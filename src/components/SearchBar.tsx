@@ -17,7 +17,7 @@ export default function SearchBar() {
       <div className="relative w-full max-w-2xl">
         <Input
           type="search"
-          placeholder="Search for developers, projects, or skills..."
+          placeholder="Search for creators, pages, or offerings..."
           className="w-full h-14 pl-5 pr-16 text-base rounded-full border border-gray-300 shadow-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-200"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
