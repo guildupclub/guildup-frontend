@@ -29,7 +29,6 @@ import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { Stepper } from "./Steeper";
-
 interface CommunityProfile {
   user: {
     user_name: string;
