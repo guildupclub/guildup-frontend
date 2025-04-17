@@ -310,7 +310,6 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
           {day}
         </label>
       </div>
-
       {!value.enabled ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="h-4 w-4" />
