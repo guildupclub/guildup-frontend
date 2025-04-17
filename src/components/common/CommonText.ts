@@ -133,4 +133,5 @@ export const StringConstants = {
 
 export const OFFERING_TYPES = {
     CONSULTATION: 'Consultation',
+    WEBINAR : 'Webinar',
 }
