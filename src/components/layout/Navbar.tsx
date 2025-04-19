@@ -37,6 +37,7 @@ import CreatorForm from "../form/CreatorForm";
 import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 // interface Community {
 //   _id: string;
@@ -83,6 +84,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
   const [searchType, setSearchType] = useState("post");
   const userId = user?._id;
+  const { heroVisible } = useSelector((state: RootState) => state.ui);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
   useEffect(() => {
     async function fetchCommunities() {
       try {
@@ -100,6 +104,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
     // fetchCommunities();
   }, []);
+
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );
@@ -202,6 +207,22 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
   };
 
+  // Track screen size for responsive design
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 640);
+    };
+    
+    // Initial check
+    checkScreenSize();
+    
+    // Add listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   return (
     <>
       <nav
@@ -211,7 +232,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         )}
         {...props}
       >
-        <div className="container flex h-16 items-center px-4 md:px-6">
+        <div className="container flex h-14 items-center px-4 md:px-6">
           <div className="flex gap-6 items-center">
             <button
               className="md:hidden flex items-center justify-center"
@@ -223,36 +244,46 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <Image
                 src={Guildup_logo_mobile || "/placeholder.svg"}
                 alt="GuildUp logo"
-                className="h-8 w-auto md:hidden"
+                className="h-6 w-auto md:hidden"
               />
               <Image
                 src={guildup_logo || "/placeholder.svg"}
                 alt="GuildUp"
-                className="h-8 w-auto hidden md:block"
+                className="h-6 w-auto hidden md:block"
               />
             </Link>
           </div>
 
           <div className="flex grow items-center justify-between">
-            <div className="flex flex-1 items-center md:ml-8 lg:ml-12">
-              <div className="relative w-full max-w-xl md:max-w-[400px]">
-                <div className="flex">
-                  <Input
-                    type="search"
-                    placeholder="Search creators, pages, or offerings..."
-                    className="w-full bg-gray-50 border-0 rounded-full pl-5 pr-12 py-2.5 text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  />
-                  <button
-                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer transition-all duration-200"
-                    onClick={handleSearch}
+            <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
+              <AnimatePresence>
+                {!heroVisible && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="relative w-full max-w-xl md:max-w-[400px]"
                   >
-                    <Search className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+                    <div className="flex">
+                      <Input
+                        type="search"
+                        placeholder={isSmallScreen ? "Search..." : "Search creators, pages, or offerings..."}
+                        className="w-full bg-gray-50 border-0 rounded-full pl-3 md:pl-5 pr-10 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                      />
+                      <button
+                        className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-8 md:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer transition-all duration-200"
+                        onClick={handleSearch}
+                      >
+                        <Search className="h-3 w-3 md:h-4 md:w-4" />
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="hidden md:flex space-x-1 items-center justify-center">
@@ -375,7 +406,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </nav>
 
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
+      <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
           <Link
             href="/"

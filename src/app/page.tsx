@@ -18,6 +18,7 @@ import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
 import { ArrowRight, Plus } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
+import { setHeroVisible } from "@/redux/uiSlice";
 
 interface Category {
   _id: string;
@@ -219,6 +220,32 @@ function Page() {
       }
     }
   }, [category]);
+
+  // Add scroll handler to detect when hero section is visible
+  useEffect(() => {
+    if (!heroRef.current) return;
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Consider the hero "visible" only if more than 20% is showing
+        // This means the search bar appears when 80% or more is out of view
+        const visiblePercentage = entry.intersectionRatio;
+        dispatch(setHeroVisible(visiblePercentage > 0.2));
+      },
+      { 
+        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+        rootMargin: "0px 0px 0px 0px"
+      }
+    );
+    
+    observer.observe(heroRef.current);
+    
+    return () => {
+      if (heroRef.current) {
+        observer.unobserve(heroRef.current);
+      }
+    };
+  }, [dispatch, heroRef]);
 
   return (
     <Suspense fallback={<div className="min-h-[75vh] flex items-center justify-center"><Loader /></div>}>
