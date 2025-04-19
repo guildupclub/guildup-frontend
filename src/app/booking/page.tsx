@@ -67,9 +67,10 @@ const BookingPage = () => {
     }
   };
 
+
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [userId]); 
 
   if(error){
     return (

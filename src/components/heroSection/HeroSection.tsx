@@ -5,6 +5,7 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import SearchBar from "../SearchBar";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Hero() {
   const { scrollY } = useScroll();
@@ -28,9 +29,12 @@ export default function Hero() {
           className="text-center max-w-4xl mx-auto"
         >
           <div className="mb-8 bg-gradient-to-r from-[#5b6be1] to-[#357fe0] w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
-            <img
+            <Image
               alt="stars icon"
               src="https://conqrr.vercel.app/_next/static/media/bi_stars.7e13c393.svg"
+              width={20}
+              height={20}
+              className="h-5 w-5"
             />
             Level Up with Experts
           </div>
