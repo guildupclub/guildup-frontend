@@ -45,18 +45,18 @@ function CategoryBar({ categorys, selectCategory, selectedCategoryId }: Category
       </div>
 
       {/* Mobile View - Horizontal Scroll */}
-      <div className="md:hidden overflow-x-auto scrollbar-none">
-        <div className="flex gap-2 py-2">
+      <div className="md:hidden overflow-x-auto scrollbar-none pb-1">
+        <div className="flex gap-2 py-1 w-max">
           {categorys?.map((cat: Category) => (
             <button
               key={cat._id}
               onClick={() => handleCategorySelect(cat._id)}
-              className={`px-4 py-2 rounded-full text-xs transition-all duration-300 flex-shrink-0
+              className={`px-3 py-1.5 rounded-full text-xs transition-all duration-300 flex-shrink-0
                 relative group
                 ${
                   selectedCategoryId === cat._id
-                    ? "bg-primary text-white font-medium shadow-sm"
-                    : "bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
+                    ? "bg-primary text-white font-medium"
+                    : "bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-100"
                 }
               `}
             >

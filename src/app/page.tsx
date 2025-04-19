@@ -230,7 +230,7 @@ function Page() {
           </div>
           {!isCreator && (
             <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
-              <h2 className="text-2xl font-semibold">
+              <h2 className="text-xl font-semibold">
                 Join or create a community to start interacting with other members.
               </h2>
               <div className="flex gap-4 mt-4">
@@ -256,79 +256,65 @@ function Page() {
               </div>
             </div>
           )}
-          <div ref={stickyTriggerRef} className="w-0 h-0" />
-          <div className="w-full max-w-[1920px] mx-auto px-8 lg:px-12 relative bg-white">
-            <div className="sticky top-16 z-50 -mx-8 px-8 py-6 bg-white border-b">
-              <div className="flex flex-col gap-4">
+          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
+            <div className="sticky top-16 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6 bg-white border-b">
+              <div className="flex flex-col gap-3 sm:gap-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-                      {StringConstants.TOP_EXPERTS}
-                    </h1>
-                  </div>
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                    {StringConstants.TOP_EXPERTS}
+                  </h1>
                   <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
                     <DialogTrigger asChild>
                       <button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-5 py-2 text-gray-700 hover:text-primary font-medium transition-all duration-200 border border-gray-200 rounded-lg hover:border-primary hover:bg-gray-50"
+                        className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 text-gray-700 hover:text-primary font-medium transition-all duration-200 border border-gray-200 rounded-lg hover:border-primary hover:bg-gray-50"
                       >
-                        <span className="text-amber-400">👋</span>
+                        <span className="text-amber-400 hidden sm:inline">👋</span>
                         <span>Expert Page</span>
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
-
-                <p className="text-gray-600 text-sm max-w-2xl description-text">
+  
+                <p className="hidden sm:block text-gray-600 text-sm max-w-2xl description-text">
                   Discover expert pages curated just for you. Connect with industry leaders, learn from their experiences, and grow your skills.
                 </p>
-
-                {/* <motion.div
-                  animate={{
-                    height: isSticky ? 0 : "auto",
-                    opacity: isSticky ? 0 : 1,
-                    marginBottom: isSticky ? 0 : undefined
-                  }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <p className="text-gray-600 text-lg max-w-2xl">
-                    Discover expert pages curated just for you. Connect with industry leaders, learn from their experiences, and grow your skills.
-                  </p>
-                </motion.div> */}
               </div>
             </div>
 
             {/* Scrollable content */}
-            <div className="pt-6">
-              <div className="flex flex-col md:flex-row gap-8">
-                {/* Main Content */}
-                <div className="flex-1 min-w-0" ref={targetRef}>
-                  <div className="rounded-2xl">
-                    <div id="scroll-target-border" className="w-full h-1 mb-8"></div>
-                    {isLoading ? (
-                      <Loader />
-                    ) : (
-                      <CommunitySection activeCategory={selectedCategoryId} />
-                    )}
-                  </div>
-                </div>
-
-                {/* Category Section - Right Side */}
-                <div className="w-full md:w-80 flex-shrink-0 order-first md:order-last">
-                  <div className="sticky top-60 z-51">
+            <div className="pt-3 sm:pt-6">
+              <div className="flex flex-col md:flex-row gap-5 sm:gap-8">
+                {/* Category Section - Top on Mobile, Right on Desktop */}
+                <div className="w-full md:w-80 flex-shrink-0 order-first md:order-last mb-3 md:mb-0">
+                  <div className="md:sticky top-60 z-51">
+                    <h2 className="text-lg font-semibold text-gray-800 mb-2 md:hidden">
+                      Categories
+                    </h2>
                     <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 mb-6">
                       Browse Categories
                     </h2>
-                    <div className="p-6 rounded-2xl border border-white/20 bg-white shadow-sm">
+                    <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 bg-white sm:shadow-sm">
                       <CategoryBar
                         categorys={category}
                         selectCategory={handleCategorySelect}
                         selectedCategoryId={selectedCategory}
                       />
                     </div>
+                  </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 min-w-0" ref={targetRef}>
+                  <div className="rounded-xl sm:rounded-2xl">
+                    <div id="scroll-target-border" className="w-full h-1 mb-4 sm:mb-8"></div>
+                    {isLoading ? (
+                      <Loader />
+                    ) : (
+                      <CommunitySection activeCategory={selectedCategoryId} />
+                    )}
                   </div>
                 </div>
               </div>

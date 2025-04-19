@@ -110,13 +110,13 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   );
 
   return (
-    <div className="bg-white min-h-screen lg:py-4">
+    <div className="bg-white min-h-screen">
       {loading ? (
-        <div className="flex justify-center items-center py-12">
+        <div className="flex justify-center items-center py-8">
           <Loader />
         </div>
       ) : (
-        <div id="card-container-top" className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pb-8 z-0 lg:pb-0 pt-10">
+        <div id="card-container-top" className="grid gap-3 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-6 z-0 lg:pb-0 pt-4 sm:pt-10">
           {communities.length > 0 ? (
             communities.map((community, index) => (
               <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
