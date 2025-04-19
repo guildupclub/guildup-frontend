@@ -36,8 +36,11 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
+    // Clear communities immediately when category changes
+    setCommunities([]);
+    setLoading(true);
+    
     const fetchCommunities = async () => {
-      setLoading(true);
       try {
         let response;
         let limits = 100;
@@ -75,9 +78,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   }, [activeCategory]);
 
   const handleClickCommunity = useCallback(
-    (communityWrapper: { community: Community }) => {
-      const community = communityWrapper.community;
-
+    (community: Community) => {
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
         return;
@@ -111,16 +112,19 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   return (
     <div className="bg-white min-h-screen lg:py-4">
       {loading ? (
-        <p className="text-center mt-4">Loading...</p>
+        <div className="flex justify-center items-center py-12">
+          <Loader />
+        </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pb-8 z-0 lg:pb-0">
+        <div id="card-container-top" className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pb-8 z-0 lg:pb-0 pt-10">
           {communities.length > 0 ? (
-            communities.map((communityWrapper) => (
-              <MemoizedCommunityCard
-                key={communityWrapper._id}
-                community={communityWrapper}
-                onClick={() => handleClickCommunity(communityWrapper)}
-              />
+            communities.map((community, index) => (
+              <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
+                <MemoizedCommunityCard
+                  community={community}
+                  onClick={() => handleClickCommunity(community)}
+                />
+              </div>
             ))
           ) : (
             <p className="text-center col-span-3 py-8 text-muted-foreground">

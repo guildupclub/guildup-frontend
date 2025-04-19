@@ -63,7 +63,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Get expert advice from those who've successfully done it. <br />{" "}
+            Get expert advice from those who&apos;ve successfully done it. <br />{" "}
             Level up faster with strong community support.
           </motion.p>
 
