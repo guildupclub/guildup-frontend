@@ -206,20 +206,20 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 bg-card pt-2 lg:px-20 w-full flex",
+          "fixed top-0 z-50 bg-white pt-2 lg:px-20 w-full flex border-b border-gray-100",
           props.className
         )}
         {...props}
       >
-        <div className="container flex h-14 items-center px-5">
-          <div className="flex gap-1 items-center">
+        <div className="container flex h-16 items-center px-4 md:px-6">
+          <div className="flex gap-6 items-center">
             <button
-              className="md:hidden flex items-center justify-center mr-2"
+              className="md:hidden flex items-center justify-center"
               onClick={() => setIsSidebarOpen((prev) => !prev)}
             >
-              <FaBars className="h-6 w-6" />
+              <FaBars className="h-5 w-5 text-gray-700" />
             </button>
-            <Link href="/" className="flex items-center space-x-2 mr-6">
+            <Link href="/" className="flex items-center">
               <Image
                 src={Guildup_logo_mobile || "/placeholder.svg"}
                 alt="GuildUp logo"
@@ -234,159 +234,123 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
 
           <div className="flex grow items-center justify-between">
-            {/* Searchbar */}
-            {/* <div className="flex flex-1 items-center  px-32">
-              <div className="relative w-full max-w-[400px]">
-                <div className="flex border-none">
-                  <Input
-                    type="search"
-                    placeholder="Search..."
-                    className="w-full shadow-lg border-none  text-muted p-2"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  />
-
-                  <div
-                    className="absolute right-0 top-0 flex h-full w-12 items-center justify-center bg-[#334bff] rounded-tr-lg rounded-br-lg cursor-pointer"
-                    onClick={handleSearch}
-                  >
-                    <Search className="h-4 w-4 text-white" />
-                  </div>
-                </div>
-              </div>
-            </div> */}
-
-            <div className="flex flex-1 items-center lg:px-40">
+            <div className="flex flex-1 items-center md:ml-8 lg:ml-12">
               <div className="relative w-full max-w-xl md:max-w-[400px]">
-                <div className="flex border-none">
+                <div className="flex">
                   <Input
                     type="search"
-                    placeholder="Search..."
-                    className="w-full bg-background border-none shadow-lg p-2 text-muted"
+                    placeholder="Search creators, pages, or offerings..."
+                    className="w-full bg-gray-50 border-0 rounded-full pl-5 pr-12 py-2.5 text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   />
-
-                  <div
-                    className="absolute right-0 top-0 flex h-full w-12 items-center justify-center bg-[#334bff] rounded-tr-lg rounded-br-lg cursor-pointer"
+                  <button
+                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer transition-all duration-200"
                     onClick={handleSearch}
                   >
-                    <Search className="h-4 w-4 text-white" />
-                  </div>
+                    <Search className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="hidden md:flex space-x-8 items-center justify-center">
+            <div className="hidden md:flex space-x-1 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
-                <ul className="flex items-center space-x-2 text-muted">
-                  <li className="w-18 px-3 rounded-xl">
+                <ul className="flex items-center space-x-2 text-gray-600">
+                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
-                        className={`h-6 w-6 ${
+                        className={`h-5 w-5 ${
                           isActive("/") ? "text-primary" : ""
                         }`}
                       />
-                      <span className={isActive("/") ? "text-primary" : ""}>
+                      <span className={`text-sm mt-1 ${isActive("/") ? "text-primary font-medium" : ""}`}>
                         {StringConstants.EXPLORE}
                       </span>
                     </Link>
                   </li>
 
-                  <li className="w-18 px-3 rounded-xl">
+                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link
                       href="/feeds"
-                      className="flex flex-col items-center px-3 py-1.5"
+                      className="flex flex-col items-center"
                     >
                       <FileText
-                        className={`h-6 w-6 ${
+                        className={`h-5 w-5 ${
                           isActive("/feeds") ? "text-primary" : ""
                         }`}
                       />
-                      <span
-                        className={`h-6 ${
-                          isActive("/feeds") ? "text-primary" : ""
-                        }`}
-                      >
+                      <span className={`text-sm mt-1 ${isActive("/feeds") ? "text-primary font-medium" : ""}`}>
                         {StringConstants.FEED}
                       </span>
                     </Link>
                   </li>
-                  <li className="w-18 px-3 rounded-xl">
+                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link
                       href={
                         activeCommunityId
                           ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
                           : `${COMMUNITY_FEED_PATH}`
                       }
-                      className="flex flex-col items-center justify-center"
+                      className="flex flex-col items-center"
                     >
                       <Users
-                        className={`w-6 h-6 ${
+                        className={`w-5 h-5 ${
                           isActive("/community") ? "text-primary" : ""
                         }`}
                       />
-                      <span
-                        className={isActive("/community") ? "text-primary" : ""}
-                      >
-                        {StringConstants.EXPERTS}
+                      <span className={`text-sm mt-1 ${isActive("/community") ? "text-primary font-medium" : ""}`}>
+                        {StringConstants.MY_SPACE}
                       </span>
                     </Link>
                   </li>
                 </ul>
               </div>
 
-              <div className="hidden md:block">
+              <div className="hidden md:block ml-4">
                 {user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <div className="flex flex-row bg-[#f2f2f2] rounded-e-full">
-                        <Button
-                          variant="ghost"
-                          className="relative h-8 w-8 rounded-full pb-3"
-                        >
-                          <Avatar className="h-10 w-10">
-                            {session?.user?.image ? (
-                              <AvatarImage
-                                src={session?.user?.image}
-                                alt="User"
-                              />
-                            ) : (
-                              <AvatarFallback>AR</AvatarFallback>
-                            )}
-                          </Avatar>
-                        </Button>
-                        <ChevronDown size={25} className="pt-2" />
-                      </div>
+                      <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
+                        <Avatar className="h-9 w-9">
+                          {session?.user?.image ? (
+                            <AvatarImage src={session?.user?.image} alt="User" />
+                          ) : (
+                            <AvatarFallback>
+                              {session?.user?.name?.charAt(0)}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <ChevronDown className="h-4 w-4 text-gray-500" />
+                      </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                      className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
+                      className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
                       align="end"
                     >
                       <DropdownMenuItem
                         asChild
-                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                       >
                         <Link href="/profile">Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         asChild
-                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                       >
                         <Link href="/booking">Bookings</Link>
                       </DropdownMenuItem>
                       {isUser && (
                         <DropdownMenuItem
                           asChild
-                          className="hover:bg-primary-gradient border-b border-zinc-300"
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
                           <Link href="/payments">Payments</Link>
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        className="hover:bg-primary-gradient"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         onClick={handleSignOut}
                       >
                         {StringConstants.SIGN_OUT}
@@ -400,7 +364,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         callbackUrl: `${window.location.origin}?hero=2`,
                       })
                     }
-                    className="text-white"
+                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium transition-all duration-200"
                   >
                     Sign In
                   </Button>
@@ -469,7 +433,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 isActive("/community") ? "text-primary" : ""
               }`}
             >
-              {StringConstants.EXPERTS}
+              {StringConstants.MY_SPACE}
             </span>
           </Link>
 

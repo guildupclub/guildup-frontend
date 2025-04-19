@@ -96,6 +96,10 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setActiveCommunity({
           id: community._id,
           name: community.name,
+          image: "",
+          background_image: "",
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
 
@@ -105,7 +109,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   );
 
   return (
-    <div className="bg-background min-h-screen lg:py-4">
+    <div className="bg-white min-h-screen lg:py-4">
       {loading ? (
         <p className="text-center mt-4">Loading...</p>
       ) : (
