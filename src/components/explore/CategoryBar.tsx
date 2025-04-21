@@ -1,33 +1,41 @@
-import React, { useState, useEffect } from "react";
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 
 interface Category {
-  name: string;
-  _id: string;
+  name: string
+  _id: string
 }
 
 interface CategoryBarProps {
-  categorys: Category[];
-  selectCategory: (a: string) => void;
+  categorys: Category[]
+  selectCategory: (a: string) => void
 }
 
 function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
+  const router = useRouter()
+
   // Initialize the selected category with the first category's ID
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    categorys.length > 0 ? categorys[0]._id : null
-  );
+    categorys.length > 0 ? categorys[0]._id : null,
+  )
 
   // On component mount, select the first category by default
   useEffect(() => {
     if (categorys.length > 0) {
-      setSelectedCategory(categorys[0]._id);
-      selectCategory(categorys[0]._id);
+      setSelectedCategory(categorys[0]._id)
+      selectCategory(categorys[0]._id)
     }
-  }, [categorys, selectCategory]);
+  }, [categorys, selectCategory])
 
-  const handleCategorySelect = (id: string) => {
-    setSelectedCategory(id); // Update the selected category state
-    selectCategory(id); // Call the parent function
-  };
+  const handleCategorySelect = (id: string, name: string) => {
+    setSelectedCategory(id) // Update the selected category state
+    selectCategory(id) // Call the parent function
+
+    // Redirect to the category page with both name and ID
+    router.push(`/explore/${encodeURIComponent(name)}?id=${id}`)
+  }
 
   return (
     <div className="w-full">
@@ -37,7 +45,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
           {categorys?.map((cat: Category) => (
             <button
               key={cat._id}
-              onClick={() => handleCategorySelect(cat._id)}
+              onClick={() => handleCategorySelect(cat._id, cat.name)}
               className={`text-left px-5 py-3 rounded-xl text-sm transition-all duration-300 
                 relative group   border-b-2
                 ${
@@ -65,7 +73,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
           {categorys?.map((cat: Category) => (
             <button
               key={cat._id}
-              onClick={() => handleCategorySelect(cat._id)}
+              onClick={() => handleCategorySelect(cat._id, cat.name)}
               className={`px-5 py-3 rounded-xl text-sm transition-all duration-300 flex-shrink-0
                 relative group border border-transparent
                 ${
@@ -87,7 +95,7 @@ function CategoryBar({ categorys, selectCategory }: CategoryBarProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default CategoryBar;
+export default CategoryBar
