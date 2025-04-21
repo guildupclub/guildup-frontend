@@ -2,13 +2,13 @@
 
 import React from "react";
 import type { RootState } from "@/redux/store";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { Avatar } from "@radix-ui/react-avatar";
 import axios from "axios";
 import Image from "next/image";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../ui/button";
-import { ArrowRight, Edit, Trash2, Pencil, User2, LockKeyhole, Link, Loader2, PencilIcon, Trash } from "lucide-react";
+import { ArrowRight, Edit, Trash2, Pencil } from "lucide-react";
 import { AddOfferingDialog } from "./AddOfferingdialog";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { IoVideocam } from "react-icons/io5";
@@ -29,9 +29,6 @@ import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { Stepper } from "./Steeper";
-import { PlusIcon, ShoppingBag, Youtube, Instagram, Linkedin } from "lucide-react";
-import { Badge } from "../ui/badge";
-
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -202,7 +199,7 @@ const InfiniteMovingCards = ({
           initial="initial"
           animate="animate"
           style={{
-            "--num": items.length as number,
+            "--num": items.length,
           }}
           whileHover={pauseOnHover ? "paused" : ""}
           {...props}
@@ -284,8 +281,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // Update the isCommunityFollowed check to use the query data
   const isCommunityFollowed = React.useMemo(() => {
     if (followedCommunitiesData) {
-      return (followedCommunitiesData as any[]).some(
-        (c) => c?._id === activeCommunityId
+      return followedCommunitiesData.some(
+        (c: any) => c?._id === activeCommunityId
       );
     }
     return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
@@ -579,293 +576,349 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
   return (
     <div className="w-full">
-      <div className="relative h-64 w-full bg-primary/20">
-        {profile?.community?.background_image && (
-          <Image
-            src={profile.community.background_image}
-            alt="Background Image"
-            fill
-            className="object-cover rounded-b-2xl"
-          />
-        )}
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative">
-          <div className="absolute -top-16">
-            <Avatar className="h-32 w-32 border-4 border-white">
-              {profile?.community?.image ? (
-                <AvatarImage src={profile.community?.image} />
-              ) : (
-                <div className="h-32 w-32 rounded-full bg-primary flex items-center justify-center">
-                  <User2 className="h-16 w-16 text-white" />
-                </div>
-              )}
-              <AvatarFallback>
-                {profile?.community?.name?.charAt(0) || "C"}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </div>
-        <div className="mt-20 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Column 1 (left side) - Offerings with horizontal scroll */}
-          <div className="lg:col-span-2">
-            <div className="mb-8">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-3xl font-bold">
-                    {profile?.community?.name}
-                  </h2>
-                  <p className="text-muted-foreground">
-                    {profile?.community?.num_member || 0} members •{" "}
-                    {profile?.community?.post_count || 0} posts
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  {!isLoading ? (
-                    isCommunityFollowed ? (
-                      <Button
-                        variant="outline"
-                        onClick={handleLeaveCommunity}
-                        className="ml-auto"
-                      >
-                        Unfollow
-                      </Button>
-                    ) : (
-                      <Button className="ml-auto" onClick={handleJoinCommunity}>
-                        Join Community
-                      </Button>
-                    )
-                  ) : (
-                    <Button disabled className="ml-auto">
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Loading...
-                    </Button>
-                  )}
+      {isOwner && (!isCalendarConnected || !isBankConnected) && (
+        <Stepper
+          steps={[
+            {
+              label: "Build Guild",
+              completed: true,
+            },
+            {
+              label: "Complete Profile",
+              completed: true,
+            },
+            {
+              label: "Create Offering",
+              completed: offerings && offerings.length > 0,
+              active: offerings && offerings.length === 0,
+            },
+            {
+              label: "Link Calendar",
+              completed: isCalendarConnected,
+              active: offerings && offerings.length > 0 && !isCalendarConnected,
+            },
+            {
+              label: "Add Bank",
+              completed: isBankConnected,
+              active:
+                offerings &&
+                offerings.length > 0 &&
+                isCalendarConnected &&
+                !isBankConnected,
+            },
+          ]}
+        />
+      )}
+      <div className="max-w-6xl mx-auto py-2 px-3 md:px-0">
+        <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border/5">
+          <div className="relative">
+            <div className="h-32 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+              <Image
+                src={
+                  profile?.community.background_image != undefined
+                    ? profile?.community.background_image
+                    : bgImgUrl
+                }
+                alt="Profile banner"
+                width={1200}
+                height={400}
+                className="w-full h-full object-cover opacity-90 transition-transform duration-500 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+            </div>
+            <div className="absolute -bottom-16 left-8">
+              <Avatar className="w-24 h-24 ring-4 ring-background shadow-xl">
+                <Image
+                  src={profile?.community?.image || avatarImgUrl}
+                  alt={profile?.community?.name || "Community Avatar"}
+                  width={100}
+                  height={100}
+                  className="w-24 h-24 rounded-full object-cover bg-primary/5 border-4 border-background transition-transform duration-300 hover:scale-105"
+                  unoptimized
+                />
 
+                {/* <AvatarFallback className="text-primary text-3xl w-32 h-32 bg-primary/5">
+                {profile.user.user_name[0]}
+              </AvatarFallback> */}
+              </Avatar>
+            </div>
+          </div>
+
+          <div className="pt-16 pb-4 px-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center gap-2">
+                  {profile?.community?.name}
                   {isOwner && (
-                    <Button
-                      variant="outline"
+                    <button
+                      className="p-1 rounded-md hover:bg-background transition"
                       onClick={() => setIsEditOpen(true)}
                     >
-                      <PencilIcon className="h-4 w-4" />
-                    </Button>
+                      <Pencil
+                        size={18}
+                        className="text-muted hover:text-primary"
+                      />
+                    </button>
                   )}
-                </div>
-              </div>
-            </div>
+                </h1>
 
-            {/* Offerings Section with horizontal scroll */}
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Offerings</h3>
-                {isOwner && (
-                  <Link href={`/create-offering?communityId=${activeCommunityId}`}>
-                    <Button size="sm" variant="outline">
-                      <PlusIcon className="mr-1 h-4 w-4" /> Add Offering
-                    </Button>
-                  </Link>
-                )}
-              </div>
-              
-              {offerings && offerings.length > 0 ? (
-                <div className="overflow-x-auto pb-4">
-                  <div className="flex space-x-4" style={{ minWidth: "min-content" }}>
-                    {offerings.map((offering) => (
-                      <div
-                        key={offering._id}
-                        className="min-w-[300px] max-w-[300px] bg-white rounded-lg shadow-md p-4 border border-gray-200"
-                      >
-                        <div className="flex justify-between items-start">
-                          <h4 className="text-lg font-bold truncate flex-1">
-                            {offering.title}
-                          </h4>
-                          {isOwner && (
-                            <div className="flex space-x-1">
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8"
-                                onClick={() => handleEditClick(offering)}
-                              >
-                                <PencilIcon className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                className="h-8 w-8 text-destructive"
-                                onClick={() => handleDeleteOffering(offering._id)}
-                              >
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                        <div className="my-2">
-                          <div className="flex items-center space-x-1">
-                            {renderStars(offering.rating)}
-                            <span className="text-gray-500 text-sm">
-                              ({offering.total_ratings})
-                            </span>
-                          </div>
-                        </div>
-                        <p className="text-sm text-gray-600 line-clamp-2 h-10">
-                          {offering.description}
-                        </p>
-                        <div className="flex flex-wrap gap-1 my-2">
-                          {offering.tags.map((tag, idx) => (
-                            <Badge
-                              key={idx}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="mt-2 flex justify-between items-center">
-                          <div>
-                            {offering.is_free ? (
-                              <p className="font-bold text-green-600">Free</p>
-                            ) : (
-                              <p className="font-bold">
-                                {offering.price.amount}{" "}
-                                {offering.price.currency}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500">
-                              {offering.duration} mins
-                            </p>
-                          </div>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              setSelectedOffering(offering);
-                            }}
-                          >
-                            Book
-                          </Button>
-                        </div>
+                <p className="text-muted-foreground text-lg">
+                  {StringConstants.CREATED_BY}{" "}
+                  <span className="text-foreground">
+                    {profile.user.user_name}
+                  </span>
+                </p>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground my-2">
+                  <div className="flex items-center gap-1.5">
+                    <MdPeopleAlt className="h-5 w-5 text-green-500" />
+                    <span className="font-medium text-foreground">
+                      {profile.community.num_member.toLocaleString()}
+                    </span>
+                    {StringConstants.MEMBER}
+                  </div>
+                  <div className="w-1 h-1 rounded-full bg-border" />
+                  <div className="flex items-center gap-1.5">
+                    <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
+                    <span className="font-medium text-foreground">
+                      {profile?.community?.post_count}
+                    </span>
+                    {StringConstants.POSTS}
+                  </div>
+
+                  {profile.community?.instagram_followers > 0 && (
+                    <>
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <div className="flex items-center gap-1.5">
+                        <GrInstagram className="h-5 w-5 text-pink-500" />
+                        <span className="font-medium text-foreground">
+                          {formatNumber(profile.community?.instagram_followers)}
+                        </span>
+                        {StringConstants.FOLLOWERS}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg shadow-md p-6 text-center border border-dashed border-gray-300">
-                  <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto" />
-                  <h3 className="mt-2 text-lg font-medium">
-                    No Offerings Available
-                  </h3>
-                  <p className="mt-1 text-gray-500">
-                    This page doesn&apos;t have any offerings yet.
-                  </p>
-                  {isOwner && (
-                    <Link href={`/create-offering?communityId=${activeCommunityId}`}>
-                      <Button className="mt-4" size="sm">
-                        <PlusIcon className="mr-1 h-4 w-4" /> Create Offering
-                      </Button>
-                    </Link>
+                    </>
+                  )}
+
+                  {profile.community?.youtube_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <BsYoutube className="h-5 w-5 text-red-500" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.youtube_followers)}
+                      </span>
+                      {StringConstants.SUBSCRIBERS}
+                    </div>
+                  )}
+
+                  {profile.community?.linkedin_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.linkedin_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
                   )}
                 </div>
+              </div>
+              {isOwner ? (
+                ""
+              ) : isCommunityFollowed ? (
+                <Button
+                  variant="destructive"
+                  size="lg"
+                  className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  onClick={handleLeaveCommunity}
+                >
+                  <HiMiniUserGroup className="h-8 w-8" />
+                  {StringConstants.FOLLOWING}
+                </Button>
+              ) : (
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  onClick={handleJoinCommunity}
+                >
+                  <HiMiniUserGroup className="h-8 w-8" />
+                  {StringConstants.FOLLOW}
+                </Button>
               )}
-            </div>
-
-            {/* Testimonials Section - Below Offerings */}
-            <div className="mb-8">
-              <div className="rounded-xl shadow-sm">
-                <Testimonials />
-              </div>
-            </div>
-          </div>
-
-          {/* Column 2 (right side) - About, Tags, Social Media */}
-          <div className="lg:col-span-1">
-            {/* About Section */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h3 className="text-xl font-semibold mb-4">About</h3>
-              <p className="text-gray-700">
-                {profile?.community?.description || "No description available."}
-              </p>
-            </div>
-
-            {/* Tags Section */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <h3 className="text-xl font-semibold mb-4">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {profile?.community?.tags && profile.community.tags.length > 0 ? (
-                  profile.community.tags.map((tag: any, idx: any) => (
-                    <Badge key={idx} variant="secondary">
-                      {tag}
-                    </Badge>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No tags available</p>
-                )}
-              </div>
-            </div>
-
-            {/* Social Media Section */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">Social Media</h3>
-              <div className="space-y-4">
-                {profile?.community?.youtube_followers && (
-                  <div className="flex items-center">
-                    <Youtube className="h-5 w-5 text-red-600 mr-2" />
-                    <div>
-                      <p className="font-medium">YouTube</p>
-                      <p className="text-sm text-gray-500">
-                        {formatNumber(profile.community.youtube_followers)} followers
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {profile?.community?.instagram_followers && (
-                  <div className="flex items-center">
-                    <Instagram className="h-5 w-5 text-pink-600 mr-2" />
-                    <div>
-                      <p className="font-medium">Instagram</p>
-                      <p className="text-sm text-gray-500">
-                        {formatNumber(profile.community.instagram_followers)} followers
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {profile?.community?.linkedin_followers && (
-                  <div className="flex items-center">
-                    <Linkedin className="h-5 w-5 text-blue-600 mr-2" />
-                    <div>
-                      <p className="font-medium">LinkedIn</p>
-                      <p className="text-sm text-gray-500">
-                        {formatNumber(profile.community.linkedin_followers)} followers
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {!profile?.community?.youtube_followers && 
-                  !profile?.community?.instagram_followers && 
-                  !profile?.community?.linkedin_followers && (
-                  <p className="text-gray-500">No social media information available</p>
-                )}
-              </div>
             </div>
           </div>
         </div>
-        
-        {isEditOpen && (
-          <EditCommunityModal
-            profile={profile}
-            isOpen={isEditOpen}
-            onClose={() => setIsEditOpen(false)}
-          />
-        )}
-        {isEditModalOpen && selectedOfferingModal && (
-          <EditOfferingModal
-            offering={selectedOfferingModal}
-            userId={user?._id}
-            communityId={activeCommunityId}
-            onClose={() => setIsEditModalOpen(false)}
-            onUpdate={fetchOfferings}
-          />
-        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          <div className="">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              {StringConstants.ABOUT}
+              {isOwner && (
+                <button
+                  className="p-1 rounded-md hover:bg-background transition mx-2"
+                  onClick={() => setIsEditOpen(true)}
+                >
+                  <Pencil size={18} className="text-muted hover:text-primary" />
+                </button>
+              )}
+            </h2>
+            <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
+              <p className="text-muted-foreground  whitespace-pre-line">
+                {profile.community.description}
+              </p>
+              <div className="flex flex-wrap gap-2 my-2">
+                {profile.community.tags.map((tag: any) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary hover:bg-primary/10 transition-colors duration-200"
+                  >
+                    
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="rounded-xl transition-all duration-300 border border-border/5">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-semibold text-foreground">
+                {StringConstants.OFFERINGS}
+              </h2>
+              <AddOfferingDialog onOfferingAdded={fetchOfferings} />
+            </div>
+
+            {!isBankConnected || offerings.length === 0 ? (
+              <div className="text-center py-16 bg-card rounded-xl border border-border/5">
+                <p className="text-lg text-muted-foreground">
+                  {StringConstants.NO_OFFERINGS}
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {offerings.map((offering) => (
+                  <div
+                    key={offering._id || Math.random()}
+                    className="group bg-white rounded-lg p-6 hover:shadow-sm transition-all duration-300"
+                  >
+                    {/* Top Row: Icon + Title + Description */}
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-blue-50 rounded-lg">
+                        <IoVideocam className="text-primary h-6 w-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                          {offering.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1 max-w-xl whitespace-pre-line">
+                          {offering.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 px-2">
+                      {/* <span className="text-xl font-semibold text-gray-900 pl-12">
+                      ₹{offering.price.amount}
+                    </span> */}
+                      <div className="flex items-center justify-between gap-2">
+                        {isOwner && (
+                          <div
+                            className={`flex gap-2`}
+                          >
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-3 py-2 rounded-lg flex items-center gap-1"
+                              onClick={() => handleEditClick(offering)}
+                            >
+                              <Edit className="w-4 h-4" />
+                              <span>{StringConstants.EDIT}</span>
+                            </Button>
+
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="px-3 py-2 rounded-lg flex items-center gap-1 text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              onClick={() => handleDeleteOffering(offering._id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              <span>{StringConstants.DELETE}</span>
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Book Now button */}
+                          <Button
+                            size="sm"
+                            disabled={isOwner ?? false}
+                            className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                              !isOwner? "cursor-pointer" : "cursor-not-allowed opacity-50"
+                            }`}
+                            onClick={() => {
+                              if (!session) {
+                                signIn("google");
+                                return;
+                              }
+                              if(!isOwner)  setSelectedOffering(offering);
+                            }}
+                          >
+                            {offering.is_free ? (
+                              <span>Free</span>
+                            ):(offering?.discounted_price &&
+                            offering?.price?.amount ? (
+                              <>
+                                <span className="line-through text-xs opacity-60">
+                                  ₹{offering.price.amount}
+                                </span>
+                                <span> ₹{offering.discounted_price}</span>
+                              </>
+                            ) : offering?.price?.amount ? (
+                              <span>₹{offering.price.amount}</span>
+                            ) : null)}
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {selectedOffering && (
+                  <BookingDialog
+                    offering={{
+                      ...selectedOffering,
+                      discounted_price: selectedOffering.discounted_price
+                        ? Number(selectedOffering.discounted_price)
+                        : 0,
+                    }}
+                    isOpen={!!selectedOffering}
+                    onClose={() => setSelectedOffering(null)}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="col-span-1 lg:col-span-2 mt-8">
+            <div className="rounded-xl shadow-sm ">
+              <Testimonials />
+            </div>
+          </div>
+          {isEditOpen && (
+            <EditCommunityModal
+              profile={profile}
+              isOpen={isEditOpen}
+              onClose={() => setIsEditOpen(false)}
+            />
+          )}
+          {isEditModalOpen && selectedOfferingModal && (
+            <EditOfferingModal
+              offering={selectedOfferingModal}
+              userId={user?._id}
+              communityId={activeCommunityId}
+              onClose={() => setIsEditModalOpen(false)}
+              onUpdate={fetchOfferings}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
