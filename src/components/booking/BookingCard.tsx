@@ -115,7 +115,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
         </div>
       </CardHeader>
       <CardContent className="pb-3 pt-0">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
           <div className="flex items-start gap-2">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
             <div>

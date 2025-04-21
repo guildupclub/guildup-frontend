@@ -291,7 +291,7 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between py-2">
+    <div className="flex flex-col md:flex-row lg:items-center justify-between py-2">
       <div className="flex items-center gap-3">
         <Switch
           id={`${day}-switch`}
@@ -316,7 +316,7 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
           <span>Unavailable</span>
         </div>
       ) : (
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex items-center gap-2 text-muted-foreground py-2 md:py-0">
           <Select
             value={value.start}
             onValueChange={(val) => onChange({ ...value, start: val })}
