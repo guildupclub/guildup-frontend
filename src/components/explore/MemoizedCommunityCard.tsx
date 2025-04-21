@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
@@ -26,12 +26,26 @@ interface CommunityCardProps {
   onClick: () => void;
 }
 
+// Add the required CSS class at the top of the file
+const scrollbarHideStyles = `
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+`;
+
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
   const router = useRouter();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const tagContainerRef = useRef<HTMLDivElement>(null);
 
   const communityDetails = useMemo(() => community?.community, [community]);
   const firstOffering = useMemo(
@@ -39,12 +53,45 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     [community?.offerings]
   );
 
+  // Add years of experience (default to 0 if not available)
+  const yearsOfExperience = useMemo(() => {
+    return communityDetails?.years_of_experience || 0;
+  }, [communityDetails]);
+
   const tags: string[] = useMemo(() => {
-    const rawTags = communityDetails?.tags?.[0];
-    if (!rawTags) return [];
-    return rawTags.includes(",")
-      ? rawTags.split(",").map((tag: string) => tag.trim())
-      : [rawTags];
+    // If tags don't exist, return empty array
+    if (!communityDetails?.tags || !communityDetails.tags.length) return [];
+    
+    // Create a flat array of all tags
+    let allTags: string[] = [];
+    
+    // Process each item in the tags array
+    communityDetails.tags.forEach((tagItem: any) => {
+      if (typeof tagItem === 'string') {
+        // If it's a string, check if it contains multiple comma-separated tags
+        if (tagItem.includes(',')) {
+          const splitTags = tagItem.split(',').map((tag: string) => tag.trim()).filter(Boolean);
+          allTags = [...allTags, ...splitTags];
+        } else {
+          allTags.push(tagItem.trim());
+        }
+      } else if (Array.isArray(tagItem)) {
+        // If it's an array, process each item
+        tagItem.forEach((tag: any) => {
+          if (typeof tag === 'string') {
+            if (tag.includes(',')) {
+              const splitTags = tag.split(',').map((t: string) => t.trim()).filter(Boolean);
+              allTags = [...allTags, ...splitTags];
+            } else {
+              allTags.push(tag.trim());
+            }
+          }
+        });
+      }
+    });
+    
+    // Remove duplicates and empty strings
+    return [...new Set(allTags)].filter(Boolean);
   }, [communityDetails?.tags]);
 
   const avatarImgUrl = useMemo(() => {
@@ -124,25 +171,42 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     [dispatch, router]
   );
 
+  // Add this at the beginning of the component
+  useEffect(() => {
+    // Add the scrollbar-hide style to the document head
+    if (!document.getElementById('scrollbar-hide-style')) {
+      const style = document.createElement('style');
+      style.id = 'scrollbar-hide-style';
+      style.innerHTML = scrollbarHideStyles;
+      document.head.appendChild(style);
+    }
+    
+    return () => {
+      // Clean up on component unmount
+      const styleElement = document.getElementById('scrollbar-hide-style');
+      if (styleElement) {
+        styleElement.remove();
+      }
+    };
+  }, []);
+
   return (
     <Card
       onClick={(e) => handleCardClick({ community: communityDetails })}
-      className="group w-full border border-gray-200/50 rounded-2xl cursor-pointer h-[320px] overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-500/10 relative"
+      className="group w-full border border-gray-100 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white hover:bg-gray-50/50 transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative"
     >
-      {/* Shine effect overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-      </div>
-
+      {/* Premium gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-100/0 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
+      
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center z-20">
+        <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/80 backdrop-blur-sm">
           <Loader />
         </div>
       )}
 
-      <div className="flex flex-col h-full p-4 relative">
-        {/* Header - Avatar and Name with enhanced hover effects */}
+      <div className="flex flex-col h-full p-5 relative">
+        {/* Header with premium spacing and layout */}
         <div className="flex gap-4">
           <div className="relative group-hover:scale-105 transition-transform duration-500">
             <div className="relative">
@@ -151,126 +215,111 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                 alt="Profile"
                 width={80}
                 height={80}
-                className="rounded-2xl object-cover w-20 h-20 transition-transform duration-500 group-hover:shadow-lg"
+                className="rounded-xl object-cover w-16 h-16 transition-all duration-500 group-hover:shadow-lg border border-gray-100"
               />
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl blur-lg -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-100/20 via-purple-100/20 to-pink-100/20 rounded-xl blur-sm -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-300">
+            <h3 className="font-medium text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
               {communityDetails?.name}
             </h3>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-              <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
-                <ImUsers className="text-blue-600 h-4 w-4 flex-shrink-0" />
-                <span className="truncate">
-                  {communityDetails?.num_member}+
-                </span>
-              </span>
-              {communityDetails?.linkedin_followers > 0 && (
-                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
-                  <FaLinkedinIn className="text-blue-600 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">
-                    {formatNumber(communityDetails.linkedin_followers)}+
-                    {/* {StringConstants.FOLLOWERS} */}
-                  </span>
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-              {communityDetails?.instagram_followers > 0 && (
-                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
-                  <GrInstagram className="text-pink-500 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">
-                    {formatNumber(communityDetails?.instagram_followers)}+
-                    {/* {StringConstants.FOLLOWERS} */}
-                  </span>
-                </span>
-              )}
-              {communityDetails?.youtube_followers > 0 && (
-                <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
-                  <BsYoutube className="text-red-600 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">
-                    {formatNumber(communityDetails.youtube_followers)}+
-                    {/* {StringConstants.SUBSCRIBERS} */}
-                  </span>
-                </span>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* Tags Section with hover effects */}
-        <div className="h-[60px] my-4 overflow-hidden">
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag: string, index: number) => (
-              <Badge
-                key={index}
-                className="bg-gray-50/50 text-gray-600 px-2 py-0.5 text-[12px] rounded-full border border-gray-100/50 
-                  transition-all duration-300 hover:bg-primary/5 hover:text-primary hover:border-primary/10"
-                // group-hover:translate-y-[-2px]"
-                // style={{
-                //   transitionDelay: `${index * 50}ms`,
-                // }}
-              >
-                {tag}
-              </Badge>
-            ))}
+        {/* Tags Section - horizontally scrollable, with original styling */}
+        <div className="mt-4 mb-3 relative">
+          <div className="overflow-x-auto scrollbar-hide pb-1.5">
+            <div ref={tagContainerRef} className="flex gap-1.5 min-w-min">
+              {tags.map((tag: string, index: number) => (
+                <Badge
+                  key={index}
+                  className="bg-white text-gray-600 px-2 py-0.5 text-[11px] rounded-full whitespace-nowrap
+                    border border-gray-100/80 shadow-sm transition-all duration-300 hover:text-primary hover:border-primary/10 flex-shrink-0"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
           </div>
+          
+          {/* Subtle horizontal scroll indicators */}
+          <div className="pointer-events-none absolute top-0 bottom-0 left-0 w-4 bg-gradient-to-r from-white to-transparent group-hover:from-gray-50/50 transition-colors duration-500"></div>
+          <div className="pointer-events-none absolute top-0 bottom-0 right-0 w-4 bg-gradient-to-l from-white to-transparent group-hover:from-gray-50/50 transition-colors duration-500"></div>
         </div>
 
-        {/* Offerings Section with enhanced effects */}
+        {/* Premium Stats Bar - Clear separation from tags */}
+        <div className="flex items-center gap-5 text-xs text-gray-500 border-t border-b border-gray-100 py-2.5">
+          {communityDetails?.num_member > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
+              <ImUsers className="h-3.5 w-3.5 text-blue-500" />
+              <span>{formatNumber(communityDetails.num_member)}+</span>
+            </div>
+          )}
+          
+          {communityDetails?.linkedin_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
+              <FaLinkedinIn className="h-3.5 w-3.5 text-blue-600" />
+              <span>{formatNumber(communityDetails.linkedin_followers)}+</span>
+            </div>
+          )}
+          
+          {communityDetails?.instagram_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-pink-600 transition-colors duration-300">
+              <GrInstagram className="h-3.5 w-3.5 text-pink-500" />
+              <span>{formatNumber(communityDetails.instagram_followers)}+</span>
+            </div>
+          )}
+          
+          {communityDetails?.youtube_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-red-600 transition-colors duration-300">
+              <BsYoutube className="h-3.5 w-3.5 text-red-500" />
+              <span>{formatNumber(communityDetails.youtube_followers)}+</span>
+            </div>
+          )}
+        </div>
+
+        {/* Offerings Section - Premium, minimal styling */}
         <div className="mt-auto flex-shrink-0">
           {firstOffering ? (
-            <div
-              className="p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 backdrop-blur-sm rounded-xl border border-blue-100/50
-              group-hover:border-blue-200/50 group-hover:from-blue-100/50 group-hover:to-purple-100/50 transition-all duration-500"
-            >
-              <div className="flex items-center justify-between w-full gap-3">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="p-2 bg-white/80 rounded-lg flex-shrink-0 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
-                    <IoVideocam className="text-primary h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-primary text-sm font-medium block truncate group-hover:text-blue-700 transition-colors duration-300">
-                      {firstOffering.type}
-                    </span>
-                    <p className="text-xs text-gray-500 truncate group-hover:text-gray-600 transition-colors duration-300">
-                      {firstOffering.duration} Min Session
-                    </p>
-                  </div>
+            <div className="mt-4 rounded-lg bg-gradient-to-r from-white to-gray-50 border border-gray-100/80 overflow-hidden group-hover:border-blue-100 transition-all duration-500">
+              {/* Offering header */}
+              <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100/80 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <IoVideocam className="text-blue-500 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors duration-300">
+                    {firstOffering.type || "Consultation"}
+                  </span>
                 </div>
-
-                <div className="flex-shrink-0 text-right">
-                  {firstOffering?.discounted_price &&
-                  firstOffering?.price?.amount ? (
-                    <div className="flex flex-col items-end">
-                      <span className="line-through text-xs text-gray-500 group-hover:text-gray-400 transition-colors duration-300">
-                        ₹{firstOffering.price.amount}
-                      </span>
-                      <span className="text-sm font-medium text-primary group-hover:text-blue-700 transition-colors duration-300">
-                        ₹{firstOffering.discounted_price}
-                      </span>
+                <span className="text-xs text-gray-500">
+                  {firstOffering.duration || 60} min
+                </span>
+              </div>
+              
+              {/* Pricing */}
+              <div className="p-4 flex items-center justify-between">
+                <div>
+                  {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-semibold text-blue-600">₹{firstOffering.discounted_price}</span>
+                      <span className="line-through text-xs text-gray-400">₹{firstOffering.price.amount}</span>
                     </div>
                   ) : (
-                    <span className="text-sm font-medium text-primary group-hover:text-blue-700 transition-colors duration-300">
-                      ₹{firstOffering?.price?.amount || "FREE"}
+                    <span className="text-lg font-semibold text-blue-600">
+                      {firstOffering?.price?.amount ? `₹${firstOffering.price.amount}` : "Free"}
                     </span>
                   )}
                 </div>
+                
+                <Button
+                  size="sm"
+                  className="bg-blue-600 text-white rounded-md px-4 py-1 text-sm hover:bg-blue-700 transition-colors duration-300"
+                  onClick={handleOfferingClick}
+                >
+                  Book Now
+                </Button>
               </div>
-
-              <Button
-                size="sm"
-                className="w-full mt-3 bg-primary text-white px-4 py-1.5 rounded-lg flex items-center justify-center text-sm
-                  transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/25
-                  group-hover:bg-blue-600"
-                onClick={handleOfferingClick}
-              >
-                Book Now
-              </Button>
             </div>
           ) : (
             <div
