@@ -756,7 +756,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     No Offerings Available
                   </h3>
                   <p className="mt-1 text-gray-500">
-                    This community doesn't have any offerings yet.
+                    This page doesn&apos;t have any offerings yet.
                   </p>
                   {isOwner && (
                     <Link href={`/create-offering?communityId=${activeCommunityId}`}>
