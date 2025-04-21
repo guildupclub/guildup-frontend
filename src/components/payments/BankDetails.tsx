@@ -199,7 +199,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
       <div className="space-y-4 mt-4">
         {/* Account Holder's Name */}
         <div>
-          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Account holder's name</label>
+          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Account holder&apos;s name</label>
           <input
             type="text"
             name="benificiaryName"
