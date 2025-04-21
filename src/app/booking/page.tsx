@@ -75,9 +75,10 @@ const BookingPage = () => {
     }
   };
 
+
   useEffect(() => {
     fetchBookings();
-  }, []);
+  }, [userId]); 
 
   if (error) {
     return <div>Error loading bookings....</div>;

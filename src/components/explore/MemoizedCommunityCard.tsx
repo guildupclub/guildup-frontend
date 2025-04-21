@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
@@ -14,6 +14,13 @@ import { BsYoutube } from "react-icons/bs";
 import { FaLinkedinIn } from "react-icons/fa6";
 import numbro from "numbro";
 import { StringConstants } from "../common/CommonText";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setCommunityData } from "@/redux/communitySlice";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { Loader2 } from "lucide-react";
+import Loader from "../Loader";
+
 interface CommunityCardProps {
   community: any;
   onClick: () => void;
@@ -22,6 +29,9 @@ interface CommunityCardProps {
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   const communityDetails = useMemo(() => community?.community, [community]);
   const firstOffering = useMemo(
@@ -77,15 +87,59 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
   };
 
+  const handleCardClick = useCallback(
+    (communityData: { community: any }) => {
+      if (!communityData.community || !communityData.community._id) {
+        console.error("Invalid community data:", communityData);
+        return;
+      }
+
+      // Set loading state
+      setIsLoading(true);
+
+      dispatch(
+        setCommunityData({
+          communityId: communityData.community._id,
+          userId: communityData.community.user_id,
+        })
+      );
+
+      // @ts-ignore - Ignoring type mismatch as the action only needs id and name
+      dispatch(
+        setActiveCommunity({
+          id: communityData.community._id,
+          name: communityData.community.name,
+          image: "",
+          background_image: "",
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
+        })
+      );
+
+      // Add a small delay to show the loader
+      setTimeout(() => {
+        router.push(`/community/${communityData.community._id}/profile`);
+      }, 300);
+    },
+    [dispatch, router]
+  );
+
   return (
     <Card
-      onClick={onClick}
+      onClick={(e) => handleCardClick({ community: communityDetails })}
       className="group w-full border border-gray-200/50 rounded-2xl cursor-pointer h-[320px] overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-500/10 relative"
     >
       {/* Shine effect overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
       </div>
+
+      {/* Loading overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <Loader />
+        </div>
+      )}
 
       <div className="flex flex-col h-full p-4 relative">
         {/* Header - Avatar and Name with enhanced hover effects */}
