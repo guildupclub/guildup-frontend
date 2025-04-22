@@ -557,7 +557,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${process.env.NEXT_PUBLIC_BASE_FRONTEND_URL}/community/${communityId}/profile`;
+    const shareUrl = `${process.env.NEXTAUTH_URL}/community/${communityId}/profile`;
 
     try {
       await navigator.share({
