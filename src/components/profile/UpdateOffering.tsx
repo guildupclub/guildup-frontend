@@ -62,13 +62,9 @@ const EditOfferingModal = ({
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/edit/${offering._id}`,
         formData
       );
-      if (response.data.r === "s") {
-        toast.success("Offering updated successfully");
-        onUpdate();
-        onClose();
-      }
-      else if (response.data.r === "e") {
-        toast.error("Offering updated successfully");
+
+      if (response.status === 200) {
+        // alert("Offering updated successfully");
         onUpdate();
         onClose();
       }
@@ -123,7 +119,6 @@ const EditOfferingModal = ({
                 <SelectItem value="mentorship">Mentorship</SelectItem>
                 <SelectItem value="course">Course</SelectItem>
                 <SelectItem value="consultation">Consultation</SelectItem>
-                <SelectItem value="webinar">Webinar</SelectItem>
               </SelectContent>
             </Select>
           </div>

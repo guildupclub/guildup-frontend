@@ -94,7 +94,6 @@ export const StringConstants = {
     HOME: 'Home',
     EXPLORE: 'Explore',
     EXPERTS: 'Experts',
-    MY_SPACE: 'My Space',
     SIGN_OUT: 'Sign out',
     EXPLORE_COMMUNITY: 'Explore Community',
     DURATION: 'Duration',
@@ -111,7 +110,7 @@ export const StringConstants = {
     PAGE_UPDATION_SUCCESS: 'Page updated successfully',
     PAGE_UPDATION_FAILED: 'Page updation failed',
     EXPLORE_CREATOR: 'Explore Creators',
-    TOP_EXPERTS: 'Top Experts',
+    TOP_PAGES: 'Top Pages',
     POSTING_IN: 'Posting in',
     UPDATE_PROFILE_PICTURE_DESCRIPTION: 'Upload a new image to update your profile picture.',
 
@@ -134,5 +133,4 @@ export const StringConstants = {
 
 export const OFFERING_TYPES = {
     CONSULTATION: 'Consultation',
-    WEBINAR : 'Webinar',
 }

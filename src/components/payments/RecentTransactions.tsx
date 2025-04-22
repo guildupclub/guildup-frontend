@@ -1,24 +1,14 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useSelector } from "react-redux";
-import axios from "axios";
-import { format } from "date-fns";
-import { ChevronDown, ChevronUp, Clock, RefreshCcw } from "lucide-react";
+import { RootState } from '@/redux/store';
+import axios from 'axios';
+import React, { FC, useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { RootState } from "@/redux/store";
+interface TableHeadingsProps {
+  heading: string;
+  className?: string;
+}
 
 interface CreatorPayment {
   _id: string;
@@ -43,335 +33,203 @@ interface TransactionRowProps {
   transaction: CreatorPayment;
 }
 
-const TransactionRow: React.FC<TransactionRowProps> = ({ transaction }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+const TableHeadings: FC<TableHeadingsProps> = ({ heading, className }) => {
+  return (
+    <div className={className}>
+      <h2 className='font-semibold text-base font-[Source Sans Pro] leading-5'>{heading}</h2>
+    </div>
+  );
+}
 
-  // Format date and time
-  const dateTime = new Date(transaction.createdAt);
-  const formattedDate = format(dateTime, "MMM dd, yyyy");
-  const formattedTime = format(dateTime, "hh:mm a");
-
-  // Format amount
-  const formattedAmount = `₹${(transaction.amount / 100).toFixed(2)}`;
-
-  // Get status badge variant
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return (
-          <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-            Completed
-          </Badge>
-        );
-      case "pending":
-        return (
-          <Badge
-            variant="outline"
-            className="bg-yellow-50 text-yellow-800 border-yellow-200 hover:bg-yellow-100"
-          >
-            Pending
-          </Badge>
-        );
-      case "failed":
-        return (
-          <Badge
-            variant="destructive"
-            className="bg-red-100 text-red-800 hover:bg-red-200"
-          >
-            Failed
-          </Badge>
-        );
-      case "refunded":
-        return (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 hover:bg-blue-200"
-          >
-            Refunded
-          </Badge>
-        );
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
+const TransactionRow: FC<TransactionRowProps> = ({ transaction }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <>
-      {/* Mobile View */}
-      <div className="md:hidden border-b border-slate-100 hover:bg-slate-50">
-        <div
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="grid grid-cols-3 gap-4 w-full px-4 py-3 cursor-pointer items-center"
-        >
-          <div className="truncate">
-            <p className="font-medium text-sm text-slate-900">
-              {transaction.rzp_paymentId.substring(0, 10)}...
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-sm text-slate-900 font-medium">
-              {formattedAmount}
-            </p>
-          </div>
-          <div className="text-right flex items-center justify-end gap-1">
-            <p className="text-sm text-slate-600">{formattedDate}</p>
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4 text-slate-400" />
-            ) : (
-              <ChevronDown className="h-4 w-4 text-slate-400" />
-            )}
-          </div>
+    <div className="border border-white">
+      <div 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="grid grid-cols-3 gap-4 w-full px-5 py-3 cursor-pointer md:cursor-default items-center md:hidden"
+      >
+        <div className="truncate">
+          <p className='font-semibold text-sm leading-5 decoration-[#4A4A4A]'>
+            {transaction.rzp_paymentId}
+          </p>
         </div>
-
-        {isExpanded && (
-          <div className="px-4 py-3 bg-slate-50 border-t border-slate-100 space-y-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs ">Mode</p>
-                <p className="text-sm font-medium">{transaction.currency}</p>
-              </div>
-              <div>
-                <p className="text-xs ">Status</p>
-                <div className="pt-1">{getStatusBadge(transaction.status)}</div>
-              </div>
-              <div>
-                <p className="text-xs ">Time</p>
-                <p className="text-sm font-medium">{formattedTime}</p>
-              </div>
-              <div>
-                <p className="text-xs ">Reference ID</p>
-                <p className="text-sm font-medium truncate">
-                  {transaction.rzp_paymentId}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        <div className="text-center">
+          <p className='font-normal text-sm leading-5 decoration-[#4A4A4A]'>
+            ₹{(transaction.amount/100).toFixed(2)}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className='font-normal text-sm leading-5 decoration-[#4A4A4A]'>
+            {transaction?.createdAt?.split('T')[0]}
+          </p>
+        </div>
       </div>
 
-      {/* Desktop View */}
-      <TableRow className="hidden md:table-row hover:bg-slate-50">
-        <TableCell className="font-medium">
-          <span className="text-sm text-muted">
+      <div 
+        className={`md:hidden ${isExpanded ? 'block' : 'hidden'} px-5 py-3 bg-gray-50 border-t border-gray-100`}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-semibold">Mode</p>
+            <p className="text-sm">{transaction.currency}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Status</p>
+            <p className="text-sm">{transaction.status}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Time</p>
+            <p className="text-sm">{transaction?.createdAt?.split('T')[1].split('.')[0]}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden md:grid md:grid-cols-6 md:gap-6 w-full h-10 px-5 py-3">
+        <div className="truncate">
+          <p className='font-semibold text-sm md:text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
             {transaction.rzp_paymentId}
-          </span>
-        </TableCell>
-        <TableCell>
-          <span className="text-sm text-muted-foreground">
+          </p>
+        </div>
+        <div className="hidden md:block">
+          <p className='font-normal text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
             {transaction.currency}
-          </span>
-        </TableCell>
-        <TableCell className="text-right">
-          <span className="text-sm font-medium text-muted-foreground">
-            {formattedAmount}
-          </span>
-        </TableCell>
-        <TableCell>
-          <span className="text-sm text-muted-foreground">{formattedDate}</span>
-        </TableCell>
-        <TableCell>
-          <span className="text-sm text-muted-foreground">{formattedTime}</span>
-        </TableCell>
-        <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-      </TableRow>
-    </>
+          </p>
+        </div>
+        <div className="text-center">
+          <p className='font-normal text-sm md:text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
+            ₹{(transaction.amount/100).toFixed(2)}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className='font-normal text-sm md:text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
+            {transaction?.createdAt?.split('T')[0]}
+          </p>
+        </div>
+        <div className="hidden md:block">
+          <p className='font-normal text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
+            {transaction?.createdAt?.split('T')[1].split('.')[0]}
+          </p>
+        </div>
+        <div className="hidden md:block">
+          <p className='font-semibold text-base font-[Source Sans Pro] leading-5 decoration-[#4A4A4A]'>
+            {transaction.status}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
 const TransactionRowSkeleton = () => {
   return (
-    <>
-      {/* Mobile Skeleton */}
-      <div className="md:hidden border-b border-slate-100">
-        <div className="grid grid-cols-3 gap-4 w-full px-4 py-3">
-          <Skeleton className="h-5 w-24" />
-          <Skeleton className="h-5 w-16 mx-auto" />
-          <Skeleton className="h-5 w-20 ml-auto" />
-        </div>
+    <div className="border border-white animate-pulse">
+      <div className="grid grid-cols-3 gap-4 w-full px-5 py-3 md:hidden">
+        <div className="h-5 bg-gray-200 rounded-md"></div>
+        <div className="h-5 bg-gray-200 rounded-md"></div>
+        <div className="h-5 bg-gray-200 rounded-md"></div>
       </div>
 
-      {/* Desktop Skeleton */}
-      <TableRow className="hidden md:table-row">
-        <TableCell>
-          <Skeleton className="h-5 w-32" />
-        </TableCell>
-        <TableCell>
-          <Skeleton className="h-5 w-16" />
-        </TableCell>
-        <TableCell>
-          <Skeleton className="h-5 w-20 ml-auto" />
-        </TableCell>
-        <TableCell>
-          <Skeleton className="h-5 w-24" />
-        </TableCell>
-        <TableCell>
-          <Skeleton className="h-5 w-16" />
-        </TableCell>
-        <TableCell>
-          <Skeleton className="h-5 w-20" />
-        </TableCell>
-      </TableRow>
-    </>
-  );
-};
-
-const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => {
-  return (
-    <div className="text-center py-12 px-4 border border-dashed border-slate-200 rounded-lg bg-slate-50">
-      <Clock className="mx-auto h-12 w-12 text-slate-300" />
-      <h3 className="mt-4 text-lg font-medium text-slate-900">
-        No transactions yet
-      </h3>
-      <p className="mt-2 text-sm text-slate-500">
-        Your recent transactions will appear here once you start receiving
-        payments.
-      </p>
-      <Button variant="outline" className="mt-4" onClick={onRefresh}>
-        <RefreshCcw className="mr-2 h-4 w-4" />
-        Refresh
-      </Button>
+      <div className="hidden md:grid md:grid-cols-6 md:gap-6 w-full h-10 px-5 py-3">
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className="h-5 bg-gray-200 rounded-md"></div>
+        ))}
+      </div>
     </div>
   );
 };
 
-const RecentTransactions: React.FC = () => {
+const RecentTransactions: FC = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
-  const [data, setData] = React.useState<CreatorPayment[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [data, setData] = useState<CreatorPayment[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchCreatorPayouts = React.useCallback(
-    async (userId: string): Promise<CreatorPayment[]> => {
-      try {
-        const response = await axios.get<GetCreatorPayoutsResponse>(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/creator-payouts/${userId}`
-        );
-        if (response.data.success) {
-          return response.data.payouts;
-        } else {
-          throw new Error("Failed to fetch creator payouts.");
-        }
-      } catch (error) {
-        console.error("Error fetching creator payouts:", error);
-        throw error;
-      }
-    },
-    []
-  );
-
-  const loadPayouts = React.useCallback(async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
+  async function fetchCreatorPayouts(userId: string): Promise<CreatorPayment[]> {
     try {
-      const response = await fetchCreatorPayouts(userId);
-      setData(response);
-      setError(null);
-    } catch (err) {
-      setError("Failed to fetch payouts.");
-    } finally {
-      setLoading(false);
+      const response = await axios.get<GetCreatorPayoutsResponse>(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/creator-payouts/${userId}`
+      );
+      if (response.data.success) {
+        return response.data.payouts;
+      } else {
+        throw new Error("Failed to fetch creator payouts.");
+      }
+    } catch (error) {
+      console.error("Error fetching creator payouts:", error);
+      throw error;
     }
-  }, [userId, fetchCreatorPayouts]);
+  }
 
-  React.useEffect(() => {
+  useEffect(() => {
+    async function loadPayouts() {
+      if (!userId) return;
+      setLoading(true);
+      try {
+        const response = await fetchCreatorPayouts(userId);
+        setData(response)
+      } catch (err) {
+        setError("Failed to fetch payouts.");
+      } finally {
+        setLoading(false);
+      }
+    }
     loadPayouts();
-  }, [loadPayouts]);
+  }, [userId]);
+
+  if (loading) {
+    return (
+      <div>
+        <div>
+          <h1 className='font-semibold text-2xl font-[Source Sans Pro] leading-7'>Recent Transactions</h1>
+        </div>
+        <div className='mt-6'>
+          <div className='grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-6 w-full rounded-t-md bg-card px-5 py-4'>
+            <TableHeadings heading="Reference Id" />
+            <TableHeadings heading="Mode" className="hidden md:block" />
+            <TableHeadings heading="Amount" className="text-center" />
+            <TableHeadings heading="Date" className="text-right" />
+            <TableHeadings heading="Time" className="hidden md:block" />
+            <TableHeadings heading="Status" className="hidden md:block" />
+          </div>
+
+          <div className="flex flex-col">
+            {[...Array(5)].map((_, index) => (
+              <TransactionRowSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) return <div>{error}</div>;
 
   return (
-    <Card className="border-slate-200">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-bold text-slate-800">
-          Recent Transactions
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {error ? (
-          <div className="p-4 border border-red-200 rounded-md bg-red-50 text-red-800">
-            <p>{error}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={loadPayouts}
-            >
-              Try Again
-            </Button>
-          </div>
-        ) : (
-          <>
-            {/* Desktop Table */}
-            <div className="hidden md:block">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-50 hover:bg-slate-50">
-                    <TableHead className="w-[250px]">Reference ID</TableHead>
-                    <TableHead>Mode</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {loading ? (
-                    Array(5)
-                      .fill(0)
-                      .map((_, index) => <TransactionRowSkeleton key={index} />)
-                  ) : data.length > 0 ? (
-                    data.map((transaction) => (
-                      <TransactionRow
-                        key={transaction._id}
-                        transaction={transaction}
-                      />
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
-                        <EmptyState onRefresh={loadPayouts} />
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+    <div>
+      <div>
+        <h1 className='font-semibold text-2xl font-[Source Sans Pro] leading-7'>Recent Transactions</h1>
+      </div>
+      <div className='mt-6'>
+        <div className='grid grid-cols-3 md:grid-cols-6 gap-4 md:gap-6 w-full rounded-t-md bg-card px-5 py-4'>
+          <TableHeadings heading="Reference Id" />
+          <TableHeadings heading="Mode" className="hidden md:block" />
+          <TableHeadings heading="Amount" className="text-center" />
+          <TableHeadings heading="Date" className="text-right" />
+          <TableHeadings heading="Time" className="hidden md:block" />
+          <TableHeadings heading="Status" className="hidden md:block" />
+        </div>
 
-            {/* Mobile List */}
-            <div className="md:hidden">
-              <div className="grid grid-cols-3 gap-4 w-full rounded-t-md bg-slate-50 px-4 py-3 border-b border-slate-200">
-                <div className="text-xs font-medium ">Reference ID</div>
-                <div className="text-xs font-medium text-center">Amount</div>
-                <div className="text-xs font-medium  text-right">Date</div>
-              </div>
-
-              <div className="divide-y divide-slate-100">
-                {loading ? (
-                  Array(5)
-                    .fill(0)
-                    .map((_, index) => <TransactionRowSkeleton key={index} />)
-                ) : data.length > 0 ? (
-                  data.map((transaction) => (
-                    <TransactionRow
-                      key={transaction._id}
-                      transaction={transaction}
-                    />
-                  ))
-                ) : (
-                  <div className="py-4">
-                    <EmptyState onRefresh={loadPayouts} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
-      </CardContent>
-    </Card>
+        <div className="flex flex-col">
+          {data.map((transaction) => (
+            <TransactionRow key={transaction._id} transaction={transaction} />
+          ))}
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 export default RecentTransactions;

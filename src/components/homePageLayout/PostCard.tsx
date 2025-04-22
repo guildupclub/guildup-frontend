@@ -217,7 +217,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${window.location.origin}/post/${post?._id}`;
+    const shareUrl = `${API_FRONTEND_URL}/feeds`;
 
     try {
       await navigator.share({

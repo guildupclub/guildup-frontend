@@ -10,19 +10,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
 import { setActiveCommunity } from "@/redux/channelSlice";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
 
 interface Community {
-  _id: string;
-  name: string;
-  user_id: string;
-  description: string;
-  imageUrl: string;
-  image: string;
-  background_image: string;
-  user_isBankDetailsAdded: boolean;
-  user_iscalendarConnected: boolean;
+  community: {
+    _id: string;
+    user_id: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+  };
 }
 
 function SearchPageContent() {
@@ -31,7 +27,7 @@ function SearchPageContent() {
   const dispatch = useDispatch();
 
   // Get query params
-  const query = searchParams?.get("q") || "";
+  const query = searchParams.get("q") || "";
   const type = "community";
 
   const [searchQuery, setSearchQuery] = useState(query);
@@ -79,10 +75,13 @@ function SearchPageContent() {
     fetchResults();
   }, [query, type]);
 
-  const handleSearchSubmit = () => {
-    if (!searchQuery.trim()) return;
-    router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-  };
+  // Handle search trigger
+  // const handleSearch = () => {
+  //   if (!searchQuery.trim()) return;
+  //   router.push(
+  //     `${API_BASE_URL}/v1/community/relook?q=${encodeURIComponent(searchQuery)}`
+  //   );
+  // };
 
   // Handle card click navigation
   const handleCardClick = (id: string) => {
@@ -91,88 +90,88 @@ function SearchPageContent() {
 
   // Handle community click with Redux
   const handleClickCommunity = useCallback(
-    (communityData: { community: Community }) => {
-      if (!communityData.community || !communityData.community._id) {
-        console.error("Invalid community data:", communityData);
+    (community: Community) => {
+      if (!community.community || !community.community._id) {
+        console.error("Invalid community data:", community);
         return;
       }
+
+      console.log("Clicked community:", community); // ✅ Check if this appears in the console
 
       setLoading(true);
 
       dispatch(
         setCommunityData({
-          communityId: communityData.community._id,
-          userId: communityData.community.user_id,
+          communityId: community.community._id,
+          userId: community.community.user_id,
         })
       );
 
-      // @ts-ignore - Ignoring type mismatch as the action only needs id and name
       dispatch(
         setActiveCommunity({
-          id: communityData.community._id,
-          name: communityData.community.name,
+          id: community.community._id,
+          name: community.community.name,
         })
       );
 
-      router.push(`/community/${communityData.community._id}/profile`);
+      console.log("Navigating to /community/profile"); // ✅ Check if this appears
+
+      router.push(`/community/${community.community._id}/profile`);
     },
     [dispatch, router]
   );
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Content Section */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Loading State */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="w-full">
-                <Skeleton className="h-[100px] w-full rounded-lg mb-4" />
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-1/2" />
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="w-full px-4 py-24 md:px-16 md:py-24 min-h-screen bg-background">
+      {/* Loading State */}
+      {loading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="w-full">
+              <Skeleton className="h-[100px] w-full rounded-lg mb-4" />
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-full mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
+        </div>
+      )}
 
-        {/* Error State */}
-        {error && (
-          <div className="bg-red-500/10 p-4 rounded-lg">
-            <p className="text-red-500">{error}</p>
-          </div>
-        )}
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-500/10 p-4 rounded-lg">
+          <p className="text-red-500">{error}</p>
+        </div>
+      )}
 
-        {/* Results */}
-        {!loading && !error && (
-          <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-8">
-              {results.length} {results.length === 1 ? 'result' : 'results'} for &quot;{query}&quot;
-            </h1>
+      {/* Results */}
+      {!loading && !error && (
+        <>
+          <h1 className="text-2xl font-bold text-muted mb-6">
+            {StringConstants.SEARCH_RESULTS_FOR} &quot;{query}&quot;
+          </h1>
 
-            {results.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-xl text-gray-600 mb-2">{StringConstants.NO_RESULTS_FOUND}</p>
-                <p className="text-gray-500">
-                  {StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
-                {results.map((result) => (
-                  <CommunityCard
-                    key={result._id}
-                    community={result}
-                    onClick={() => handleClickCommunity(result)}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          {results.length === 0 ? (
+            <div className="text-center text-gray-400 p-8">
+              <p>{StringConstants.NO_RESULTS_FOUND}</p>
+              <p className="text-sm">
+                {StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+              {results.map((result) => (
+                <CommunityCard
+                  key={result._id}
+                  community={result}
+                  onClick={() => handleClickCommunity(result)}
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
