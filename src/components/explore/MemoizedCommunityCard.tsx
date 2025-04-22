@@ -193,7 +193,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   return (
     <Card
       onClick={(e) => handleCardClick({ community: communityDetails })}
-      className="group w-full border border-gray-100 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white hover:bg-gray-50/50 transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative"
+      className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white hover:bg-gray-50/50 transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative"
     >
       {/* Premium gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-100/0 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
