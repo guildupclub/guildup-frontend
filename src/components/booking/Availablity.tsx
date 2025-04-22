@@ -72,9 +72,9 @@ export const Availablity = ({userId}:AvailabilityProps) => {
        const initial: Record<string, DayAvailability> = {};
         days.forEach((day) => {
           initial[day] = {
-            enabled: day === "Saturday" || day === "Sunday",
-            start: "09:00",
-            end: "17:00",
+            enabled: !(day === "Saturday" || day === "Sunday"),
+            start: "11:00",
+            end: "18:00",
           };
         });
         return initial;
