@@ -64,6 +64,7 @@ interface Offering {
     currency: string;
   };
   discounted_price: string;
+  when : Date,
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -360,6 +361,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
 
       if (response.data.r === "s") {
+        console.log("@offerings",response.data.data);
         setOfferings(
           Array.isArray(response.data.data)
             ? response.data.data
