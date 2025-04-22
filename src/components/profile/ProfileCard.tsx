@@ -28,8 +28,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
-import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
+
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -556,20 +556,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       ));
   };
 
-  const handleShareClick = async () => {
-    const shareUrl = `${process.env.NEXTAUTH_URL}/community/${communityId}/profile`;
-
-    try {
-      await navigator.share({
-        title: "Check out this profile!",
-        text: "Here is a community profile I wanted to share with you.",
-        url: shareUrl,
-      });
-    } catch (error) {
-      console.log("Error sharing:", error);
-    }
-  };
-
   // if (loading) return <div>{StringConstants.LOADING}</div>;
 
   if (loading) {
@@ -742,7 +728,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="destructive"
                   size="lg"
-                  className="bg-blue-600 hover:bg-blue-600  shadow-lg hover:shadow-xl transition-all duration-300  px-8"
+                  className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
                   onClick={handleLeaveCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
@@ -752,17 +738,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="default"
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 px-8"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
                   onClick={handleJoinCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
                   {StringConstants.FOLLOW}
-                </Button>
-              )}
-              {isOwner && (
-                <Button onClick={handleShareClick}>
-                  Share Profile
-                  <RiUserSharedFill />
                 </Button>
               )}
             </div>
@@ -806,7 +786,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <AddOfferingDialog onOfferingAdded={fetchOfferings} />
             </div>
 
-            {!isBankConnected || offerings.length === 0 ? (
+            {offerings.length === 0 ? (
               <div className="text-center py-16 bg-card rounded-xl border border-border/5">
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
@@ -840,7 +820,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </span> */}
                       <div className="flex items-center justify-between gap-2">
                         {isOwner && (
-                          <div className={`flex gap-2`}>
+                          <div
+                            className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}
+                          >
                             <Button
                               size="sm"
                               variant="outline"
@@ -864,37 +846,36 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
 
                         {/* Book Now button */}
-                        <Button
-                          size="sm"
-                          disabled={isOwner ?? false}
-                          className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                            !isOwner
-                              ? "cursor-pointer"
-                              : "cursor-not-allowed opacity-50"
-                          }`}
-                          onClick={() => {
-                            if (!session) {
-                              signIn("google");
-                              return;
-                            }
-                            if (!isOwner) setSelectedOffering(offering);
-                          }}
-                        >
-                          {offering.is_free ? (
-                            <span>Free</span>
-                          ) : offering?.discounted_price &&
+                        {!isOwner && (
+                          <Button
+                            size="sm"
+                            className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                              !isOwner ? "ml-auto" : ""
+                            }`}
+                            onClick={() => {
+                              if (!session) {
+                                signIn("google");
+                                return;
+                              }
+                              setSelectedOffering(offering);
+                            }}
+                          >
+                            {offering.is_free ? (
+                              <span>Free</span>
+                            ):(offering?.discounted_price &&
                             offering?.price?.amount ? (
-                            <>
-                              <span className="line-through text-xs opacity-60">
-                                ₹{offering.price.amount}
-                              </span>
-                              <span> ₹{offering.discounted_price}</span>
-                            </>
-                          ) : offering?.price?.amount ? (
-                            <span>₹{offering.price.amount}</span>
-                          ) : null}
-                          <ArrowRight className="w-4 h-4" />
-                        </Button>
+                              <>
+                                <span className="line-through text-xs opacity-60">
+                                  ₹{offering.price.amount}
+                                </span>
+                                <span> ₹{offering.discounted_price}</span>
+                              </>
+                            ) : offering?.price?.amount ? (
+                              <span>₹{offering.price.amount}</span>
+                            ) : null)}
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
