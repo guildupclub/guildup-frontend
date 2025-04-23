@@ -30,6 +30,8 @@ import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
+import { FaShareAlt } from "react-icons/fa";
+
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -557,16 +559,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${process.env.NEXTAUTH_URL}/community/${communityId}/profile`;
+    const shareUrl = `${window.location.origin}/community/${communityId}/profile`;
 
     try {
-      await navigator.share({
-        title: "Check out this profile!",
-        text: "Here is a community profile I wanted to share with you.",
-        url: shareUrl,
-      });
+      await navigator.clipboard.writeText(shareUrl);
+      toast.info("Profile link copied to clipboard!");
     } catch (error) {
-      console.log("Error sharing:", error);
+      console.log("Error copying to clipboard:", error);
+      toast.error("Failed to copy link. Please try again.");
     }
   };
 
@@ -760,9 +760,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 </Button>
               )}
               {isOwner && (
-                <Button onClick={handleShareClick}>
-                  Share Profile
-                  <RiUserSharedFill />
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="bg-white hover:bg-zinc-100 transition-all duration-300"
+                  onClick={handleShareClick}
+                >
+                  <FaShareAlt className="h-5 w-5 text-logo-color" />
                 </Button>
               )}
             </div>
