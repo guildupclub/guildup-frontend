@@ -104,6 +104,13 @@ export function EditCommunityModal({
 
   // Handle image selection
   const handleImageSelect = (file: File, type: "profile" | "background") => {
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast.error(`File size exceeds 5MB limit. Please choose a smaller file.`);
+      return;
+    }
+
     if (type === "profile") {
       setImageFile(file);
       // Create a temporary URL for preview
