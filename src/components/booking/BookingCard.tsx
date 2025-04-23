@@ -183,7 +183,6 @@ const BookingCard: React.FC<BookingCardProps> = ({
           >
             View Details
           </Button> */}
-        )}
       </CardFooter>
     </Card>
   );
