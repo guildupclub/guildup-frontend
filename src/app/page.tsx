@@ -172,20 +172,20 @@ function Page() {
       setSelectedCategoryId("all");
     }
     
-    // Scroll and stop loading
-    setTimeout(() => {
-      if (targetRef.current) {
-        const headerOffset = 180;
-        const elementPosition = targetRef.current.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth"
-        });
-      }
-      setIsLoading(false); // Stop loading after scroll
-    }, 500);
+    // Perform scrolling immediately without timeout
+    if (targetRef.current) {
+      const headerOffset = 150;
+      const elementPosition = targetRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+    
+    // Stop loading immediately
+    setIsLoading(false);
   };
 
   // Add scroll handler to detect when header becomes sticky

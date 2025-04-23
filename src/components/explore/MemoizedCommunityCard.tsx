@@ -193,7 +193,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   return (
     <Card
       onClick={(e) => handleCardClick({ community: communityDetails })}
-      className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white hover:bg-gray-50/50 transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative"
+      className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative active:bg-white focus:bg-white"
     >
       {/* Premium gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-100/0 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
@@ -245,8 +245,8 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           </div>
           
           {/* Subtle horizontal scroll indicators */}
-          <div className="pointer-events-none absolute top-0 bottom-0 left-0 w-4 bg-gradient-to-r from-white to-transparent group-hover:from-gray-50/50 transition-colors duration-500"></div>
-          <div className="pointer-events-none absolute top-0 bottom-0 right-0 w-4 bg-gradient-to-l from-white to-transparent group-hover:from-gray-50/50 transition-colors duration-500"></div>
+          <div className="pointer-events-none absolute top-0 bottom-0 left-0 w-4 bg-gradient-to-r from-white to-transparent transition-colors duration-500"></div>
+          <div className="pointer-events-none absolute top-0 bottom-0 right-0 w-4 bg-gradient-to-l from-white to-transparent transition-colors duration-500"></div>
         </div>
 
         {/* Premium Stats Bar - Clear separation from tags */}
