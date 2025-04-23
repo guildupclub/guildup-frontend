@@ -329,7 +329,7 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
             onValueChange={(val) => onChange({ ...value, start: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
+            <SelectTrigger className="w-[100px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="Start time" />
             </SelectTrigger>
             <SelectContent>
@@ -352,7 +352,7 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
             onValueChange={(val) => onChange({ ...value, end: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
+            <SelectTrigger className="w-[100px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="End time" />
             </SelectTrigger>
             <SelectContent>
