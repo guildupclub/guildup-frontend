@@ -75,10 +75,9 @@ const BookingPage = () => {
     }
   };
 
-
   useEffect(() => {
     fetchBookings();
-  }, [userId]); 
+  }, [userId]);
 
   if (error) {
     return <div>Error loading bookings....</div>;
@@ -136,11 +135,11 @@ const BookingPage = () => {
               <BookingCard
                 key={booking._id}
                 profileImage="/default-profile.jpg"
-                name={booking.provider_id?.name}
+                name={booking.offering_id?.community_id?.name}
                 role={booking.offering_id?.type}
                 service={booking.offering_id?.title}
                 host={booking.provider_id?.name}
-                guest={booking?.client_id}
+                guest={booking?.client_id?.name}
                 bookedOn={new Date(booking?.start_time).toLocaleString()}
                 amount={booking.offering_id?.price?.amount}
               />

@@ -47,7 +47,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onReschedule,
 }) => {
   // Get initials for avatar fallback
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name) return ""; // or return "NA" or some default initials
     return name
       .split(" ")
       .map((n) => n[0])

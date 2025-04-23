@@ -217,17 +217,17 @@ const TransactionRowSkeleton = () => {
 
 const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => {
   return (
-    <div className="text-center py-12 px-4 border border-dashed border-slate-200 rounded-lg bg-slate-50">
+    <div className="text-center py-12 px-4 border  border-slate-200 rounded-lg bg-slate-50">
       <Clock className="mx-auto h-12 w-12 text-slate-300" />
       <h3 className="mt-4 text-lg font-medium text-slate-900">
         No transactions yet
       </h3>
-      <p className="mt-2 text-sm text-slate-500">
+      <p className="mt-2 text-sm text-slate-600">
         Your recent transactions will appear here once you start receiving
         payments.
       </p>
       <Button variant="outline" className="mt-4" onClick={onRefresh}>
-        <RefreshCcw className="mr-2 h-4 w-4" />
+        <RefreshCcw className="mr-2 h-4 w-4 text-muted-foreground" />
         Refresh
       </Button>
     </div>
