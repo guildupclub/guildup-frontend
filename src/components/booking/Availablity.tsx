@@ -215,7 +215,9 @@ export const Availability = ({ userId }: AvailabilityProps) => {
               onClick={handleSave}
               disabled={loading || saving || !hasChanges}
               className={`h-8 px-3 text-xs sm:text-sm ${
-                !hasChanges && !saving ? "bg-blue-400 hover:bg-blue-500" : "bg-blue-600 hover:bg-blue-700"
+                !hasChanges && !saving
+                  ? "bg-blue-400 hover:bg-blue-500"
+                  : "bg-blue-600 hover:bg-blue-700"
               }`}
             >
               {saving ? (
@@ -314,7 +316,7 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
           {day}
         </label>
       </div>
-      
+
       {!value.enabled ? (
         <div className="flex items-center gap-1.5 ml-8 sm:ml-0 text-sm text-gray-500">
           <Clock className="h-3.5 w-3.5" />
@@ -327,12 +329,16 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
             onValueChange={(val) => onChange({ ...value, start: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200">
+            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="Start time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((time) => (
-                <SelectItem key={`start-${time}`} value={time} className="text-xs sm:text-sm">
+                <SelectItem
+                  key={`start-${time}`}
+                  value={time}
+                  className="text-xs sm:text-sm"
+                >
                   {formatTime(time)}
                 </SelectItem>
               ))}
@@ -346,12 +352,16 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
             onValueChange={(val) => onChange({ ...value, end: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200">
+            <SelectTrigger className="w-[95px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="End time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((time) => (
-                <SelectItem key={`end-${time}`} value={time} className="text-xs sm:text-sm">
+                <SelectItem
+                  key={`end-${time}`}
+                  value={time}
+                  className="text-xs sm:text-sm"
+                >
                   {formatTime(time)}
                 </SelectItem>
               ))}

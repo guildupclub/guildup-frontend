@@ -5,9 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { IoVideocam } from "react-icons/io5";
 import { Button } from "@/components/ui/button";
 import { ImUsers } from "react-icons/im";
-import { FaYoutube } from "react-icons/fa";
+import { FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { useSession, signIn } from "next-auth/react";
+import { GrInstagram } from "react-icons/gr";
+import { BsYoutube } from "react-icons/bs";
+import numbro from "numbro";
 
 interface Offering {
   type: string;
@@ -29,6 +32,9 @@ interface Community {
   icon?: string;
   tags?: string[];
   background_image: string;
+  linkedin_followers: number;
+  instagram_followers: number;
+  youtube_followers: number;
 }
 
 interface CommunityCardProps {
@@ -41,9 +47,13 @@ interface CommunityCardProps {
 
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
-  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
 
-  const offerings = Array.isArray(community.offerings) ? community.offerings : [];
+  const offerings = Array.isArray(community.offerings)
+    ? community.offerings
+    : [];
   const communityDetails = community.community;
   const firstOffering = offerings.length > 0 ? offerings[0] : null;
 
@@ -51,14 +61,19 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     ? community?.community?.tags[0]?.split(",").map((tag: string) => tag.trim())
     : community?.community?.tags || [];
 
-  const avatarImgUrl = communityDetails?.image && communityDetails.image !== ""
-    ? communityDetails.image
-    : `/defaultCommunityIcon.png`;
+  const avatarImgUrl =
+    communityDetails?.image && communityDetails.image !== ""
+      ? communityDetails.image
+      : `/defaultCommunityIcon.png`;
 
+  const formatNumber = (num: any) => {
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
+  };
   return (
     <Card
       onClick={() => onClick(community.community._id)}
-      className="group w-full border border-gray-200/50 rounded-2xl cursor-pointer h-[320px] overflow-hidden bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-500 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-500/10 relative"
+      className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative active:bg-white focus:bg-white"
     >
       {/* Shine effect overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -85,82 +100,120 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             <h3 className="font-semibold text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-300">
               {communityDetails.name}
             </h3>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full truncate group-hover:bg-blue-50/50 group-hover:text-blue-600 transition-all duration-300">
-                <ImUsers className="text-blue-600 h-4 w-4 flex-shrink-0" />
-                <span className="truncate">{communityDetails.num_member}+</span>
-              </span>
+          </div>
+        </div>
+
+        {/* Tags Section - horizontally scrollable, with original styling */}
+        <div className="mt-4 mb-3 relative">
+          <div className="overflow-x-auto scrollbar-hide pb-1.5">
+            <div className="flex gap-1.5 min-w-min">
+              {tags.map((tag: string, index: number) => (
+                <Badge
+                  key={index}
+                  className="bg-gray-50/50 text-gray-600 px-2 py-0.5 text-[12px] rounded-full border border-gray-100/50 
+                  transition-all duration-300 hover:bg-primary/5 hover:text-primary hover:border-primary/10"
+                >
+                  {tag}
+                </Badge>
+              ))}
             </div>
           </div>
+
+          {/* Subtle horizontal scroll indicators */}
+          <div className="pointer-events-none absolute top-0 bottom-0 left-0 w-4 bg-gradient-to-r from-white to-transparent transition-colors duration-500"></div>
+          <div className="pointer-events-none absolute top-0 bottom-0 right-0 w-4 bg-gradient-to-l from-white to-transparent transition-colors duration-500"></div>
         </div>
 
-        {/* Tags Section */}
-        <div className="h-[60px] my-4 overflow-hidden">
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag: string, index: number) => (
-              <Badge
-                key={index}
-                className="bg-gray-50/50 text-gray-600 px-2 py-0.5 text-[12px] rounded-full border border-gray-100/50 
-                  transition-all duration-300 hover:bg-primary/5 hover:text-primary hover:border-primary/10"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
+        {/* Premium Stats Bar - Clear separation from tags */}
+        <div className="flex items-center gap-5 text-xs text-gray-500 border-t border-b border-gray-100 py-2.5">
+          {communityDetails?.num_member > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
+              <ImUsers className="h-3.5 w-3.5 text-blue-500" />
+              <span>{formatNumber(communityDetails.num_member)}+</span>
+            </div>
+          )}
+
+          {communityDetails?.linkedin_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
+              <FaLinkedinIn className="h-3.5 w-3.5 text-blue-600" />
+              <span>{formatNumber(communityDetails.linkedin_followers)}+</span>
+            </div>
+          )}
+
+          {communityDetails?.instagram_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-pink-600 transition-colors duration-300">
+              <GrInstagram className="h-3.5 w-3.5 text-pink-500" />
+              <span>{formatNumber(communityDetails.instagram_followers)}+</span>
+            </div>
+          )}
+
+          {communityDetails?.youtube_followers > 0 && (
+            <div className="flex items-center gap-1.5 hover:text-red-600 transition-colors duration-300">
+              <BsYoutube className="h-3.5 w-3.5 text-red-500" />
+              <span>{formatNumber(communityDetails.youtube_followers)}+</span>
+            </div>
+          )}
         </div>
 
-        {/* Offerings Section */}
-        {firstOffering ? (
-          <div className="mt-auto flex-shrink-0">
-            <div className="p-3 bg-gradient-to-r from-blue-50/50 to-purple-50/50 backdrop-blur-sm rounded-xl border border-blue-100/50
-              group-hover:border-blue-200/50 group-hover:from-blue-100/50 group-hover:to-purple-100/50 transition-all duration-500">
-              <div className="flex items-center justify-between w-full gap-3">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="p-2 bg-white/80 rounded-lg flex-shrink-0 group-hover:bg-white group-hover:shadow-md transition-all duration-300">
-                    <IoVideocam className="text-primary h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="text-primary text-sm font-medium block truncate group-hover:text-blue-700 transition-colors duration-300">
-                      {firstOffering.type}
-                    </span>
-                    <p className="text-xs text-gray-500 truncate group-hover:text-gray-600 transition-colors duration-300">
-                      {firstOffering.duration} Min Session
-                    </p>
-                  </div>
+        {/* Offerings Section - Premium, minimal styling */}
+        <div className="mt-auto flex-shrink-0">
+          {firstOffering ? (
+            <div className="mt-4 rounded-lg bg-gradient-to-r from-white to-gray-50 border border-gray-100/80 overflow-hidden group-hover:border-blue-100 transition-all duration-500">
+              {/* Offering header */}
+              <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100/80 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <IoVideocam className="text-blue-500 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300" />
+                  <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors duration-300">
+                    {firstOffering.type || "Consultation"}
+                  </span>
                 </div>
+                <span className="text-xs text-gray-500">
+                  {firstOffering.duration || 60} min
+                </span>
+              </div>
+
+              {/* Pricing */}
+              <div className="p-4 flex items-center justify-between">
+                <div>
+                  {firstOffering?.discounted_price &&
+                  firstOffering?.price?.amount ? (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg font-semibold text-blue-600">
+                        ₹{firstOffering.discounted_price}
+                      </span>
+                      <span className="line-through text-xs text-gray-400">
+                        ₹{firstOffering.price.amount}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-lg font-semibold text-blue-600">
+                      {firstOffering?.price?.amount
+                        ? `₹${firstOffering.price.amount}`
+                        : "Free"}
+                    </span>
+                  )}
+                </div>
+                {/* 
                 <Button
                   size="sm"
-                  className="bg-primary/90 hover:bg-primary text-white shadow-sm hover:shadow-md transition-all duration-300"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!session) {
-                      signIn("google");
-                      return;
-                    }
-                    setSelectedOffering(firstOffering);
-                  }}
+                  className="bg-blue-600 text-white rounded-md px-4 py-1 text-sm hover:bg-blue-700 transition-colors duration-300"
+                  onClick={handleOfferingClick}
                 >
-                  {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
-                    <>
-                      <span className="line-through text-xs opacity-60">₹{firstOffering.price.amount}</span>
-                      <span className="ml-1">₹{firstOffering.discounted_price}</span>
-                    </>
-                  ) : firstOffering?.price?.amount ? (
-                    <span>₹{firstOffering.price.amount}</span>
-                  ) : (
-                    "Book Now"
-                  )}
-                </Button>
+                  Book Now
+                </Button> */}
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="mt-auto flex-shrink-0">
-            <div className="p-3 bg-gray-50/50 backdrop-blur-sm rounded-xl border border-gray-100/50 text-center">
-              <p className="text-gray-500 text-sm">No Offering Available</p>
+          ) : (
+            <div
+              className="flex items-center justify-center p-4 bg-gradient-to-r from-gray-50/50 to-gray-100/50 backdrop-blur-sm rounded-xl border border-gray-200/50
+                group-hover:from-gray-100/50 group-hover:to-gray-200/50 transition-all duration-500"
+            >
+              <p className="text-muted text-sm font-medium">
+                No Offering Available
+              </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Card>
   );

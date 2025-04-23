@@ -296,6 +296,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
             {post?.media?.fileType === "video" && (
               <video
                 controls
+                controlsList="nodownload"
                 className="w-full max-h-[400px] rounded-lg object-contain"
               >
                 <source src={post?.media?.publicUrl} type="video/mp4" />
