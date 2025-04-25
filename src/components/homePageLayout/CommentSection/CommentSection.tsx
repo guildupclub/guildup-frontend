@@ -479,6 +479,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     </div>
   );
 
+  
   const renderComments = (commentList: Comment[], level = 0) => {
     return commentList.map((comment, index) => {
       const replies = repliesData[comment._id] || [];
