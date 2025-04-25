@@ -344,8 +344,8 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           <div className="px-4 py-4">
             <div className="flex gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
                 <input
