@@ -1,5 +1,6 @@
 "use client";
 import HomePage from "@/components/homePageLayout/HomePage";
+import Loader from "@/components/Loader";
 import TopicSelectionModal from "@/components/SelectTopicForm";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import axios from "axios";
@@ -19,17 +20,12 @@ export default function Home() {
   };
 
   if (status === "loading") {
-    return <div>Loading...</div>; // Optionally, show a loading spinner
+    return <div><Loader/></div>;
   }
 
   return (
     <div className=" min-h-screen pt-16">
       <HomePage />
-      {/* <TopicSelectionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleTopicSelection}
-      /> */}
     </div>
   );
 }

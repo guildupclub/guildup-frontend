@@ -620,6 +620,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 offerings.length > 0 &&
                 isCalendarConnected &&
                 !isBankConnected,
+              href: "/payments"
             },
           ]}
         />
@@ -765,6 +766,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-600  shadow-lg hover:shadow-xl transition-all duration-300  px-8 lg:px-6 "
                   onClick={handleShareClick}
+                  title="Share Profile"
                 >
                   Share Profile
                   <FaShareAlt className="h-5 w-5 " />
