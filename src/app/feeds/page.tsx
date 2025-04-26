@@ -25,11 +25,6 @@ export default function Home() {
   return (
     <div className=" min-h-screen pt-16">
       <HomePage />
-      {/* <TopicSelectionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleTopicSelection}
-      /> */}
     </div>
   );
 }
