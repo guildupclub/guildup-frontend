@@ -7,7 +7,13 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
-import React, { useEffect, useRef, useState, Suspense, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  Suspense,
+  useCallback,
+} from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Hero from "@/components/heroSection/HeroSection";
@@ -26,25 +32,29 @@ interface Category {
 }
 
 // Component to handle search params with Suspense
-function SearchParamsProvider({ children, onCategoryFromUrl }: { 
-  children: React.ReactNode,
-  onCategoryFromUrl: (category: string | null) => void 
+function SearchParamsProvider({
+  children,
+  onCategoryFromUrl,
+}: {
+  children: React.ReactNode;
+  onCategoryFromUrl: (category: string | null) => void;
 }) {
   const searchParams = useSearchParams();
-  
+
   useEffect(() => {
     // Handle category from URL
     const categoryFromUrl = searchParams?.get("category");
     onCategoryFromUrl(categoryFromUrl ?? null);
   }, [searchParams, onCategoryFromUrl]);
-  
+
   return children;
 }
 
 function Page() {
   const { data: session, status } = useSession();
   const [category, setCategory] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All Category");
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>("All Category");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -96,12 +106,12 @@ function Page() {
 
   // Convert category name to URL-friendly format
   const categoryToUrl = (name: string) => {
-    return name.replace(/\s+/g, '-');
+    return name.replace(/\s+/g, "-");
   };
 
   // Convert URL-friendly format back to category name
   const urlToCategory = (url: string) => {
-    return url.replace(/-/g, ' ');
+    return url.replace(/-/g, " ");
   };
 
   // Fetch categories
@@ -129,10 +139,12 @@ function Page() {
     if (!category.length) return;
 
     if (selectedCategory === "All Category") {
-      router.replace('/', { scroll: false });
+      router.replace("/", { scroll: false });
     } else {
       // Convert category name to URL-friendly format
-      router.replace(`?category=${categoryToUrl(selectedCategory)}`, { scroll: false });
+      router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
+        scroll: false,
+      });
     }
   }, [selectedCategory, router, category]);
 
@@ -161,9 +173,11 @@ function Page() {
   const handleCategorySelect = (categoryId: string) => {
     // Start loading immediately to clear current content
     setIsLoading(true);
-    
+
     // Update category state
-    const selectedCat = category.find((cat: Category) => cat._id === categoryId);
+    const selectedCat = category.find(
+      (cat: Category) => cat._id === categoryId
+    );
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -171,19 +185,19 @@ function Page() {
       setSelectedCategory("All Category");
       setSelectedCategoryId("all");
     }
-    
+
     // Perform scrolling immediately without timeout
     if (targetRef.current) {
       const headerOffset = 150;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - headerOffset;
-      
+
       window.scrollTo({
         top: offsetPosition,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
-    
+
     // Stop loading immediately
     setIsLoading(false);
   };
@@ -201,30 +215,33 @@ function Page() {
       observer.observe(stickyTriggerRef.current);
     }
 
-
     return () => {
       observer.disconnect();
     };
   }, []);
 
   // Handle category from URL
-  const handleCategoryFromUrl = useCallback((categoryFromUrl: string | null) => {
-    if (categoryFromUrl && category.length > 0) {
-      const categoryName = urlToCategory(categoryFromUrl);
-      const categoryObj = category.find((cat: Category) => 
-        cat.name.toLowerCase() === categoryName.toLowerCase()
-      );
-      if (categoryObj) {
-        setSelectedCategory(categoryObj.name);
-        setSelectedCategoryId(categoryObj._id);
+  const handleCategoryFromUrl = useCallback(
+    (categoryFromUrl: string | null) => {
+      if (categoryFromUrl && category.length > 0) {
+        const categoryName = urlToCategory(categoryFromUrl);
+        const categoryObj = category.find(
+          (cat: Category) =>
+            cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        if (categoryObj) {
+          setSelectedCategory(categoryObj.name);
+          setSelectedCategoryId(categoryObj._id);
+        }
       }
-    }
-  }, [category]);
+    },
+    [category]
+  );
 
   // Add scroll handler to detect when hero section is visible
   useEffect(() => {
     if (!heroRef.current) return;
-    
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         // Consider the hero "visible" only if more than 20% is showing
@@ -232,14 +249,14 @@ function Page() {
         const visiblePercentage = entry.intersectionRatio;
         dispatch(setHeroVisible(visiblePercentage > 0.2));
       },
-      { 
+      {
         threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-        rootMargin: "0px 0px 0px 0px"
+        rootMargin: "0px 0px 0px 0px",
       }
     );
-    
+
     observer.observe(heroRef.current);
-    
+
     return () => {
       if (heroRef.current) {
         observer.unobserve(heroRef.current);
@@ -248,7 +265,13 @@ function Page() {
   }, [dispatch, heroRef]);
 
   return (
-    <Suspense fallback={<div className="min-h-[75vh] flex items-center justify-center"><Loader /></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-[75vh] flex items-center justify-center">
+          <Loader />
+        </div>
+      }
+    >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
         <div className="min-h-[75vh] bg-white relative">
           <div className="absolute inset-0 pointer-events-none" />
@@ -258,7 +281,8 @@ function Page() {
           {!isCreator && (
             <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
               <h2 className="text-xl font-semibold">
-                Join or create a community to start interacting with other members.
+                Join or create a community to start interacting with other
+                members.
               </h2>
               <div className="flex gap-4 mt-4">
                 <button
@@ -278,7 +302,9 @@ function Page() {
                     {StringConstants.CREATE_A_PAGE}
                   </button>
 
-                  {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+                  {session && (
+                    <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                  )}
                 </Dialog>
               </div>
             </div>
@@ -290,13 +316,18 @@ function Page() {
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
                     {StringConstants.TOP_EXPERTS}
                   </h1>
-                  <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+                  <Dialog
+                    open={isCreatorFormOpen}
+                    onOpenChange={setIsCreatorFormOpen}
+                  >
                     <DialogTrigger asChild>
                       <button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 text-gray-700 hover:text-primary font-medium transition-all duration-200 border border-gray-200 rounded-lg hover:border-primary hover:bg-gray-50"
+                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-sm rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-2 border-transparent"
                       >
-                        <span className="text-amber-400 hidden sm:inline">👋</span>
+                        <span className="text-amber-400 hidden sm:inline">
+                          👋
+                        </span>
                         <span>Expert Page</span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
@@ -304,9 +335,11 @@ function Page() {
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
-  
+
                 <p className="hidden sm:block text-gray-600 text-sm max-w-2xl description-text">
-                  Discover expert pages curated just for you. Connect with industry leaders, learn from their experiences, and grow your skills.
+                  Discover expert pages curated just for you. Connect with
+                  industry leaders, learn from their experiences, and grow your
+                  skills.
                 </p>
               </div>
             </div>
@@ -336,7 +369,10 @@ function Page() {
                 {/* Main Content */}
                 <div className="flex-1 min-w-0" ref={targetRef}>
                   <div className="rounded-xl sm:rounded-2xl">
-                    <div id="scroll-target-border" className="w-full h-1 mb-4 sm:mb-8"></div>
+                    <div
+                      id="scroll-target-border"
+                      className="w-full h-1 mb-4 sm:mb-8"
+                    ></div>
                     {isLoading ? (
                       <Loader />
                     ) : (
@@ -354,5 +390,3 @@ function Page() {
 }
 
 export default Page;
-
-

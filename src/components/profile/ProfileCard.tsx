@@ -745,8 +745,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   className="bg-blue-600 hover:bg-blue-600  shadow-lg hover:shadow-xl transition-all duration-300  px-8"
                   onClick={handleLeaveCommunity}
                 >
-                  <HiMiniUserGroup className="h-8 w-8" />
                   {StringConstants.FOLLOWING}
+                  <HiMiniUserGroup className="h-5 w-5" />
                 </Button>
               ) : (
                 <Button
@@ -761,12 +761,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               )}
               {isOwner && (
                 <Button
-                  variant="link"
-                  size="sm"
-                  className="bg-white hover:bg-zinc-100 transition-all duration-300"
+                  variant="destructive"
+                  size="lg"
+                  className="bg-blue-600 hover:bg-blue-600  shadow-lg hover:shadow-xl transition-all duration-300  px-8 lg:px-6 "
                   onClick={handleShareClick}
                 >
-                  <FaShareAlt className="h-5 w-5 text-logo-color" />
+                  Share Profile
+                  <FaShareAlt className="h-5 w-5 " />
                 </Button>
               )}
             </div>
