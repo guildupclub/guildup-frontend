@@ -33,7 +33,6 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
-  const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
     // Clear communities immediately when category changes
@@ -84,8 +83,10 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         return;
       }
 
-      setClickLoading(true);
-
+      // Navigate immediately first
+      router.push(`/community/${community._id}/profile`);
+      
+      // Then update Redux state
       dispatch(
         setCommunityData({
           communityId: community._id,
@@ -103,8 +104,6 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
           user_iscalendarConnected: false
         })
       );
-
-      router.push(`/community/${community._id}/profile`);
     },
     [dispatch, router]
   );
