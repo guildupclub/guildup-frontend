@@ -172,20 +172,20 @@ function Page() {
       setSelectedCategoryId("all");
     }
     
-    // Scroll and stop loading
-    setTimeout(() => {
-      if (targetRef.current) {
-        const headerOffset = 180;
-        const elementPosition = targetRef.current.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: "smooth"
-        });
-      }
-      setIsLoading(false); // Stop loading after scroll
-    }, 500);
+    // Perform scrolling immediately without timeout
+    if (targetRef.current) {
+      const headerOffset = 150;
+      const elementPosition = targetRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+    
+    // Stop loading immediately
+    setIsLoading(false);
   };
 
   // Add scroll handler to detect when header becomes sticky
@@ -323,7 +323,7 @@ function Page() {
                     <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 mb-6">
                       Browse Categories
                     </h2>
-                    <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-gray-100 bg-white sm:shadow-sm">
+                    <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white sm:shadow-sm">
                       <CategoryBar
                         categorys={category}
                         selectCategory={handleCategorySelect}

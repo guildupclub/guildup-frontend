@@ -47,7 +47,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
   onReschedule,
 }) => {
   // Get initials for avatar fallback
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name) return ""; // or return "NA" or some default initials
     return name
       .split(" ")
       .map((n) => n[0])
@@ -151,7 +152,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <Clock className="h-4 w-4 text-slate-500" />
           <p className="font-medium text-slate-900">{formattedAmount}</p>
         </div>
-        {status === "upcoming" && (
+        {/* {status === "upcoming" && (
           <div className="flex gap-3">
             <Button
               variant="outline"
@@ -182,8 +183,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
             className="border-slate-200 text-slate-700 hover:bg-slate-100"
           >
             View Details
-          </Button>
-        )}
+          </Button> */}
       </CardFooter>
     </Card>
   );

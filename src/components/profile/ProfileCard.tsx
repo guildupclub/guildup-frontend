@@ -28,8 +28,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
+import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
 import { RiUserSharedFill } from "react-icons/ri";
+
+import { FaShareAlt } from "react-icons/fa";
+
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -569,6 +573,18 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     }
   };
 
+  const handleShareClick = async () => {
+    const shareUrl = `${window.location.origin}/community/${communityId}/profile`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.info("Profile link copied to clipboard!");
+    } catch (error) {
+      console.log("Error copying to clipboard:", error);
+      toast.error("Failed to copy link. Please try again.");
+    }
+  };
+
   // if (loading) return <div>{StringConstants.LOADING}</div>;
 
   if (loading) {
@@ -741,7 +757,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="destructive"
                   size="lg"
+
                   className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300  px-8"
+
                   onClick={handleLeaveCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
@@ -751,13 +769,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="default"
                   size="lg"
+
                   className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300  px-8"
+
                   onClick={handleJoinCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
                   {StringConstants.FOLLOW}
                 </Button>
               )}
+
 
               {isOwner && (
                 <Button onClick={handleShareClick}>

@@ -45,8 +45,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              <span className="text-foreground">Expert Advice,</span> Real
-              Results.
+              Book Experts. Buy Services.
             </motion.span>
             <motion.span
               className="text-foreground"
@@ -54,7 +53,7 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
-              with StreamLine
+              All in One Place
             </motion.span>
           </h1>
           <motion.p
@@ -63,8 +62,7 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            Get expert advice from those who&apos;ve successfully done it. <br />{" "}
-            Level up faster with strong community support.
+            No more chasing links or juggling apps—find, book, and pay trusted experts in one smooth flow
           </motion.p>
 
           <motion.div

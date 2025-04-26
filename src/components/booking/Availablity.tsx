@@ -187,25 +187,26 @@ export const Availability = ({ userId }: AvailabilityProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-xl text-muted">
-              <CalendarClock className="h-5 w-5 text-primary" />
+    <Card className="border border-gray-100 shadow-sm overflow-hidden max-w-full">
+      <CardHeader className="bg-white pb-4 px-4 md:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg md:text-xl font-medium text-gray-900">
+              <CalendarClock className="h-5 w-5 text-blue-600" />
               Weekly Availability
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
+            <CardDescription className="text-gray-500 text-sm mt-1">
               Set your availability for booking services.
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-start sm:self-auto ml-auto sm:ml-0">
             {hasChanges && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleReset}
                 disabled={loading || saving}
+                className="h-8 text-xs sm:text-sm"
               >
                 Reset
               </Button>
@@ -213,10 +214,15 @@ export const Availability = ({ userId }: AvailabilityProps) => {
             <Button
               onClick={handleSave}
               disabled={loading || saving || !hasChanges}
+              className={`h-8 px-3 text-xs sm:text-sm ${
+                !hasChanges && !saving
+                  ? "bg-blue-400 hover:bg-blue-500"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
             >
               {saving ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-1.5 h-3 w-3 animate-spin" />
                   Saving...
                 </>
               ) : (
@@ -225,7 +231,7 @@ export const Availability = ({ userId }: AvailabilityProps) => {
                     "Save Changes"
                   ) : (
                     <>
-                      <Check className="mr-2 h-4 w-4" />
+                      <Check className="mr-1.5 h-3 w-3" />
                       Saved
                     </>
                   )}
@@ -235,9 +241,9 @@ export const Availability = ({ userId }: AvailabilityProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         {loading ? (
-          <div className="space-y-4">
+          <div className="space-y-4 p-4 md:p-6">
             {[...Array(7)].map((_, i) => (
               <div key={i} className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -253,9 +259,9 @@ export const Availability = ({ userId }: AvailabilityProps) => {
             ))}
           </div>
         ) : (
-          <div className="space-y-1">
-            {days.map((day, index) => (
-              <React.Fragment key={day}>
+          <div className="divide-y divide-gray-100">
+            {days.map((day) => (
+              <div key={day} className="px-4 py-2.5 md:px-6 md:py-3">
                 <AvailabilityRow
                   day={day}
                   value={availability[day]}
@@ -266,8 +272,7 @@ export const Availability = ({ userId }: AvailabilityProps) => {
                     }));
                   }}
                 />
-                {index < days.length - 1 && <Separator className="my-2" />}
-              </React.Fragment>
+              </div>
             ))}
           </div>
         )}
@@ -291,8 +296,8 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between py-2">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <div className="flex items-center gap-2">
         <Switch
           id={`${day}-switch`}
           checked={value.enabled}
@@ -300,53 +305,63 @@ const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
             onChange({ ...value, enabled: checked })
           }
           disabled={isLoading}
+          className="data-[state=checked]:bg-blue-600"
         />
         <label
           htmlFor={`${day}-switch`}
-          className={`w-24 font-medium ${
-            value.enabled ? "text-muted" : "text-muted-foreground"
+          className={`font-medium ${
+            value.enabled ? "text-gray-800" : "text-gray-500"
           }`}
         >
           {day}
         </label>
       </div>
+
       {!value.enabled ? (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4" />
+        <div className="flex items-center gap-1.5 ml-8 sm:ml-0 text-sm text-gray-500">
+          <Clock className="h-3.5 w-3.5" />
           <span>Unavailable</span>
         </div>
       ) : (
-        <div className="flex items-center gap-2 text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 ml-8 sm:ml-0">
           <Select
             value={value.start}
             onValueChange={(val) => onChange({ ...value, start: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[110px]">
+            <SelectTrigger className="w-[100px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="Start time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((time) => (
-                <SelectItem key={`start-${time}`} value={time}>
+                <SelectItem
+                  key={`start-${time}`}
+                  value={time}
+                  className="text-xs sm:text-sm"
+                >
                   {formatTime(time)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <span className="text-muted-foreground">to</span>
+          <span className="text-gray-500 text-xs sm:text-sm">to</span>
 
           <Select
             value={value.end}
             onValueChange={(val) => onChange({ ...value, end: val })}
             disabled={isLoading}
           >
-            <SelectTrigger className="w-[110px]">
+            <SelectTrigger className="w-[100px] h-8 text-xs sm:text-sm bg-white border border-gray-200 text-muted">
               <SelectValue placeholder="End time" />
             </SelectTrigger>
             <SelectContent>
               {timeOptions.map((time) => (
-                <SelectItem key={`end-${time}`} value={time}>
+                <SelectItem
+                  key={`end-${time}`}
+                  value={time}
+                  className="text-xs sm:text-sm"
+                >
                   {formatTime(time)}
                 </SelectItem>
               ))}
