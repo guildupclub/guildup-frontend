@@ -323,12 +323,12 @@ function Page() {
                     <DialogTrigger asChild>
                       <button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold text-sm rounded-lg shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-200 border-2 border-transparent"
+                        className="flex items-center gap-2 px-4 py-3 bg-primary text-white font-semibold text-sm rounded-lg shadow-lg hover:bg-blue-700 active:scale-[0.98] border border-white/20"
                       >
-                        <span className="text-amber-400 hidden sm:inline">
+                        <span className="text-amber-300 hidden sm:inline">
                           👋
                         </span>
-                        <span>Expert Page</span>
+                        <span className="hidden sm:inline text-md">Expert Page</span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                     </DialogTrigger>
