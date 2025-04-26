@@ -212,15 +212,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 640);
     };
-    
+
     // Initial check
     checkScreenSize();
-    
+
     // Add listener for window resize
-    window.addEventListener('resize', checkScreenSize);
-    
+    window.addEventListener("resize", checkScreenSize);
+
     // Cleanup
-    return () => window.removeEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   return (
@@ -232,7 +232,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         )}
         {...props}
       >
-        <div className="container flex h-14 items-center px-4 md:px-6">
+        <div className="container flex h-14 items-center px-4 ">
           <div className="flex gap-6 items-center">
             <button
               className="md:hidden flex items-center justify-center"
@@ -249,7 +249,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <Image
                 src={guildup_logo || "/placeholder.svg"}
                 alt="GuildUp"
-                className="h-6 w-auto hidden md:block"
+                className="h-8 w-auto hidden md:block"
               />
             </Link>
           </div>
@@ -258,7 +258,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
               <AnimatePresence>
                 {!heroVisible && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
@@ -268,7 +268,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <div className="flex">
                       <Input
                         type="search"
-                        placeholder={isSmallScreen ? "Search..." : "Search creators, pages, or offerings..."}
+                        placeholder={
+                          isSmallScreen
+                            ? "Search..."
+                            : "Search creators, pages, or offerings..."
+                        }
                         className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-10 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -296,23 +300,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           isActive("/") ? "text-primary" : ""
                         }`}
                       />
-                      <span className={`text-sm mt-1 ${isActive("/") ? "text-primary font-medium" : ""}`}>
+                      <span
+                        className={`text-sm mt-1 ${
+                          isActive("/") ? "text-primary font-medium" : ""
+                        }`}
+                      >
                         {StringConstants.EXPLORE}
                       </span>
                     </Link>
                   </li>
 
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
-                    <Link
-                      href="/feeds"
-                      className="flex flex-col items-center"
-                    >
+                    <Link href="/feeds" className="flex flex-col items-center">
                       <FileText
                         className={`h-5 w-5 ${
                           isActive("/feeds") ? "text-primary" : ""
                         }`}
                       />
-                      <span className={`text-sm mt-1 ${isActive("/feeds") ? "text-primary font-medium" : ""}`}>
+                      <span
+                        className={`text-sm mt-1 ${
+                          isActive("/feeds") ? "text-primary font-medium" : ""
+                        }`}
+                      >
                         {StringConstants.FEED}
                       </span>
                     </Link>
@@ -331,7 +340,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           isActive("/community") ? "text-primary" : ""
                         }`}
                       />
-                      <span className={`text-sm mt-1 ${isActive("/community") ? "text-primary font-medium" : ""}`}>
+                      <span
+                        className={`text-sm mt-1 ${
+                          isActive("/community")
+                            ? "text-primary font-medium"
+                            : ""
+                        }`}
+                      >
                         {StringConstants.MY_SPACE}
                       </span>
                     </Link>
@@ -346,7 +361,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
                         <Avatar className="h-9 w-9">
                           {session?.user?.image ? (
-                            <AvatarImage src={session?.user?.image} alt="User" />
+                            <AvatarImage
+                              src={session?.user?.image}
+                              alt="User"
+                            />
                           ) : (
                             <AvatarFallback>
                               {session?.user?.name?.charAt(0)}
@@ -395,7 +413,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         callbackUrl: `${window.location.origin}?hero=2`,
                       })
                     }
-                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-full text-sm font-medium transition-all duration-200"
+                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
                   >
                     Sign In
                   </Button>

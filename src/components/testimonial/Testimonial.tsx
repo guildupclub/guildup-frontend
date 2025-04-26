@@ -160,7 +160,7 @@ export default function Testimonials() {
           },
           body: JSON.stringify({
             userId,
-            imageUrl: selectedTestimonial,
+            imageUrl: selectedTestimonial?.imageUrl,
             communityId,
           }),
         }

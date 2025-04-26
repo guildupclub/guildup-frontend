@@ -26,7 +26,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-
 interface PostCardProps {
   post: {
     _id: string;
@@ -49,6 +48,10 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const [isCommenting, setIsCommenting] = useState(false);
   const [liked, setLiked] = useState(false);
   const [relativeTime, setRelativeTime] = useState("");
@@ -152,36 +155,38 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
             </div>
             <span className="text-sm">{relativeTime}</span>
           </div>
-          <div className="relative">
-            <button onClick={handleMenuClick}>
-              <IoEllipsisVerticalSharp />
-            </button>
-            {isMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 bg-white shadow-lg rounded-lg p-4 z-10">
-                <ul className="space-y-2">
-                  {/* <li
-                    onClick={openEditDialog}
-                    className="flex items-center gap-2 cursor-pointer hover:text-purple-500"
-                  >
-                    <FaEdit className="w-5 h-5" />
-                    <span>Edit</span>
-                  </li>
-                  <li className="flex items-center gap-2 cursor-pointer hover:text-purple-500">
-                    <FaShare className="w-5 h-5" />
-                    <span>{StringConstants.SHARE}</span>
-                  </li> */}
+          {isAdmin && (
+            <div className="relative">
+              <button onClick={handleMenuClick}>
+                <IoEllipsisVerticalSharp />
+              </button>
+              {isMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 bg-white shadow-lg rounded-lg p-4 z-10">
+                  <ul className="space-y-2">
+                    {/* <li
+            onClick={openEditDialog}
+            className="flex items-center gap-2 cursor-pointer hover:text-purple-500"
+          >
+            <FaEdit className="w-5 h-5" />
+            <span>Edit</span>
+          </li>
+          <li className="flex items-center gap-2 cursor-pointer hover:text-purple-500">
+            <FaShare className="w-5 h-5" />
+            <span>{StringConstants.SHARE}</span>
+          </li> */}
 
-                  <li
-                    onClick={openDeleteConfirmation}
-                    className="flex items-center gap-2 cursor-pointer text-center justify-center hover:text-purple-500"
-                  >
-                    <MdDelete className="w-5 h-5" />
-                    <span>Delete</span>
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
+                    <li
+                      onClick={openDeleteConfirmation}
+                      className="flex items-center gap-2 cursor-pointer text-center justify-center hover:text-purple-500"
+                    >
+                      <MdDelete className="w-5 h-5" />
+                      <span>Delete</span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -260,8 +265,8 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           <DialogHeader>
             <DialogTitle>Delete Post</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this post? you won&apos;t be able to
-              undo this action.
+              Are you sure you want to delete this post? you won&apos;t be able
+              to undo this action.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-between sm:justify-between">
