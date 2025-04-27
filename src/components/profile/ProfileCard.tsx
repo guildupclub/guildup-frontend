@@ -28,7 +28,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
+import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
+import { FaShareAlt } from "react-icons/fa";
 
 interface CommunityProfile {
   user: {
@@ -48,6 +50,7 @@ interface CommunityProfile {
     background_image: string;
     youtube_followers: string;
     instagram_followers: string;
+    linkedin_followers: string;
   };
 }
 
@@ -557,6 +560,18 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       ));
   };
 
+  const handleShareClick = async () => {
+    const shareUrl = `${window.location.origin}/community/${communityId}/profile`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.info("Profile link copied to clipboard!");
+    } catch (error) {
+      console.log("Error copying to clipboard:", error);
+      toast.error("Failed to copy link. Please try again.");
+    }
+  };
+
   // if (loading) return <div>{StringConstants.LOADING}</div>;
 
   if (loading) {
@@ -573,41 +588,41 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       </div>
     );
   // console.log("@prifle", profile.user);
-  console.log("ekjrwhjkgkje", avatarImgUrl);
+  // console.log("ekjrwhjkgkje", avatarImgUrl);
+  const isBankConnected = profile?.user?.user_isBankDetailsAdded;
+  const isCalendarConnected = profile?.user?.user_iscalendarConnected;
   return (
     <div className="w-full">
-      {isOwner && (
+      {isOwner && (!isCalendarConnected || !isBankConnected) && (
         <Stepper
           steps={[
             {
-              label: "Create Community",
+              label: "Build Guild",
               completed: true,
             },
             {
-              label: "Create Profile",
+              label: "Complete Profile",
               completed: true,
             },
             {
-              label: "Create Course",
+              label: "Create Offering",
               completed: offerings && offerings.length > 0,
               active: offerings && offerings.length === 0,
             },
             {
               label: "Link Calendar",
-              completed: profile?.user?.user_iscalendarConnected,
-              active:
-                offerings &&
-                offerings.length > 0 &&
-                !profile?.user?.user_iscalendarConnected,
+              completed: isCalendarConnected,
+              active: offerings && offerings.length > 0 && !isCalendarConnected,
             },
             {
-              label: "Link Bank",
-              completed: profile?.user?.user_isBankDetailsAdded,
+              label: "Add Bank",
+              completed: isBankConnected,
               active:
                 offerings &&
                 offerings.length > 0 &&
-                profile?.user?.user_iscalendarConnected &&
-                !profile?.user?.user_isBankDetailsAdded,
+                isCalendarConnected &&
+                !isBankConnected,
+              href: "/payments"
             },
           ]}
         />
@@ -712,11 +727,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </div>
                   )}
 
-                  <div className="w-1 h-1 rounded-full bg-border" />
-                  <div className="flex items-center gap-1.5 cursor-pointer">
-                    <FaLinkedinIn className="h-5 w-5 text-blue-800" />
-                    {/* <BsLinkedin className="h-5 w-5 text-blue-800" /> */}
-                  </div>
+                  {profile.community?.linkedin_followers > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1 h-1 rounded-full bg-border" />
+                      <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                      <span className="font-medium text-foreground">
+                        {formatNumber(profile.community?.linkedin_followers)}
+                      </span>
+                      {StringConstants.FOLLOWERS}
+                    </div>
+                  )}
                 </div>
               </div>
               {isOwner ? (
@@ -725,7 +745,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="destructive"
                   size="lg"
-                  className="bg-green-500 hover:bg-green-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  className="bg-blue-600 hover:bg-blue-600  shadow-lg hover:shadow-xl transition-all duration-300  px-8"
                   onClick={handleLeaveCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
@@ -735,11 +755,22 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <Button
                   variant="default"
                   size="lg"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-8"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 px-8"
                   onClick={handleJoinCommunity}
                 >
                   <HiMiniUserGroup className="h-8 w-8" />
                   {StringConstants.FOLLOW}
+                </Button>
+              )}
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-white hover:bg-zinc-100 transition-all duration-300 rounded-full p-1.5 h-8 w-8 flex items-center justify-center shadow-md"
+                  onClick={handleShareClick}
+                  title="Share Profile"
+                >
+                  <FaShareAlt className="h-4 w-4 text-logo-color" />
                 </Button>
               )}
             </div>
@@ -750,6 +781,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           <div className="">
             <h2 className="text-2xl font-semibold text-foreground mb-4">
               {StringConstants.ABOUT}
+              {isOwner && (
+                <button
+                  className="p-1 rounded-md hover:bg-background transition mx-2"
+                  onClick={() => setIsEditOpen(true)}
+                >
+                  <Pencil size={18} className="text-muted hover:text-primary" />
+                </button>
+              )}
             </h2>
             <div className="bg-card rounded-xl p-8 shadow-sm border border-border/5 h-auto">
               <p className="text-muted-foreground  whitespace-pre-line">
@@ -775,7 +814,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <AddOfferingDialog onOfferingAdded={fetchOfferings} />
             </div>
 
-            {offerings.length === 0 ? (
+            {!isBankConnected || offerings.length === 0 ? (
               <div className="text-center py-16 bg-card rounded-xl border border-border/5">
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
@@ -809,9 +848,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </span> */}
                       <div className="flex items-center justify-between gap-2">
                         {isOwner && (
-                          <div
-                            className={`flex gap-2 ${isOwner ? "ml-auto" : ""}`}
-                          >
+                          <div className={`flex gap-2`}>
                             <Button
                               size="sm"
                               variant="outline"
@@ -835,36 +872,37 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
 
                         {/* Book Now button */}
-                        {!isOwner && (
-                          <Button
-                            size="sm"
-                            className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                              !isOwner ? "ml-auto" : ""
-                            }`}
-                            onClick={() => {
-                              if (!session) {
-                                signIn("google");
-                                return;
-                              }
-                              setSelectedOffering(offering);
-                            }}
-                          >
-                            {offering.is_free ? (
-                              <span>Free</span>
-                            ):(offering?.discounted_price &&
+                        <Button
+                          size="sm"
+                          disabled={isOwner ?? false}
+                          className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                            !isOwner
+                              ? "cursor-pointer"
+                              : "cursor-not-allowed opacity-50"
+                          }`}
+                          onClick={() => {
+                            if (!session) {
+                              signIn("google");
+                              return;
+                            }
+                            if (!isOwner) setSelectedOffering(offering);
+                          }}
+                        >
+                          {offering.is_free ? (
+                            <span>Free</span>
+                          ) : offering?.discounted_price &&
                             offering?.price?.amount ? (
-                              <>
-                                <span className="line-through text-xs opacity-60">
-                                  ₹{offering.price.amount}
-                                </span>
-                                <span> ₹{offering.discounted_price}</span>
-                              </>
-                            ) : offering?.price?.amount ? (
-                              <span>₹{offering.price.amount}</span>
-                            ) : null)}
-                            <ArrowRight className="w-4 h-4" />
-                          </Button>
-                        )}
+                            <>
+                              <span className="line-through text-xs opacity-60">
+                                ₹{offering.price.amount}
+                              </span>
+                              <span> ₹{offering.discounted_price}</span>
+                            </>
+                          ) : offering?.price?.amount ? (
+                            <span>₹{offering.price.amount}</span>
+                          ) : null}
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>

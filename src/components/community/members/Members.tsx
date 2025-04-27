@@ -25,10 +25,11 @@ import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 
 interface User {
+  name: string;
   _id: string;
-  user_name?: string;
   email: string;
   avatar: string | null;
+  name: string | null;
 }
 
 interface Member {
@@ -49,7 +50,7 @@ interface MembersProps {
   communityId: string;
 }
 
-export default function Members({communityId}: MembersProps) {
+export default function Members({ communityId }: MembersProps) {
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,8 +61,7 @@ export default function Members({communityId}: MembersProps) {
   const { user } = useSelector((state: RootState) => state.user);
   const removerUserId = user?._id;
 
-
-  const activeCommunityId = communityId
+  const activeCommunityId = communityId;
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -163,14 +163,14 @@ export default function Members({communityId}: MembersProps) {
                     <Avatar>
                       <AvatarImage src={member.user_id.avatar || undefined} />
                       <AvatarFallback className="bg-card text-muted-foreground">
-                        {member.user_id.user_name?.[0]?.toUpperCase() ||
+                        {member.user_id.name?.[0]?.toUpperCase() ||
                           member.user_id.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-medium truncate text-muted-foreground">
-                          {member.user_id.user_name || member.user_id.email}
+                          {member.user_id?.name}
                         </p>
                         <div className="flex gap-1">
                           {member.is_owner && (
@@ -191,31 +191,37 @@ export default function Members({communityId}: MembersProps) {
                         </div>
                       </div>
                       <p className="text-sm text-start text-muted-foreground">
-                        {StringConstants.JOINED} {formatDistanceToNow(new Date(member.createdAt))}{" "}
+                        {StringConstants.JOINED}{" "}
+                        {formatDistanceToNow(new Date(member.createdAt))}{" "}
                         {StringConstants.AGO}
                       </p>
                     </div>
                   </div>
-                  {!member.is_owner && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <button
-                          aria-label="Options"
-                          className="text-muted-foreground"
-                        >
-                          <MoreHorizontal className="h-5 w-5" />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="bg-card border-zinc-700 hover:bg-background cursor-pointer">
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => handleRemoveClick(member.user_id._id)}
-                        >
-                          {StringConstants.REMOVE_USER}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
+                  {members.find(
+                    (m) => m.user_id._id === user?._id && m.is_owner
+                  ) &&
+                    member.user_id._id !== user?._id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <button
+                            aria-label="Options"
+                            className="text-muted-foreground"
+                          >
+                            <MoreHorizontal className="h-5 w-5" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-card border-zinc-700 hover:bg-background cursor-pointer">
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() =>
+                              handleRemoveClick(member.user_id._id)
+                            }
+                          >
+                            {StringConstants.REMOVE_USER}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                 </div>
               ))}
         </div>
@@ -225,7 +231,9 @@ export default function Members({communityId}: MembersProps) {
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
         <DialogContent>
           <DialogHeader>
-            <h2 className="text-lg font-semibold">{StringConstants.CONFIRM_REMOVAL}</h2>
+            <h2 className="text-lg font-semibold">
+              {StringConstants.CONFIRM_REMOVAL}
+            </h2>
           </DialogHeader>
           <p>{StringConstants.REMOVAL_CONFIRMATION}</p>
           <DialogFooter>

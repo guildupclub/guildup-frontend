@@ -217,7 +217,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${API_FRONTEND_URL}/feeds`;
+    const shareUrl = `${window.location.origin}/post/${post?._id}`;
 
     try {
       await navigator.share({
@@ -296,6 +296,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
             {post?.media?.fileType === "video" && (
               <video
                 controls
+                controlsList="nodownload"
                 className="w-full max-h-[400px] rounded-lg object-contain"
               >
                 <source src={post?.media?.publicUrl} type="video/mp4" />
@@ -343,8 +344,8 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           <div className="px-4 py-4">
             <div className="flex gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
                 <input
