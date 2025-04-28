@@ -22,9 +22,32 @@ export const metadata: Metadata = {
   title: "GuildUp Club",
   description: "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
   icons: {
-    icon: "/guildup_logo_final.png",
-    shortcut: "/guildup_logo_final.png",
-    apple: "/guildup_logo_final.png",
+    icon: [
+      {
+        url: guildup_logo_final, // Add forward slash to indicate public folder
+        sizes: "32x32",
+        type: "image/png"
+      },
+      {
+        url: guildup_logo_final, // Add forward slash to indicate public folder
+        sizes: "16x16",
+        type: "image/png"
+      }
+    ],
+    shortcut: [guildup_logo_final], // Add forward slash
+    apple: [
+      {
+        url: guildup_logo_final, // Add forward slash
+        sizes: "180x180",
+        type: "image/png"
+      }
+    ],
+    other: [
+      {
+        rel: "mask-icon",
+        url: guildup_logo_final
+      }
+    ]
   }
 };
 
@@ -36,19 +59,17 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="shortcut icon" href="/guildup_logo_final.png" />
-        <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
-        <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
-        <script>
-          {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){window.dataLayer.push(arguments);}
-          gtag('js', new Date());
+        <link rel="icon" href="/guildup_logo_final.png" type="image/png" />
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
+      <script>
+        {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){window.dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-          gtag('config', 'G-B3B9W8GRQP');
-          `}
-        </script>
+        gtag('config', 'G-B3B9W8GRQP');
+        `}
+      </script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>

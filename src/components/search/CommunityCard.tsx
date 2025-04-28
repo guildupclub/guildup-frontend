@@ -50,11 +50,18 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
 
   const offerings = Array.isArray(community.offerings)
     ? community.offerings
     : [];
+  const offerings = Array.isArray(community.offerings)
+    ? community.offerings
+    : [];
   const communityDetails = community.community;
+  // Get the first offering from the array if it exists
   const firstOffering = offerings.length > 0 ? offerings[0] : null;
 
   const tags: string[] = community?.community?.tags?.[0]?.includes(",")
@@ -75,26 +82,30 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
       onClick={() => onClick(community.community._id)}
       className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative active:bg-white focus:bg-white"
     >
-      {/* Shine effect overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+      <div className="relative h-[80px] w-full bg-gray-200">
+        <Image
+          src={
+            community?.community?.background_image ||
+            "/defaultCommunityIcon.png"
+          }
+          alt="Background"
+          fill
+          className="object-cover"
+        />
       </div>
-
-      <div className="flex flex-col h-full p-4 relative">
-        {/* Header - Avatar and Name with enhanced hover effects */}
-        <div className="flex items-start gap-4 mb-4">
-          <div className="relative group-hover:scale-105 transition-transform duration-500">
-            <div className="relative">
-              <Image
-                src={avatarImgUrl}
-                alt="Profile"
-                width={80}
-                height={80}
-                className="rounded-2xl object-cover w-20 h-20 transition-transform duration-500 group-hover:shadow-lg"
-              />
-              <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/20 to-blue-600/20 rounded-2xl blur-lg -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
-          </div>
+      <div className="absolute left-4 top-[50px] rounded-full border border-white">
+        <Image
+          src={
+            community.community.image && community.community.image !== ""
+              ? community.community.image
+              : "/defaultCommunityIcon.png"
+          }
+          alt="Profile"
+          width={64}
+          height={64}
+          className="rounded-full object-cover h-16 w-16"
+        />
+      </div>
 
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-300">

@@ -11,19 +11,18 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import { useParams } from "next/navigation";
 
 type Testimonial = {
   _id: string;
   imageUrl: string;
   userId: string;
-  mediaType?: "image" | "video";
 };
-const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
+
 export default function Testimonials() {
   const dispatch = useDispatch();
   const params = useParams();
@@ -43,7 +42,6 @@ export default function Testimonials() {
     useState<Testimonial | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -65,19 +63,7 @@ export default function Testimonials() {
       }
 
       const data = await response.json();
-
-      const formatted: Testimonial[] = (data.data || []).map((url: string) => {
-        const lowerUrl = url.toLowerCase();
-        const isVideo = videoExtensions.some((ext) => lowerUrl.endsWith(ext));
-        return {
-          _id: url,
-          imageUrl: url,
-          userId: userId || "",
-          mediaType: isVideo ? "video" : "image",
-        };
-      });
-      setTestimonials(formatted);
-      // setTestimonials(data.data || []);
+      setTestimonials(data.data || []);
     } catch (error) {
       console.error("Error fetching testimonials:", error);
       toast({
@@ -212,7 +198,7 @@ export default function Testimonials() {
                 "Uploading..."
               ) : (
                 <>
-                  <span>Add Media</span>
+                  <span>Add Testimonial</span>
                   {/* <Plus className="w-5 h-5" /> */}
                 </>
               )}
@@ -225,7 +211,7 @@ export default function Testimonials() {
             onChange={handleFileChange}
             className="hidden"
             multiple
-            accept="image/*,video/*"
+            accept="image/*"
           />
         </div>
       </div>
@@ -235,31 +221,20 @@ export default function Testimonials() {
           <Marquee
             className="overflow-hidden relative testimonial-blur"
             direction="right"
-            pauseOnHover={isHovered}
           >
             <div className="flex gap-6 relative z-0">
-              {testimonials?.map((testimonial, index) => (
+              {testimonials?.map((imageUrl, index) => (
                 <div
                   key={index}
                   className="w-full min-w-0 cursor-pointer mx-4 "
-                  onClick={() => openTestimonialModal(testimonial)}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
+                  onClick={() => openTestimonialModal(imageUrl)}
                 >
                   <div className="bg-white p-4 rounded-2xl h-auto flex flex-col shadow-sm w-72">
-                    {testimonial.mediaType === "video" ? (
-                      <video
-                        src={testimonial.imageUrl || "/placeholder.svg"}
-                        className="w-auto h-48 object-cover"
-                        controls={false}
-                      />
-                    ) : (
-                      <img
-                        src={testimonial.imageUrl || "/placeholder.svg"}
-                        alt="Testimonial"
-                        className="w-auto h-48 object-cover"
-                      />
-                    )}
+                    <img
+                      src={imageUrl || "/placeholder.svg"}
+                      alt="Testimonial"
+                      className="w-auto h-48 object-cover"
+                    />
                   </div>
                 </div>
               )) || []}{" "}
@@ -280,20 +255,11 @@ export default function Testimonials() {
           </DialogHeader>
           {selectedTestimonial && (
             <div className="flex flex-col items-center gap-4">
-              {selectedTestimonial.mediaType === "video" ? (
-                <video
-                  src={selectedTestimonial.imageUrl || "/placeholder.svg"}
-                  className="max-w-full max-h-[400px] object-contain rounded-lg"
-                  controls
-                  autoPlay
-                />
-              ) : (
-                <img
-                  src={selectedTestimonial.imageUrl || "/placeholder.svg"}
-                  alt="Testimonial"
-                  className="max-w-full max-h-[400px] object-contain rounded-lg"
-                />
-              )}
+              <img
+                src={selectedTestimonial || "/placeholder.svg"}
+                alt="Testimonial"
+                className="max-w-full max-h-[400px] object-contain rounded-lg"
+              />
               <DialogFooter className="w-full flex justify-between sm:justify-between">
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Close

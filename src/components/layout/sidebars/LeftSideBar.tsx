@@ -561,7 +561,7 @@ export function LeftSidebar() {
                 <button
                   key={community?._id}
                   onClick={() => handleCommunityClick(community)}
-                  className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-background text-start"
+                  className="w-full flex items-start gap-2 rounded-lg p-2 text-sm hover:bg-background text-start"
                 >
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={community?.image} />

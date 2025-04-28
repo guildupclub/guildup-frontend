@@ -122,7 +122,6 @@ const EditOfferingModal = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="consultation">Consultation</SelectItem>
-                <SelectItem value="webinar">Webinar</SelectItem>
               </SelectContent>
             </Select>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
@@ -9,104 +9,46 @@ import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
-import { GrInstagram } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
-import { FaLinkedinIn } from "react-icons/fa6";
-import numbro from "numbro";
-import { StringConstants } from "../common/CommonText";
-import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setCommunityData } from "@/redux/communitySlice";
-import { setActiveCommunity } from "@/redux/channelSlice";
-import { Loader2 } from "lucide-react";
-import Loader from "../Loader";
 
 interface CommunityCardProps {
   community: any;
   onClick: () => void;
 }
 
-// Add the required CSS class at the top of the file
-const scrollbarHideStyles = `
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-`;
-
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
   const [selectedOffering, setSelectedOffering] = useState<any>(null);
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const tagContainerRef = useRef<HTMLDivElement>(null);
+  const [avatarImgUrl, setAvatarImgUrl] = useState("");
+  const [bgImgUrl, setBgImgUrl] = useState("");
+  const tags: string[] = community?.community?.tags?.[0]?.includes(",")
+    ? community.community.tags[0].split(",").map((tag: string) => tag.trim())
+    : community?.community?.tags || [];
 
-  const communityDetails = useMemo(() => community?.community, [community]);
-  const firstOffering = useMemo(
-    () => (community?.offerings?.length > 0 ? community.offerings[0] : null),
-    [community?.offerings]
-  );
+  const communityDetails = community?.community;
+  const OfferingDetails = community?.offerings;
 
-  // Add years of experience (default to 0 if not available)
-  const yearsOfExperience = useMemo(() => {
-    return communityDetails?.years_of_experience || 0;
-  }, [communityDetails]);
+  const firstOffering = OfferingDetails?.length > 0 ? OfferingDetails[0] : null;
 
-  const tags: string[] = useMemo(() => {
-    // If tags don't exist, return empty array
-    if (!communityDetails?.tags || !communityDetails.tags.length) return [];
-    
-    // Create a flat array of all tags
-    let allTags: string[] = [];
-    
-    // Process each item in the tags array
-    communityDetails.tags.forEach((tagItem: any) => {
-      if (typeof tagItem === 'string') {
-        // If it's a string, check if it contains multiple comma-separated tags
-        if (tagItem.includes(',')) {
-          const splitTags = tagItem.split(',').map((tag: string) => tag.trim()).filter(Boolean);
-          allTags = [...allTags, ...splitTags];
-        } else {
-          allTags.push(tagItem.trim());
-        }
-      } else if (Array.isArray(tagItem)) {
-        // If it's an array, process each item
-        tagItem.forEach((tag: any) => {
-          if (typeof tag === 'string') {
-            if (tag.includes(',')) {
-              const splitTags = tag.split(',').map((t: string) => t.trim()).filter(Boolean);
-              allTags = [...allTags, ...splitTags];
-            } else {
-              allTags.push(tag.trim());
-            }
-          }
-        });
-      }
-    });
-    
-    // Remove duplicates and empty strings
-    return [...new Set(allTags)].filter(Boolean);
-  }, [communityDetails?.tags]);
+  useEffect(() => {
+    if (community) {
+      const seedValue =
+        community._id ||
+        communityDetails?._id ||
+        (communityDetails?.name &&
+          `${communityDetails.name}-${
+            communityDetails?.user_id || Date.now()
+          }`);
 
-  const avatarImgUrl = useMemo(() => {
-    if (!community) return "";
+      setAvatarImgUrl(
+        communityDetails?.image ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`
+      );
 
-    const seedValue =
-      community._id ||
-      communityDetails?._id ||
-      (communityDetails?.name &&
-        `${communityDetails.name}-${communityDetails?.user_id || Date.now()}`);
-
-    return (
-      communityDetails?.image ||
-      `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`
-    );
+      setBgImgUrl(
+        communityDetails?.background_image ||
+          "https://random-image-pepebigotes.vercel.app/api/random-image"
+      );
+    }
   }, [community, communityDetails]);
 
   const handleOfferingClick = React.useCallback(
@@ -295,46 +237,20 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                 <span className="text-xs text-gray-500">
                   {firstOffering.duration || 60} min
                 </span>
-              </div>
-              
-              {/* Pricing */}
-              <div className="p-4 flex items-center justify-between">
-                <div>
-                  {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-semibold text-blue-600">₹{firstOffering.discounted_price}</span>
-                      <span className="line-through text-xs text-gray-400">₹{firstOffering.price.amount}</span>
-                    </div>
-                  ) : (
-                    <span className="text-lg font-semibold text-blue-600">
-                      {firstOffering?.price?.amount ? `₹${firstOffering.price.amount}` : "Free"}
-                    </span>
-                  )}
-                </div>
-                
-                <Button
-                  size="sm"
-                  className="bg-blue-600 text-white rounded-md px-4 py-1 text-sm hover:bg-blue-700 transition-colors duration-300"
-                  onClick={handleOfferingClick}
-                >
-                  Book Now
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div
-              className="flex items-center justify-center p-4 bg-gradient-to-r from-gray-50/50 to-gray-100/50 backdrop-blur-sm rounded-xl border border-gray-200/50
-              group-hover:from-gray-100/50 group-hover:to-gray-200/50 transition-all duration-500"
-            >
-              <p className="text-muted text-sm font-medium">
-                No Offering Available
-              </p>
-            </div>
-          )}
+                <span> ₹{firstOffering.discounted_price}</span>
+              </>
+            ) : (
+              <span>₹{firstOffering?.price?.amount || "FREE"}</span>
+            )}
+          </Button>
         </div>
-      </div>
+      ) : (
+        <div className="mt-auto flex items-center justify-center m-4 p-3 bg-gray-100 rounded-lg">
+          <p className="text-muted font-medium">No Offering Available</p>
+        </div>
+      )}
     </Card>
   );
 }
 
-export default CommunityCard;
+export default React.memo(CommunityCard);

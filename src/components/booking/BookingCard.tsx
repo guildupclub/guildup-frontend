@@ -1,23 +1,7 @@
-"use client";
+'use client';
 
-import React from "react";
-import { CalendarDays, Clock, MapPin, User } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import React from 'react';
+import { Button } from '../ui/button';
 
 interface BookingCardProps {
   profileImage: string;
@@ -28,9 +12,6 @@ interface BookingCardProps {
   guest: string;
   bookedOn: string;
   amount: number;
-  status?: "upcoming" | "completed" | "cancelled";
-  onCancel?: () => void;
-  onReschedule?: () => void;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({
@@ -42,9 +23,6 @@ const BookingCard: React.FC<BookingCardProps> = ({
   guest,
   bookedOn,
   amount,
-  status = "upcoming",
-  onCancel,
-  onReschedule,
 }) => {
   // Get initials for avatar fallback
   const getInitials = (name: string | undefined) => {
@@ -64,93 +42,47 @@ const BookingCard: React.FC<BookingCardProps> = ({
   }).format(amount);
 
   return (
-    <Card className="overflow-hidden transition-all duration-200 hover:shadow-md">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Avatar className="h-12 w-12 border-2 border-white shadow-sm">
-              <AvatarImage
-                src={profileImage || "/placeholder.svg"}
-                alt={name}
-              />
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {getInitials(name)}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <h3 className="font-semibold text-slate-900">{name}</h3>
-              <p className="text-sm text-slate-500">{role}</p>
-            </div>
-          </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge
-                  variant={
-                    status === "upcoming"
-                      ? "outline"
-                      : status === "completed"
-                      ? "default"
-                      : "destructive"
-                  }
-                  className={
-                    status === "upcoming"
-                      ? "border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
-                      : status === "completed"
-                      ? "bg-green-100 text-green-800 hover:bg-green-200"
-                      : ""
-                  }
-                >
-                  {status === "upcoming"
-                    ? "Upcoming"
-                    : status === "completed"
-                    ? "Completed"
-                    : "Cancelled"}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Booking status</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+    <div className="bg-white shadow-lg rounded-xl p-6 gap-3 flex flex-col w-full border">
+      <div className="flex items-center space-x-4">
+        <img
+          src={profileImage}
+          alt={name}
+          className="w-12 h-12 rounded-full object-cover bg-red-500"
+        />
+        <div className='flex flex-col'>
+          <h3 className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">{name}</h3>
+          <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{role}</p>
         </div>
-      </CardHeader>
-      <CardContent className="pb-3 pt-0">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-          <div className="flex items-start gap-2">
-            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500">Service</p>
-              <p className="text-sm font-medium text-slate-900">{service}</p>
-            </div>
+      </div>
+      <div className="mt-4 text-sm gap-2 flex flex-row justify-between">
+        <div className='flex flex-col gap-2'>
+          <div className="flex flex-col">
+            <p className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">Service</p>
+            <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{service}</p>
           </div>
-          <div className="flex items-start gap-2">
-            <User className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500">Guest</p>
-              <p className="text-sm font-medium text-slate-900">{guest}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <User className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500">Host</p>
-              <p className="text-sm font-medium text-slate-900">{host}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2">
-            <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
-            <div>
-              <p className="text-xs font-medium text-slate-500">Booked on</p>
-              <p className="text-sm font-medium text-slate-900">{bookedOn}</p>
-            </div>
+          <div className="flex flex-col">
+            <p className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">Host by</p>
+            <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{host}</p>
           </div>
         </div>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between border-t bg-slate-50 px-6 py-3">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-slate-500" />
-          <p className="font-medium text-slate-900">{formattedAmount}</p>
+        <div className='flex flex-col gap-2'>
+          <div className="flex flex-col items-end">
+            <p className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">Guest</p>
+            <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{guest}</p>
+          </div>
+          <div className="flex flex-col items-end">
+            <p className="text-lg font-semibold leading-[1.5] tracking-[1%] align-bottom">Booked on</p>
+            <p className="font-sans font-normal text-base leading-[1.5] tracking-[1%] align-bottom">{bookedOn}</p>
+          </div>
+        </div>
+      </div>
+      <div className="mt-4 flex justify-between items-center">
+        <p className="font-bold">Amount: ₹{amount}</p>
+        <div className="space-x-4">
+          <button className="w-[80px] h-[40px] md:w-[120px] md:h-[42px] rounded-lg border border-[#334BFF] py-2 px-3 animate-[ease-in_300ms] text-center">Cancel</button>
+          <button className="md:w-[120px] md:h-[42px] rounded-lg border bg-[#334BFF] text-white py-2 px-3 animate-[ease-in_300ms] text-center">Reschedule</button>
+          {/* <Button className='bg-card '>Cancel</Button>
+          <Button>Reschedule</Button> */}
         </div>
         {/* {status === "upcoming" && (
           <div className="flex gap-3">
