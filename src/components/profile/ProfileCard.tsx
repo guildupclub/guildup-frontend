@@ -880,7 +880,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               <span>
                                 <Button
                                   size="sm"
-                                  disabled={!isBankConnected}
+                                  disabled={!offering.is_free && !isBankConnected}
                                   className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
                                     !isOwner
                                       ? "cursor-pointer"
@@ -911,25 +911,27 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                 </Button>
                               </span>
                             </TooltipTrigger>
-                            <TooltipContent
-                              side="bottom"
-                              align="center"
-                              className="bg-white text-black border border-gray-200 shadow-lg px-3 py-2 rounded flex items-center gap-2"
-                            >
-                              <span>
-                                <svg
-                                  className="w-4 h-4 text-blue-500 inline-block mr-1"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" />
-                                </svg>
-                              </span>
-                              <span>The expert is not accepting bookings at the moment</span>
-                            </TooltipContent>
+                            {!offering.is_free && !isBankConnected && (
+                              <TooltipContent
+                                side="bottom"
+                                align="center"
+                                className="bg-white text-black border border-gray-200 shadow-lg px-3 py-2 rounded flex items-center gap-2"
+                              >
+                                <span>
+                                  <svg
+                                    className="w-4 h-4 text-blue-500 inline-block mr-1"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" />
+                                  </svg>
+                                </span>
+                                <span>The expert is not accepting bookings at the moment</span>
+                              </TooltipContent>
+                            )}
                           </Tooltip>
                         </TooltipProvider>
                       </div>
