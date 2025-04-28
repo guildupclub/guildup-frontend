@@ -4,6 +4,10 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Plus, Send } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 interface CommentProps {
   author: string;
@@ -11,6 +15,8 @@ interface CommentProps {
   content: string;
   timestamp: string;
   likes: number;
+  commentId: string;
+  postId: string;
   replies?: CommentProps[];
 }
 
@@ -20,30 +26,66 @@ export function Comment({
   content,
   timestamp,
   likes,
+  commentId,
+  postId,
   replies,
 }: CommentProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [replyText, setReplyText] = useState("");
+  const queryClient = useQueryClient();
+  const userId = useSelector((state: RootState) => state.user.user?._id);
+  const user = useSelector((state: RootState) => state.user.user);
+
+  // Add reply mutation
+  const replyMutation = useMutation({
+    mutationFn: async (text: string) => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/replyComment`,
+        {
+          postId,
+          commentId,
+          text,
+          userId,
+        }
+      );
+      return response.data.data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch comments and replies
+      queryClient.invalidateQueries({ queryKey: ["replies", commentId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+      // Also invalidate post data to update comment count
+      queryClient.invalidateQueries({ queryKey: ["post", postId] });
+    },
+  });
+
+  const handleReplySubmit = () => {
+    if (!replyText.trim()) return;
+
+    replyMutation.mutate(replyText);
+    setReplyText("");
+    setIsReplying(false);
+  };
 
   return (
     <div className="group">
       <div className="flex gap-3 py-3">
         <Avatar className="h-8 w-8">
-          <AvatarImage src="/placeholder.svg" />
-          <AvatarFallback>{author[0]}</AvatarFallback>
+          <AvatarImage src={user?.image} />
+          <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-zinc-200">{author}</span>
-            <span className="text-xs text-zinc-400">Level {level}</span>
-            <span className="text-xs text-zinc-400">{timestamp}</span>
+            <span className="font-medium text-muted">{author}</span>
+            <span className="text-xs text-accent">Level {level}</span>
+            <span className="text-xs text-accent">{timestamp}</span>
           </div>
-          <p className="text-sm text-zinc-300 mt-1">{content}</p>
+          <p className="text-sm text-accent mt-1">{content}</p>
           <div className="flex items-center gap-4 mt-2">
             <button
               onClick={() => setIsLiked(!isLiked)}
-              className="flex items-center gap-1 text-zinc-400 hover:text-zinc-300"
+              className="flex items-center gap-1 text-accent"
             >
               <Heart
                 className={`h-4 w-4 ${
@@ -54,7 +96,7 @@ export function Comment({
             </button>
             <button
               onClick={() => setIsReplying(!isReplying)}
-              className="text-xs text-zinc-400 hover:text-zinc-300"
+              className="text-xs text-accent"
             >
               Reply
             </button>
@@ -63,8 +105,8 @@ export function Comment({
           {isReplying && (
             <div className="mt-3 flex gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src="/placeholder.svg" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
                 <input
@@ -72,20 +114,20 @@ export function Comment({
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   placeholder="Write a reply..."
-                  className="w-full bg-zinc-800 rounded-full px-4 py-2 text-sm text-zinc-200 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8 text-accent"
                   >
                     <Plus className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-zinc-400 hover:text-zinc-300"
+                    className="h-8 w-8 text-accent"
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
@@ -93,11 +135,8 @@ export function Comment({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 text-purple-500"
-                    onClick={() => {
-                      // Handle reply submission
-                      setIsReplying(false);
-                      setReplyText("");
-                    }}
+                    onClick={handleReplySubmit}
+                    disabled={replyMutation.isPending}
                   >
                     <Send className="h-4 w-4" />
                   </Button>

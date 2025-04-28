@@ -43,11 +43,11 @@ export default function CommunityLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="h-screen bg-background text-muted">
+    <div className="h-screen bg-background text-muted md:pe-[100px] pb-16 overflow-scroll">
       <LeftmostSidebar />
-      <div className="ml-20">
+      <div className="flex flex-col md:ml-20">
         <Sidebar />
-        <div className="ml-80 flex-1">{children}</div>
+        <div className="flex md:ml-80">{children}</div>
       </div>
     </div>
   );

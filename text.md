@@ -1,0 +1,156 @@
+import React from "react";
+import { Card } from "../ui/card";
+import Image from "next/image";
+import { Badge } from "../ui/badge";
+import { IoVideocam } from "react-icons/io5";
+import { Button } from "../ui/button";
+import { ImUsers } from "react-icons/im";
+import { FaGraduationCap } from "react-icons/fa";
+import { BsInstagram } from "react-icons/bs";
+import { FaYoutube } from "react-icons/fa";
+function CommunityCard({
+  community,
+  onClick,
+}: {
+  community: any;
+  onClick: (id: string) => void;
+}) {
+  const tags = [
+    ...new Set(community?.offerings?.flatMap((offering: any) => offering.tags)),
+  ];
+  const communityDetails = community?.community;
+  const OfferingDetails = community?.offerings;
+
+  return (
+    <Card
+      onClick={() => onClick(community._id)}
+      className="relative w-full lg:w-[320px] border border-gray-200 rounded-xl shadow-md overflow-hidden cursor-pointer flex flex-col h-full"
+    >
+      {/* Background Image */}
+      <div className="relative h-[100px] w-full bg-gray-200">
+        <Image
+          src={community.image || "/defaultCommunityIcon.png"}
+          alt="Background"
+          fill
+          className="object-cover"
+        />
+      </div>
+
+      {/* Profile Image */}
+      <div className="absolute left-4 top-[70px] w-14 h-14 rounded-full border-4 border-white">
+        <Image
+          src={community.icon || "/defaultCommunityIcon.png"}
+          alt="Profile"
+          width={64}
+          height={64}
+          className="rounded-full object-cover"
+        />
+      </div>
+
+      {/* Card Content */}
+      <div className="p-4 pt-10 flex-1">
+        {/* Name & Stats */}
+        <h3 className="font-semibold text-gray-800 text-lg">
+          {communityDetails?.name}
+        </h3>
+        <div className="flex items-center gap-2 text-sm text-gray-500 my-2">
+          <span className="flex items-center gap-1">
+            <ImUsers className="text-blue-600 h-4 w-4" />{" "}
+            {communityDetails?.num_member}+
+          </span>
+          <span className="flex items-center gap-1 mx-2">
+            <FaYoutube className="text-red-600 h-4 w-4" /> 4K+
+          </span>
+        </div>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mt-3">
+          {tags.map((tag: string, index: number) => (
+            <Badge
+              key={index}
+              className="bg-gray-200 text-gray-700 px-3 py-1 text-xs rounded-lg"
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
+      {/* Offerings Section (Stuck at Bottom) */}
+      <div className="mt-auto flex items-center justify-between m-4 p-3 bg-blue-50 rounded-lg">
+        <div className="flex items-center space-x-2">
+          <IoVideocam className="text-blue-600 h-6 w-6" />
+          <div>
+            <span className="text-blue-700 font-medium">
+              {OfferingDetails?.[0]?.type}
+            </span>
+            <p className="text-xs text-gray-500">
+              {OfferingDetails?.[0]?.duration} Min
+            </p>
+          </div>
+        </div>
+        {OfferingDetails && (
+          <Button className="text-sm font-semibold text-white bg-blue-600 px-4 py-1 rounded-lg">
+            {OfferingDetails?.[0]?.price?.amount ? (
+              <>
+                <span className="line-through text-xs opacity-60">
+                  ₹{OfferingDetails[0].price.amount + 1000}
+                </span>{" "}
+              </>
+            ) : null}
+            {OfferingDetails?.[0]?.price?.amount
+              ? `₹${OfferingDetails[0].price.amount}`
+              : "FREE"}
+          </Button>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+export default React.memo(CommunityCard);
+
+
+
+
+
+
+
+
+
+
+
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default: "border-transparent bg-background text-accent shadow ",
+        secondary: "border-transparent bg-secondary text-secondary-foreground ",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground shadow",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  );
+}
+
+export { Badge, badgeVariants };

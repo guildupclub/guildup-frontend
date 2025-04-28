@@ -1,39 +1,45 @@
 "use client";
 
 import * as React from "react";
-import axios from "axios";
-import { Link2, Smile, Plus, Image, Video, Gift, Link } from "lucide-react"; // Import necessary icons
+import { Plus, Image, Video, LinkIcon } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
+import { useCreatePost } from "@/hook/queries/usePostMutations";
+import { StringConstants } from "@/components/common/CommonText";
+import Link from "@tiptap/extension-link"; // Import the correct Link extension
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import {
+  Bold,
+  Italic,
+  UnderlineIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  List,
+} from "lucide-react";
 
-interface FileResponse {
-  signedUrl: string;
-  fileId: string;
-  key: string;
-  publicUrl: string;
-}
-
-interface MediaData {
-  fileName: string;
-  fileType: string;
-  fileId: string;
-  key: string;
-  publicUrl: string;
+interface MediaPreview {
+  file: File;
+  previewUrl: string;
+  type: "image" | "video" | "gif" | "link";
 }
 
 export function PostDialog() {
-  const mediaRef = React.useRef<MediaData | null>(null);
   const [isOpen, setIsOpen] = React.useState(false);
   const [content, setContent] = React.useState("");
   const [title, setTitle] = React.useState("");
-  const [isUploading, setIsUploading] = React.useState(false);
+  const [mediaPreview, setMediaPreview] = React.useState<MediaPreview | null>(
+    null
+  );
+  const [tags, setTags] = React.useState<string[]>([]);
 
   const imageInputRef = React.useRef<HTMLInputElement>(null);
   const videoInputRef = React.useRef<HTMLInputElement>(null);
@@ -43,148 +49,144 @@ export function PostDialog() {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
 
   const activeCommunityId = activeCommunity?.id;
-  console.log(activeCommunityId);
-  const userID = useSelector((state: RootState) => state.user.user?.id);
-  const sessionId = useSelector((state: RootState) => state.user.sessionId);
+  const userID = useSelector((state: RootState) => state.user.user?._id);
 
   const { data: session } = useSession();
-  const userId = userID;
-  const communityId = activeCommunityId;
-  const sessionToken = sessionId;
 
-  const handleFileUpload = async (
+  // Use the React Query mutation hook
+  const createPostMutation = useCreatePost();
+
+  const handleFileSelection = (
     event: React.ChangeEvent<HTMLInputElement>,
     fileType: "image" | "video" | "gif" | "link"
   ) => {
     const file = event.target.files?.[0];
-    if (!file && fileType !== "link") return;
+    if (!file) return;
 
-    setIsUploading(true);
-    try {
-      const signUrlResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/getSignUrl`,
-        {
-          fileName: file?.name || "",
-          fileType,
-          userId,
-          communityId,
-        }
+    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(
+        "File size exceeds 20MB limit. Please upload a smaller file."
       );
-      const { signedUrl, fileId, key, publicUrl } = signUrlResponse.data.data;
 
-      console.log(signedUrl, fileId, key, publicUrl);
-      const responseData = signUrlResponse.data.data;
-
-      // Step 2: Upload to S3 if it's a file (not a link)
-      if (fileType !== "link" && file) {
-        await axios.put(responseData.signedUrl, file, {
-          headers: { "Content-Type": file.type },
-        });
-        console.log("File uploaded to S3 successfully");
-      }
-
-      // Step 3: Store media data
-      const newMediaData = {
-        fileName: file?.name || "Link",
-        fileType,
-        fileId: responseData.fileId,
-        key: responseData.key,
-        publicUrl:
-          fileType === "link" ? file?.name || "" : responseData.publicUrl,
-      };
-
-      console.log("Storing media data:", newMediaData);
-      //@ts-nocheck
-      mediaRef.current = newMediaData;
-
-      // Force re-render
-      setIsUploading(false);
-    } catch (error) {
-      console.error("Upload failed:", error);
-      mediaRef.current = null;
-      setIsUploading(false);
-    }
-  };
-
-  const handlePostCreate = async () => {
-    if (!title || !content) {
-      alert("Title and content are required!");
+      event.target.value = "";
       return;
     }
 
-    console.log("Current media ref:", mediaRef.current);
+    // Create a preview URL for the selected file
+    const previewUrl = URL.createObjectURL(file);
 
-    // Create the media object
-    const mediaPayload = mediaRef.current
-      ? {
-          fileName: mediaRef.current.fileName,
-          fileType: mediaRef.current.fileType,
-          fileId: mediaRef.current.fileId,
-          key: mediaRef.current.key,
-          publicUrl: mediaRef.current.publicUrl,
-        }
-      : null;
+    // Store the file and preview URL
+    setMediaPreview({
+      file,
+      previewUrl,
+      type: fileType,
+    });
+  };
 
-    console.log("Media payload:", mediaPayload);
+  const clearMediaPreview = () => {
+    if (mediaPreview?.previewUrl) {
+      URL.revokeObjectURL(mediaPreview.previewUrl);
+    }
+    setMediaPreview(null);
+  };
 
-    const postPayload = {
-      userId,
-      session: sessionToken,
-      type: "close",
-      communityId,
-      slug: title,
-      title,
-      body: content,
-      is_locked: false,
-      media: mediaPayload,
-    };
-
-    console.log("Post payload before API call:", postPayload);
+  const handlePostCreate = async () => {
+    if (!content) {
+      toast.error("Content are required!");
+      return;
+    }
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/create`,
-        JSON.stringify(postPayload),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      // Stringify the HTML content if needed
+      const contentToSend = JSON.stringify(content);
 
-      console.log("Post created successfully:", response.data);
+      await createPostMutation.mutateAsync({
+        userId: userID || "",
+        communityId: activeCommunityId || "",
+        title,
+        body: contentToSend,
+        tags: tags.length > 0 ? tags : undefined,
+        file: mediaPreview?.file,
+      });
 
-      // Show toast after successful post creation
       toast.success("Post created successfully!");
 
+      // Reset form
       setIsOpen(false);
-      setTitle("");
       setContent("");
-      mediaRef.current = null;
+      clearMediaPreview();
+      setTags([]);
     } catch (error) {
       console.error("Post creation failed:", error);
-      alert("Failed to create post. Please try again.");
+      toast.error("Failed to create post. Please try again.");
     }
   };
+
+  // Handle cleanup when dialog closes
+  React.useEffect(() => {
+    return () => {
+      if (mediaPreview?.previewUrl) {
+        URL.revokeObjectURL(mediaPreview.previewUrl);
+      }
+    };
+  }, [mediaPreview]);
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Link,
+      TextAlign.configure({
+        types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right"],
+      }),
+    ],
+    content: content,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setContent(html);
+    },
+  });
+
+  // Update editor content when content state changes
+  React.useEffect(() => {
+    if (editor && content !== editor.getHTML()) {
+      editor.commands.setContent(content);
+    }
+  }, [content, editor]);
 
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(newOpen) => {
         if (!newOpen) {
-          mediaRef.current = null;
+          clearMediaPreview();
         }
         setIsOpen(newOpen);
       }}
     >
       <DialogTrigger asChild>
-        <button className="flex items-center gap-2 text-muted">
-          <div className="rounded-md bg-card hover:bg-background text-muted mx-2">
+        <button
+          className={`flex items-center gap-2 text-accent ${
+            !isAdmin ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isAdmin}
+        >
+          <div
+            className={`rounded-md bg-card text-accent mx-2 ${
+              isAdmin ? "hover:bg-background" : ""
+            }`}
+          >
             <Plus />
-          </div>{" "}
-          Create
+          </div>
+          {StringConstants.CREATE}
         </button>
       </DialogTrigger>
 
@@ -199,74 +201,171 @@ export function PostDialog() {
               </Avatar>
               <span className="text-muted">
                 {session?.user?.name || "User Name"}{" "}
-                <span className="text-maccent">posting in</span>{" "}
-                <span className="font-medium">Technology</span>
+                <span className="text-maccent">
+                  {StringConstants.POSTING_IN}
+                </span>{" "}
+                <span className="font-medium">{activeCommunity?.name}</span>
               </span>
             </div>
-            {/* <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-zinc-300 hover:text-zinc-600"
-              onClick={() => setIsOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button> */}
           </div>
 
           {/* Post Inputs */}
-          <Input
+          {/* <Input
             placeholder="Heading"
-            className="p-2 text-lg text-muted placeholder:text-mutedfocus-visible:ring-0 border border-background bg-card"
+            className="p-2 text-lg text-muted placeholder:text-muted focus-visible:ring-0 border border-background bg-card"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-          />
-          <Textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write something..."
-            className="min-h-[200px] bg-card border border-background p-2 text-muted placeholder:text-mutedfocus-visible:ring-0 resize-none"
-          />
+          /> */}
+
+          <div className="space-y-0">
+            <div className="flex items-center gap-2 p-2 bg-card border border-background rounded-t-md">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleBold().run()}
+                disabled={!editor?.can().chain().focus().toggleBold().run()}
+              >
+                <Bold className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
+                disabled={!editor?.can().chain().focus().toggleItalic().run()}
+              >
+                <Italic className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                disabled={
+                  !editor?.can().chain().focus().toggleUnderline().run()
+                }
+              >
+                <UnderlineIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                disabled={
+                  !editor?.can().chain().focus().toggleBulletList().run()
+                }
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("left").run()
+                }
+              >
+                <AlignLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("center").run()
+                }
+              >
+                <AlignCenter className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() =>
+                  editor?.chain().focus().setTextAlign("right").run()
+                }
+              >
+                <AlignRight className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => {
+                  const url = window.prompt("URL");
+                  if (url) {
+                    editor?.chain().focus().setLink({ href: url }).run();
+                  }
+                }}
+                disabled={
+                  !editor?.can().chain().focus().setLink({ href: "" }).run()
+                }
+              >
+                <LinkIcon className="h-4 w-4" />
+              </Button>
+            </div>
+            <div
+              className="relative w-full h-[270px] border border-gray-300 rounded-md"
+              onClick={() => editor?.commands.focus()}
+            >
+              <EditorContent
+                editor={editor}
+                className="w-full h-full p-2 overflow-y-auto bg-white text-black outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Tags Input */}
+          {/* <Input
+            placeholder="Add tags (comma separated)"
+            className="p-2 text-sm text-muted placeholder:text-muted focus-visible:ring-0 border border-background bg-card"
+            onChange={(e) => {
+              const tagList = e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+              setTags(tagList);
+            }}
+          /> */}
 
           {/* File Preview */}
-          {mediaRef.current && (
+          {mediaPreview && (
             <div className="space-y-2">
               <div className="flex items-center justify-between p-2 rounded-lg bg-card">
                 <div className="flex items-center gap-2">
-                  {mediaRef.current.fileType.includes("video") && (
+                  {mediaPreview.type === "video" && (
                     <video
-                      src={mediaRef.current.publicUrl}
+                      src={mediaPreview.previewUrl}
                       className="h-10 w-10 object-cover rounded"
                     />
                   )}
-                  {mediaRef.current.fileType.includes("image") && (
+                  {(mediaPreview.type === "image" ||
+                    mediaPreview.type === "gif") && (
                     <img
-                      src={mediaRef.current.publicUrl}
+                      src={mediaPreview.previewUrl || "/placeholder.svg"}
                       className="h-10 w-10 object-cover rounded"
-                      alt={mediaRef.current.fileName}
-                    />
-                  )}
-                  {mediaRef.current.fileType.includes("gif") && (
-                    <img
-                      src={mediaRef.current.publicUrl}
-                      className="h-10 w-10 object-cover rounded"
-                      alt={mediaRef.current.fileName}
+                      alt={mediaPreview.file.name}
                     />
                   )}
                   <span className="text-sm text-zinc-400">
-                    {mediaRef.current.fileName}
+                    {mediaPreview.file.name}
                   </span>
                 </div>
-                {/* <Button
+                <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 text-zinc-400 hover:text-zinc-200"
-                  onClick={() => {
-                    mediaRef.current = null;
-                    setIsUploading((prev) => !prev); // Force re-render
-                  }}
+                  onClick={clearMediaPreview}
                 >
-                  <X className="h-4 w-4" />
-                </Button> */}
+                  <span>×</span>
+                </Button>
               </div>
             </div>
           )}
@@ -279,16 +378,16 @@ export function PostDialog() {
               ref={imageInputRef}
               className="hidden"
               accept="image/*"
-              onChange={(e) => handleFileUpload(e, "image")}
+              onChange={(e) => handleFileSelection(e, "image")}
             />
             <Button
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-lg bg-purple-200 hover:bg-purple-300 text-purple-700"
-              disabled={isUploading}
+              disabled={createPostMutation.isPending || !!mediaPreview}
               onClick={() => imageInputRef.current?.click()}
             >
-              {isUploading ? "⏳" : <Image />}
+              <Image />
             </Button>
 
             {/* Video Upload */}
@@ -297,16 +396,16 @@ export function PostDialog() {
               ref={videoInputRef}
               className="hidden"
               accept="video/*"
-              onChange={(e) => handleFileUpload(e, "video")}
+              onChange={(e) => handleFileSelection(e, "video")}
             />
             <Button
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-lg bg-green-200 hover:bg-green-300 text-green-700"
-              disabled={isUploading}
+              disabled={createPostMutation.isPending || !!mediaPreview}
               onClick={() => videoInputRef.current?.click()}
             >
-              {isUploading ? "⏳" : <Video />}
+              <Video />
             </Button>
 
             {/* GIF Upload */}
@@ -315,34 +414,44 @@ export function PostDialog() {
               ref={gifInputRef}
               className="hidden"
               accept="image/gif"
-              onChange={(e) => handleFileUpload(e, "gif")}
+              onChange={(e) => handleFileSelection(e, "gif")}
             />
-            <Button
+            {/* <Button
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-lg bg-pink-200 hover:bg-pink-300 text-pink-700"
-              disabled={isUploading}
+              disabled={createPostMutation.isPending || !!mediaPreview}
               onClick={() => gifInputRef.current?.click()}
             >
-              {isUploading ? "⏳" : <Gift />}
-            </Button>
+              <Gift />
+            </Button> */}
 
             {/* Link Upload */}
-            <input
-              type="file"
+            {/* <input
+              type="text"
               ref={linkInputRef}
               className="hidden"
-              onChange={(e) => handleFileUpload(e, "link")}
+              onChange={(e) => {
+                // This would need to be implemented differently for links
+                // as they're not files
+              }}
             />
             <Button
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-lg bg-blue-200 hover:bg-blue-300 text-blue-700"
-              disabled={isUploading}
-              onClick={() => linkInputRef.current?.click()}
+              disabled={createPostMutation.isPending || !!mediaPreview}
+              onClick={() => {
+                const link = prompt("Enter link URL:");
+                if (link) {
+                  // Handle link differently - perhaps store it in state
+                  // or add to the content
+                  setContent(prev => prev + "\n\n" + link);
+                }
+              }}
             >
-              {isUploading ? "⏳" : <Link />}
-            </Button>
+              <Link />
+            </Button> */}
           </div>
 
           {/* Submit Button */}
@@ -350,8 +459,9 @@ export function PostDialog() {
             variant="default"
             className="w-full text-white"
             onClick={handlePostCreate}
+            disabled={createPostMutation.isPending}
           >
-            Post
+            {createPostMutation.isPending ? "Posting..." : "Post"}
           </Button>
         </div>
       </DialogContent>

@@ -1,16 +1,62 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useState, Suspense } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
+import { useSearchParams } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { RightSection } from "@/components/signIn/RightSection";
+import { UserHeroSection } from "@/components/signIn/UserHeroSection";
+import { UserMobileHeroSection } from "@/components/signIn/UserMobileHeroSection";
+import { CreatorMobileHeroSection1 } from "@/components/signIn/CreatorMobileHeroSection1";
+import { CreatorHeroSection1 } from "@/components/signIn/CreatorHeroSection1";
+import { CreatorHeroSection2 } from "@/components/signIn/CreatorHeroSection2";
+import Loader from "@/components/Loader";
+
+function SignInContent() {
+  const searchParams = useSearchParams();
+  const { data: session } = useSession();
+  const callbackUrl = searchParams.get("callbackUrl");
+
+  const getHeroVersion = () => {
+    if (!callbackUrl) return 2;
+    try {
+      const url = new URL(callbackUrl);
+      return url.searchParams.get("hero") === "2" ? 2 : 1;
+    } catch {
+      return 2;
+    }
+  };
+
+  return (
+    <div className="flex md:flex-row h-screen md:overflow-hidden">
+      <div className="hidden md:block w-1/2">
+        {getHeroVersion() === 1 ? (
+          session ? (
+            <CreatorHeroSection2 />
+          ) : (
+            <CreatorHeroSection1 />
+          )
+        ) : (
+          <UserHeroSection />
+        )}
+      </div>
+      <div className="block w-full md:hidden">
+        {getHeroVersion() === 1 ? (
+          <CreatorMobileHeroSection1 />
+        ) : (
+          <UserMobileHeroSection />
+        )}
+      </div>
+      <div className="hidden md:block md:w-1/2">
+        <RightSection />
+      </div>
+    </div>
+  );
+}
 
 export default function SignIn() {
   const router = useRouter();
@@ -28,29 +74,29 @@ export default function SignIn() {
     const password = formData.get("password") as string;
 
     try {
-      // const result = await signIn("credentials", {
-      //   email,
-      //   password,
-      //   redirect: false,
-      // });
-      const result = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,{
-        email,password
-      })
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/login`,
+        {
+          email,
+          password,
+        }
+      );
 
-      console.log("@result",result)
-      dispatch(setUser({
-        id: result.data.data.user.id,
-        name: result.data.data.user.name || "",
-        email: result.data.data.user.email,
-        image: result.data.data.user.avatar,
-        accessToken: result.data.data.session
-      }));
-      console.log("@sininreust",result)
+      dispatch(
+        setUser({
+          _id: result.data.data.user.id,
+          name: result.data.data.user.name || "",
+          email: result.data.data.user.email,
+          image: result.data.data.user.avatar,
+          accessToken: result.data.data.session,
+        })
+      );
+
       if (result?.data?.e === "e") {
         setError(result.data.data);
       } else {
         toast.success("Signed in successfully!");
-        router.push("/");
+        router.push("/explore");
         router.refresh();
       }
     } catch (error) {
@@ -62,93 +108,8 @@ export default function SignIn() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-lg bg-zinc-800">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-zinc-200">Welcome back</h1>
-          <p className="text-muted-foreground">Sign in to your account</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4 text-zinc-300">
-          <div className="space-y-2 ">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Enter your email"
-              required
-              disabled={isLoading}
-              className="border-gray-700"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="Enter your password"
-              required
-              disabled={isLoading}
-              className="border-gray-700"
-            />
-          </div>
-
-          {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
-          )}
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign in"}
-          </Button>
-        </form>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border"></div>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
-
-        <Button
-          variant="outline"
-          className="w-full bg-slate-200"
-          onClick={() => signIn("google", { callbackUrl: "/" })}
-          disabled={isLoading}
-        >
-          <svg
-            className="mr-2 h-4 w-4"
-            aria-hidden="true"
-            focusable="false"
-            data-prefix="fab"
-            data-icon="google"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 488 512"
-          >
-            <path
-              fill="currentColor"
-              d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-            ></path>
-          </svg>
-          Continue with Google
-        </Button>
-
-        <p className="text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/api/auth/signup"
-            className="text-gradient hover:underline"
-          >
-            Sign up
-          </Link>
-        </p>
-      </div>
-    </div>
+    <Suspense fallback={<Loader />}>
+      <SignInContent />
+    </Suspense>
   );
 }

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronUp, Pin } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -20,6 +21,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { getSelectedTopic } from "@/redux/postSlice";
 import { Button } from "@/components/ui/button";
+import { setActiveCommunity } from "@/redux/channelSlice";
+import { StringConstants } from "@/components/common/CommonText";
+import { setCommunityData } from "@/redux/communitySlice";
 // Optionally, if you're updating selected topics in the topic slice
 // import { setSelectedTopics } from "@/redux/topicSlice";
 
@@ -28,8 +32,16 @@ type SelectedItem = {
   id: number | string;
 };
 
+interface Community {
+  _id: string;
+  name: string;
+  image:string,
+  background_image:string
+}
+
 export function LeftSidebar() {
-  const userId = useSelector((state: RootState) => state.user.user?.id);
+  const COMMUNITY_PROFILE_PATH= '/community/profile'
+  const userId = useSelector((state: RootState) => state.user.user?._id);
   // Extract session ID
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const [openSections, setOpenSections] = React.useState({
@@ -106,30 +118,80 @@ export function LeftSidebar() {
     return selectedItem?.section === section && selectedItem?.id === id;
   };
 
+  // useEffect(() => {
+  //   async function fetchCommunities() {
+  //     try {
+  //       const res = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+  //         {
+  //           userId: userId,
+  //         }
+  //       );
+
+  //       setMyCommunities(res.data.data);
+  //       dispatch(setUserFollowedCommunities(res.data.data));
+  //       console.log("Comm ======>>>>", res.data.data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       setMyCommunities([]);
+  //     }
+  //   }
+  //   fetchCommunities();
+  // }, [userId]); // Ensure this runs when `userId` changes
+
+  const communities = useSelector((state: RootState) => state?.user?.userFollowedCommunities|| []);
+  
   useEffect(() => {
     async function fetchCommunities() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/community/user",
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
           {
-            // userId: "678cf08b3755e3d81f93d5ad"
             userId: userId,
           }
         );
+
         setMyCommunities(res.data.data);
-        console.log(res.data.data);
+        console.log("Comm ======>>>>", res.data.data);
       } catch (error) {
         console.error(error);
         setMyCommunities([]);
       }
     }
-    fetchCommunities();
-  }, []);
+    // fetchCommunities();
+  }, []); // Ensure this runs when `userId` changes
 
-  const handleCommunityClick = (id: string) => {
-    router.push(`/community/${id}`);
+  // ✅ Set active community AFTER myCommunities is updated
+  useEffect(() => {
+    if (myCommunities && myCommunities.length > 0) {
+      dispatch(
+        setActiveCommunity({
+          id: myCommunities[0]?._id, // Now it's properly set
+          name: myCommunities[0]?.name,
+          image: myCommunities[0]?.image,
+          background_image: myCommunities[0]?.background_image
+        })
+      );
+    }
+  }, [myCommunities, dispatch]); // Runs when `myCommunities` updates
+
+  const handleCommunityClick = (community: Community) => {
+    dispatch(
+      setActiveCommunity({
+        id: community._id, // Now it's properly set
+        name: community.name,
+        image: community.image,
+        background_image: community.background_image
+      })
+    );
+    dispatch(
+      setCommunityData({
+        communityId: community._id,
+        userId: userId,
+      })
+    );
+    router.push(`/community/${community._id}/profile`);
   };
-
   function handleSelectChange(communityId: string) {
     setSelectedCommunities((prev) =>
       prev.includes(communityId)
@@ -143,12 +205,12 @@ export function LeftSidebar() {
     async function fetchTopics() {
       try {
         const res = await axios.post(
-          "http://localhost:8000/v1/category/interest",
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/interest`,
           { userId: userId }
         );
 
         setMyTopics(res.data.data);
-        console.log("Topics:", res.data.data);
+        console.log("Topics:----->>>>", res.data.data);
       } catch (error) {
         console.error(error);
         setMyTopics([]);
@@ -157,6 +219,19 @@ export function LeftSidebar() {
 
     fetchTopics();
   }, []);
+
+  const toggleBodyScroll = (lockScroll: boolean) => {
+    if (lockScroll) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  };
+
+  useEffect(() => {
+    toggleBodyScroll(showTopicsModal);
+    return () => toggleBodyScroll(false);
+  }, [showTopicsModal]);
 
   const handleTopicSelectChange = (topicId: string) => {
     setSelectedTopics((prev) =>
@@ -212,7 +287,7 @@ export function LeftSidebar() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/v1/feed/custom/create",
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/feed/custom/create`,
         {
           userId: userId,
           communityIds: selectedCommunities,
@@ -235,20 +310,22 @@ export function LeftSidebar() {
   }
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-80  pt-20 pb-3 px-4 space-y-3">
-      <div className="bg-card rounded-xl p-3 space-y-1">
-        <div>
+    <aside className="left-0 h-screen w-80 pl-5 pr-2 py-4 pb-3 space-y-3 ">
+      {/* <div className="bg-card rounded-xl p-3 space-y-1"> */}
+
+      {/* Home Feed */}
+      {/* <div>
           <button
             onClick={() => handleItemClick("home", "feed")}
-            className={`w-full flex items-center text-sm font-medium border-b border-zinc-300 py-2 bg ${
-              isItemSelected("home", "feed") ? "text-purple-500" : ""
-            }`}
+            className={`w-full flex items-center text-sm font-medium border-b border-zinc-300 py-2 bg ${isItemSelected("home", "feed") ? "text-purple-500" : ""
+              }`}
           >
             Home Feed
           </button>
-        </div>
+        </div> */}
 
-        <Collapsible
+      {/* Custom Feed */}
+      {/* <Collapsible
           open={openSections.customFeed}
           onOpenChange={() => toggleSection("customFeed")}
           className="space-y-2"
@@ -287,27 +364,29 @@ export function LeftSidebar() {
                   </button>
                 </div>
                 {feed.communityIds.map((cid) => {
-                  const community = myCommunities.find((c: any) => c._id === cid);
+                  const community = myCommunities.find(
+                    (c: any) => c._id === cid
+                  );
                   return (
                     <div
                       key={cid}
                       className=" mt-1 border-l border-zinc-700 pl-4 text-sm"
                     >
-                      <div className="font-semibold ">{community?.name}</div>
-                      {/* {community?.description && (
+                      <div className="font-semibold ">{community?.name}</div> */}
+      {/* {community?.description && (
                         <div className="text-zinc-400">{community.description}</div>
                       )}
                       {community?.membersCount && (
                         <div className="text-zinc-500">Members: {community.membersCount}</div>
                       )} */}
-                    </div>
+      {/* </div>
                   );
                 })}
               </div>
             ))}
-          </CollapsibleContent>
+          </CollapsibleContent> */}
 
-          {showSelectModal && (
+      {/* {showSelectModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-card/50">
               <div className="bg-card p-4 rounded space-y-2 w-[300px]">
                 <div className="flex justify-between items-center">
@@ -327,7 +406,7 @@ export function LeftSidebar() {
                   placeholder="Feed Name"
                 />
                 <p className="">Select Communities:</p>
-                {myCommunities.map((comm) => (
+                {myCommunities.map((comm: any) => (
                   <label key={comm._id} className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -346,11 +425,11 @@ export function LeftSidebar() {
               </div>
             </div>
           )}
-        </Collapsible>
+        </Collapsible> */}
 
-        {/* Followed Topics */}
+      {/* Followed Topics */}
 
-        <Collapsible
+      {/* <Collapsible
           open={openSections.customTopics}
           onOpenChange={() => toggleSection("customTopics")}
           className="space-y-2 border-t border-zinc-300 py-2"
@@ -388,7 +467,7 @@ export function LeftSidebar() {
                 </div>
                 {topicFeed.topicIds.map((tid) => {
                   const topic = myTopics?.user_interests?.find(
-                    (t) => t._id === tid
+                    (t: any) => t._id === tid
                   );
                   return (
                     <div
@@ -403,7 +482,9 @@ export function LeftSidebar() {
             ))}
           </CollapsibleContent>
           {showTopicsModal && (
-            <div className="fixed inset-0 flex items-center justify-center bg-background/50">
+               <div className={ cn(
+                  "fixed  inset-0 z-50 flex items-center justify-center bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 m-0 !important size-full overflow-y-hidden",
+                )}>  
               <div className="bg-card p-4 rounded space-y-2 w-[300px]">
                 <div className="flex justify-between items-center">
                   <h2 className="">Create Custom Topic Feed</h2>
@@ -422,7 +503,7 @@ export function LeftSidebar() {
                   placeholder="Topic Feed Name"
                 />
                 <p className="">Select Topics:</p>
-                {myTopics?.user_interests?.map((topic) => (
+                {myTopics?.user_interests?.map((topic: any) => (
                   <label key={topic._id} className="flex items-center gap-2 ">
                     <input
                       type="checkbox"
@@ -441,9 +522,9 @@ export function LeftSidebar() {
               </div>
             </div>
           )}
-        </Collapsible>
+        </Collapsible> */}
 
-        {/* {myTopics?.user_interests && (
+      {/* {myTopics?.user_interests && (
           <div className="mt-4 p-4 bg-zinc-800 rounded-lg text-zinc-300 shadow-lg">
 
             {myTopics.user_interests.map((topic) => (
@@ -456,8 +537,9 @@ export function LeftSidebar() {
             ))}
           </div>
         )} */}
-      </div>
+      {/* </div> */}
 
+      {/* My Communities */}
       <div className="bg-card rounded-xl p-4 space-y-2">
         <Collapsible
           open={openSections.communities}
@@ -465,27 +547,29 @@ export function LeftSidebar() {
           className="space-y-2  py-2"
         >
           <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium border-b border-zinc-300 py-2 ">
-            My Communities
+            {StringConstants.PAGE_FOLLOWED}
             {openSections.communities ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
             )}
           </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-2">
-            {myCommunities?.map((community: any) => (
-              <button
-                key={community?._id}
-                onClick={() => handleCommunityClick("678ce9330d10751b4a0dd2cc")}
-                className="w-full flex items-center gap-2 rounded-lg p-2 text-sm  hover:bg-background"
-              >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={community?.avatarURL} />
-                  <AvatarFallback>{community?.name[0]}</AvatarFallback>
-                </Avatar>
-                <span>{community?.name}</span>
-              </button>
-            ))}
+          <CollapsibleContent className="space-y-2 max-h-[365px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
+            {communities
+              ?.filter((community: any) => community !== null)
+              .map((community: any) => (
+                <button
+                  key={community?._id}
+                  onClick={() => handleCommunityClick(community)}
+                  className="w-full flex items-center gap-2 rounded-lg p-2 text-sm hover:bg-background text-start"
+                >
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={community?.image} />
+                    <AvatarFallback>{community?.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <span className="flex-1">{community?.name}</span>
+                </button>
+              ))}
           </CollapsibleContent>
         </Collapsible>
       </div>

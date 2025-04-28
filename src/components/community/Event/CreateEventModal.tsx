@@ -242,7 +242,6 @@ export function CreateEventModal({
           {/* Footer */}
           <div className="flex justify-end gap-2 px-4 py-2">
             <Button
-              type="button"
               onClick={onClose}
               variant="outline"
               className="bg-transparent hover:bg-background text-accent border-zinc-700 px-8"

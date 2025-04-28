@@ -4,7 +4,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <div className="lg:py-16 px-4 lg:px-0">
+    <div className="rounded-t-xl bg-card flex-1 ml-2 md:mt-20 md:ml-6">
       <CommunityChat />
     </div>
   );

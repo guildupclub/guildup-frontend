@@ -12,7 +12,7 @@ const handler = NextAuth({
 
       if (user) {
         const userExists = await client
-          .db("your-database-name") 
+          .db("Cluster0") 
           .collection("users")
           .findOne({ email: user.email });
 
@@ -52,12 +52,12 @@ const handler = NextAuth({
   ],
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup", // Customize the sign-up page for new users
   },
   session: {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: true
 });
 
 export { handler as GET, handler as POST };

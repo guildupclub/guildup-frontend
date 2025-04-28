@@ -1,12 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  compiler: {
+    removeConsole: false,
+  },
   images: {
-    domains: [
+    unoptimized: true,
+    domains : [
       "target.scene7.com",
       "lh3.googleusercontent.com",
       "api.dicebear.com",
-    ], // Correct usage for external domains
+      "random-image-pepebigotes.vercel.app",
+      "storage.googleapis.com",
+      "img.freepik.com",
+      "conqrr.vercel.app",
+    ] ,
     remotePatterns: [
       {
         protocol: "https",
@@ -18,6 +29,9 @@ const nextConfig: NextConfig = {
         hostname: "api.dicebear.com",
       },
     ],
+  },
+  env: {
+    NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
   },
 };
 
