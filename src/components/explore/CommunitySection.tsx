@@ -33,11 +33,13 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
-  const [clickLoading, setClickLoading] = useState(false);
 
   useEffect(() => {
+    // Clear communities immediately when category changes
+    setCommunities([]);
+    setLoading(true);
+    
     const fetchCommunities = async () => {
-      setLoading(true);
       try {
         let response;
         let limits = 100;
@@ -75,16 +77,16 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
   }, [activeCategory]);
 
   const handleClickCommunity = useCallback(
-    (communityWrapper: { community: Community }) => {
-      const community = communityWrapper.community;
-
+    (community: Community) => {
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
         return;
       }
 
-      setClickLoading(true);
-
+      // Navigate immediately first
+      router.push(`/community/${community._id}/profile`);
+      
+      // Then update Redux state
       dispatch(
         setCommunityData({
           communityId: community._id,
@@ -96,27 +98,32 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
         setActiveCommunity({
           id: community._id,
           name: community.name,
+          image: "",
+          background_image: "",
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
-
-      router.push(`/community/${community._id}/profile`);
     },
     [dispatch, router]
   );
 
   return (
-    <div className="bg-background min-h-screen lg:py-4">
+    <div className="bg-white min-h-screen">
       {loading ? (
-        <p className="text-center mt-4">Loading...</p>
+        <div className="flex justify-center items-center py-8">
+          <Loader />
+        </div>
       ) : (
-        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 pb-8 z-0 lg:pb-0">
+        <div id="card-container-top" className="grid gap-3 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-6 z-0 lg:pb-0 pt-4 sm:pt-10">
           {communities.length > 0 ? (
-            communities.map((communityWrapper) => (
-              <MemoizedCommunityCard
-                key={communityWrapper._id}
-                community={communityWrapper}
-                onClick={() => handleClickCommunity(communityWrapper)}
-              />
+            communities.map((community, index) => (
+              <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
+                <MemoizedCommunityCard
+                  community={community}
+                  onClick={() => handleClickCommunity(community)}
+                />
+              </div>
             ))
           ) : (
             <p className="text-center col-span-3 py-8 text-muted-foreground">

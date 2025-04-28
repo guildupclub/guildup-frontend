@@ -104,10 +104,10 @@ export function EditCommunityModal({
 
   // Handle image selection
   const handleImageSelect = (file: File, type: "profile" | "background") => {
-    // Check file size (5MB limit)
+    // Check file size (5MB = 5 * 1024 * 1024 bytes)
     const maxSize = 5 * 1024 * 1024; // 5MB in bytes
     if (file.size > maxSize) {
-      toast.error(`File size exceeds 5MB limit. Please choose a smaller file.`);
+      toast.error(`File size exceeds 5MB limit for ${type === "profile" ? "profile" : "background"} image`);
       return;
     }
 
@@ -175,6 +175,25 @@ export function EditCommunityModal({
   // Handle form submission
   const handleSubmit = async () => {
     try {
+      // Validate mandatory fields
+      const mandatoryFields = {
+        name: "Page Name",
+        description: "Page Description",
+        tags: "Tags"
+      };
+
+      const missingFields = Object.entries(mandatoryFields).filter(([key]) => {
+        if (key === 'tags') {
+          return !formData.tags || formData.tags.length === 0;
+        }
+        return !formData[key as keyof typeof formData];
+      });
+
+      if (missingFields.length > 0) {
+        toast.error(`Please fill in all required fields: ${missingFields.map(([_, label]) => label).join(', ')}`);
+        return;
+      }
+
       setIsLoading(true);
 
       // Create FormData object for multipart/form-data submission

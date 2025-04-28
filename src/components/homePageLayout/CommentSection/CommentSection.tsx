@@ -271,6 +271,7 @@ import { Reply, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { stat } from "fs";
 
 interface Comment {
   _id: string;
@@ -307,6 +308,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     new Set()
   );
   const userId = useSelector((state: RootState) => state.user.user?._id);
+  const user = useSelector((state: RootState) => state.user.user);
   const queryClient = useQueryClient();
   const [repliesData, setRepliesData] = useState<{
     [commentId: string]: Comment[];
@@ -448,8 +450,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const renderReplyInput = (commentId: string) => (
     <div className="flex gap-2 mt-4 ml-8">
       <Avatar className="h-6 w-6">
-        <AvatarImage src="/placeholder.svg" />
-        <AvatarFallback>U</AvatarFallback>
+        <AvatarImage src={user?.image} />
+        <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex-1 relative">
         <input
@@ -477,6 +479,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     </div>
   );
 
+  
   const renderComments = (commentList: Comment[], level = 0) => {
     return commentList.map((comment, index) => {
       const replies = repliesData[comment._id] || [];
@@ -489,15 +492,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           <div className="flex items-center gap-3">
             <Avatar className="h-7 w-7">
               <AvatarImage
-                src={comment?.postedBy?.avatar || "/placeholder.svg"}
+                src={comment?.postedBy?.image || "/placeholder.svg"}
               />
-              <AvatarFallback>
-                {comment?.postedBy?.user_name?.[0]}
+              <AvatarFallback className="border">
+                {comment?.postedBy?.name?.[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <strong className="text-accent">
-                {comment?.postedBy?.user_name}
+              <strong className="text-muted textsm">
+                {comment?.postedBy?.name}
               </strong>
               <span className="text-xs text-accent">
                 {new Date(comment?.commentedAt).toLocaleDateString()}

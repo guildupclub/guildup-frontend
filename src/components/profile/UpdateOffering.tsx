@@ -44,7 +44,9 @@ const EditOfferingModal = ({
     //   return;
     // }
     if (formData.discounted_price > formData.price.amount) {
-      toast.error("Discounted price cannot be greater than the original price.");
+      toast.error(
+        "Discounted price cannot be greater than the original price."
+      );
       return;
     }
     if (formData.discounted_price < 0) {
@@ -62,9 +64,12 @@ const EditOfferingModal = ({
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/edit/${offering._id}`,
         formData
       );
-
-      if (response.status === 200) {
-        // alert("Offering updated successfully");
+      if (response.data.r === "s") {
+        toast.success("Offering updated successfully");
+        onUpdate();
+        onClose();
+      } else if (response.data.r === "e") {
+        toast.error("Offering updated successfully");
         onUpdate();
         onClose();
       }
@@ -116,24 +121,22 @@ const EditOfferingModal = ({
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="mentorship">Mentorship</SelectItem>
-                <SelectItem value="course">Course</SelectItem>
                 <SelectItem value="consultation">Consultation</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-              <label htmlFor="duration">Duration (mins)</label>
-              <Input
-                id="duration"
-                type="number"
-                value={formData.duration}
-                onChange={(e) =>
-                  setFormData({ ...formData, duration: Number(e.target.value) })
-                }
-                required
-              />
-            </div>
+            <label htmlFor="duration">Duration (mins)</label>
+            <Input
+              id="duration"
+              type="number"
+              value={formData.duration}
+              onChange={(e) =>
+                setFormData({ ...formData, duration: Number(e.target.value) })
+              }
+              required
+            />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label htmlFor="price">Price ({StringConstants.INR})</label>
@@ -174,7 +177,6 @@ const EditOfferingModal = ({
                 required
               />
             </div>
-          
           </div>
           {/* <div className="space-y-2">
             <label htmlFor="tags">Tags (comma-separated)</label>

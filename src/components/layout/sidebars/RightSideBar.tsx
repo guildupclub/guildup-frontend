@@ -18,6 +18,7 @@ import type { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 import { toast } from "sonner";
 import DOMPurify from "dompurify";
+import { useRouter } from "next/navigation";
 interface TrendingPost {
   _id: string;
   user_id: {
@@ -39,6 +40,7 @@ interface TrendingPost {
 }
 
 export function RightSidebar() {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [trendingPosts, setTrendingPosts] = useState<TrendingPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -104,7 +106,9 @@ export function RightSidebar() {
       setIsDialogOpen(true);
     }
   };
-
+  const handlePostClick = (postId: string) => {
+    router.push(`/post/${postId}`);
+  };
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
       {!isCreator && (
@@ -160,6 +164,7 @@ export function RightSidebar() {
             trendingPosts.map((post) => (
               <div
                 key={post._id}
+                onClick={() => handlePostClick(post?._id)}
                 className="px-4 py-2 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
               >
                 <div className="space-y-2">
