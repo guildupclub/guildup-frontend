@@ -37,6 +37,7 @@ import CreatorForm from "../form/CreatorForm";
 import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 // interface Community {
 //   _id: string;
@@ -55,7 +56,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/community/feed";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
-  const PROFILE_PATH = '/profile'
+  const PROFILE_PATH = "/profile";
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -83,6 +84,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
   const [searchType, setSearchType] = useState("post");
   const userId = user?._id;
+  // Removed heroVisible as it is not used
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
   useEffect(() => {
     async function fetchCommunities() {
       try {
@@ -100,6 +104,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
     // fetchCommunities();
   }, []);
+
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
   );
@@ -161,7 +166,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         image: "",
         background_image: "",
         user_isBankDetailsAdded: false,
-        user_iscalendarConnected: false
+        user_iscalendarConnected: false,
       })
     );
 
@@ -191,9 +196,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       toast("Sign in required", {
         action: {
           label: "Sign In",
-          onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}?hero=1`
-          }),
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
         },
       });
     } else {
@@ -221,7 +227,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 bg-card pt-2 lg:px-20 w-full flex",
+          "fixed top-0 z-50 bg-white pt-2 lg:px-20 w-full flex border-b border-gray-100",
           props.className
         )}
         {...props}
@@ -229,16 +235,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         <div className="container flex h-14 items-center px-4 ">
           <div className="flex gap-6 items-center">
             <button
-              className="md:hidden flex items-center justify-center mr-2"
+              className="md:hidden flex items-center justify-center"
               onClick={() => setIsSidebarOpen((prev) => !prev)}
             >
-              <FaBars className="h-6 w-6" />
+              <FaBars className="h-5 w-5 text-gray-700" />
             </button>
-            <Link href="/" className="flex items-center space-x-2 mr-6">
+            <Link href="/" className="flex items-center">
               <Image
                 src={Guildup_logo_mobile || "/placeholder.svg"}
                 alt="GuildUp logo"
-                className="h-8 w-auto md:hidden"
+                className="h-6 w-auto md:hidden"
               />
               <Image
                 src={guildup_logo || "/placeholder.svg"}
@@ -251,7 +257,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           <div className="flex grow items-center justify-between">
             <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
               <AnimatePresence>
-                {!heroVisible && (
+                {/* {!heroVisible && ( */}
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -280,17 +286,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </button>
                     </div>
                   </motion.div>
-                )}
+                {/* )} */}
               </AnimatePresence>
             </div>
 
-            <div className="hidden md:flex space-x-8 items-center justify-center">
+            <div className="hidden md:flex space-x-1 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
-                <ul className="flex items-center space-x-2 text-muted">
-                  <li className="w-18 px-3 rounded-xl">
+                <ul className="flex items-center space-x-2 text-gray-600">
+                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
-                        className={`h-6 w-6 ${
+                        className={`h-5 w-5 ${
                           isActive("/") ? "text-primary" : ""
                         }`}
                       />
@@ -307,7 +313,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <FileText
-                        className={`h-6 w-6 ${
+                        className={`h-5 w-5 ${
                           isActive("/feeds") ? "text-primary" : ""
                         }`}
                       />
@@ -320,17 +326,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  <li className="w-18 px-3 rounded-xl">
+                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link
                       href={
                         activeCommunityId
                           ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
                           : `${COMMUNITY_FEED_PATH}`
                       }
-                      className="flex flex-col items-center justify-center"
+                      className="flex flex-col items-center"
                     >
                       <Users
-                        className={`w-6 h-6 ${
+                        className={`w-5 h-5 ${
                           isActive("/community") ? "text-primary" : ""
                         }`}
                       />
@@ -348,7 +354,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 </ul>
               </div>
 
-              <div className="hidden md:block">
+              <div className="hidden md:block ml-4">
                 {user?._id ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -369,31 +375,31 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                      className="bg-background/95 backdrop-blur text-zinc-200 border-gray-700"
+                      className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
                       align="end"
                     >
                       <DropdownMenuItem
                         asChild
-                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                       >
                         <Link href="/profile">Profile</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         asChild
-                        className="hover:bg-primary-gradient border-b border-zinc-300"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                       >
                         <Link href="/booking">Bookings</Link>
                       </DropdownMenuItem>
                       {isUser && (
                         <DropdownMenuItem
                           asChild
-                          className="hover:bg-primary-gradient border-b border-zinc-300"
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
                           <Link href="/payments">Payments</Link>
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
-                        className="hover:bg-primary-gradient"
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         onClick={handleSignOut}
                       >
                         {StringConstants.SIGN_OUT}
@@ -418,7 +424,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </nav>
 
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t md:hidden">
+      <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
           <Link
             href="/"
@@ -442,7 +448,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           >
             <div className="w-6 h-6 flex items-center justify-center">
               <FileText
-                className={`w-5 h-5 ${isActive("/feeds") ? "text-primary" : ""}`}
+                className={`w-5 h-5 ${
+                  isActive("/feeds") ? "text-primary" : ""
+                }`}
               />
             </div>
             <span
@@ -474,7 +482,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 isActive("/community") ? "text-primary" : ""
               }`}
             >
-              {StringConstants.EXPERTS}
+              {StringConstants.MY_SPACE}
             </span>
           </Link>
 
@@ -484,7 +492,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <button className="flex flex-col items-center justify-center gap-1">
                   <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
                     <Avatar className="h-4 w-4">
-                      <AvatarImage src={session?.user?.image || ""} alt="User" />
+                      <AvatarImage
+                        src={session?.user?.image || ""}
+                        alt="User"
+                      />
                       <AvatarFallback>
                         {session?.user?.name?.charAt(0)}
                       </AvatarFallback>
@@ -499,14 +510,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 side="top"
                 sideOffset={40}
               >
-                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
                   <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
                   <Link href="/booking">Bookings</Link>
                 </DropdownMenuItem>
                 {isUser && (
-                  <DropdownMenuItem asChild className="hover:bg-primary-gradient border-b border-zinc-300">
+                  <DropdownMenuItem
+                    asChild
+                    className="hover:bg-primary-gradient border-b border-zinc-300"
+                  >
                     <Link href="/payments">Payments</Link>
                   </DropdownMenuItem>
                 )}
@@ -572,9 +592,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <Plus className="h-6 w-6" />
                 </Button>
               </DialogTrigger>
-              <CreatorForm
-                onClose={() => setIsCreatorFormOpen(false)}
-              />
+              <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
             </Dialog>
           </div>
           <div className="space-y-3 pb-16">
@@ -626,7 +644,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 );
               })
             ) : (
-              <div className=""> 
+              <div className="">
                 {StringConstants.NO_COMMUNITIES_AVAILABLE}
                 {!session && (
                   <p className="mt-2">Sign in to create or join communities</p>

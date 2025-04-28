@@ -6,21 +6,41 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
-interface BankDetailsProps{
-  onClose: ()=> void;
+interface BankDetailsProps {
+  onClose: () => void;
 }
+
+const THROTTLE_DELAY = 5000; // 5 seconds
+
+// Throttle function to prevent multiple clicks within a specified delay
+const useThrottle = (callback: Function, delay: number) => {
+  const lastRan = React.useRef(0);
+
+  return React.useCallback(
+    (...args: any[]) => {
+      const now = Date.now();
+      if (now - lastRan.current >= delay) {
+        callback(...args);
+        lastRan.current = now;
+      }
+    },
+    [callback, delay]
+  );
+};
+
 const BankDetails = ({ onClose }: BankDetailsProps) => {
-  const {user}= useSelector((state: RootState)=> state.user);
-  const userId= user?._id;
-  const user_isBankDetailsAdded= user?.isBankDetailsAdded;
+  const { user } = useSelector((state: RootState) => state.user);
+  const userId = user?._id;
+  const user_isBankDetailsAdded = user?.isBankDetailsAdded;
   const [bankDetails, setBankDetails] = React.useState({
     benificiaryName: "",
     accountNumber: "",
@@ -32,7 +52,20 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     ifsc: "",
   });
   const [isChanged, setIsChanged] = React.useState(false);
-  
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [lastClickTime, setLastClickTime] = React.useState(0);
+  const [isThrottled, setIsThrottled] = React.useState(false);
+  const throttleTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  // Clear throttle timer on component unmount
+  React.useEffect(() => {
+    return () => {
+      if (throttleTimerRef.current) {
+        clearTimeout(throttleTimerRef.current);
+      }
+    };
+  }, []);
+
   React.useEffect(() => {
     fetchBankDetails();
   }, [userId]);
@@ -41,7 +74,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details?user_id=${userId}`
       );
-      if(response.data.r === "s") {
+      if (response.data.r === "s") {
         setInitialBankDetails(response.data.data);
         setBankDetails(response.data.data);
         setIsChanged(false);
@@ -56,18 +89,24 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     setBankDetails((prevDetails) => {
       const updatedDetails = {
         ...prevDetails,
-        [name]: value
+        [name]: value,
       };
-      setIsChanged(JSON.stringify(updatedDetails) !== JSON.stringify(initialBankDetails));
+      setIsChanged(
+        JSON.stringify(updatedDetails) !== JSON.stringify(initialBankDetails)
+      );
       return updatedDetails;
     });
   };
 
-  const handleSave = async () => {
+  const handleSaveImpl = async () => {
+    // this will prevent multiple submissions within 2 seconds
+    // @tanishq can you if we need to change this to 1 second or 3 seconds
+    if (isSubmitting) return;
+
     try {
+      setIsSubmitting(true);
       let response;
-      // Check if bank details are already added
-      if(user_isBankDetailsAdded){
+      if (user_isBankDetailsAdded) {
         response = await axios.patch(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
           {
@@ -75,8 +114,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
             bank_details: bankDetails,
           }
         );
-        console.log("this is handle save response ",response.data);
-      }else{
+      } else {
         response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
           {
@@ -84,10 +122,10 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
             bank_details: bankDetails,
           }
         );
-        console.log("this is handle save response ",response.data);
       }
-      fetchBankDetails();
+
       if (response.data.r === "s") {
+        await fetchBankDetails();
         onClose();
         toast.success(response.data.data);
         return response.data.data;
@@ -108,37 +146,91 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     } catch (error: any) {
       toast.error(error.message || "Failed to update bank details.");
       console.error("Error updating bank details:", error);
-      throw error;
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Throttle the save function to prevent multiple calls within 2 seconds
+  const handleSave = useThrottle(handleSaveImpl, THROTTLE_DELAY);
+
+  // Alternative throttle implementation without custom hook
+  const handleSaveWithThrottle = () => {
+    const now = Date.now();
+    if (now - lastClickTime < THROTTLE_DELAY) {
+      // If less than 2 seconds have passed since the last click, ignore this click
+      return;
+    }
+
+    // Update the last click time
+    setLastClickTime(now);
+    setIsThrottled(true);
+
+    // Execute the save function
+    handleSaveImpl();
+
+    // Set a timer to remove the throttle state after the delay
+    throttleTimerRef.current = setTimeout(() => {
+      setIsThrottled(false);
+    }, THROTTLE_DELAY);
+  };
+
+  // Determine if button should be disabled
+  const isButtonDisabled = !isChanged || isSubmitting || isThrottled;
+
+  // Determine what to display on the button
+  const getButtonContent = () => {
+    if (isSubmitting) {
+      return (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Updating...
+        </>
+      );
+    } else if (isThrottled) {
+      return (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+        </>
+      );
+    }
+    return "Update";
   };
 
   return (
     <DialogContent className="bg-white p-6 rounded-lg w-full max-w-md">
       <DialogHeader>
-        <DialogTitle className="text-2xl font-semibold text-[#19191A] leading-7 front-[Source Sans Pro]">Your Bank Details</DialogTitle>
+        <DialogTitle className="text-2xl font-semibold text-[#19191A] leading-7 front-[Source Sans Pro]">
+          Your Bank Details
+        </DialogTitle>
       </DialogHeader>
       <div className="space-y-4 mt-4">
         {/* Account Holder's Name */}
         <div>
-          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Account holder’s name</label>
+          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">
+            Account holder&apos;s name
+          </label>
           <input
             type="text"
             name="benificiaryName"
             value={bankDetails.benificiaryName}
             onChange={handleChange}
-            placeholder="Enter account holder’s name"
+            disabled={isSubmitting || isThrottled}
+            placeholder="Enter account holder's name"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Account Number */}
         <div>
-          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">Account number</label>
+          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">
+            Account number
+          </label>
           <input
             type="text"
             name="accountNumber"
             value={bankDetails.accountNumber}
             onChange={handleChange}
+            disabled={isSubmitting || isThrottled}
             placeholder="Enter your account number"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -146,12 +238,15 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
 
         {/* IFSC Code */}
         <div>
-          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">IFSC Code</label>
+          <label className="block text-[#19191A] text-base font-normal leading-7 front-[Source Sans Pro]">
+            IFSC Code
+          </label>
           <input
             type="text"
             name="ifsc"
             value={bankDetails.ifsc}
             onChange={handleChange}
+            disabled={isSubmitting || isThrottled}
             placeholder="Enter branch IFSC code"
             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -174,11 +269,15 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
       {/* Save Button */}
       <div className="flex justify-end mt-16">
         <Button
-          onClick={handleSave}
-          className="bg-blue-600 text-white px-10 py-2 rounded-lg hover:bg-blue-700 transition"
-          disabled={!isChanged}
+          onClick={handleSaveWithThrottle}
+          className={`px-10 py-2 rounded-lg transition ${
+            isButtonDisabled
+              ? "bg-blue-400 text-white cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+          disabled={isButtonDisabled}
         >
-          Update
+          {getButtonContent()}
         </Button>
       </div>
 

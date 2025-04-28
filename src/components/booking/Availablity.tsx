@@ -1,53 +1,98 @@
 "use client";
 
-import type React from "react";
-import { useEffect, useState } from "react";
+import * as React from "react";
 import axios from "axios";
-import {toast} from "sonner";
+import { toast } from "sonner";
+import { CalendarClock, Check, Clock, Loader2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AvailabilityProps {
-    userId: string;
+  userId: string;
 }
 
 interface AvailabilityRowProps {
-    day: string;
-    value: { enabled: boolean; start: string; end: string };
-    onChange: (val: { enabled: boolean; start: string; end: string }) => void;
+  day: string;
+  value: { enabled: boolean; start: string; end: string };
+  onChange: (val: { enabled: boolean; start: string; end: string }) => void;
+  isLoading?: boolean;
 }
 
 type DayAvailability = {
-    enabled: boolean;
-    start: string;
-    end: string;
+  enabled: boolean;
+  start: string;
+  end: string;
 };
 
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-
-const timeOptions = [
-    '06:00', '07:00', '08:00', '09:00', '10:00',
-    '11:00', '12:00', '13:00', '14:00', '15:00',
-    '16:00', '17:00', '18:00', '19:00', '20:00',
-    '21:00', '22:00',
+const days = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
+const timeOptions = [
+  "06:00",
+  "07:00",
+  "08:00",
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+  "19:00",
+  "20:00",
+  "21:00",
+  "22:00",
+];
 
-const handlesetAvailability = async (userId: string, availability: Record<string, DayAvailability>) => {
+const handleSetAvailability = async (
+  userId: string,
+  availability: Record<string, DayAvailability>
+) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/availability/${userId}`,
-      { availability}
+      { availability }
     );
     if (response.data.r === "s") {
       toast.success("Availability saved successfully!");
+      return true;
     } else {
       toast.error("Failed to save availability.");
+      return false;
     }
   } catch (error) {
     console.error("Error saving availability:", error);
     toast.error("An error occurred while saving availability.");
+    return false;
   }
 };
-
 
 const getAvailability = async (userId: string) => {
   try {
@@ -64,8 +109,7 @@ const getAvailability = async (userId: string) => {
     toast.error("An error occurred while fetching availability.");
     return null;
   }
-}
-
+};
 
 export const Availability = ({ userId }: AvailabilityProps) => {
   const defaultAvailability: Record<string, DayAvailability> = {};
@@ -84,23 +128,28 @@ export const Availability = ({ userId }: AvailabilityProps) => {
     JSON.parse(JSON.stringify(defaultAvailability))
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     const fetchAvailability = async () => {
       setLoading(true);
       const data = await getAvailability(userId);
-      if (data && typeof data === 'object') {
+      if (data && typeof data === "object") {
         // Check if data has the expected structure
-        const hasValidStructure = days.every(day => 
-          data[day] && 
-          typeof data[day].enabled === 'boolean' &&
-          typeof data[day].start === 'string' && 
-          typeof data[day].end === 'string'
+        const hasValidStructure = days.every(
+          (day) =>
+            data[day] &&
+            typeof data[day].enabled === "boolean" &&
+            typeof data[day].start === "string" &&
+            typeof data[day].end === "string"
         );
 
         if (hasValidStructure) {
           setAvailability(data);
+          originalData.current = JSON.parse(JSON.stringify(data));
         } else {
-          console.warn("Retrieved availability data has invalid structure", data);
+          console.warn(
+            "Retrieved availability data has invalid structure",
+            data
+          );
         }
       }
       setLoading(false);
@@ -108,7 +157,33 @@ export const Availability = ({ userId }: AvailabilityProps) => {
 
     fetchAvailability();
   }, [userId]);
-    
+
+  // Check for changes
+  React.useEffect(() => {
+    if (!originalData.current) return;
+
+    const isChanged =
+      JSON.stringify(availability) !== JSON.stringify(originalData.current);
+    setHasChanges(isChanged);
+  }, [availability]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const success = await handleSetAvailability(userId, availability);
+    if (success) {
+      originalData.current = JSON.parse(JSON.stringify(availability));
+      setHasChanges(false);
+    }
+    setSaving(false);
+  };
+
+  const handleReset = () => {
+    if (originalData.current) {
+      setAvailability(JSON.parse(JSON.stringify(originalData.current)));
+      setHasChanges(false);
+    }
+  };
+
   return (
     <Card className="border border-gray-100 shadow-sm overflow-hidden max-w-full">
       <CardHeader className="bg-white pb-4 px-4 md:px-6">
@@ -202,27 +277,33 @@ export const Availability = ({ userId }: AvailabilityProps) => {
       </CardContent>
     </Card>
   );
-}
+};
 
-const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange}) => {
-  
+const AvailabilityRow: React.FC<AvailabilityRowProps> = ({
+  day,
+  value,
+  onChange,
+  isLoading,
+}) => {
   const formatTime = (time: string) => {
-    const [hour, minute] = time.split(':');
-    const h = parseInt(hour);
-    const suffix = h >= 12 ? 'PM' : 'AM';
+    const [hour, minute] = time.split(":");
+    const h = Number.parseInt(hour);
+    const suffix = h >= 12 ? "PM" : "AM";
     const formattedHour = h % 12 === 0 ? 12 : h % 12;
     return `${formattedHour}:${minute} ${suffix}`;
   };
-  
+
   return (
-    <div className="flex items-center gap-20 py-2">
-        <div className="flex items-center gap-2">
-        <input
-        type="checkbox"
-        id={day}
-        checked={value.enabled}
-        onChange={() => onChange({ ...value, enabled: !value.enabled })}
-        className="w-4 h-4 accent-green-600"
+    <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+      <div className="flex items-center gap-2">
+        <Switch
+          id={`${day}-switch`}
+          checked={value.enabled}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, enabled: checked })
+          }
+          disabled={isLoading}
+          className="data-[state=checked]:bg-blue-600"
         />
         <label
           htmlFor={`${day}-switch`}
@@ -239,8 +320,6 @@ const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange
           <Clock className="h-3.5 w-3.5" />
           <span>Unavailable</span>
         </div>
-        {!value.enabled ? (
-        <span className="text-gray-500">Unavailable</span>
       ) : (
         <div className="flex flex-wrap items-center gap-2 ml-8 sm:ml-0">
           <Select
@@ -264,7 +343,7 @@ const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange
             </SelectContent>
           </Select>
 
-        <span>-</span>
+          <span className="text-gray-500 text-xs sm:text-sm">to</span>
 
           <Select
             value={value.end}
@@ -290,4 +369,6 @@ const AvailabilityRow : React.FC<AvailabilityRowProps> = ({ day, value, onChange
       )}
     </div>
   );
-}
+};
+
+export default Availability;

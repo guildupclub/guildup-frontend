@@ -48,7 +48,7 @@ interface BookingDialogProps {
       currency: string;
     };
     discounted_price: number;
-    when: Date,
+    when: Date;
     duration: number;
     is_free: boolean;
   };
@@ -105,18 +105,20 @@ export function BookingDialog({
 
   useEffect(() => {
     if (!offering) return;
-  
+
     if (offering.type === "webinar") {
       setBookingStep("confirmation");
       const webinarDate = new Date(offering.when);
       setSelectedDate(webinarDate);
       setSelectedSlot({
         start: webinarDate.toISOString(),
-        end: new Date(webinarDate.getTime() + offering.duration * 60000).toISOString(),
+        end: new Date(
+          webinarDate.getTime() + offering.duration * 60000
+        ).toISOString(),
       });
-    }  
+    }
   }, [offering]);
-  
+
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
@@ -193,13 +195,13 @@ export function BookingDialog({
           user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
-          startTime
+          startTime,
         }
       );
 
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
-        if(offering.is_free){
+        if (offering.is_free) {
           toast.success("Booking confirmed successfully!");
           setIsProcessing(false);
           onClose();
@@ -304,9 +306,7 @@ export function BookingDialog({
     razorpay.open();
   };
 
-  const handlePaymentVerification = async (
-    paymentResponse: any
-  ) => {
+  const handlePaymentVerification = async (paymentResponse: any) => {
     try {
       console.log("Payment response:", paymentResponse);
       const response = await axios.post(

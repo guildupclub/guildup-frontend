@@ -1,77 +1,10 @@
-// "use client";
-// import HomePage from "@/components/homePageLayout/HomePage";
-// import TopicSelectionModal from "@/components/SelectTopicForm";
-// import { setUserFollowedCommunities } from "@/redux/userSlice";
-// import axios from "axios";
-// import { useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
-// import { useEffect, useState } from "react";
-// import { useDispatch } from "react-redux";
-
-// export default function Home() {
-//   const { data: session, status } = useSession();
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const router = useRouter();
-//   const dispatch= useDispatch();
-
-//   const handleTopicSelection = (selectedTopics: string[]) => {
-//     setIsModalOpen(false); // Close modal after topic selection
-//   };
-
-//   useEffect(() => {
-//     if (status === "loading") {
-//       return; // Show loading state while the session is being fetched
-//     }
-
-//     if (session) {
-//       async function fetchCommunities() {
-//         try {
-//           const res = await axios.post(
-//             `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-//             {
-//               userId: session?.user._id,
-//             }
-//           );
-//           dispatch(setUserFollowedCommunities(res.data.data));
-//         } catch (error) {
-//           console.error(error);
-//         }
-//       }
-//       fetchCommunities();
-//       // If the user is new, open the modal
-//       if (session.user?.isNewUser) {
-//         setIsModalOpen(true); // Open modal for topic selection
-//       }
-//     } else {
-//       router.push("/"); // Redirect to sign-in page if not authenticated
-//     }
-//   }, [session, status, router]);
-
-//   if (status === "loading") {
-//     return <div>Loading...</div>; // Optionally, show a loading spinner
-//   }
-
-//   return (
-//     <div className=" min-h-screen pt-16">
-//       <HomePage />
-//       {/* <TopicSelectionModal
-//         isOpen={isModalOpen}
-//         onClose={() => setIsModalOpen(false)}
-//         onSubmit={handleTopicSelection}
-//       /> */}
-//     </div>
-//   );
-// }
-
 "use client";
 import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
 import { API_BASE_URL } from "../config/constants";
 import CommunitySection from "@/components/explore/CommunitySection";
-import TrendingSection from "@/components/explore/TrendingSection";
 import axios from "axios";
-import { useSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { useDispatch } from "react-redux";
 import React, {
@@ -126,24 +59,29 @@ function Page() {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const targetRef = useRef<HTMLDivElement | null>(null);
   const user = useSelector((state: RootState) => state.user);
   const isCreator = user?.user?.is_creator ? true : false;
-
+  const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [isSticky, setIsSticky] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const stickyTriggerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  
   useEffect(() => {
     if (!isMounted || status === "loading") return;
 
     if (!session) {
-      router.push("/"); 
+      router.push("/");
     } else {
       const fetchCommunities = async () => {
         try {
@@ -180,19 +118,15 @@ function Page() {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        console.log("BACKEND_URL", process.env.NEXT_PUBLIC_BACKEND_BASE_URL);
-        console.log("BACKENDURL_FROM_POST", API_BASE_URL);
-        console.log("NEXTAUTH_URL", process.env.NEXTAUTH_URL);
-
         const response = await axios.get(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
         );
 
-        setCategory([
+        const categories = [
           { _id: "all", name: "All Category" },
           ...response.data.data,
-        ]);
-        setSelectedCategory("all");
+        ];
+        setCategory(categories);
       } catch (error) {
         console.error("Failed to fetch categories", error);
       }
@@ -219,9 +153,10 @@ function Page() {
       toast("Sign in required", {
         action: {
           label: "Sign In",
-          onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}?hero=1`
-          }),
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
         },
       });
     } else {
@@ -231,7 +166,7 @@ function Page() {
 
   const handleScroll = () => {
     if (targetRef.current) {
-      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+      targetRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -393,7 +328,9 @@ function Page() {
                         <span className="text-amber-300 hidden sm:inline">
                           👋
                         </span>
-                        <span className="hidden sm:inline text-md">Expert Page</span>
+                        <span className="hidden sm:inline text-md">
+                          Expert Page
+                        </span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                     </DialogTrigger>
@@ -449,8 +386,8 @@ function Page() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </SearchParamsProvider>
+    </Suspense>
   );
 }
 
