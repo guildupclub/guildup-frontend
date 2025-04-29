@@ -22,33 +22,30 @@ export const metadata: Metadata = {
   title: "GuildUp Club",
   description: "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
   icons: {
-    icon: [
+    icon: "/guildup_logo_final.png",
+    shortcut: "/guildup_logo_final.png",
+    apple: "/guildup_logo_final.png",
+  },
+  openGraph: {
+    title: "GuildUp Club",
+    description: "Ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+    images: [
       {
-        url: guildup_logo_final, // Add forward slash to indicate public folder
-        sizes: "32x32",
-        type: "image/png"
+        url: "/guildup_logo_final.png",
+        width: 1200,
+        height: 630,
+        alt: "GuildUp Logo",
       },
-      {
-        url: guildup_logo_final, // Add forward slash to indicate public folder
-        sizes: "16x16",
-        type: "image/png"
-      }
     ],
-    shortcut: [guildup_logo_final], // Add forward slash
-    apple: [
-      {
-        url: guildup_logo_final, // Add forward slash
-        sizes: "180x180",
-        type: "image/png"
-      }
-    ],
-    other: [
-      {
-        rel: "mask-icon",
-        url: guildup_logo_final
-      }
-    ]
-  }
+    type: "website",
+    siteName: "GuildUp",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GuildUp Club",
+    description: "Ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+    images: ["/guildup_logo_final.png"],
+  },
 };
 
 export default async function RootLayout({
