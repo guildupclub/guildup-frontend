@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   generator:"Next.js",
   manifest: "/manifest.json",
   applicationName: "GuildUp Club",
-  authors: [{ name: "GuildUp Club", url: "https://guildupclub.com" }],
+  authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
     themeColor: "#ffffff",
