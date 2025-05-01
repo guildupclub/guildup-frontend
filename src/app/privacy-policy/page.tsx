@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
           {/* Main Title */}
           <h1 className="text-4xl font-bold text-primary mb-2">GuildUp Privacy Policy</h1>
           <p className="text-muted-foreground mb-8">Last updated on 20/02/2025</p>
-
+ 
           {/* Content Container with Scroll */}
           <div className="space-y-8 overflow-y-auto">
             <div>
