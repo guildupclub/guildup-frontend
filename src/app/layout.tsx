@@ -21,6 +21,15 @@ const guildup_logo_final = "/guildup_logo_final.png";
 export const metadata: Metadata = {
   title: "GuildUp Club",
   description: "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+  generator:"Next.js",
+  manifest: "/manifest.json",
+  applicationName: "GuildUp Club",
+  authors: [{ name: "GuildUp Club", url: "https://guildupclub.com" }],
+  creator: "GuildUp Club",
+  keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
+  colorScheme: "dark light",
+  themeColor: "#0A0A0A",
+
   icons: {
     icon: "/guildup_logo_final.png",
     shortcut: "/guildup_logo_final.png",
