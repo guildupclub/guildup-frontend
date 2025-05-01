@@ -2,9 +2,7 @@ import type { NextConfig } from "next";
 import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
-  distDir: "build",
   reactStrictMode: true,
-  swcMinify: true,
 
   typescript: {
     ignoreBuildErrors: true,

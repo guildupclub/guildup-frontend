@@ -27,8 +27,10 @@ export const metadata: Metadata = {
   authors: [{ name: "GuildUp Club", url: "https://guildupclub.com" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
-  colorScheme: "dark light",
-  themeColor: "#0A0A0A",
+    themeColor: "#ffffff",
+    colorScheme: "light",
+
+  
 
   icons: {
     icon: "/guildup_logo_final.png",
