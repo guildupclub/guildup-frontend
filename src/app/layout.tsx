@@ -24,11 +24,13 @@ export const metadata: Metadata = {
   generator:"Next.js",
   manifest: "/manifest.json",
   applicationName: "GuildUp Club",
-  authors: [{ name: "GuildUp Club", url: "https://guildupclub.com" }],
+  authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
-  colorScheme: "dark light",
-  themeColor: "#0A0A0A",
+    themeColor: "#ffffff",
+    colorScheme: "light",
+
+  
 
   icons: {
     icon: "/guildup_logo_final.png",
@@ -36,6 +38,7 @@ export const metadata: Metadata = {
     apple: "/guildup_logo_final.png",
   }
 };
+
 
 export default async function RootLayout({
   children,
