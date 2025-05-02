@@ -40,7 +40,7 @@ export default function Hero() {
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
             <motion.span
-              className="text-primary block mb-2"
+              className="text-indigo-500 block mb-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
@@ -62,8 +62,10 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            No more chasing links or juggling apps—find, book, and pay trusted experts in one smooth flow
+            No more chasing links or juggling apps—find, book, and pay trusted
+            experts in one smooth flow
           </motion.p>
+
 
           <motion.div
             className="mt-10 mb-16 md:mb-0"
@@ -132,9 +134,9 @@ export default function Hero() {
       <motion.div
         className="absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
         initial={{ opacity: 0, y: -20 }}
-        animate={{ 
+        animate={{
           opacity: isVisible ? 1 : 0,
-          y: isVisible ? 0 : 20
+          y: isVisible ? 0 : 20,
         }}
         transition={{ duration: 0.3 }}
       >
