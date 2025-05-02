@@ -5,7 +5,6 @@ import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from 'next/headers';
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,23 +61,12 @@ export default async function RootLayout({
           gtag('config', 'G-B3B9W8GRQP');
           `}
         </script>
-        {/* DO NOT TOUCH */}
-        <script src="https://cdn.amplitude.com/script/a9ea4b62bfdddfb8ac8955e34ac7a498.js"></script>
-        <script>
-          {`
-            window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
-            window.amplitude.init('a9ea4b62bfdddfb8ac8955e34ac7a498', {
-              fetchRemoteConfig: true,
-              autocapture: true
-            });
-          `}
-        </script>
+      
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <NavbarClient />
           {children}
-          <SpeedInsights />
           <Toaster richColors position="top-center" />
         </Providers>
       </body>
