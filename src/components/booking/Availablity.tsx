@@ -69,6 +69,7 @@ const timeOptions = [
   "20:00",
   "21:00",
   "22:00",
+  "23:00",
 ];
 
 const handleSetAvailability = async (
