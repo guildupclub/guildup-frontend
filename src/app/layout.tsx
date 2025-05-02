@@ -5,6 +5,7 @@ import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from 'next/headers';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default async function RootLayout({
         <Providers>
           <NavbarClient />
           {children}
+          <SpeedInsights />
           <Toaster richColors position="top-center" />
         </Providers>
       </body>
