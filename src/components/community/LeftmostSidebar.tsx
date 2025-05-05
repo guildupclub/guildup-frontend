@@ -319,6 +319,7 @@ export function LeftmostSidebar() {
                     alt={community.name}
                     className="!rounded-lg"
                   />
+                  
                   <AvatarFallback className="!rounded-lg bg-primary text-white">
                     {getInitials(community.name)}
                   </AvatarFallback>
