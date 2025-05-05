@@ -92,15 +92,14 @@ const NotificationDropdown = () => {
             {notifications.map((notification) => (
               <DropdownMenuItem 
                 key={notification._id}
-                className={`p-3 cursor-pointer ${!notification.read ? 'bg-gray-50' : ''}`}
-                onClick={() => markAsRead(notification._id)}
+                className={`p-3 cursor-pointer bg-white`}
               >
                 <div className="flex gap-3 w-full">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm bg-zinc-100 line-clamp-2">{notification.message}</p>
-                    <p className="text-xs text-zinc-500 mt-1">
+                    <p className="text-sm bg-transparent line-clamp-2">{notification.message}</p>
+                    {/* <p className="text-xs text-zinc-500 mt-1">
                       {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </DropdownMenuItem>

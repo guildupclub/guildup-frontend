@@ -32,7 +32,10 @@ import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
 import { FaShareAlt } from "react-icons/fa";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
+import { useNotifications } from '../notifications/NotificationContext';
+import { ref, push, update } from "firebase/database";
+import database from "../../../firebase";
+import { removeSpecialCharacters } from "../utils/StringUtils";
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -243,8 +246,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const activeCommunityId = communityId || community?.communityId;
 
-  // Add this state in ProfileCard component after other state declarations
-
   // Add this ref and effect for the infinite scroll animation
   const testimonialRef = useRef<HTMLDivElement>(null);
 
@@ -424,58 +425,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     fetchOfferings();
   }, [community.communityId, fetchOfferings]);
 
-  // useEffect(() => {
-  //   if (!community?.communityId) return; // Ensure communityId is set before fetching
-
-  //   const fetchProfileData = async () => {
-  //     try {
-  //       setLoading(true);
-  //       const response = await axios.post(
-  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-  //         {
-  //           communityId: community.communityId,
-  //         }
-  //       );
-
-  //       console.log("@response", response.data.data);
-  //       if (response.data.r === "s") {
-  //         if (response.data.data.community.image) {
-  //           setAvatarImgUrl(response.data.data.community.image);
-  //         } else {
-  //           setAvatarImgUrl(
-  //             `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
-  //           );
-  //         }
-  //         if (response.data.data.community.background_image) {
-  //           setBgImgUrl(response.data.data.community.background_image);
-  //         } else {
-  //           setBgImgUrl(
-  //             "https://random-image-pepebigotes.vercel.app/api/random-image"
-  //           );
-  //         }
-
-  //         dispatch(
-  //           setUserBankDetails(
-  //             response.data.data.user.user_isBankDetailsAdded || false
-  //           )
-  //         );
-  //         dispatch(
-  //           setUserCalendarConnected(
-  //             response.data.data.user.user_iscalendarConnected || false
-  //           )
-  //         );
-  //       }
-  //     } catch (error) {
-  //       toast.error("Failed to load community profile");
-  //       console.error("Error fetching profile data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchProfileData();
-  // }, [community?.communityId]); // Dependency array includes communityId
-
   const followMutation = useMutation({
     mutationFn: async () => {
       const response = await axios.post(
@@ -487,9 +436,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.r === "s") {
         toast.success("Successfully joined the community!");
+        console.log('data upon follow', data);
         // Update the cache to reflect the new followed community
         queryClient.setQueryData(
           ["userFollowedCommunities"],
@@ -502,6 +452,33 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         queryClient.invalidateQueries({
           queryKey: ["userFollowedCommunities"],
         });
+
+        // Send notification to   community owner
+        console.log('data upon follow', data);
+        console.log('current user', user);
+        console.log('profile data', profile);
+        console.log('profile email', profile?.user?.user_email);
+
+        const email = removeSpecialCharacters(profile?.user?.user_email);
+        
+        if (data.data?.user_id) {
+         
+          const notificationsRef = ref(database, `notification/${email}`);
+          const newNotificationRef = push(notificationsRef);
+          console.log('new notification ref', newNotificationRef);
+          await update(newNotificationRef, {
+            type: "community_follow",
+            message: `${user.name} started following your community`,
+            read: false,
+            createdAt: new Date().toISOString(),
+            data: {
+              communityId: activeCommunityId,
+              userId: user._id,
+              userName: user.name,
+              userImage: user.image
+            }
+          });
+        }
       }
     },
     onError: (error) => {
