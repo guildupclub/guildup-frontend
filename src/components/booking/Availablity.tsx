@@ -69,6 +69,7 @@ const timeOptions = [
   "20:00",
   "21:00",
   "22:00",
+  "23:00",
 ];
 
 const handleSetAvailability = async (
@@ -112,22 +113,20 @@ const getAvailability = async (userId: string) => {
 };
 
 export const Availability = ({ userId }: AvailabilityProps) => {
-  const [availability, setAvailability] = React.useState(() => {
-    const initial: Record<string, DayAvailability> = {};
-    days.forEach((day) => {
-      initial[day] = {
-        enabled: day !== "Saturday" && day !== "Sunday",
-        start: "09:00",
-        end: "17:00",
-      };
-    });
-    return initial;
+  const defaultAvailability: Record<string, DayAvailability> = {};
+  days.forEach((day) => {
+    defaultAvailability[day] = {
+      enabled: day !== "Saturday" && day !== "Sunday",
+      start: "09:00",
+      end: "17:00",
+    };
   });
+  const [availability, setAvailability] = React.useState(defaultAvailability);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [hasChanges, setHasChanges] = React.useState(false);
-  const originalData = React.useRef<Record<string, DayAvailability> | null>(
-    null
+  const originalData = React.useRef<Record<string, DayAvailability>>(
+    JSON.parse(JSON.stringify(defaultAvailability))
   );
 
   React.useEffect(() => {

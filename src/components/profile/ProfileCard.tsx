@@ -31,6 +31,7 @@ import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { RiUserSharedFill } from "react-icons/ri";
 import { Stepper } from "./Steeper";
 import { FaShareAlt } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CommunityProfile {
   user: {
@@ -67,6 +68,7 @@ interface Offering {
     currency: string;
   };
   discounted_price: string;
+  when : Date,
   duration: number;
   is_free: boolean;
   tags: string[];
@@ -363,6 +365,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
 
       if (response.data.r === "s") {
+        console.log("@offerings",response.data.data);
         setOfferings(
           Array.isArray(response.data.data)
             ? response.data.data
@@ -813,7 +816,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <AddOfferingDialog onOfferingAdded={fetchOfferings} />
             </div>
 
-            {!isBankConnected || offerings.length === 0 ? (
+            {offerings.length === 0 ? (
               <div className="text-center py-16 bg-card rounded-xl border border-border/5">
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
@@ -871,37 +874,66 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
 
                         {/* Book Now button */}
-                        <Button
-                          size="sm"
-                          disabled={isOwner ?? false}
-                          className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
-                            !isOwner
-                              ? "cursor-pointer"
-                              : "cursor-not-allowed opacity-50"
-                          }`}
-                          onClick={() => {
-                            if (!session) {
-                              signIn("google");
-                              return;
-                            }
-                            if (!isOwner) setSelectedOffering(offering);
-                          }}
-                        >
-                          {offering.is_free ? (
-                            <span>Free</span>
-                          ) : offering?.discounted_price &&
-                            offering?.price?.amount ? (
-                            <>
-                              <span className="line-through text-xs opacity-60">
-                                ₹{offering.price.amount}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span>
+                                <Button
+                                  size="sm"
+                                  disabled={!offering.is_free && !isBankConnected}
+                                  className={`text-white px-6 py-2 rounded-lg flex items-center gap-2 ${
+                                    !isOwner
+                                      ? "cursor-pointer"
+                                      : "cursor-not-allowed opacity-50"
+                                  }`}
+                                  onClick={() => {
+                                    if (!session) {
+                                      signIn("google");
+                                      return;
+                                    }
+                                    if (!isOwner) setSelectedOffering(offering);
+                                  }}
+                                >
+                                  {offering.is_free ? (
+                                    <span>Free</span>
+                                  ) : offering?.discounted_price &&
+                                    offering?.price?.amount ? (
+                                    <>
+                                      <span className="line-through text-xs opacity-60">
+                                        ₹{offering.price.amount}
+                                      </span>
+                                      <span> ₹{offering.discounted_price}</span>
+                                    </>
+                                  ) : offering?.price?.amount ? (
+                                    <span>₹{offering.price.amount}</span>
+                                  ) : null}
+                                  <ArrowRight className="w-4 h-4" />
+                                </Button>
                               </span>
-                              <span> ₹{offering.discounted_price}</span>
-                            </>
-                          ) : offering?.price?.amount ? (
-                            <span>₹{offering.price.amount}</span>
-                          ) : null}
-                          <ArrowRight className="w-4 h-4" />
-                        </Button>
+                            </TooltipTrigger>
+                            {!offering.is_free && !isBankConnected && (
+                              <TooltipContent
+                                side="bottom"
+                                align="center"
+                                className="bg-white text-black border border-gray-200 shadow-lg px-3 py-2 rounded flex items-center gap-2"
+                              >
+                                <span>
+                                  <svg
+                                    className="w-4 h-4 text-blue-500 inline-block mr-1"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0-4h.01" />
+                                  </svg>
+                                </span>
+                                <span>The expert is not accepting bookings at the moment</span>
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                     </div>
                   </div>

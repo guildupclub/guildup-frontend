@@ -48,6 +48,7 @@ interface BookingDialogProps {
       currency: string;
     };
     discounted_price: number;
+    when: Date,
     duration: number;
     is_free: boolean;
   };
@@ -102,6 +103,20 @@ export function BookingDialog({
     document.body.appendChild(script);
   }, []);
 
+  useEffect(() => {
+    if (!offering) return;
+  
+    if (offering.type === "webinar") {
+      setBookingStep("confirmation");
+      const webinarDate = new Date(offering.when);
+      setSelectedDate(webinarDate);
+      setSelectedSlot({
+        start: webinarDate.toISOString(),
+        end: new Date(webinarDate.getTime() + offering.duration * 60000).toISOString(),
+      });
+    }  
+  }, [offering]);
+  
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");

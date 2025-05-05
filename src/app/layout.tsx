@@ -21,12 +21,24 @@ const guildup_logo_final = "/guildup_logo_final.png";
 export const metadata: Metadata = {
   title: "GuildUp Club",
   description: "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+  generator:"Next.js",
+  manifest: "/manifest.json",
+  applicationName: "GuildUp Club",
+  authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
+  creator: "GuildUp Club",
+  keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
+    themeColor: "#ffffff",
+    colorScheme: "light",
+
+  
+
   icons: {
     icon: "/guildup_logo_final.png",
     shortcut: "/guildup_logo_final.png",
     apple: "/guildup_logo_final.png",
   }
 };
+
 
 export default async function RootLayout({
   children,
@@ -49,6 +61,7 @@ export default async function RootLayout({
           gtag('config', 'G-B3B9W8GRQP');
           `}
         </script>
+      
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
