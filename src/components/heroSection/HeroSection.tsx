@@ -20,7 +20,7 @@ export default function Hero() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white relative flex items-center justify-center">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-r from-[#777BEA]/20 relative flex items-center justify-center">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center min-h-[calc(100vh-4rem)]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -28,7 +28,7 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto"
         >
-          <div className="mb-8 bg-gradient-to-r from-[#5b6be1] to-[#357fe0] w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
+          <div className="mb-8 bg-gradient-to-r from-[#7175f0] to-[#9296F9]  w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
             <Image
               alt="stars icon"
               src="https://conqrr.vercel.app/_next/static/media/bi_stars.7e13c393.svg"
@@ -40,15 +40,15 @@ export default function Hero() {
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
             <motion.span
-              className="text-indigo-500 block mb-2"
+              className="text-indigo-400 block mb-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              Book Experts. Buy Services.
+              <span className="text-primary"> Book Experts.</span> Buy Services.
             </motion.span>
             <motion.span
-              className="text-foreground"
+              className="text-primary"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
@@ -66,7 +66,6 @@ export default function Hero() {
             experts in one smooth flow
           </motion.p>
 
-
           <motion.div
             className="mt-10 mb-16 md:mb-0"
             initial={{ opacity: 0 }}
@@ -83,7 +82,7 @@ export default function Hero() {
         <motion.div
           className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-100/60 to-indigo-200/60 rounded-full"
           animate={{
-            scale: [1, 1.1, 1],
+            scale: [0.6, 0.9, 0.6],
             rotate: [0, 90, 0],
           }}
           transition={{
@@ -92,7 +91,7 @@ export default function Hero() {
             ease: "linear",
           }}
         />
-        <motion.div
+        {/* <motion.div
           className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-indigo-100/60 to-blue-200/60 rounded-full"
           animate={{
             scale: [1, 1.2, 1],
@@ -103,24 +102,24 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-        />
+        /> */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-16 h-16 bg-gradient-to-r from-blue-200/70 to-indigo-200/70 rounded-full blur-sm"
+          className="absolute top-1/4 lg:top-[70%] left-1/4 lg:left-[60%] w-16 h-16 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-full blur-2xl"
           animate={{
             y: [0, -20, 0],
             x: [0, 20, 0],
           }}
           transition={{
-            duration: 5,
+            duration: 7,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 right-1/4 w-12 h-12 bg-gradient-to-l from-indigo-200/70 to-blue-200/70 rounded-full blur-sm"
+          className="absolute bottom-1/4 lg:bottom-[80%] right-1/4 lg:right-[10%] w-12 h-12 bg-gradient-to-l from-indigo-200/70 to-blue-200/70 rounded-full blur-sm"
           animate={{
-            y: [0, 30, 0],
-            x: [0, -30, 0],
+            y: [0, 40, 0],
+            x: [0, -40, 0],
           }}
           transition={{
             duration: 7,

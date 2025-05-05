@@ -1,4 +1,3 @@
-
 "use client";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,6 @@ import {
 import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 
-
 interface Community {
   _id: string;
   title: string;
@@ -59,7 +57,7 @@ export function LeftmostSidebar() {
 
   const params = useParams();
   const dispatch = useDispatch();
- 
+
   const user = useSelector((state: RootState) => state.user.user);
 
   const activeCommunityId = params?.id;
@@ -125,7 +123,6 @@ export function LeftmostSidebar() {
       }
     );
 
-
     if (!response.ok) {
       throw new Error("Failed to fetch communities");
     }
@@ -146,7 +143,7 @@ export function LeftmostSidebar() {
           image: validCommunities[0].image,
           background_image: validCommunities[0].background_image,
           user_isBankDetailsAdded: false,
-          user_iscalendarConnected: false
+          user_iscalendarConnected: false,
         })
       );
     }
@@ -235,23 +232,27 @@ export function LeftmostSidebar() {
   // const handleNavigation = (path: string) => {
   //   router.push(path);
   // };
-  const handleNavigation = (path: string,communityId:string) => {
+  const handleNavigation = (path: string, communityId: string) => {
     const currentPath = window.location.pathname;
-    const pathSegments = currentPath.split('/');
-    const currentPage = pathSegments[3] || 'profile'; // Default to profile if no page specified
+    const pathSegments = currentPath.split("/");
+    const currentPage = pathSegments[3] || "profile"; // Default to profile if no page specified
 
     // If we're switching communities, maintain the same page
-    if (currentPage =='channel') {
+    if (currentPage == "channel") {
       // For channels, always navigate to profile
       router.push(`/community/${communityId}/profile`);
-    }else if (path.includes('community')) {
+    } else if (path.includes("community")) {
       // const communityId = path.split('/community/')[1];
-      console.log("@communityId", `/community/${communityId}/${currentPage}`,communityId);
+      console.log(
+        "@communityId",
+        `/community/${communityId}/${currentPage}`,
+        communityId
+      );
       router.push(`/community/${communityId}/${currentPage}`);
-    } 
+    }
   };
 
-  console.log("@communityDataLeftMostSideBar",communities)
+  console.log("@communityDataLeftMostSideBar", communities);
   if (error) {
     return (
       <div className="fixed left-0 h-screen w-20 bg-background flex items-center justify-center text-red-500">
@@ -261,8 +262,7 @@ export function LeftmostSidebar() {
   }
 
   return (
-
-    <div className="hidden md:flex fixed left-0 h-screen w-20 bg-card flex-col items-center border-r border-background py-20 gap-3">
+    <div className="hidden md:flex fixed left-0 h-screen w-20 md:bg-indigo-400/80 text-white flex-col items-center border-r border-background py-20 gap-3">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -281,10 +281,11 @@ export function LeftmostSidebar() {
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative rounded-lg  ${activeCommunityId === community._id
-                  ? "bg-blue-500/20 ring-2 ring-purple-500"
-                  : "hover:bg-zinc-800"
-                  }`}
+                className={`relative rounded-lg  ${
+                  activeCommunityId === community._id
+                    ? "bg-blue-500/20 ring-2 ring-purple-500"
+                    : "hover:bg-zinc-800"
+                }`}
                 onClick={() => {
                   dispatch(
                     setActiveCommunity({
@@ -293,7 +294,7 @@ export function LeftmostSidebar() {
                       image: community.image,
                       background_image: community.background_image,
                       user_isBankDetailsAdded: false,
-                      user_iscalendarConnected: false
+                      user_iscalendarConnected: false,
                     })
                   );
                   dispatch(
@@ -303,12 +304,12 @@ export function LeftmostSidebar() {
                     })
                   );
                   handleNavigation(
-                    `/community/${community._id}/profile`,community._id
+                    `/community/${community._id}/profile`,
+                    community._id
                   );
                 }}
               >
                 <Avatar className="w-full h-full !rounded-lg">
-
                   <AvatarImage
                     src={
                       community.image && community.image !== ""
@@ -318,7 +319,9 @@ export function LeftmostSidebar() {
                     alt={community.name}
                     className="!rounded-lg"
                   />
-                  <AvatarFallback className="!rounded-lg">{getInitials(community.name)}</AvatarFallback>
+                  <AvatarFallback className="!rounded-lg bg-primary text-white">
+                    {getInitials(community.name)}
+                  </AvatarFallback>
                 </Avatar>
                 {community.subscription && (
                   <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">

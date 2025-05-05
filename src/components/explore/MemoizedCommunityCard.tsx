@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { Card } from "../ui/card";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
@@ -61,16 +67,19 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   const tags: string[] = useMemo(() => {
     // If tags don't exist, return empty array
     if (!communityDetails?.tags || !communityDetails.tags.length) return [];
-    
+
     // Create a flat array of all tags
     let allTags: string[] = [];
-    
+
     // Process each item in the tags array
     communityDetails.tags.forEach((tagItem: any) => {
-      if (typeof tagItem === 'string') {
+      if (typeof tagItem === "string") {
         // If it's a string, check if it contains multiple comma-separated tags
-        if (tagItem.includes(',')) {
-          const splitTags = tagItem.split(',').map((tag: string) => tag.trim()).filter(Boolean);
+        if (tagItem.includes(",")) {
+          const splitTags = tagItem
+            .split(",")
+            .map((tag: string) => tag.trim())
+            .filter(Boolean);
           allTags = [...allTags, ...splitTags];
         } else {
           allTags.push(tagItem.trim());
@@ -78,9 +87,12 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
       } else if (Array.isArray(tagItem)) {
         // If it's an array, process each item
         tagItem.forEach((tag: any) => {
-          if (typeof tag === 'string') {
-            if (tag.includes(',')) {
-              const splitTags = tag.split(',').map((t: string) => t.trim()).filter(Boolean);
+          if (typeof tag === "string") {
+            if (tag.includes(",")) {
+              const splitTags = tag
+                .split(",")
+                .map((t: string) => t.trim())
+                .filter(Boolean);
               allTags = [...allTags, ...splitTags];
             } else {
               allTags.push(tag.trim());
@@ -89,7 +101,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
         });
       }
     });
-    
+
     // Remove duplicates and empty strings
     return [...new Set(allTags)].filter(Boolean);
   }, [communityDetails?.tags]);
@@ -159,7 +171,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           image: "",
           background_image: "",
           user_isBankDetailsAdded: false,
-          user_iscalendarConnected: false
+          user_iscalendarConnected: false,
         })
       );
 
@@ -174,16 +186,16 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   // Add this at the beginning of the component
   useEffect(() => {
     // Add the scrollbar-hide style to the document head
-    if (!document.getElementById('scrollbar-hide-style')) {
-      const style = document.createElement('style');
-      style.id = 'scrollbar-hide-style';
+    if (!document.getElementById("scrollbar-hide-style")) {
+      const style = document.createElement("style");
+      style.id = "scrollbar-hide-style";
       style.innerHTML = scrollbarHideStyles;
       document.head.appendChild(style);
     }
-    
+
     return () => {
       // Clean up on component unmount
-      const styleElement = document.getElementById('scrollbar-hide-style');
+      const styleElement = document.getElementById("scrollbar-hide-style");
       if (styleElement) {
         styleElement.remove();
       }
@@ -197,7 +209,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     >
       {/* Premium gradient overlay on hover */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-purple-100/0 opacity-0 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
-      
+
       {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/80 backdrop-blur-sm">
@@ -222,7 +234,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-blue-700 transition-colors duration-300">
+            <h3 className="font-medium text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary-foreground transition-colors duration-300">
               {communityDetails?.name}
             </h3>
           </div>
@@ -243,7 +255,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
               ))}
             </div>
           </div>
-          
+
           {/* Subtle horizontal scroll indicators */}
           <div className="pointer-events-none absolute top-0 bottom-0 left-0 w-4 bg-gradient-to-r from-white to-transparent transition-colors duration-500"></div>
           <div className="pointer-events-none absolute top-0 bottom-0 right-0 w-4 bg-gradient-to-l from-white to-transparent transition-colors duration-500"></div>
@@ -252,26 +264,26 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
         {/* Premium Stats Bar - Clear separation from tags */}
         <div className="flex items-center gap-5 text-xs text-gray-500 border-t border-b border-gray-100 py-2.5">
           {communityDetails?.num_member > 0 && (
-            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
-              <ImUsers className="h-3.5 w-3.5 text-blue-500" />
+            <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+              <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
               <span>{formatNumber(communityDetails.num_member)}+</span>
             </div>
           )}
-          
+
           {communityDetails?.linkedin_followers > 0 && (
-            <div className="flex items-center gap-1.5 hover:text-blue-600 transition-colors duration-300">
+            <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
               <FaLinkedinIn className="h-3.5 w-3.5 text-blue-600" />
               <span>{formatNumber(communityDetails.linkedin_followers)}+</span>
             </div>
           )}
-          
+
           {communityDetails?.instagram_followers > 0 && (
             <div className="flex items-center gap-1.5 hover:text-pink-600 transition-colors duration-300">
               <GrInstagram className="h-3.5 w-3.5 text-pink-500" />
               <span>{formatNumber(communityDetails.instagram_followers)}+</span>
             </div>
           )}
-          
+
           {communityDetails?.youtube_followers > 0 && (
             <div className="flex items-center gap-1.5 hover:text-red-600 transition-colors duration-300">
               <BsYoutube className="h-3.5 w-3.5 text-red-500" />
@@ -287,7 +299,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
               {/* Offering header */}
               <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100/80 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <IoVideocam className="text-blue-500 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300" />
+                  <IoVideocam className="text-primary-foreground h-4 w-4 transition-colors duration-300" />
                   <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors duration-300">
                     {firstOffering.type || "Consultation"}
                   </span>
@@ -296,25 +308,31 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                   {firstOffering.duration || 60} min
                 </span>
               </div>
-              
+
               {/* Pricing */}
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  {firstOffering?.discounted_price && firstOffering?.price?.amount ? (
+                  {firstOffering?.discounted_price &&
+                  firstOffering?.price?.amount ? (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-semibold text-blue-600">₹{firstOffering.discounted_price}</span>
-                      <span className="line-through text-xs text-gray-400">₹{firstOffering.price.amount}</span>
+                      <span className="text-lg font-semibold text-primary-foreground">
+                        ₹{firstOffering.discounted_price}
+                      </span>
+                      <span className="line-through text-xs text-gray-400">
+                        ₹{firstOffering.price.amount}
+                      </span>
                     </div>
                   ) : (
-                    <span className="text-lg font-semibold text-blue-600">
-                      {firstOffering?.price?.amount ? `₹${firstOffering.price.amount}` : "Free"}
+                    <span className="text-lg font-semibold text-primary-foreground">
+                      {firstOffering?.price?.amount
+                        ? `₹${firstOffering.price.amount}`
+                        : "Free"}
                     </span>
                   )}
                 </div>
-                
+
                 <Button
-                  size="sm"
-                  className="bg-blue-600 text-white rounded-md px-4 py-1 text-sm hover:bg-blue-700 transition-colors duration-300"
+                  className="bg-gradient-to-r from-indigo-600 to-indigo-400"
                   onClick={handleOfferingClick}
                 >
                   Book Now

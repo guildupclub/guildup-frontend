@@ -20,11 +20,15 @@ export default function Home() {
   };
 
   if (status === "loading") {
-    return <div><Loader/></div>;
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
   }
 
   return (
-    <div className=" min-h-screen pt-16">
+    <div className=" min-h-screen pt-16 bg-gradient-to-r from-[#777BEA]/20  text-muted">
       <HomePage />
     </div>
   );
