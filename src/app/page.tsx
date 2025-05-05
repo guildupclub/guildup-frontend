@@ -328,7 +328,9 @@ function Page() {
                         <span className="text-amber-300 hidden sm:inline">
                           👋
                         </span>
-                        <span className="hidden sm:inline text-md">Expert Page</span>
+                        <span className="hidden sm:inline text-md">
+                          Sign up, it's free
+                        </span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </button>
                     </DialogTrigger>
@@ -336,10 +338,9 @@ function Page() {
                   </Dialog>
                 </div>
 
-                <p className="hidden sm:block text-gray-600 text-sm max-w-2xl description-text">
-                  Discover expert pages curated just for you. Connect with
-                  industry leaders, learn from their experiences, and grow your
-                  skills.
+                <p className="hidden sm:block text-gray-600  max-w-2xl description-text">
+                  GuildUp brings real experts together in one easy place—so you
+                  can get support without the stress.
                 </p>
               </div>
             </div>
