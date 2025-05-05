@@ -491,60 +491,57 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </Link>
 
           {user?._id ? (
-            <div className="flex items-center gap-2">
-              <NotificationDropdown />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex flex-col items-center justify-center gap-1">
-                    <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
-                      <Avatar className="h-4 w-4">
-                        <AvatarImage
-                          src={session?.user?.image || ""}
-                          alt="User"
-                        />
-                        <AvatarFallback>
-                          {session?.user?.name?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <span className="text-[10px]">My Account</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="bg-background/95 backdrop-blur border-gray-700"
-                  align="end"
-                  side="top"
-                  sideOffset={40}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex flex-col items-center justify-center gap-1">
+                  <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
+                    <Avatar className="h-4 w-4">
+                      <AvatarImage
+                        src={session?.user?.image || ""}
+                        alt="User"
+                      />
+                      <AvatarFallback>
+                        {session?.user?.name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <span className="text-[10px]">My Account</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="bg-background/95 backdrop-blur border-gray-700"
+                align="end"
+                side="top"
+                sideOffset={40}
+              >
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
                 >
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link href="/booking">Bookings</Link>
+                </DropdownMenuItem>
+                {isUser && (
                   <DropdownMenuItem
                     asChild
                     className="hover:bg-primary-gradient border-b border-zinc-300"
                   >
-                    <Link href="/profile">Profile</Link>
+                    <Link href="/payments">Payments</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:bg-primary-gradient border-b border-zinc-300"
-                  >
-                    <Link href="/booking">Bookings</Link>
-                  </DropdownMenuItem>
-                  {isUser && (
-                    <DropdownMenuItem
-                      asChild
-                      className="hover:bg-primary-gradient border-b border-zinc-300"
-                    >
-                      <Link href="/payments">Payments</Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem
-                    className="hover:bg-primary-gradient"
-                    onClick={handleSignOut}
-                  >
-                    {StringConstants.SIGN_OUT}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                )}
+                <DropdownMenuItem
+                  className="hover:bg-primary-gradient"
+                  onClick={handleSignOut}
+                >
+                  {StringConstants.SIGN_OUT}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <button
               className="flex flex-col items-center justify-center gap-1"
