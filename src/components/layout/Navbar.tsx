@@ -38,6 +38,7 @@ import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
+import NotificationDropdown from "../notifications/NotificationDropdown";
 
 // interface Community {
 //   _id: string;
@@ -356,56 +357,59 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
               <div className="hidden md:block ml-4">
                 {user?._id ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
-                        <Avatar className="h-9 w-9">
-                          {session?.user?.image ? (
-                            <AvatarImage
-                              src={session?.user?.image}
-                              alt="User"
-                            />
-                          ) : (
-                            <AvatarFallback>
-                              {session?.user?.name?.charAt(0)}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
-                      align="end"
-                    >
-                      <DropdownMenuItem
-                        asChild
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                  <div className="flex items-center gap-2">
+                    <NotificationDropdown />
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
+                          <Avatar className="h-9 w-9">
+                            {session?.user?.image ? (
+                              <AvatarImage
+                                src={session?.user?.image}
+                                alt="User"
+                              />
+                            ) : (
+                              <AvatarFallback>
+                                {session?.user?.name?.charAt(0)}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
+                        align="end"
                       >
-                        <Link href="/profile">Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        asChild
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                      >
-                        <Link href="/booking">Bookings</Link>
-                      </DropdownMenuItem>
-                      {isUser && (
                         <DropdownMenuItem
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
-                          <Link href="/payments">Payments</Link>
+                          <Link href="/profile">Profile</Link>
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                        onClick={handleSignOut}
-                      >
-                        {StringConstants.SIGN_OUT}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
+                          <Link href="/booking">Bookings</Link>
+                        </DropdownMenuItem>
+                        {isUser && (
+                          <DropdownMenuItem
+                            asChild
+                            className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          >
+                            <Link href="/payments">Payments</Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          onClick={handleSignOut}
+                        >
+                          {StringConstants.SIGN_OUT}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 ) : (
                   <Button
                     onClick={() =>
