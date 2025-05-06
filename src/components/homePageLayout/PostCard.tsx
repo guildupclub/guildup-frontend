@@ -17,12 +17,14 @@ import { setActiveCommunity } from "@/redux/channelSlice";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
-import { API_FRONTEND_URL } from "@/config/constants";
 import moment from "moment";
 import DOMPurify from "dompurify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CommentSection from "./CommentSection/CommentSection";
 import { StringConstants } from "../common/CommonText";
+import { push, update, ref } from "firebase/database";
+import database from "../../../firebase";
+import { removeSpecialCharacters } from "../utils/StringUtils";
 
 interface PostCardProps {
   post: {
@@ -99,8 +101,6 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     router.push(COMMUNITY_PROFILE_PATH);
   }, [dispatch, router, post]);
 
-  // Update the comment submission function to use React Query
-
   // Add comment mutation
   const commentMutation = useMutation({
     mutationFn: async (comment: string) => {
@@ -128,7 +128,6 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     setNewComment("");
   };
 
-  // Existing functions remain the same
   const formatTimeAgo = (date: string) => {
     const now = new Date();
     const postDate = new Date(date);
@@ -161,9 +160,61 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
     );
   };
 
+  // Function to send notification
+  const sendLikeNotification = async () => {
+    try {
+      // Make sure we have the post owner's data
+      if (
+        !post.user_id ||
+        !post.user_id.email ||
+        user._id === post.user_id._id
+      ) {
+        console.log("Skipping notification: missing user data or self-like");
+        return;
+      }
+
+      const email = removeSpecialCharacters(post?.user_id?.email);
+      console.log("Sending notification to:", email);
+
+      console.log("sendLikeNotification triggered");
+
+      const notificationsRef = ref(database, `notification/${email}`);
+      console.log("notificationsRef path:", notificationsRef.toString());
+
+      const newNotificationRef = push(notificationsRef);
+      console.log("newNotificationRef key:", newNotificationRef.key);
+
+      // Try a minimal update first to verify it works
+      await update(newNotificationRef, { test: "Hello Firebase" })
+        .then(() => console.log("Write successful"))
+        .catch((err) => console.error("Firebase write error", err));
+
+      await update(newNotificationRef, {
+        userId: post.user_id._id, // Important: this should be the recipient's ID
+        type: "post_like",
+        message: `${user.name} liked your post`,
+        read: false,
+        createdAt: new Date().toISOString(),
+        data: {
+          postId: post._id,
+          userId: user._id,
+          userName: user.name,
+          userImage: user.image,
+        },
+      });
+
+      console.log("Like notification sent successfully");
+    } catch (error) {
+      console.error("Error sending like notification:", error);
+    }
+  };
+
   // Use React Query mutation for likes
   const likeMutation = useMutation({
     mutationFn: async () => {
+      // Store the current like state before the mutation
+      const wasLiked = isLiked;
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,
         {
@@ -173,6 +224,12 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           communityId: post.community_id,
         }
       );
+
+      // Only send notification if this was a like action (not an unlike)
+      if (!wasLiked) {
+        await sendLikeNotification();
+      }
+
       return response.data;
     },
     onMutate: async () => {
@@ -244,7 +301,9 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
         <div className="flex gap-3">
           <div className="flex-shrink-0 w-10">
             <Avatar className="h-10 w-10 border-2 border-purple-500">
-              <AvatarImage src={post?.community_id?.image} />
+              <AvatarImage
+                src={post?.community_id?.image || "/placeholder.svg"}
+              />
               <AvatarFallback>{fallbackLetter}</AvatarFallback>
             </Avatar>
           </div>
@@ -344,7 +403,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
           <div className="px-4 py-4">
             <div className="flex gap-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.image} />
+                <AvatarImage src={user?.image || "/placeholder.svg"} />
                 <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
