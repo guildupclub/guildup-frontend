@@ -282,6 +282,8 @@ interface Comment {
   commentedAt: string;
   replies: string[] | Comment[];
   __v: number;
+  image: string;
+  avatar: string;
 }
 
 interface CommentUser {
@@ -527,7 +529,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           <div className="flex items-center gap-3">
             <Avatar className="h-7 w-7">
               <AvatarImage
-                src={comment?.postedBy?.avatar || "/placeholder.svg"}
+                src={comment?.postedBy?.image || "/placeholder.svg"}
               />
               <AvatarFallback className="border">
                 {comment?.postedBy?.name?.[0] ||
