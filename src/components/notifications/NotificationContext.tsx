@@ -17,7 +17,7 @@ import { removeSpecialCharacters } from "../utils/StringUtils";
 interface Notification {
   _id: string;
   userId: string;
-  type: string; // we can create types for notifications such as system, post, follow etc
+  type: string;
   message: string;
   read: boolean;
   createdAt: string;
@@ -82,6 +82,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
             })
           );
 
+        
+          notificationsArray.sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+
           setNotifications(notificationsArray);
 
           // Calculate unread count
@@ -90,7 +97,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
           );
           setUnreadCount(unreadNotifications.length);
         } else {
-          setNotifications([]); // Clear notifications if none exist
+          setNotifications([]);
           setUnreadCount(0);
         }
         setLoading(false);
