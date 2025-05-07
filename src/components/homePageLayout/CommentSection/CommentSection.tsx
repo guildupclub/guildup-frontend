@@ -271,7 +271,7 @@ import { Reply, Send } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { stat } from "fs";
+import { sendNotification } from "@/components/utils/notification";
 
 interface Comment {
   _id: string;
@@ -282,12 +282,16 @@ interface Comment {
   commentedAt: string;
   replies: string[] | Comment[];
   __v: number;
+  image: string;
+  avatar: string;
 }
 
 interface CommentUser {
   _id: string;
   user_name: string;
   avatar: string | null;
+  email?: string; // Optional, for notifications
+  name?: string; // Align with rendering logic
 }
 
 interface CommentSectionProps {
@@ -330,6 +334,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           userId: userId,
         }
       );
+      console.log("Comments Response:", response.data.data); // Debug
       return response.data.data;
     },
     enabled: !!postId && !!userId,
@@ -386,9 +391,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       return response.data.data;
     },
     onSuccess: () => {
-      // Invalidate and refetch comments
       queryClient.invalidateQueries({ queryKey: ["comments", postId] });
-      // Also invalidate post data to update comment count
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
     },
   });
@@ -413,13 +416,49 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       );
       return { data: response.data.data, parentCommentId };
     },
-    onSuccess: (result) => {
-      // Invalidate and refetch replies for this specific comment
+    onSuccess: async (result) => {
+      console.log("addReplyMutation onSuccess:", result); // Debug
       queryClient.invalidateQueries({
         queryKey: ["replies", result.parentCommentId],
       });
-      // Also invalidate post data to update comment count
       queryClient.invalidateQueries({ queryKey: ["post", postId] });
+      queryClient.invalidateQueries({ queryKey: ["comments", postId] });
+
+      // Find parent comment for notification
+      const parentComment = comments.find(
+        (comment) => comment._id === result.parentCommentId
+      );
+      console.log("Parent Comment:", parentComment); // Debug
+
+      if (parentComment && parentComment.postedBy._id !== userId) {
+        // Use email if available, else fallback to user ID
+        const recipientId =
+          parentComment.postedBy.email || parentComment.postedBy._id;
+        console.log("Sending notification to:", recipientId); // Debug
+        await sendNotification(recipientId, {
+          userId: parentComment.postedBy._id,
+          type: "comment_reply",
+          message: `${user?.name || "Someone"} replied to your comment`,
+          read: false,
+          createdAt: new Date().toISOString(),
+          data: {
+            postId,
+            userId,
+            userName: user?.name || "Unknown",
+            userImage: user?.image || "",
+            commentId: result.data._id,
+          },
+        });
+      } else {
+        console.log("Notification not sent:", {
+          hasParentComment: !!parentComment,
+          isDifferentUser:
+            parentComment && parentComment.postedBy._id !== userId,
+        }); // Debug
+      }
+    },
+    onError: (error) => {
+      console.error("addReplyMutation failed:", error); // Debug
     },
   });
 
@@ -432,7 +471,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       parentCommentId: replyInput.parentCommentId,
     });
 
-    // Clear reply input
     setReplyInputs((prev) => ({
       ...prev,
       [commentId]: { text: "", parentCommentId: "" },
@@ -451,7 +489,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     <div className="flex gap-2 mt-4 ml-8">
       <Avatar className="h-6 w-6">
         <AvatarImage src={user?.image} />
-        <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+        <AvatarFallback>{user?.name?.charAt(0) || "U"}</AvatarFallback>
       </Avatar>
       <div className="flex-1 relative">
         <input
@@ -479,7 +517,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     </div>
   );
 
-  
   const renderComments = (commentList: Comment[], level = 0) => {
     return commentList.map((comment, index) => {
       const replies = repliesData[comment._id] || [];
@@ -495,12 +532,16 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                 src={comment?.postedBy?.image || "/placeholder.svg"}
               />
               <AvatarFallback className="border">
-                {comment?.postedBy?.name?.[0]}
+                {comment?.postedBy?.name?.[0] ||
+                  comment?.postedBy?.user_name?.[0] ||
+                  "U"}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <strong className="text-muted textsm">
-                {comment?.postedBy?.name}
+              <strong className="text-muted text-sm">
+                {comment?.postedBy?.name ||
+                  comment?.postedBy?.user_name ||
+                  "Unknown"}
               </strong>
               <span className="text-xs text-accent">
                 {new Date(comment?.commentedAt).toLocaleDateString()}
