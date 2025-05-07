@@ -25,6 +25,7 @@ import { StringConstants } from "../common/CommonText";
 import { push, update, ref } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
+import { sendNotification } from "../utils/notification";
 
 interface PostCardProps {
   post: {
@@ -101,7 +102,6 @@ export function PostCard({ post, cardRef, userID }: PostCardProps) {
     router.push(COMMUNITY_PROFILE_PATH);
   }, [dispatch, router, post]);
 
-  // Add comment mutation
   const commentMutation = useMutation({
     mutationFn: async (comment: string) => {
       const response = await axios.post(
@@ -114,11 +114,29 @@ export function PostCard({ post, cardRef, userID }: PostCardProps) {
       );
       return response.data.data;
     },
-    onSuccess: () => {
+    onSuccess: async (newComment) => {
       // Invalidate and refetch comments
       queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
       // Also invalidate post data to update comment count
       queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+
+      // Send notification to post owner if commenter is not the post owner
+      if (post.user_id?._id !== user?._id) {
+        await sendNotification(post.user_id?.email, {
+          userId: post.user_id._id,
+          type: "post_comment",
+          message: `${user.name} commented on your post`,
+          read: false,
+          createdAt: new Date().toISOString(),
+          data: {
+            postId: post._id,
+            userId: user._id,
+            userName: user.name,
+            userImage: user.image,
+            commentId: newComment._id,
+          },
+        });
+      }
     },
   });
 
