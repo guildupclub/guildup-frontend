@@ -47,11 +47,11 @@ interface PostCardProps {
       _id: string;
     };
   };
-  ref: any;
+  cardRef: any;
   userID: string;
 }
 
-export function PostCard({ post, ref, userID }: PostCardProps) {
+export function PostCard({ post, cardRef, userID }: PostCardProps) {
   const community_id = post.community_id?._id;
   const community_name = post.community_id?.name;
   const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
@@ -296,7 +296,7 @@ export function PostCard({ post, ref, userID }: PostCardProps) {
   const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
 
   return (
-    <div className="bg-card rounded-xl mb-4" ref={ref}>
+    <div className="bg-card rounded-xl mb-4" ref={cardRef}>
       <div className="p-4">
         <div className="flex gap-3">
           <div className="flex-shrink-0 w-10">
