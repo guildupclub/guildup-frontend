@@ -475,7 +475,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         <div className="overflow-hidden rounded-xl border border-border/5 bg-card shadow-lg">
           {/* Banner Image */}
           <div className="relative">
-            <div className="h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
+            <div className="h-44 lg:h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
               <Image
                 src={
                   profile?.community.background_image != undefined
@@ -493,20 +493,20 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
           <div className="flex flex-col md:flex-row">
             {/* Left Column - Profile Image and Key Actions */}
-            <div className="w-full md:w-1/3 px-6 pt-0 pb-6 relative">
+            <div className="w-full md:w-1/3 px-2 lg:px-6 pt-0 pb-6 relative">
               {/* Profile Avatar - Half on background, half below */}
-              <div className="absolute -top-20 left-10">
+              <div className="absolute -top-20 left-4 lg:left-10">
                 <Image
                   src={profile?.community?.image || avatarImgUrl}
                   alt={profile?.community?.name || "Community Avatar"}
                   width={200}
                   height={200}
-                  className="h-60 w-56 rounded-xl border-4 border-background bg-primary/5 object-cover transition-transform duration-300 hover:scale-105 shadow-lg"
+                  className="h-44 lg:h-60 w-44 lg:w-56 rounded-xl border-4 border-background bg-primary/5 object-cover transition-transform duration-300 hover:scale-105 shadow-lg"
                   unoptimized
                 />
               </div>
-              <div className="mt-20">
-                <div className="flex flex-col gap-2  pt-24 w-56 ml-4">
+              <div className="mt-20 hidden md:block">
+                <div className="flex flex-col gap-2 pt-8 lg:pt-24 w-56 lg:ml-4">
                   {/* <h1 className="flex items-center  text-lg font-semibold text-muted">
                     {profile?.community?.name} - {profile.user.user_name}
                   </h1> */}
@@ -547,7 +547,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             </div>
 
             {/* Right Column - Community Details */}
-            <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10">
+            <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10 pt-20 lg:pt-4 ">
               <div className="space-y-2">
                 <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
                   {profile?.community?.name}
@@ -717,6 +717,46 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </>
                   )}
                 </div>
+              </div>
+            </div>
+
+            <div className=" block md:hidden mt-4 px-4">
+              <div className="flex flex-col gap-2 w-full lg:ml-4">
+                {/* <h1 className="flex items-center  text-lg font-semibold text-muted">
+                    {profile?.community?.name} - {profile.user.user_name}
+                  </h1> */}
+                {isOwner ? (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                    onClick={handleShareClick}
+                    title="Share Profile"
+                  >
+                    Share Profile
+                    <Share2 className="ml-2 h-5 w-5" />
+                  </Button>
+                ) : isCommunityFollowed ? (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                    onClick={handleLeaveCommunity}
+                  >
+                    {StringConstants.FOLLOWING}
+                    <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                    onClick={handleJoinCommunity}
+                  >
+                    <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                    {StringConstants.FOLLOW}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
