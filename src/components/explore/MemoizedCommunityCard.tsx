@@ -237,6 +237,53 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             <h3 className="font-medium text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary-foreground transition-colors duration-300">
               {communityDetails?.name}
             </h3>
+
+            <div className="flex items-center gap-6 text-sm text-gray-500 mt-4">
+              <div>
+                {communityDetails?.owner_experience > 0 && (
+                  // <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                  //   <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
+                  //   <span>{formatNumber(communityDetails.num_member)}+</span>
+                  // </div>
+                  <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5 text-amber-500"
+                    >
+                      <circle cx="12" cy="8" r="7" />
+                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </svg>
+                    <span>
+                      {formatNumber(communityDetails?.owner_experience)}+
+                    </span>
+                  </div>
+                )}
+              </div>
+              {communityDetails?.owner_sessions > 0 && (
+                <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-violet-500"
+                  >
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <span>{formatNumber(communityDetails?.owner_sessions)}+</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -263,50 +310,10 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
 
         {/* Premium Stats Bar - Clear separation from tags */}
         <div className="flex items-center gap-5 text-xs text-gray-500 border-t border-b border-gray-100 py-2.5">
-          {communityDetails?.owner_experience > 0 && (
-            // <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
-            //   <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
-            //   <span>{formatNumber(communityDetails.num_member)}+</span>
-            // </div>
+          {communityDetails?.num_member > 0 && (
             <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5 text-amber-500"
-              >
-                <circle cx="12" cy="8" r="7" />
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-              </svg>
-              <span>{formatNumber(communityDetails?.owner_experience)}+</span>
-            </div>
-          )}
-
-          {communityDetails?.owner_sessions > 0 && (
-            // <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
-            //   <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
-            //   <span>{formatNumber(communityDetails.num_member)}+</span>
-            // </div>
-            <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5 text-violet-500"
-              >
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-              </svg>
-
-              <span>{formatNumber(communityDetails?.owner_sessions)}+</span>
+              <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
+              <span>{formatNumber(communityDetails.num_member)}+</span>
             </div>
           )}
 
