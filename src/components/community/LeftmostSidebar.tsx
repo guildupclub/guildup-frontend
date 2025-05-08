@@ -262,7 +262,7 @@ export function LeftmostSidebar() {
   }
 
   return (
-    <div className="hidden md:flex fixed left-0 h-screen w-20 md:bg-indigo-400/80 text-white flex-col items-center border-r border-background py-20 gap-3">
+    <div className="hidden md:flex md:bg-card  fixed left-0 h-screen w-20  flex-col items-center border-r border-background py-20 gap-3">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -319,7 +319,7 @@ export function LeftmostSidebar() {
                     alt={community.name}
                     className="!rounded-lg"
                   />
-                  
+
                   <AvatarFallback className="!rounded-lg bg-primary text-white">
                     {getInitials(community.name)}
                   </AvatarFallback>
