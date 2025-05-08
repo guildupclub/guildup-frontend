@@ -63,8 +63,8 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            From fitness and nutrition to therapy and coaching—find <br/> someone who
-            gets you.
+            From fitness and nutrition to therapy and coaching—find <br />{" "}
+            someone who gets you
           </motion.p>
 
           <motion.div

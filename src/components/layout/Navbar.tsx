@@ -291,7 +291,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </AnimatePresence>
             </div>
 
-            <div className="hidden md:flex space-x-1 items-center justify-center">
+            <div className="hidden md:flex space-x-6 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
                 <ul className="flex items-center space-x-2 text-gray-600">
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
@@ -352,17 +352,18 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
+
+                  {user?._id && <NotificationDropdown />}
                 </ul>
               </div>
 
-              <div className="hidden md:block ml-4">
+              <div className="hidden md:block ml-8">
                 {user?._id ? (
-                  <div className="flex items-center gap-2">
-                    <NotificationDropdown />
+                  <div className="flex items-center ">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
-                          <Avatar className="h-9 w-9">
+                          <Avatar className="h-10 w-10">
                             {session?.user?.image ? (
                               <AvatarImage
                                 src={session?.user?.image}

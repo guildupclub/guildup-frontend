@@ -1,55 +1,69 @@
-"use client"
+"use client";
 
-import { Bell } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useNotifications } from "./NotificationContext"
-import { formatDistanceToNow } from "date-fns"
+import { Bell } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useNotifications } from "./NotificationContext";
+import { formatDistanceToNow } from "date-fns";
 
 const NotificationDropdown = () => {
-  const context = useNotifications()
+  const context = useNotifications();
 
   if (!context) {
-    console.error("NotificationDropdown must be used within a NotificationProvider")
-    return null
+    console.error(
+      "NotificationDropdown must be used within a NotificationProvider"
+    );
+    return null;
   }
 
-  const { notifications, unreadCount, loading, markAsRead, markAllAsRead, fetchNotifications } = context
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    fetchNotifications,
+  } = context;
 
   const handleRefresh = async () => {
     try {
-      await fetchNotifications()
+      await fetchNotifications();
     } catch (error) {
-      console.error("Error refreshing notifications:", error)
+      console.error("Error refreshing notifications:", error);
     }
-  }
+  };
 
   const handleNotificationClick = async (notificationId: string) => {
     try {
-      await markAsRead(notificationId)
+      await markAsRead(notificationId);
     } catch (error) {
-      console.error("Error marking notification as read:", error)
+      console.error("Error marking notification as read:", error);
     }
-  }
+  };
 
   try {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex flex-col items-center">
-            <button className="relative rounded-full hover:bg-zinc-100 transition-colors p-2">
-              <Bell className="h-5 w-5 text-gray-600" />
+            <button className="relative rounded-full text-gray-600  hover:bg-gray-50 transition-colors p-1">
+              <Bell className="h-5 w-5 mb-0 pb-0" />
               {unreadCount > 0 && (
                 <Badge
                   variant="destructive"
-                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-xs"
                 >
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </Badge>
               )}
             </button>
-            <span className="text-sm mt-1 text-zinc-500">Notifications</span>
+            <span className="text-gray-600 text-sm">Notifications</span>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-80 max-h-[400px] overflow-y-auto mt-2 bg-white">
@@ -63,7 +77,10 @@ const NotificationDropdown = () => {
                 Refresh
               </button>
               {unreadCount > 0 && (
-                <button onClick={markAllAsRead} className="text-xs text-primary hover:underline">
+                <button
+                  onClick={markAllAsRead}
+                  className="text-xs text-primary hover:underline"
+                >
                   Mark all as read
                 </button>
               )}
@@ -87,19 +104,26 @@ const NotificationDropdown = () => {
               {notifications.map((notification) => (
                 <DropdownMenuItem
                   key={notification._id}
-                  className={`p-3 cursor-pointer ${notification.read ? "bg-white" : "bg-zinc-100 font-semibold"}`}
+                  className={`p-3 cursor-pointer ${
+                    notification.read ? "bg-white" : "bg-zinc-100 font-semibold"
+                  }`}
                   onClick={() => handleNotificationClick(notification._id)}
                 >
                   <div className="flex gap-3 w-full">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm bg-transparent line-clamp-2">{notification.message}</p>
+                      <p className="text-sm bg-transparent line-clamp-2">
+                        {notification.message}
+                      </p>
                       <p className="text-xs text-zinc-500 mt-1">
                         {notification.createdAt &&
                           (() => {
                             try {
-                              return formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })
+                              return formatDistanceToNow(
+                                new Date(notification.createdAt),
+                                { addSuffix: true }
+                              );
                             } catch (error) {
-                              return "recently"
+                              return "recently";
                             }
                           })()}
                       </p>
@@ -115,26 +139,26 @@ const NotificationDropdown = () => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-    )
+    );
   } catch (error) {
-    console.error("Error rendering notification dropdown:", error)
+    console.error("Error rendering notification dropdown:", error);
     return (
-      <div className="flex flex-col items-center">
-        <button className="relative rounded-full hover:bg-zinc-100 transition-colors p-2">
-          <Bell className="h-5 w-5 text-gray-600" />
+      <div className="flex flex-col items-center justify-center ">
+        <div className="relative flex items-center justify-center h-4 w-4 text-gray-600 hover:bg-gray-50">
+          <Bell className=" " />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              className="absolute -top-2 -right-2 p-0 text-[6px] h-4 w-4 flex items-center justify-center"
             >
               {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
           )}
-        </button>
-        <span className="text-sm mt-1 text-zinc-500">Notifications</span>
+        </div>
+        <span className="text-sm ">Notifications</span>
       </div>
-    )
+    );
   }
-}
+};
 
-export default NotificationDropdown
+export default NotificationDropdown;
