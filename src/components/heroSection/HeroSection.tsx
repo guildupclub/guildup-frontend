@@ -46,7 +46,7 @@ export default function Hero() {
               transition={{ delay: 0.2, duration: 0.8 }}
             >
               <span className="text-foreground"> Get Help That </span> Truly
-              Helps .
+              Helps 
             </motion.span>
             {/* <motion.span
               className="text-foreground"
