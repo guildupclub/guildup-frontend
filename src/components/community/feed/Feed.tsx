@@ -43,51 +43,49 @@ export function Feed({ communityId }: FeedProps) {
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
-  
+
   const [sortBy, setSortBy] = useState("newest");
   const [filter, setFilter] = useState("Your Activity");
   const [channel, setChannel] = useState("Open Discussion");
 
-  const { 
-    data: posts = [], 
-    isLoading, 
-    error 
-  } = useCommunityPosts(communityId);
+  const { data: posts = [], isLoading, error } = useCommunityPosts(communityId);
 
   // Show message for non-signed in users or users without communities
-  if (!session ) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-        <div className="flex flex-col items-center space-y-6 max-w-md text-center">
-          <FaUsers className="w-16 h-16 text-muted-foreground" />
-          <h1 className="text-2xl font-semibold">
-            {!session ? "Sign in to view community posts" : "No Communities Joined"}
-          </h1>
-          <p className="text-muted-foreground">
-            {!session 
-              ? "Please sign in to view and interact with community posts"
-              : "Join some communities to start seeing posts"}
-          </p>
-          <div className="flex gap-4">
-            <Link
-              href="/"
-              className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
-            >
-             {StringConstants.EXPLORE_COMMUNITY} 
-            </Link>
-            {!session && (
-              <Link
-                href="/api/auth/signin"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                {StringConstants.SIGN_IN}
-              </Link>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // if (!session) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+  //       <div className="flex flex-col items-center space-y-6 max-w-md text-center">
+  //         <FaUsers className="w-16 h-16 text-muted-foreground" />
+  //         <h1 className="text-2xl font-semibold">
+  //           {!session
+  //             ? "Sign in to view community posts"
+  //             : "No Communities Joined"}
+  //         </h1>
+  //         <p className="text-muted-foreground">
+  //           {!session
+  //             ? "Please sign in to view and interact with community posts"
+  //             : "Join some communities to start seeing posts"}
+  //         </p>
+  //         <div className="flex gap-4">
+  //           <Link
+  //             href="/"
+  //             className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+  //           >
+  //             {StringConstants.EXPLORE_COMMUNITY}
+  //           </Link>
+  //           {!session && (
+  //             <Link
+  //               href="/api/auth/signin"
+  //               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  //             >
+  //               {StringConstants.SIGN_IN}
+  //             </Link>
+  //           )}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen grow py-2 md:py-24">
@@ -160,7 +158,10 @@ export function Feed({ communityId }: FeedProps) {
         {/* Error state */}
         {error && (
           <div className="py-8 text-center">
-            <p className="text-red-500">{StringConstants.ERROR_LOADING_POSTS} {StringConstants.PLEASE_TRY_AGAIN}</p>
+            <p className="text-red-500">
+              {StringConstants.ERROR_LOADING_POSTS}{" "}
+              {StringConstants.PLEASE_TRY_AGAIN}
+            </p>
           </div>
         )}
 
@@ -171,9 +172,14 @@ export function Feed({ communityId }: FeedProps) {
               <Loader />
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
+            <div className="text-center text-zinc-400">
+              {StringConstants.NO_POST_AVAILABLE}
+            </div>
           ) : (
-            posts.map((post) => <PostCard key={post._id} post={post} />)
+            posts
+              .slice()
+              .reverse()
+              .map((post) => <PostCard key={post._id} post={post} />)
           )}
         </div>
       </div>
