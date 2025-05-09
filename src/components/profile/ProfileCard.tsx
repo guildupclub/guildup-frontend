@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { RootState } from "@/redux/store";
 import axios from "axios";
 import Image from "next/image";
@@ -37,21 +37,14 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
-import numbro from "numbro";
-import { motion } from "framer-motion";
-import Testimonials from "../testimonial/Testimonial";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Loader from "../Loader";
 import { FaLinkedinIn } from "react-icons/fa6";
-import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { RiUserSharedFill } from "react-icons/ri";
-import { Stepper } from "./Steeper";
-import { FaShareAlt } from "react-icons/fa";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useNotifications } from '../notifications/NotificationContext';
+import { FaClock, FaShareAlt } from "react-icons/fa";
+import { useNotifications } from "../notifications/NotificationContext";
 import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
+import { FcClock } from "react-icons/fc";
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -212,22 +205,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     };
   }, []);
 
-  // Add this near the top of your component, after other useQuery hooks
-  const { data: followedCommunitiesData } = useQuery({
-    queryKey: ["userFollowedCommunities"],
-    enabled: !!user?._id,
-  });
-
-  // Update the isCommunityFollowed check to use the query data
-  const isCommunityFollowed = React.useMemo(() => {
-    if (followedCommunitiesData) {
-      return followedCommunitiesData.some(
-        (c: any) => c?._id === activeCommunityId
-      );
-    }
-    return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
-  }, [followedCommunitiesData, userFollowedCommunities, activeCommunityId]);
-
   const isOwner =
     memberDetails &&
     memberDetails.is_owner === true &&
@@ -366,11 +343,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     },
   });
 
-  const handleLeaveCommunity = () => {
-    if (!user?._id || !activeCommunityId) return;
-    unfollowMutation.mutate();
-  };
-
   useEffect(() => {
     fetchOfferings();
   }, [community.communityId, fetchOfferings]);
@@ -389,7 +361,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     onSuccess: async (data) => {
       if (data.r === "s") {
         toast.success("Successfully joined the community!");
-        console.log('data upon follow', data);
+        console.log("data upon follow", data);
         // Update the cache to reflect the new followed community
         queryClient.setQueryData(
           ["userFollowedCommunities"],
@@ -404,18 +376,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         });
 
         // Send notification to   community owner
-        console.log('data upon follow', data);
-        console.log('current user', user);
-        console.log('profile data', profile);
-        console.log('profile email', profile?.user?.user_email);
+        console.log("data upon follow", data);
+        console.log("current user", user);
+        console.log("profile data", profile);
+        console.log("profile email", profile?.user?.user_email);
 
         const email = removeSpecialCharacters(profile?.user?.user_email);
-        
+
         if (data.data?.user_id) {
-         
           const notificationsRef = ref(database, `notification/${email}`);
           const newNotificationRef = push(notificationsRef);
-          console.log('new notification ref', newNotificationRef);
+          console.log("new notification ref", newNotificationRef);
           await update(newNotificationRef, {
             type: "community_follow",
             message: `${user.name} started following your community`,
@@ -425,8 +396,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               communityId: activeCommunityId,
               userId: user._id,
               userName: user.name,
-              userImage: user.image
-            }
+              userImage: user.image,
+            },
           });
         }
       }
@@ -1007,6 +978,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-gray-600">
                           {offering.description}
                         </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
+                      <FcClock size={28} className="text-primary-foreground" />
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                        <span className="text-base  font-semibold text-gray-700">
+                          Duration:
+                        </span>
+                        <span className="text-base text-gray-600">
+                          {offering.duration} min
+                        </span>
                       </div>
                     </div>
 

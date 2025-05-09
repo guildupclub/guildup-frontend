@@ -39,6 +39,7 @@ import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
+import { MdOutlineRssFeed } from "react-icons/md";
 
 // interface Community {
 //   _id: string;
