@@ -4,7 +4,6 @@ import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
-import { headers } from 'next/headers';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,16 +56,23 @@ export default async function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/guildup_logo_final.png" type="image/png" />
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
-      <script>
-        {`
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
+        <script>
+          {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){window.dataLayer.push(arguments);}
         gtag('js', new Date());
 
         gtag('config', 'G-B3B9W8GRQP');
         `}
-      </script>
+        </script>
+        <script type="text/javascript">
+          {` (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "rgpxrvmq3a");`}
+        </script>
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
