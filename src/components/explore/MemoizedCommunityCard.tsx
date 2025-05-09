@@ -227,7 +227,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                 alt="Profile"
                 width={80}
                 height={80}
-                className="rounded-xl object-cover w-16 h-16 transition-all duration-500 group-hover:shadow-lg border border-gray-100"
+                className="rounded-xl object-cover w-20 h-20 transition-all duration-500 group-hover:shadow-lg border border-gray-100"
               />
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-100/20 via-purple-100/20 to-pink-100/20 rounded-xl blur-sm -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
