@@ -37,9 +37,21 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
-import { FaLinkedinIn, FaShareAlt } from "react-icons/fa";
-
-// Types
+import numbro from "numbro";
+import { motion } from "framer-motion";
+import Testimonials from "../testimonial/Testimonial";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Loader from "../Loader";
+import { FaLinkedinIn } from "react-icons/fa6";
+import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
+import { RiUserSharedFill } from "react-icons/ri";
+import { Stepper } from "./Steeper";
+import { FaShareAlt } from "react-icons/fa";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNotifications } from '../notifications/NotificationContext';
+import { ref, push, update } from "firebase/database";
+import database from "../../../firebase";
+import { removeSpecialCharacters } from "../utils/StringUtils";
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -167,6 +179,54 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [isEditOpen, setIsEditOpen] = useState(false);
 
   const activeCommunityId = communityId || community?.communityId;
+
+  // Add this ref and effect for the infinite scroll animation
+  const testimonialRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollContainer = testimonialRef.current;
+    if (!scrollContainer) return;
+
+    let animationId: number;
+    let startTime: number | null = null;
+    const duration = 30000; // 30 seconds for one complete scroll
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = (elapsed % duration) / duration;
+
+      if (scrollContainer) {
+        const totalWidth =
+          scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        scrollContainer.scrollLeft = totalWidth * progress;
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, []);
+
+  // Add this near the top of your component, after other useQuery hooks
+  const { data: followedCommunitiesData } = useQuery({
+    queryKey: ["userFollowedCommunities"],
+    enabled: !!user?._id,
+  });
+
+  // Update the isCommunityFollowed check to use the query data
+  const isCommunityFollowed = React.useMemo(() => {
+    if (followedCommunitiesData) {
+      return followedCommunitiesData.some(
+        (c: any) => c?._id === activeCommunityId
+      );
+    }
+    return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
+  }, [followedCommunitiesData, userFollowedCommunities, activeCommunityId]);
 
   const isOwner =
     memberDetails &&
@@ -306,7 +366,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     },
   });
 
-  // Mutation for following a community
+  const handleLeaveCommunity = () => {
+    if (!user?._id || !activeCommunityId) return;
+    unfollowMutation.mutate();
+  };
+
+  useEffect(() => {
+    fetchOfferings();
+  }, [community.communityId, fetchOfferings]);
+
   const followMutation = useMutation({
     mutationFn: async () => {
       const response = await axios.post(
@@ -318,9 +386,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data.r === "s") {
         toast.success("Successfully joined the community!");
+        console.log('data upon follow', data);
         // Update the cache to reflect the new followed community
         queryClient.setQueryData(
           ["userFollowedCommunities"],
@@ -333,6 +402,33 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         queryClient.invalidateQueries({
           queryKey: ["userFollowedCommunities"],
         });
+
+        // Send notification to   community owner
+        console.log('data upon follow', data);
+        console.log('current user', user);
+        console.log('profile data', profile);
+        console.log('profile email', profile?.user?.user_email);
+
+        const email = removeSpecialCharacters(profile?.user?.user_email);
+        
+        if (data.data?.user_id) {
+         
+          const notificationsRef = ref(database, `notification/${email}`);
+          const newNotificationRef = push(notificationsRef);
+          console.log('new notification ref', newNotificationRef);
+          await update(newNotificationRef, {
+            type: "community_follow",
+            message: `${user.name} started following your community`,
+            read: false,
+            createdAt: new Date().toISOString(),
+            data: {
+              communityId: activeCommunityId,
+              userId: user._id,
+              userName: user.name,
+              userImage: user.image
+            }
+          });
+        }
       }
     },
     onError: (error) => {

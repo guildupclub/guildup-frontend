@@ -61,6 +61,7 @@ export default async function RootLayout({
           gtag('config', 'G-B3B9W8GRQP');
           `}
         </script>
+      
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>

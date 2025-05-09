@@ -45,16 +45,17 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              <span className="text-primary"> Book Experts.</span> Buy Services.
+              <span className="text-foreground"> Get Help That </span> Truly
+              Helps 
             </motion.span>
-            <motion.span
-              className="text-primary"
+            {/* <motion.span
+              className="text-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
               All in One Place
-            </motion.span>
+            </motion.span> */}
           </h1>
           <motion.p
             className="mt-6 text-xl text-muted font-medium max-w-2xl mx-auto"
@@ -62,8 +63,8 @@ export default function Hero() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            No more chasing links or juggling apps—find, book, and pay trusted
-            experts in one smooth flow
+            From fitness and nutrition to therapy and coaching—find <br />{" "}
+            someone who gets you
           </motion.p>
 
           <motion.div
