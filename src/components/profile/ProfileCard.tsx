@@ -659,7 +659,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span className="font-medium text-foreground">
                       {profile.user.user_year_of_experience}
                     </span>
-                    <span>years experience</span>
+                    <span>years of experience</span>
                   </div>
                 )}
 
