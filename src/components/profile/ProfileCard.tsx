@@ -657,9 +657,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
                     </svg>
                     <span className="font-medium text-foreground">
-                      {profile.user.user_year_of_experience}
+                      {profile.user.user_year_of_experience}+
                     </span>
-                    <span>years of experience</span>
+                    <span>Years of experience</span>
                   </div>
                 )}
 
@@ -680,9 +680,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
                     </svg>
                     <span className="font-medium text-foreground">
-                      {profile.user.user_session_conducted}
+                      {profile.user.user_session_conducted}+
                     </span>
-                    <span>sessions</span>
+                    <span>Sessions Conducted</span>
                   </div>
                 )}
 
