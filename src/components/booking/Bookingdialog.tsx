@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import {
   Dialog,
   DialogContent,
@@ -15,28 +13,23 @@ declare global {
     Razorpay: any;
   }
 }
-import {
-  CalendarIcon,
-  Clock,
-  FileText,
-  DollarSign,
-  ChevronLeft,
-  Check,
-} from "lucide-react";
-import { format, set } from "date-fns";
+import { CalendarIcon, Clock, ChevronLeft, Check } from "lucide-react";
+import { format } from "date-fns";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
 import {
   loadRazorpayScript,
-  RazorpayOptions,
-  RazorpayResponse,
+  type RazorpayOptions,
+  type RazorpayResponse,
 } from "@/components/utils/razorpay";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRupeeSign } from "react-icons/fa";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -48,7 +41,7 @@ interface BookingDialogProps {
       currency: string;
     };
     discounted_price: number;
-    when: Date,
+    when: Date;
     duration: number;
     is_free: boolean;
   };
@@ -87,15 +80,21 @@ export function BookingDialog({
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [phone, setPhone] = useState("");
   const [bookingStep, setBookingStep] = useState<
     "date" | "time" | "confirmation"
   >("date");
+
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingDetails, setBookingDetails] = useState<any>(null);
 
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const user = useSelector((state: RootState) => state.user.user);
+  const name = user?.name || "";
+  const email = user?.email || "";
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -105,18 +104,20 @@ export function BookingDialog({
 
   useEffect(() => {
     if (!offering) return;
-  
+
     if (offering.type === "webinar") {
       setBookingStep("confirmation");
       const webinarDate = new Date(offering.when);
       setSelectedDate(webinarDate);
       setSelectedSlot({
         start: webinarDate.toISOString(),
-        end: new Date(webinarDate.getTime() + offering.duration * 60000).toISOString(),
+        end: new Date(
+          webinarDate.getTime() + offering.duration * 60000
+        ).toISOString(),
       });
-    }  
+    }
   }, [offering]);
-  
+
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
@@ -178,6 +179,31 @@ export function BookingDialog({
     }
 
     try {
+      // First, submit user information to wati API
+      const phoneWithoutFormatting = phone.replace(/\D/g, ""); // Remove all non-digit characters
+
+      // Make sure phone has country code without + or spaces
+      if (!phoneWithoutFormatting) {
+        toast.error("Phone number is required");
+        setIsProcessing(false);
+        return;
+      }
+
+      // Submit user information to wati API
+      const watiResponse = await axios.post(
+        "http://localhost:8000/v1/profile/wati/addContact",
+        {
+          userId: userId,
+          phone: phoneWithoutFormatting,
+        }
+      );
+
+      if (!watiResponse.data.data?.watiSync?.success) {
+        toast.error("Failed to register phone number");
+        setIsProcessing(false);
+        return;
+      }
+
       // Add your booking API call here
       const dateObject = new Date(selectedSlot.start);
 
@@ -193,16 +219,18 @@ export function BookingDialog({
           user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
-          startTime
+          startTime,
         }
       );
 
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
-        if(offering.is_free){
-          toast.success("Booking confirmed successfully!");
+        if (offering.is_free) {
           setIsProcessing(false);
-          onClose();
+          // Store booking details and show success modal
+          setBookingDetails(response.data.data);
+          setBookingSuccess(true);
+          toast.success("Booking confirmed successfully!");
           return;
         }
         // Start Razorpay payment process
@@ -213,7 +241,7 @@ export function BookingDialog({
           name: "GuildUp", // Your business name
           description: "Slot Booking Payment",
           order_id: response.data.data.id, // Razorpay order ID from backend
-          handler: async function (paymentResponse: any) {
+          handler: async (paymentResponse: any) => {
             console.log("Payment Success:", paymentResponse);
             // After successful payment, call your backend to verify the payment
             const dateObject = new Date(selectedSlot.start);
@@ -237,15 +265,18 @@ export function BookingDialog({
             );
 
             if (response.data.r === "s") {
-              onClose();
               setIsProcessing(false);
+              // Store booking details and show success modal
+              setBookingDetails(response.data.data);
+              setBookingSuccess(true);
               setTimeout(() => {
                 toast.success("Booking confirmed successfully!");
               }, 300);
               console.log("Booking confirmed successfully!");
-              // alert("Booking confirmed successfully!");
+              // Don't close the dialog here
             } else {
               toast.error("Payment verification failed");
+              onClose();
             }
           },
           theme: {
@@ -254,13 +285,16 @@ export function BookingDialog({
         };
 
         const razorpayInstance = new window.Razorpay(razorpayOptions);
-        onClose(); // closing the dialog before opening the payment gateway
         razorpayInstance.open();
       } else {
         console.error("Failed to create order:", response.data.message);
+        toast.error("Failed to create order");
       }
     } catch (error) {
       console.error("Error booking slot:", error);
+      toast.error("Failed to process booking");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -285,7 +319,7 @@ export function BookingDialog({
       name: "GuildUp",
       description: `Booking for ${offering.title}`,
       order_id: orderId,
-      handler: function (response: RazorpayResponse) {
+      handler: (response: RazorpayResponse) => {
         handlePaymentVerification(response);
       },
       prefill: {
@@ -304,9 +338,7 @@ export function BookingDialog({
     razorpay.open();
   };
 
-  const handlePaymentVerification = async (
-    paymentResponse: any
-  ) => {
+  const handlePaymentVerification = async (paymentResponse: any) => {
     try {
       console.log("Payment response:", paymentResponse);
       const response = await axios.post(
@@ -317,56 +349,27 @@ export function BookingDialog({
           razorpay_signature: paymentResponse.razorpay_signature,
           user_id: user?._id,
           offering_id: offering._id,
-          // date: format(selectedDate!, "yyyy-MM-dd"),
           startTime: selectedSlot!.start,
-          // end_time: selectedSlot!.end,
         }
       );
 
       if (response.data.booking) {
+        // Don't close the dialog here
+        setIsProcessing(false);
+        // Store booking details and show success modal
+        setBookingDetails(response.data.booking);
+        setBookingSuccess(true);
         toast.success("Booking confirmed successfully!");
         console.log("Booking confirmed successfully!");
-        // alert("Booking confirmed successfully!");
-        onClose();
       } else {
         toast.error("Payment verification failed");
+        onClose();
       }
     } catch (error) {
       console.error("Payment verification error:", error);
-      // toast.error("Failed to verify payment");
+      onClose();
     }
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    // const handleBookSlot = async () => {
-    //   if (!selectedDate || !selectedSlot) return;
-
-    //   try {
-    //     setIsProcessing(true);
-    //     // Create Razorpay order
-    //     const response = await axios.post(
-    //       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/create-order`,
-    //       {
-    //         amount: offering.price.amount,
-    //         currency: offering.price.currency,
-    //         offering_id: offering._id,
-    //       }
-    //     );
-
-    //     if (response.data.success && response.data.order.id) {
-    //       await handlePayment(response.data.order.id);
-    //     } else {
-    //       // toast.error("Failed to create payment order");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error creating order:", error);
-    //     // toast.error("Failed to initiate payment");
-    //   } finally {
-    //     setIsProcessing(false);
-    //   }
-    // };
-
     setIsProcessing(false);
-    onClose();
   };
 
   return (
@@ -375,43 +378,44 @@ export function BookingDialog({
         <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted  border border-border/50 rounded-xl shadow-xl  ">
           <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0 ">
             {/* Left Section - Welcome Panel */}
-            <div className="p-8 flex flex-col items-center text-center space-y-6 border-r border-border/20">
-              <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm h-auto">
+            <div className="p-8 flex flex-col items-center text-center border-r border-border/20">
+              <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm">
                 {/* Title */}
                 <h1 className="text-muted font-bold text-2xl">
                   Hello {user?.name}
                 </h1>
 
                 {/* Avatar */}
-                <div className="relative w-24 h-24 mx-auto">
+                <div className="relative w-24 h-24 mx-auto my-4">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
                   <img
                     src={
                       activeCommunity?.image ||
-                      "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh"
+                      "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh" ||
+                      "/placeholder.svg" ||
+                      "/placeholder.svg" ||
+                      "/placeholder.svg"
                     }
                     alt="User"
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-md"
                   />
                 </div>
 
-                {/* User Name */}
-                <div className="text-center">
-                  <p className="text-xl font-semibold text-primary leading-tight">
+                <div className="text-center space-y-2">
+                  <p className="text-xl font-semibold text-primary">
                     Booking {offering.title}
                   </p>
                   <p className="flex items-center justify-center gap-1 text-muted-foreground">
-                    <GoDotFill className="" />
+                    <GoDotFill className="w-3 h-3" />
                     {offering?.type}
                   </p>
                 </div>
-
                 {/* Details (Duration & Price) */}
-                <div className="flex justify-between items-center w-full px-4 py-6">
+                <div className="grid grid-cols-2 gap-4 w-full mt-4 px-2 py-4 bg-primary-muted/20 rounded-lg">
                   {/* Duration */}
                   <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-500" />
-                    <div>
+                    <Clock className="w-5 h-5 text-blue-500 shrink-0" />
+                    <div className="text-left">
                       <p className="text-xs text-muted-foreground">Duration</p>
                       <p className="text-sm font-medium">
                         {offering.duration} min
@@ -421,18 +425,15 @@ export function BookingDialog({
 
                   {/* Price */}
                   <div className="flex items-center gap-2">
-                    <FaRupeeSign className="h-5 w-5 text-green-500" />
-                    <div>
+                    <FaRupeeSign className="h-5 w-5 text-green-500 shrink-0" />
+                    <div className="text-left">
                       <p className="text-xs text-muted-foreground">Price</p>
                       <p className="text-sm font-medium">
-                        {/* {offering.price.currency} */}
                         {offering.discounted_price || offering.price.amount}
                       </p>
                     </div>
                   </div>
                 </div>
-
-                {/* <p>{offering?.description}</p> */}
               </div>
             </div>
 
@@ -440,7 +441,7 @@ export function BookingDialog({
             <div className="p-6 bg-background">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
-                  Choose your available time slot
+                  Fill Basic Information for Booking
                 </DialogTitle>
               </DialogHeader>
 
@@ -523,7 +524,7 @@ export function BookingDialog({
                     className="space-y-6"
                   >
                     <div className="bg-card/30 p-6 rounded-lg space-y-6 shadow-sm border border-border/30">
-                      <div className="space-y-3">
+                      {/* <div className="space-y-3">
                         <h3 className="font-semibold text-lg flex items-center gap-2">
                           <CalendarIcon className="w-5 h-5 text-primary" />
                           Selected Date & Time
@@ -538,44 +539,89 @@ export function BookingDialog({
                             {formatTime(selectedSlot!.end)}
                           </p>
                         </div>
+                      </div> */}
+
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label htmlFor="phone" className="font-medium">
+                            Phone Number <span className="text-red-500">*</span>
+                          </label>
+                          <PhoneInput
+                            international
+                            defaultCountry="IN"
+                            value={phone}
+                            onChange={setPhone}
+                            className="w-full p-2 shadow-md border border-border/30 rounded-md"
+                            required
+                            placeholder="Enter your phone number"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Your phone number is required for booking
+                            confirmation
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <label htmlFor="name">Name</label>
+                          <input
+                            id="name"
+                            value={name}
+                            className="w-full p-2 shadow-md border border-border/30 rounded-md"
+                            type="text"
+                            placeholder="Enter your name"
+                            disabled
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label htmlFor="email">Email</label>
+                          <input
+                            id="email"
+                            value={email}
+                            className="w-full p-2 shadow-md border border-border/30 rounded-md"
+                            type="email"
+                            placeholder="Enter your email"
+                            disabled
+                          />
+                        </div>
                       </div>
 
-                      <div className="space-y-3 pt-2 border-t border-border/30">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                      {/* <div className="space-y-3 pt-2 border-t border-border/30"> */}
+                      {/* <h3 className="font-semibold text-lg flex items-center gap-2">
                           <FileText className="w-5 h-5 text-primary" />
                           Offering Details
                         </h3>
                         <p className="text-sm text-muted-foreground whitespace-pre-line">
                           {offering.description}
-                        </p>
+                        </p> */}
 
-                        <div className="grid grid-cols-2 gap-2 pt-2">
-                          <div className="bg-background/50 p-3 rounded-md flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary/70" />
-                            <div>
+                      {/* <div className="grid grid-cols-2 gap-2 pt-2"> */}
+                      {/* <div className="bg-background/50 p-3 rounded-md flex items-center gap-2"> */}
+                      {/* <Clock className="w-4 h-4 text-primary/70" /> */}
+                      {/* <div>
                               <p className="text-xs text-muted-foreground">
                                 Duration
                               </p>
                               <p className="text-sm font-medium">
                                 {offering.duration} minutes
                               </p>
-                            </div>
-                          </div>
-                          <div className="bg-background/50 p-3 rounded-md flex items-center gap-2">
-                            <FaRupeeSign className="h-5 w-5 text-green-500" />
-                            <div>
-                              <p className="text-xs text-muted-foreground">
-                                Price
-                              </p>
-                              <p className="text-sm font-medium">
-                                {/* {offering.price.currency}{" "} */}
-                                {offering.discounted_price ||
-                                  offering.price.amount}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                            </div> */}
+                      {/* </div> */}
+                      {/* <div className="bg-background/50 p-3 rounded-md flex items-center gap-2"> */}
+                      {/* <FaRupeeSign className="h-5 w-5 text-green-500" /> */}
+                      {/* <div> */}
+                      {/* <p className="text-xs text-muted-foreground"> */}
+                      {/* Price */}
+                      {/* </p> */}
+                      {/* <p className="text-sm font-medium"> */}
+                      {/* {offering.price.currency}{" "} */}
+                      {/* {offering.discounted_price || */}
+                      {/* offering.price.amount} */}
+                      {/* </p> */}
+                      {/* </div> */}
+                      {/* </div> */}
+                      {/* </div> */}
+                      {/* </div> */}
                     </div>
 
                     <div className="flex justify-end gap-3 pt-2">
@@ -592,7 +638,7 @@ export function BookingDialog({
                       </Button>
                       <Button
                         onClick={handleBookSlot}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
+                        className="bg-primary  hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
                         disabled={isProcessing}
                       >
                         {isProcessing ? (
@@ -615,6 +661,94 @@ export function BookingDialog({
           </div>
         </DialogContent>
       </div>
+      {bookingSuccess && (
+        <Dialog
+          open={bookingSuccess}
+          onOpenChange={() => {
+            setBookingSuccess(false);
+            onClose();
+          }}
+        >
+          <DialogContent className="sm:max-w-sm md:max-w-xl p-6 bg-card rounded-xl shadow-xl border border-border/50">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="w-8 h-8 text-green-600" />
+              </div>
+              <DialogTitle className="text-2xl font-bold text-foreground">
+                Booking Confirmed!
+              </DialogTitle>
+              <p className="text-muted-foreground mt-2">
+                Your booking has been successfully confirmed.
+              </p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div className="bg-background p-4 rounded-lg">
+                <h2 className="text-center font-semibold">Booking Detaills </h2>
+
+                <div>
+                  <p className="text-muted-foreground">Service Name</p>
+                  <p className="font-medium">{offering.title}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Date</p>
+                    <p className="font-medium">
+                      {selectedDate ? format(selectedDate, "PPP") : "N/A"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-muted-foreground">Time</p>
+                    <p className="font-medium">
+                      {selectedSlot
+                        ? `${formatTime(selectedSlot.start)} - ${formatTime(
+                            selectedSlot.end
+                          )}`
+                        : "N/A"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-muted-foreground">Duration</p>
+                    <p className="font-medium">{offering.duration} minutes</p>
+                  </div>
+
+                  <div>
+                    <p className="text-muted-foreground">Price</p>
+                    <p className="font-medium">
+                      {offering.price.currency}{" "}
+                      {offering.discounted_price || offering.price.amount}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-center">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setBookingSuccess(false);
+                  onClose();
+                }}
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  setBookingSuccess(false);
+                  onClose();
+                  window.location.href = "/booking";
+                }}
+              >
+                Go to Bookings
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 }
