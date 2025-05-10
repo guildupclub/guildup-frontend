@@ -62,7 +62,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   const activeCommunity = useSelector(
     (state: RootState) => state.channel.activeCommunity
   );
-  const userId = useSelector((state: RootState) => state.user.user._id);
+  const userId = useSelector((state: RootState) => state.user?.user?._id);
 
   const name = activeCommunity?.name;
   const getInitials = (name: string) => {

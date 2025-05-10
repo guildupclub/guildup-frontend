@@ -39,6 +39,7 @@ import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
+import { MdOutlineRssFeed } from "react-icons/md";
 
 // interface Community {
 //   _id: string;
@@ -228,7 +229,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 bg-white pt-2 lg:px-20 w-full flex border-b border-gray-100",
+          "fixed top-0 z-50 border-b border-gray-10 bg-[#F4F4FB] pt-2 lg:px-20 w-full flex ",
           props.className
         )}
         {...props}
@@ -313,7 +314,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
-                      <FileText
+                      <MdOutlineRssFeed
                         className={`h-5 w-5 ${
                           isActive("/feeds") ? "text-primary" : ""
                         }`}
@@ -452,7 +453,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             className="flex flex-col items-center justify-center gap-1"
           >
             <div className="w-6 h-6 flex items-center justify-center">
-              <FileText
+              <MdOutlineRssFeed
                 className={`w-5 h-5 ${
                   isActive("/feeds") ? "text-primary" : ""
                 }`}

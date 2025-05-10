@@ -11,6 +11,7 @@ import { useSession, signIn } from "next-auth/react";
 import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import numbro from "numbro";
+import { toast } from "sonner";
 
 interface Offering {
   type: string;
@@ -35,6 +36,8 @@ interface Community {
   linkedin_followers: number;
   instagram_followers: number;
   youtube_followers: number;
+  owner_sessions: number;
+  owner_experience: number;
 }
 
 interface CommunityCardProps {
@@ -70,6 +73,26 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     if (num < 1000) return num;
     return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
   };
+
+  const handleOfferingClick = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!session) {
+        toast("Please sign in to book the offering", {
+          action: {
+            label: "Sign In",
+            onClick: () =>
+              signIn(undefined, {
+                callbackUrl: `${window.location.origin}?hero=1`,
+              }),
+          },
+        });
+        return;
+      }
+      setSelectedOffering(firstOffering);
+    },
+    [session, firstOffering]
+  );
   return (
     <Card
       onClick={() => onClick(community.community._id)}
@@ -100,10 +123,57 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             <h3 className="font-semibold text-gray-800 text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors duration-300">
               {communityDetails.name}
             </h3>
+            <div className="flex items-center gap-6 text-sm text-gray-500 mt-4">
+              <div>
+                {communityDetails?.owner_experience > 0 && (
+                  // <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                  //   <ImUsers className="h-3.5 w-3.5 text-primary-foreground" />
+                  //   <span>{formatNumber(communityDetails.num_member)}+</span>
+                  // </div>
+                  <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-5 w-5 text-amber-500"
+                    >
+                      <circle cx="12" cy="8" r="7" />
+                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </svg>
+                    <span>
+                      {formatNumber(communityDetails?.owner_experience)}+
+                    </span>
+                  </div>
+                )}
+              </div>
+              {communityDetails?.owner_sessions > 0 && (
+                <div className="flex items-center gap-1.5 hover:text-primary-foreground transition-colors duration-300">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-violet-500"
+                  >
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <span>{formatNumber(communityDetails?.owner_sessions)}+</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Tags Section - horizontally scrollable, with original styling */}
+
         <div className="mt-4 mb-3 relative">
           <div className="overflow-x-auto scrollbar-hide pb-1.5">
             <div className="flex gap-1.5 min-w-min">
@@ -155,14 +225,13 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           )}
         </div>
 
-        {/* Offerings Section - Premium, minimal styling */}
         <div className="mt-auto flex-shrink-0">
           {firstOffering ? (
             <div className="mt-4 rounded-lg bg-gradient-to-r from-white to-gray-50 border border-gray-100/80 overflow-hidden group-hover:border-blue-100 transition-all duration-500">
               {/* Offering header */}
               <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100/80 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <IoVideocam className="text-blue-500 h-4 w-4 group-hover:text-blue-600 transition-colors duration-300" />
+                  <IoVideocam className="text-primary-foreground h-4 w-4 transition-colors duration-300" />
                   <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors duration-300">
                     {firstOffering.type || "Consultation"}
                   </span>
@@ -178,7 +247,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                   {firstOffering?.discounted_price &&
                   firstOffering?.price?.amount ? (
                     <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-semibold text-blue-600">
+                      <span className="text-lg font-semibold text-primary-foreground">
                         ₹{firstOffering.discounted_price}
                       </span>
                       <span className="line-through text-xs text-gray-400">
@@ -186,27 +255,26 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                       </span>
                     </div>
                   ) : (
-                    <span className="text-lg font-semibold text-blue-600">
+                    <span className="text-lg font-semibold text-primary-foreground">
                       {firstOffering?.price?.amount
                         ? `₹${firstOffering.price.amount}`
                         : "Free"}
                     </span>
                   )}
                 </div>
-                {/* 
+
                 <Button
-                  size="sm"
-                  className="bg-blue-600 text-white rounded-md px-4 py-1 text-sm hover:bg-blue-700 transition-colors duration-300"
+                  className="bg-gradient-to-r from-indigo-600 to-indigo-400"
                   onClick={handleOfferingClick}
                 >
                   Book Now
-                </Button> */}
+                </Button>
               </div>
             </div>
           ) : (
             <div
               className="flex items-center justify-center p-4 bg-gradient-to-r from-gray-50/50 to-gray-100/50 backdrop-blur-sm rounded-xl border border-gray-200/50
-                group-hover:from-gray-100/50 group-hover:to-gray-200/50 transition-all duration-500"
+               group-hover:from-gray-100/50 group-hover:to-gray-200/50 transition-all duration-500"
             >
               <p className="text-muted text-sm font-medium">
                 No Offering Available

@@ -25,6 +25,7 @@ import Loader from "@/components/Loader";
 import { ArrowRight, Plus } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
+import { Button } from "@/components/ui/button";
 
 interface Category {
   _id: string;
@@ -279,28 +280,25 @@ function Page() {
             <Hero />
           </div>
           {!isCreator && (
-            <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4">
+            <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4 ">
               <h2 className="text-xl font-semibold">
                 Join or create a community to start interacting with other
                 members.
               </h2>
               <div className="flex gap-4 mt-4">
-                <button
-                  onClick={handleScroll}
-                  className="px-2 py-1 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
-                >
+                <Button onClick={handleScroll} className="px-2 py-1 ">
                   Explore Communities
-                </button>
+                </Button>
                 <Dialog
                   open={session ? isDialogOpen : false}
                   onOpenChange={setIsDialogOpen}
                 >
-                  <button
-                    className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  <Button
+                    className="px-2 py-1 "
                     onClick={handleCreatorButtonClick}
                   >
                     {StringConstants.CREATE_A_PAGE}
-                  </button>
+                  </Button>
 
                   {session && (
                     <CreatorForm onClose={() => setIsDialogOpen(false)} />
@@ -313,7 +311,7 @@ function Page() {
             <div className="sticky top-16 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6 bg-white border-b">
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-500">
                     {StringConstants.TOP_EXPERTS}
                   </h1>
                   <Dialog
@@ -321,9 +319,9 @@ function Page() {
                     onOpenChange={setIsCreatorFormOpen}
                   >
                     <DialogTrigger asChild>
-                      <button
+                      <Button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-4 py-3 bg-primary text-white font-semibold text-sm rounded-lg shadow-lg hover:bg-blue-700 active:scale-[0.98] border border-white/20"
+                        className="flex items-center gap-2 px-4 py-4 rounded-lg shadow-lg  active:scale-[0.98] "
                       >
                         <span className="text-amber-300 hidden sm:inline">
                           👋
@@ -332,7 +330,7 @@ function Page() {
                           Sign up, it&apos;s free
                         </span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </button>
+                      </Button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>

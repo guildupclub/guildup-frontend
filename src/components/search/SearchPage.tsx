@@ -149,18 +149,21 @@ function SearchPageContent() {
         {!loading && !error && (
           <>
             <h1 className="text-2xl font-bold text-gray-900 mb-8">
-              {results.length} {results.length === 1 ? 'result' : 'results'} for &quot;{query}&quot;
+              {results.length} {results.length === 1 ? "result" : "results"} for
+              &quot;{query}&quot;
             </h1>
 
             {results.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-xl text-gray-600 mb-2">{StringConstants.NO_RESULTS_FOUND}</p>
+                <p className="text-xl text-gray-600 mb-2">
+                  {StringConstants.NO_RESULTS_FOUND}
+                </p>
                 <p className="text-gray-500">
                   {StringConstants.TRY_SEARCH_WITH_DIFFERENT_KEYWORDS}
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
                 {results.map((result) => (
                   <CommunityCard
                     key={result._id}

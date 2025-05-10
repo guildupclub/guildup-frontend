@@ -245,7 +245,7 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
+      <div className="md:fixed md:h-screen md:w-80  md:bg-card  md:p-4 md:py-24 md:flex flex-col hidden ">
         <div className="flex items-center justify-between px-2">
           {isLoadingCommunity ? (
             <div className="h-6 w-32 bg-background animate-pulse rounded" />

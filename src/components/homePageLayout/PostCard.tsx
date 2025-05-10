@@ -291,6 +291,12 @@ export function PostCard({ post, cardRef, userID }: PostCardProps) {
     likeMutation.mutate();
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSendComment();
+    }
+  };
+
   const handleShareClick = async () => {
     const shareUrl = `${window.location.origin}/post/${post?._id}`;
 
@@ -417,9 +423,9 @@ export function PostCard({ post, cardRef, userID }: PostCardProps) {
       </div>
 
       {showComments && (
-        <div className="border-t border-zinc-300/50">
+        <div className="border-t border-zinc-300/50 ">
           <div className="px-4 py-4">
-            <div className="flex gap-2">
+            <div className="flex gap-2 mb-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.image || "/placeholder.svg"} />
                 <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
@@ -429,24 +435,11 @@ export function PostCard({ post, cardRef, userID }: PostCardProps) {
                   type="text"
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Write a comment..."
                   className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted hover:text-accent"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-muted hover:text-accent"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"

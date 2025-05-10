@@ -89,7 +89,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     },
     discounted_price: 0,
     duration: 60,
-    is_free : true,
+    is_free: true,
     tags: "",
     start_time: "",
     link: "",
@@ -178,7 +178,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           },
           discounted_price: 0,
           duration: 60,
-          is_free : true,
+          is_free: true,
           tags: "",
           start_time: "",
           link: "",
@@ -336,7 +336,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             },
             discounted_price: 0,
             duration: 60,
-            is_free : true,
+            is_free: true,
             tags: "",
             start_time: "",
             link: "",
@@ -383,7 +383,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free : true,
+      is_free: true,
       tags: "",
       start_time: "",
       link: "",
@@ -412,7 +412,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free : true,
+      is_free: true,
       tags: "",
     });
 
@@ -444,7 +444,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         <DialogTrigger asChild>
           <Button
             variant="default"
-            className={`text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
+            className={`${
               isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
             }`}
             disabled={!isAdmin}
@@ -986,24 +986,23 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </div>
 
               <div className="w-2/3 border-l pl-4">
-              {
-                  formData.type === "consultation" ? (
-                    <ConsultationForm
-                      formData={formData}
-                      setFormData={setFormData}
-                      handleOfferingSubmit={handleOfferingSubmit}
-                      loading={loading}
-                      offeringCreated={offeringCreated}
-                    />) : (
-                      <WebinarForm
-                        formData={formData}
-                        setFormData={setFormData}
-                        handleOfferingSubmit={handleOfferingSubmit}
-                        loading={loading}
-                        offeringCreated={offeringCreated}
-                      />
-                    ) 
-                }
+                {formData.type === "consultation" ? (
+                  <ConsultationForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : (
+                  <WebinarForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                )}
               </div>
             </div>
             {/* Mobile View */}
@@ -1025,24 +1024,23 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </div>
 
               <div className="border-t">
-                {
-                  formData.type === "consultation" ? (
-                    <ConsultationForm
-                      formData={formData}
-                      setFormData={setFormData}
-                      handleOfferingSubmit={handleOfferingSubmit}
-                      loading={loading}
-                      offeringCreated={offeringCreated}
-                    />) : (
-                      <WebinarForm
-                        formData={formData}
-                        setFormData={setFormData}
-                        handleOfferingSubmit={handleOfferingSubmit}
-                        loading={loading}
-                        offeringCreated={offeringCreated}
-                      />
-                    ) 
-                }
+                {formData.type === "consultation" ? (
+                  <ConsultationForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : (
+                  <WebinarForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                )}
               </div>
             </div>
           </>
