@@ -1,2 +1,2 @@
 // This is just for triggering the build without any other file changes
-const buildTrigger = 5;
+const buildTrigger = 6;
