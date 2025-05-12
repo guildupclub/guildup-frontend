@@ -226,8 +226,8 @@ const EmptyState = ({ onRefresh }: { onRefresh: () => void }) => {
         Your recent transactions will appear here once you start receiving
         payments.
       </p>
-      <Button variant="outline" className="mt-4" onClick={onRefresh}>
-        <RefreshCcw className="mr-2 h-4 w-4 text-muted-foreground" />
+      <Button variant="outline" className="mt-4 text-muted" onClick={onRefresh}>
+        <RefreshCcw className="mr-2 h-4 w-4 text-muted" />
         Refresh
       </Button>
     </div>
