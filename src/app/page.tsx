@@ -73,7 +73,7 @@ function Page() {
   const headerRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
-
+  const userId = session?.user._id;
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -265,6 +265,23 @@ function Page() {
     };
   }, [dispatch, heroRef]);
 
+  // useEffect(() => {
+  //   async function fetchCommunities() {
+  //     try {
+  //       const res = await axios.post(
+  //         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+  //         {
+  //           userId: userId,
+  //         }
+  //       );
+
+  //       dispatch(setUserFollowedCommunities(res.data.data));
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   fetchCommunities();
+  // }, []);
   return (
     <Suspense
       fallback={

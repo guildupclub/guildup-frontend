@@ -5,13 +5,7 @@ import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Heart,
-  MessageCircleMore,
-  Send,
-  MoreVertical,
-  Share2,
-} from "lucide-react";
+import { Heart, MessageCircleMore, Send, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useSelector, useDispatch } from "react-redux";
@@ -19,7 +13,6 @@ import type { RootState } from "@/redux/store";
 import DOMPurify from "dompurify";
 import axios from "axios";
 import { toast } from "sonner";
-import Image from "next/image";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { StringConstants } from "@/components/common/CommonText";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,6 +33,9 @@ import {
 import { sendNotification } from "@/components/utils/notification";
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
 import { BsSend } from "react-icons/bs";
+
+// Add this CSS class to your global CSS file
+// .xs\:inline { @media (min-width: 480px) { display: inline; } }
 
 interface PostCardProps {
   post: {
@@ -319,12 +315,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-card rounded-xl overflow-hidden mb-5 shadow-sm hover:shadow-md transition-shadow border border-zinc-200 dark:border-zinc-800"
-    >
+    <div className="bg-card rounded-lg overflow-hidden">
       <div className="p-5">
         {/* Header */}
         <div className="flex items-center gap-3">
@@ -379,40 +370,28 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           />
 
           {post?.media?.publicUrl && post?.media?.fileType === "image" && (
-            <motion.div
-              className="mt-4 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isImageLoaded ? 1 : 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Image
-                src={post.media.publicUrl || "/placeholder.svg"}
-                alt="Post Image"
-                width={500}
-                height={400}
-                className="w-full max-h-[420px] object-contain"
-                onLoad={() => setIsImageLoaded(true)}
-              />
-            </motion.div>
+            <img
+              src={post.media.publicUrl || "/placeholder.svg"}
+              alt="Post Image"
+              className="mt-4 w-full max-h-[400px] rounded-lg object-contain"
+            />
           )}
           {post?.media?.publicUrl && post?.media?.fileType === "video" && (
-            <div className="mt-4 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-              <video
-                controls
-                controlsList="nodownload"
-                className="w-full max-h-[420px] object-contain"
-              >
-                <source src={post?.media?.publicUrl} type="video/mp4" />
-              </video>
-            </div>
+            <video
+              controls
+              controlsList="nodownload"
+              className="w-full max-h-[420px] object-contain"
+            >
+              <source src={post?.media?.publicUrl} type="video/mp4" />
+            </video>
           )}
         </div>
 
-        <div className="flex items-center justify-between  mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800 px-20">
+        <div className="flex items-center justify-between mt-5 pt-4 border-t border-zinc-100 dark:border-zinc-800 px-2 sm:px-4 md:px-10">
           <Button
             variant="ghost"
             size="sm"
-            className={`rounded-full px-4 gap-2 transition-colors  ${
+            className={`rounded-full px-2 sm:px-4 gap-1 sm:gap-2 transition-colors  ${
               isLiked
                 ? "text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                 : "text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
@@ -432,7 +411,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className={`rounded-full px-4 gap-2  text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+            className={`rounded-full px-2 sm:px-4 gap-1 sm:gap-2 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
               isCommenting
                 ? "bg-zinc-100 text-foreground dark:bg-zinc-800 dark:text-zinc-200"
                 : ""
@@ -440,7 +419,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
             onClick={() => setIsCommenting(!isCommenting)}
           >
             <MessageCircleMore className="h-6 w-6" />
-            <span className="font-semibold">
+            <span className="font-semibold ">
               {" "}
               {post.reply_count} {StringConstants.COMMENT}
             </span>
@@ -449,7 +428,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-full px-4 gap-2  text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            className="rounded-full px-2 sm:px-4 gap-1 sm:gap-2 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
             onClick={handleShareClick}
           >
             <BsSend className="h-6 w-6" />
@@ -531,6 +510,6 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }
