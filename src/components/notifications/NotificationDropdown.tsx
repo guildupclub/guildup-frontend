@@ -63,12 +63,14 @@ const NotificationDropdown = () => {
                 </Badge>
               )}
             </button>
-            <span className="text-gray-600 text-sm">Notifications</span>
+            <span className="text-gray-600 text-sm hidden lg:block ">
+              Notifications
+            </span>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-80 max-h-[400px] overflow-y-auto mt-2 bg-white">
           <div className="flex items-center justify-between p-3 border-b">
-            <h3 className="font-medium">Notifications</h3>
+            <h3 className="font-medium ">Notifications</h3>
             <div className="flex gap-2 items-center">
               <button
                 onClick={handleRefresh}

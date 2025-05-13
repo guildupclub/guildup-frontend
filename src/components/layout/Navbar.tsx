@@ -272,7 +272,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                             ? "Search..."
                             : "Search creators, pages, or offerings..."
                         }
-                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-10 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
+                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-6 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -419,6 +419,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 )}
               </div>
             </div>
+          </div>
+          <div className="lg:hidden">
+            {user?._id && <NotificationDropdown />}
           </div>
         </div>
       </nav>
