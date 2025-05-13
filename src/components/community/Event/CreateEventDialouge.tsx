@@ -69,12 +69,13 @@ export function PostDialog() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const MAX_FILE_SIZE = 20 * 1024 * 1024;
+  
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; 
     if (file.size > MAX_FILE_SIZE) {
       toast.error(
         "File size exceeds 20MB limit. Please upload a smaller file."
       );
-
+    
       event.target.value = "";
       return;
     }

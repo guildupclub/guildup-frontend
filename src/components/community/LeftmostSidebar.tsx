@@ -60,7 +60,7 @@ export function LeftmostSidebar() {
 
   const user = useSelector((state: RootState) => state.user.user);
 
-  const activeCommunityId = params?.id;
+  const activeCommunityId = params.id;
   useEffect(() => {
     fetchCommunities();
   }, []);

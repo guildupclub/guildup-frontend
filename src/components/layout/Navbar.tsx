@@ -86,7 +86,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
   const [searchType, setSearchType] = useState("post");
   const userId = user?._id;
-  const { heroVisible } = useSelector((state: RootState) => state.ui);
+  // Removed heroVisible as it is not used
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
@@ -259,7 +259,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           <div className="flex grow items-center justify-between">
             <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
               <AnimatePresence>
-                {!heroVisible && (
+                {/* {!heroVisible && ( */}
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -288,7 +288,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </button>
                     </div>
                   </motion.div>
-                )}
+                {/* )} */}
               </AnimatePresence>
             </div>
 

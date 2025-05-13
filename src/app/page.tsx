@@ -327,7 +327,9 @@ function Page() {
                           👋
                         </span>
                         <span className="hidden sm:inline text-md">
+
                           Sign up, it&apos;s free
+
                         </span>
                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>

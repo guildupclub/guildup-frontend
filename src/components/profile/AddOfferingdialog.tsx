@@ -30,8 +30,7 @@ import {
 } from "@/components/common/CommonText";
 import { toast } from "sonner";
 import Link from "next/link";
-import ConsultationForm from "./offeringForms/consultation";
-import WebinarForm from "./offeringForms/webinar";
+
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
 }
@@ -91,8 +90,6 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     duration: 60,
     is_free: true,
     tags: "",
-    start_time: "",
-    link: "",
   });
 
   useEffect(() => {
@@ -180,8 +177,6 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           duration: 60,
           is_free: true,
           tags: "",
-          start_time: "",
-          link: "",
         });
       } else {
         // Handle error
@@ -338,8 +333,6 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             duration: 60,
             is_free: true,
             tags: "",
-            start_time: "",
-            link: "",
           });
           setOfferingCreated(false);
         }
@@ -385,8 +378,6 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       duration: 60,
       is_free: true,
       tags: "",
-      start_time: "",
-      link: "",
     });
   };
 
@@ -1003,6 +994,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     offeringCreated={offeringCreated}
                   />
                 )}
+
               </div>
             </div>
             {/* Mobile View */}
@@ -1041,6 +1033,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     offeringCreated={offeringCreated}
                   />
                 )}
+
               </div>
             </div>
           </>
