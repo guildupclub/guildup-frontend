@@ -52,12 +52,12 @@ function TrendingSection() {
   const handleCreatorButtonClick = () => {
     if (!session) {
       toast("Sign in required", {
-
         action: {
           label: StringConstants.SIGN_IN,
-          onClick: () => signIn(undefined, {
-            callbackUrl: `${window.location.origin}?hero=1`
-          }),
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
         },
       });
     } else {
@@ -126,7 +126,7 @@ function TrendingSection() {
           </div>
         )}
       </div>
-       <FooterLinks />
+      <FooterLinks />
     </div>
   );
 }

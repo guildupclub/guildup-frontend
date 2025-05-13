@@ -874,7 +874,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
             {offerings.length === 0 ? (
               <div className="rounded-xl border border-border/5 bg-card py-16 text-center">
-
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
                 </p>
@@ -1017,7 +1016,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </Button>
                         </div>
                       ) : (
-
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
@@ -1028,7 +1026,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                     !offering.is_free && !isBankConnected
                                   }
                                   className={`flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
-
                                     !isOwner
                                       ? "cursor-pointer"
                                       : "cursor-not-allowed opacity-50"
@@ -1043,7 +1040,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                 >
                                   <span>Book Now</span>
                                   <ArrowRight className="h-4 w-4" />
-
                                 </Button>
                               </span>
                             </TooltipTrigger>
@@ -1067,13 +1063,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                   The expert is not accepting bookings at the
                                   moment
                                 </span>
-
                               </TooltipContent>
                             )}
                           </Tooltip>
                         </TooltipProvider>
                       )}
-
                     </div>
                   </div>
                 ))}

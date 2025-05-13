@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       "random-image-pepebigotes.vercel.app",
       "storage.googleapis.com",
       "img.freepik.com",
+      "conqrr.vercel.app",
     ] ,
     remotePatterns: [
       {
