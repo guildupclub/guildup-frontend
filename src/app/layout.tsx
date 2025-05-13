@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
 const guildup_logo_final = "/guildup_logo_final.png";
 
 export const metadata: Metadata = {
-  title: "GuildUp Club",
+  title: "GuildUp",
   description:
-    "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
   generator: "Next.js",
   manifest: "/manifest.json",
   applicationName: "GuildUp Club",
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   colorScheme: "light",
 
   icons: {
-    icon: "/guildup_logo_final.png",
-    shortcut: "/guildup_logo_final.png",
-    apple: "/guildup_logo_final.png",
+    icon: "/guildup-logo.png",
+    shortcut: "/guildup-logo.png",
+    apple: "/guildup-logo.png",
   },
 };
 

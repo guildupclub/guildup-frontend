@@ -274,12 +274,12 @@ function Page() {
       }
     >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
-        <div className="min-h-[75vh] bg-white relative">
+        <div className="min-h-[100vh] bg-white relative">
           <div className="absolute inset-0 pointer-events-none" />
           <div ref={heroRef}>
             <Hero />
           </div>
-          {!isCreator && (
+          {/* {!isCreator && (
             <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4 ">
               <h2 className="text-xl font-semibold">
                 Join or create a community to start interacting with other
@@ -306,7 +306,7 @@ function Page() {
                 </Dialog>
               </div>
             </div>
-          )}
+          )} */}
           <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
             <div className="sticky top-16 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6 bg-white border-b">
               <div className="flex flex-col gap-3 sm:gap-4">
@@ -329,7 +329,8 @@ function Page() {
                         <span className="hidden sm:inline text-md">
                           Sign up, it&apos;s free
                         </span>
-                        <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                        <Plus className="hidden lg:block h-3 w-3 sm:h-4 sm:w-4" />
+                        <span className="lg:hidden">Get Started 🚀</span>
                       </Button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
