@@ -34,8 +34,10 @@ const InputField: React.FC<InputFieldProps> = ({
         {label}
       </label>
       {prefix || type === "password" ? (
-        <div className="flex items-center  rounded-md bg-white  decoration-none  shadow-md border border-gray-100 text-primary ">
-          {prefix && <span className="px-3 text-primary">{prefix}</span>}
+        <div className="flex items-center  rounded-md bg-white  decoration-none  shadow-md border border-gray-100 text-muted-foreground ">
+          {prefix && (
+            <span className="px-3 text-muted-foreground">{prefix}</span>
+          )}
           <input
             type={inputType}
             name={name}
@@ -62,7 +64,7 @@ const InputField: React.FC<InputFieldProps> = ({
           value={value}
           onChange={onChange}
           disabled={disabled}
-          className="w-full px-3 py-2 rounded-md bg-white decoration-none  shadow-md border border-gray-100 text-primary"
+          className="w-full px-3 py-2 rounded-md bg-white decoration-none  shadow-md border border-gray-100 text-muted-foreground"
         />
       )}
     </div>

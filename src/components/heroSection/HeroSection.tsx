@@ -4,12 +4,23 @@ import { Button } from "@/components/ui/button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import SearchBar from "../SearchBar";
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import { Dialog } from "../ui/dialog";
+import CreatorForm from "../form/CreatorForm";
+import { StringConstants } from "../common/CommonText";
+import { useSession ,signIn } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { RootState } from "@/redux/store";
 
 export default function Hero() {
+  const { data: session, status } = useSession();
   const { scrollY } = useScroll();
   const [isVisible, setIsVisible] = useState(true);
+  const user = useSelector((state: RootState) => state.user);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const isCreator = user?.user?.is_creator ? true : false;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 50) {
@@ -18,10 +29,25 @@ export default function Hero() {
       setIsVisible(true);
     }
   });
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
+        },
+      });
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-r from-[#777BEA]/20 relative flex items-center justify-center">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center min-h-[calc(100vh-4rem)]">
+    <div className="min-h-[calc(100vh-1rem)] bg-gradient-to-r from-[#777BEA]/20 relative flex items-center justify-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center md:min-h-[calc(100vh-4rem)]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -36,7 +62,7 @@ export default function Hero() {
               height={20}
               className="h-5 w-5"
             />
-            Level Up with Experts
+            Real Experts, Real Guidance
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
             <motion.span
@@ -46,7 +72,7 @@ export default function Hero() {
               transition={{ delay: 0.2, duration: 0.8 }}
             >
               <span className="text-foreground"> Get Help That </span> Truly
-              Helps 
+              Helps
             </motion.span>
             {/* <motion.span
               className="text-foreground"
@@ -58,13 +84,13 @@ export default function Hero() {
             </motion.span> */}
           </h1>
           <motion.p
-            className="mt-6 text-xl text-muted font-medium max-w-2xl mx-auto"
+            className="mt-6 text-lg text-muted font-medium max-w-2xl mx-auto leading-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            From fitness and nutrition to therapy and coaching—find <br />{" "}
-            someone who gets you
+            From fitness and nutrition to <br className="lg:hidden" /> therapy
+            and coaching—find <br /> someone who gets you
           </motion.p>
 
           <motion.div
@@ -76,6 +102,32 @@ export default function Hero() {
             <SearchBar />
           </motion.div>
         </motion.div>
+
+        {!isCreator && (
+          <div className="md:hidden mt-2 flex flex-col items-center justify-center text-center mb-2 ">
+            <h2 className="font-medium px-4 leading-tight">
+              Are you a coach, therapist, or expert <br /> struggling to find
+              clients?
+            </h2>
+            <div className="flex gap-4">
+              <Dialog
+                open={session ? isDialogOpen : false}
+                onOpenChange={setIsDialogOpen}
+              >
+                <Button
+                  className="px-2 py-1 mt-2 "
+                  onClick={handleCreatorButtonClick}
+                >
+                  🚀 Sign up, it&apos;s free
+                </Button>
+
+                {session && (
+                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                )}
+              </Dialog>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Animated background elements with enhanced visibility */}
@@ -132,7 +184,7 @@ export default function Hero() {
 
       {/* Scroll Indicator */}
       <motion.div
-        className="absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
+        className="hidden lg:block absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
         initial={{ opacity: 0, y: -20 }}
         animate={{
           opacity: isVisible ? 1 : 0,

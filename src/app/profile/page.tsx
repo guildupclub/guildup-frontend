@@ -216,7 +216,7 @@ const ProfilePage = () => {
 
   if (!profile)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f2f2f2] text-primary">
+      <div className="min-h-screen flex items-center justify-center bg-[#f2f2f2] text-muted">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-16 w-16 bg-gray-300 rounded-full mb-4"></div>
           <div className="h-4 w-48 bg-gray-300 rounded mb-2"></div>
@@ -390,7 +390,7 @@ const ProfilePage = () => {
                   />
 
                   <div className="col-span-1 md:col-span-2">
-                    <label className="block text-sm font-medium mb-1 text-primary">
+                    <label className="block text-sm font-medium mb-1 text-muted-foreground">
                       Languages
                     </label>
                     <div className="flex flex-wrap gap-2 mb-2">

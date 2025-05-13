@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "../ui/button";
 
 interface Category {
   name: string;
@@ -26,14 +27,15 @@ function CategoryBar({
       <div className="hidden md:block max-h-[480px] overflow-y-auto scrollbar-none space-y-2">
         {categorys?.map((cat: Category) => (
           <div key={cat._id}>
-            <button
+            <Button
+              variant="outline"
               onClick={() => handleCategorySelect(cat._id)}
               className={`w-full text-left px-5 py-3 rounded-xl text-sm transition-all duration-300 
-          relative group border-b-2
+          relative group 
           ${
             selectedCategoryId === cat._id
               ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary font-semibold border-primary/20"
-              : "hover:bg-white/10 text-gray-600 hover:text-gray-800 hover:border-gray-200"
+              : "hover:bg-white/10 text-gray-600 hover:text-gray-800 hover:border-gray-50"
           }
           before:absolute before:inset-0 before:rounded-xl before:border before:border-gray-200/30 
           before:transition-all before:duration-300
@@ -44,7 +46,7 @@ function CategoryBar({
         `}
             >
               <span className="relative z-10">{cat.name}</span>
-            </button>
+            </Button>
           </div>
         ))}
       </div>
