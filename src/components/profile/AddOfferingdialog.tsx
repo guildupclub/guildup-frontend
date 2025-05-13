@@ -30,7 +30,8 @@ import {
 } from "@/components/common/CommonText";
 import { toast } from "sonner";
 import Link from "next/link";
-
+import ConsultationForm from "./offeringForms/consultation";
+import WebinarForm from "./offeringForms/webinar";
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
 }
@@ -88,8 +89,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     },
     discounted_price: 0,
     duration: 60,
-    is_free : true,
+    is_free: true,
     tags: "",
+    start_time: "",
+    link: "",
   });
 
   useEffect(() => {
@@ -175,8 +178,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           },
           discounted_price: 0,
           duration: 60,
-          is_free : true,
+          is_free: true,
           tags: "",
+          start_time: "",
+          link: "",
         });
       } else {
         // Handle error
@@ -331,8 +336,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             },
             discounted_price: 0,
             duration: 60,
-            is_free : true,
+            is_free: true,
             tags: "",
+            start_time: "",
+            link: "",
           });
           setOfferingCreated(false);
         }
@@ -376,8 +383,10 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free : true,
+      is_free: true,
       tags: "",
+      start_time: "",
+      link: "",
     });
   };
 
@@ -403,7 +412,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       },
       discounted_price: 0,
       duration: 60,
-      is_free : true,
+      is_free: true,
       tags: "",
     });
 
@@ -435,7 +444,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         <DialogTrigger asChild>
           <Button
             variant="default"
-            className={`text-white bg-primary hover:bg-primary/90 text-primary-foreground shadow transition-all duration-300 ${
+            className={`${
               isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
             }`}
             disabled={!isAdmin}
@@ -977,146 +986,23 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </div>
 
               <div className="w-2/3 border-l pl-4">
-                <form onSubmit={handleOfferingSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">
-                      Title<span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      placeholder="Discovery Call"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">
-                      Description<span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="In this offering we will discuss about...."
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="type">
-                      Type<span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, type: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your offering type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="consultation">
-                          {OFFERING_TYPES.CONSULTATION}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="price">
-                        {StringConstants.PRICE} ({StringConstants.INR})
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={formData.price.amount}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setFormData({
-                            ...formData,
-                            price: {
-                              ...formData.price,
-                              amount: Number(value),
-                            },
-                            is_free: Number(value) === 0,
-                          });
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="discounted_price">
-                        {StringConstants.DISCOUNTED_PRICE} (
-                        {StringConstants.INR})
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="discounted_price"
-                        type="number"
-                        value={
-                          formData.discounted_price
-                        }
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setFormData({
-                            ...formData,
-                            discounted_price: Number(value),
-                            is_free: Number(value) === 0,
-                          });
-                        }}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="duration">
-                        {StringConstants.DURATION} (Mins)
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="duration"
-                        type="number"
-                        value={formData.duration}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            duration: Number(e.target.value),
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <Button
-                      type="submit"
-                      className="bg-primary text-white"
-                      disabled={loading || offeringCreated}
-                    >
-                      {loading
-                        ? "Creating..."
-                        : offeringCreated
-                        ? "Created!"
-                        : "Create offerings"}
-                    </Button>
-                  </div>
-                </form>
+                {formData.type === "consultation" ? (
+                  <ConsultationForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : (
+                  <WebinarForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                )}
               </div>
             </div>
             {/* Mobile View */}
@@ -1138,148 +1024,23 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               </div>
 
               <div className="border-t">
-                <form onSubmit={handleOfferingSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="title">
-                      Title<span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) =>
-                        setFormData({ ...formData, title: e.target.value })
-                      }
-                      placeholder="Enter offering title"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">
-                      Description<span className="text-red-500">*</span>
-                    </Label>
-                    <Textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        })
-                      }
-                      placeholder="Describe your offerings"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="type">
-                      Type<span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      value={formData.type}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, type: value })
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your offering type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="consultation">
-                          {OFFERING_TYPES.CONSULTATION}
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="price">
-                        {StringConstants.PRICE} ({StringConstants.INR})
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="price"
-                        type="number"
-                        value={
-                          formData.price.amount
-                        }
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setFormData({
-                            ...formData,
-                            price: {
-                              ...formData.price,
-                              amount: Number(value),
-                            },
-                            is_free: Number(value) === 0,
-                          });
-                        }}
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="discounted_price">
-                        {StringConstants.DISCOUNTED_PRICE} (
-                        {StringConstants.INR})
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="discounted_price"
-                        type="number"
-                        value={
-                          formData.discounted_price
-                        }
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setFormData({
-                            ...formData,
-                            discounted_price: Number(value),
-                            is_free: Number(value) === 0,
-                          });
-                        }}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="duration">
-                        {StringConstants.DURATION} (Mins)
-                        <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="duration"
-                        type="number"
-                        value={formData.duration}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            duration: Number(e.target.value),
-                          })
-                        }
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <Button
-                      type="submit"
-                      className="bg-primary text-white"
-                      disabled={loading || offeringCreated}
-                    >
-                      {loading
-                        ? "Creating..."
-                        : offeringCreated
-                        ? "Created!"
-                        : "Create offerings"}
-                    </Button>
-                  </div>
-                </form>
+                {formData.type === "consultation" ? (
+                  <ConsultationForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : (
+                  <WebinarForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                )}
               </div>
             </div>
           </>

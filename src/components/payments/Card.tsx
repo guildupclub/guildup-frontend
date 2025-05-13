@@ -78,7 +78,11 @@ const Dashboard = () => {
   // Format currency values
   const formatCurrency = (value: number | string) => {
     if (value === undefined || value === null) return "₹0";
-    return `₹${Number(value).toLocaleString("en-IN")}`;
+    const rupees = Number(value) / 100;
+    return `₹${rupees.toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
   };
 
   if (error) {

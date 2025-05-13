@@ -25,8 +25,8 @@ import { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 
 interface User {
+  name: string;
   _id: string;
-  user_name?: string;
   email: string;
   avatar: string | null;
   name: string | null;
@@ -79,7 +79,6 @@ export default function Members({ communityId }: MembersProps) {
 
         const data: MembersResponse = await response.json();
         setMembers(data.data);
-        console.log("Members data:", data.data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load members");
       } finally {
@@ -164,7 +163,7 @@ export default function Members({ communityId }: MembersProps) {
                     <Avatar>
                       <AvatarImage src={member.user_id.avatar || undefined} />
                       <AvatarFallback className="bg-card text-muted-foreground">
-                        {member.user_id.user_name?.[0]?.toUpperCase() ||
+                        {member.user_id.name?.[0]?.toUpperCase() ||
                           member.user_id.email[0].toUpperCase()}
                       </AvatarFallback>
                     </Avatar>

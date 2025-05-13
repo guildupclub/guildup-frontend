@@ -11,8 +11,8 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 232.9 100% 60%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 232.9 100% 60%;   
+    --primary-foreground: 238.73 83.53% 66.67%;     
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 2% 10%;
@@ -100,7 +100,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 10rem; /* Equivalent to w-40 in Tailwind */
+    width: 10rem;
     z-index: 10;
     background: linear-gradient(to right, #fffcf5, transparent);
   }
@@ -111,7 +111,7 @@
     top: 0;
     bottom: 0;
     right: 0;
-    width: 10rem; /* Equivalent to w-40 in Tailwind */
+    width: 10rem;
     z-index: 10;
     background: linear-gradient(to left, #fffcf5, transparent);
   }

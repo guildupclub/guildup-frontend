@@ -4,6 +4,8 @@ import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
+import { headers } from "next/headers";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,32 +20,22 @@ const geistMono = Geist_Mono({
 const guildup_logo_final = "/guildup_logo_final.png";
 
 export const metadata: Metadata = {
-  title: "GuildUp Club",
-  description: "ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
+  title: "GuildUp",
+  description:
+    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+  generator: "Next.js",
+  manifest: "/manifest.json",
+  applicationName: "GuildUp Club",
+  authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
+  creator: "GuildUp Club",
+  keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
+  themeColor: "#ffffff",
+  colorScheme: "light",
+
   icons: {
-    icon: "/guildup_logo_final.png",
-    shortcut: "/guildup_logo_final.png",
-    apple: "/guildup_logo_final.png",
-  },
-  openGraph: {
-    title: "GuildUp Club",
-    description: "Ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
-    images: [
-      {
-        url: "/guildup_logo_final.png",
-        width: 1200,
-        height: 630,
-        alt: "GuildUp Logo",
-      },
-    ],
-    type: "website",
-    siteName: "GuildUp",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "GuildUp Club",
-    description: "Ultimate platform to build communities, share knowledge, and monetize your passion seamlessly",
-    images: ["/guildup_logo_final.png"],
+    icon: "/guildup-logo.png",
+    shortcut: "/guildup-logo.png",
+    apple: "/guildup-logo.png",
   },
 };
 
@@ -55,26 +47,26 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/guildup_logo_final.png" type="image/png" />
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"></script>
+        <link rel="shortcut icon" href="/guildup_logo_final.png" />
+        <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
+        <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
+        ></script>
         <script>
           {`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){window.dataLayer.push(arguments);}
-        gtag('js', new Date());
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){window.dataLayer.push(arguments);}
+          gtag('js', new Date());
 
-        gtag('config', 'G-B3B9W8GRQP');
-        `}
-        </script>
-        <script type="text/javascript">
-          {` (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "rgpxrvmq3a");`}
+          gtag('config', 'G-B3B9W8GRQP');
+          `}
         </script>
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers>
           <NavbarClient />
           {children}

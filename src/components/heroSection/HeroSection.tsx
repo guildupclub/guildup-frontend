@@ -4,12 +4,23 @@ import { Button } from "@/components/ui/button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import SearchBar from "../SearchBar";
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
+import { Dialog } from "../ui/dialog";
+import CreatorForm from "../form/CreatorForm";
+import { StringConstants } from "../common/CommonText";
+import { useSession ,signIn } from "next-auth/react";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { RootState } from "@/redux/store";
 
 export default function Hero() {
+  const { data: session, status } = useSession();
   const { scrollY } = useScroll();
   const [isVisible, setIsVisible] = useState(true);
+  const user = useSelector((state: RootState) => state.user);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const isCreator = user?.user?.is_creator ? true : false;
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (latest > 50) {
@@ -18,17 +29,32 @@ export default function Hero() {
       setIsVisible(true);
     }
   });
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
+        },
+      });
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white relative flex items-center justify-center">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center min-h-[calc(100vh-4rem)]">
+    <div className="min-h-[calc(100vh-1rem)] bg-gradient-to-r from-[#777BEA]/20 relative flex items-center justify-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center md:min-h-[calc(100vh-4rem)]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto"
         >
-          <div className="mb-8 bg-gradient-to-r from-[#5b6be1] to-[#357fe0] w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
+          <div className="mb-8 bg-gradient-to-r from-[#7175f0] to-[#9296F9]  w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
             <Image
               alt="stars icon"
               src="https://conqrr.vercel.app/_next/static/media/bi_stars.7e13c393.svg"
@@ -36,33 +62,35 @@ export default function Hero() {
               height={20}
               className="h-5 w-5"
             />
-            Level Up with Experts
+            Real Experts, Real Guidance
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
             <motion.span
-              className="text-primary block mb-2"
+              className="text-indigo-400 block mb-2"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
             >
-              Book Experts. Buy Services.
+              <span className="text-foreground"> Get Help That </span> Truly
+              Helps
             </motion.span>
-            <motion.span
+            {/* <motion.span
               className="text-foreground"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
             >
               All in One Place
-            </motion.span>
+            </motion.span> */}
           </h1>
           <motion.p
-            className="mt-6 text-xl text-muted font-medium max-w-2xl mx-auto"
+            className="mt-6 text-lg text-muted font-medium max-w-2xl mx-auto leading-tight"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            No more chasing links or juggling apps—find, book, and pay trusted experts in one smooth flow
+            From fitness and nutrition to <br className="lg:hidden" /> therapy
+            and coaching—find <br /> someone who gets you
           </motion.p>
 
           <motion.div
@@ -74,6 +102,32 @@ export default function Hero() {
             <SearchBar />
           </motion.div>
         </motion.div>
+
+        {!isCreator && (
+          <div className="md:hidden mt-2 flex flex-col items-center justify-center text-center mb-2 ">
+            <h2 className="font-medium px-4 leading-tight">
+              Are you a coach, therapist, or expert <br /> struggling to find
+              clients?
+            </h2>
+            <div className="flex gap-4">
+              <Dialog
+                open={session ? isDialogOpen : false}
+                onOpenChange={setIsDialogOpen}
+              >
+                <Button
+                  className="px-2 py-1 mt-2 "
+                  onClick={handleCreatorButtonClick}
+                >
+                  🚀 Sign up, it&apos;s free
+                </Button>
+
+                {session && (
+                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                )}
+              </Dialog>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Animated background elements with enhanced visibility */}
@@ -81,7 +135,7 @@ export default function Hero() {
         <motion.div
           className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-100/60 to-indigo-200/60 rounded-full"
           animate={{
-            scale: [1, 1.1, 1],
+            scale: [0.6, 0.9, 0.6],
             rotate: [0, 90, 0],
           }}
           transition={{
@@ -90,7 +144,7 @@ export default function Hero() {
             ease: "linear",
           }}
         />
-        <motion.div
+        {/* <motion.div
           className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-indigo-100/60 to-blue-200/60 rounded-full"
           animate={{
             scale: [1, 1.2, 1],
@@ -101,24 +155,24 @@ export default function Hero() {
             repeat: Infinity,
             ease: "linear",
           }}
-        />
+        /> */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-16 h-16 bg-gradient-to-r from-blue-200/70 to-indigo-200/70 rounded-full blur-sm"
+          className="absolute top-1/4 lg:top-[70%] left-1/4 lg:left-[60%] w-16 h-16 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-full blur-2xl"
           animate={{
             y: [0, -20, 0],
             x: [0, 20, 0],
           }}
           transition={{
-            duration: 5,
+            duration: 7,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
         <motion.div
-          className="absolute bottom-1/4 right-1/4 w-12 h-12 bg-gradient-to-l from-indigo-200/70 to-blue-200/70 rounded-full blur-sm"
+          className="absolute bottom-1/4 lg:bottom-[80%] right-1/4 lg:right-[10%] w-12 h-12 bg-gradient-to-l from-indigo-200/70 to-blue-200/70 rounded-full blur-sm"
           animate={{
-            y: [0, 30, 0],
-            x: [0, -30, 0],
+            y: [0, 40, 0],
+            x: [0, -40, 0],
           }}
           transition={{
             duration: 7,
@@ -130,11 +184,11 @@ export default function Hero() {
 
       {/* Scroll Indicator */}
       <motion.div
-        className="absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
+        className="hidden lg:block absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
         initial={{ opacity: 0, y: -20 }}
-        animate={{ 
+        animate={{
           opacity: isVisible ? 1 : 0,
-          y: isVisible ? 0 : 20
+          y: isVisible ? 0 : 20,
         }}
         transition={{ duration: 0.3 }}
       >

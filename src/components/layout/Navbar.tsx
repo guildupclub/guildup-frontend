@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  FileText,
-  Compass,
-  Users,
-  ChevronDown,
-  Search,
-  Plus,
-} from "lucide-react";
+import { Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -38,22 +31,11 @@ import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
-
-// interface Community {
-//   _id: string;
-//   title: string;
-//   name: string;
-//   description: string;
-//   subscription: boolean;
-//   subscription_price: number;
-//   num_member: number;
-// }
+import NotificationDropdown from "../notifications/NotificationDropdown";
+import { MdOutlineRssFeed } from "react-icons/md";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
-  const COMMUNITY_PROFILE_PATH = "/community/profile";
-  const COMMUNITY_MEMBERS_PATH = "/community/members";
-  const COMMUNITY_CHANNEL_PATH = "/community/channel";
-  const COMMUNITY_FEED_PATH = "/community/feed";
+  const COMMUNITY_FEED_PATH = "/feed";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
   const PROFILE_PATH = "/profile";
@@ -63,47 +45,42 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
   const [isUser, setIsUser] = useState(true);
-  // useEffect(() => {
-  //   if ('isNewUser' in user) {
-  //     setIsUser(false);
-  //     console.info("this is user: ", user);
-  //   }
-  // }, [user]);
-  // Assume communities are stored in state.community.communities (an array of Community)
-  // const communities = useSelector((state: RootState) => state?.community?.communities);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
-
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
   } | null>(null);
-
   const [searchType, setSearchType] = useState("post");
   const userId = user?._id;
-  // Removed heroVisible as it is not used
+  const { heroVisible } = useSelector((state: RootState) => state.ui);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  // State to store fetchCommunities API response
+  const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchCommunities() {
       try {
         const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
           {
             userId: userId,
           }
         );
-
+        // Store the API response in state
+        setFetchedCommunities(res.data.data);
         dispatch(setUserFollowedCommunities(res.data.data));
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching communities:", error);
       }
     }
-    // fetchCommunities();
-  }, []);
+    if (userId) {
+      fetchCommunities();
+    }
+  }, [userId, dispatch]);
 
   const activeCommunity = useSelector(
     (state: any) => state.channel.activeCommunity
@@ -113,16 +90,51 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const communities = useSelector(
     (state: RootState) => state?.user?.userFollowedCommunities
   );
+
+  // Function to get the first non-null community
+  const getFirstValidCommunity = () => {
+    return fetchedCommunities.find((community) => community && community._id);
+  };
+
+  // Function to determine MySpace link
+  const getMySpaceLink = () => {
+    if (activeCommunityId) {
+      return `${COMMUNITY_PATH}/${activeCommunityId}${COMMUNITY_FEED_PATH}`;
+    } else {
+      const firstCommunity = getFirstValidCommunity();
+      if (firstCommunity) {
+        // Set the first community as active
+        dispatch(
+          setActiveCommunity({
+            id: firstCommunity._id,
+            name: firstCommunity.name,
+            image: firstCommunity.image || "",
+            background_image: firstCommunity.background_image || "",
+            user_isBankDetailsAdded: false,
+            user_iscalendarConnected: false,
+          })
+        );
+        if (user?._id) {
+          dispatch(
+            setCommunityData({
+              communityId: firstCommunity._id,
+              userId: user._id,
+            })
+          );
+        }
+        return `${COMMUNITY_PATH}/${firstCommunity._id}${COMMUNITY_FEED_PATH}`;
+      }
+      return FEED_PATH; // Fallback to /feed if no communities
+    }
+  };
+
   const getInitials = (name: string) => {
-    return (
-      name
-        // [0].toUpperCase();
-        .split(" ")
-        .map((word) => word[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2)
-    );
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   const handleSearch = () => {
@@ -135,36 +147,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     signOut();
   };
 
-  // When "Edit Community" is clicked, show the community drop list instead of the modal.
   const handleEditClick = () => {
     setShowCommunityList(true);
   };
 
-  // When user selects a community from the list, store the selection and open the modal
   const handleCommunitySelect = (community: { _id: string; name: string }) => {
     setSelectedCommunity(community);
     setShowCommunityList(false);
     setShowEditCommunity(true);
   };
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.body.style.overflow = isSidebarOpen ? "hidden" : "auto";
-    }
-
-    // Optional cleanup if needed
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [isSidebarOpen]);
-
   function handleSelectCommunity(community: any) {
     dispatch(
       setActiveCommunity({
         id: community._id,
         name: community.name,
-        image: "",
-        background_image: "",
+        image: community.image || "",
+        background_image: community.background_image || "",
         user_isBankDetailsAdded: false,
         user_iscalendarConnected: false,
       })
@@ -178,16 +177,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         })
       );
     }
-    router.push(`/community/${community._id}/profile`);
+    router.push(`/community/${community._id}/feed`);
     setIsSidebarOpen(false);
   }
 
-  // Function to check if a path is active
   const isActive = (path: string) => {
     if (path === "/" && pathname === "/") {
       return true;
     }
-    // For paths other than home, check if pathname starts with the path
     return path !== "/" && pathname?.startsWith(path);
   };
 
@@ -207,27 +204,29 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
   };
 
-  // Track screen size for responsive design
   useEffect(() => {
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 640);
     };
-
-    // Initial check
     checkScreenSize();
-
-    // Add listener for window resize
     window.addEventListener("resize", checkScreenSize);
-
-    // Cleanup
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      document.body.style.overflow = isSidebarOpen ? "hidden" : "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSidebarOpen]);
 
   return (
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 bg-white pt-2 lg:px-20 w-full flex border-b border-gray-100",
+          "fixed top-0 z-50 border-b border-gray-10 bg-[#F4F4FB] pt-2 lg:px-20 w-full flex",
           props.className
         )}
         {...props}
@@ -257,7 +256,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           <div className="flex grow items-center justify-between">
             <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
               <AnimatePresence>
-                {/* {!heroVisible && ( */}
+                {!heroVisible && (
                   <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -273,7 +272,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                             ? "Search..."
                             : "Search creators, pages, or offerings..."
                         }
-                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-10 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
+                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-6 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={(e) => e.key === "Enter" && handleSearch()}
@@ -286,11 +285,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </button>
                     </div>
                   </motion.div>
-                {/* )} */}
+                )}
               </AnimatePresence>
             </div>
 
-            <div className="hidden md:flex space-x-1 items-center justify-center">
+            <div className="hidden md:flex space-x-6 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
                 <ul className="flex items-center space-x-2 text-gray-600">
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
@@ -312,7 +311,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
-                      <FileText
+                      <MdOutlineRssFeed
                         className={`h-5 w-5 ${
                           isActive("/feeds") ? "text-primary" : ""
                         }`}
@@ -328,11 +327,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </li>
                   <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
                     <Link
-                      href={
-                        activeCommunityId
-                          ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
-                          : `${COMMUNITY_FEED_PATH}`
-                      }
+                      href={getMySpaceLink()}
                       className="flex flex-col items-center"
                     >
                       <Users
@@ -351,61 +346,65 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
+
+                  {user?._id && <NotificationDropdown />}
                 </ul>
               </div>
 
-              <div className="hidden md:block ml-4">
+              <div className="hidden md:block ml-8">
                 {user?._id ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
-                        <Avatar className="h-9 w-9">
-                          {session?.user?.image ? (
-                            <AvatarImage
-                              src={session?.user?.image}
-                              alt="User"
-                            />
-                          ) : (
-                            <AvatarFallback>
-                              {session?.user?.name?.charAt(0)}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <ChevronDown className="h-4 w-4 text-gray-500" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
-                      align="end"
-                    >
-                      <DropdownMenuItem
-                        asChild
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                  <div className="flex items-center ">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
+                          <Avatar className="h-10 w-10">
+                            {session?.user?.image ? (
+                              <AvatarImage
+                                src={session?.user?.image || "/placeholder.svg"}
+                                alt="User"
+                              />
+                            ) : (
+                              <AvatarFallback>
+                                {session?.user?.name?.charAt(0)}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
+                        align="end"
                       >
-                        <Link href="/profile">Profile</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        asChild
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                      >
-                        <Link href="/booking">Bookings</Link>
-                      </DropdownMenuItem>
-                      {isUser && (
                         <DropdownMenuItem
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
-                          <Link href="/payments">Payments</Link>
+                          <Link href="/profile">Profile</Link>
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                        onClick={handleSignOut}
-                      >
-                        {StringConstants.SIGN_OUT}
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
+                          <Link href="/booking">Bookings</Link>
+                        </DropdownMenuItem>
+                        {isUser && (
+                          <DropdownMenuItem
+                            asChild
+                            className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          >
+                            <Link href="/payments">Payments</Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          onClick={handleSignOut}
+                        >
+                          {StringConstants.SIGN_OUT}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 ) : (
                   <Button
                     onClick={() =>
@@ -420,6 +419,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 )}
               </div>
             </div>
+          </div>
+          <div className="lg:hidden">
+            {user?._id && <NotificationDropdown />}
           </div>
         </div>
       </nav>
@@ -447,7 +449,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             className="flex flex-col items-center justify-center gap-1"
           >
             <div className="w-6 h-6 flex items-center justify-center">
-              <FileText
+              <MdOutlineRssFeed
                 className={`w-5 h-5 ${
                   isActive("/feeds") ? "text-primary" : ""
                 }`}
@@ -463,11 +465,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </Link>
 
           <Link
-            href={
-              activeCommunityId
-                ? `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`
-                : `${COMMUNITY_FEED_PATH}`
-            }
+            href={getMySpaceLink()}
             className="flex flex-col items-center justify-center gap-1"
           >
             <div className="w-6 h-6 flex items-center justify-center">
@@ -598,13 +596,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           <div className="space-y-3 pb-16">
             {communities && communities.length > 0 ? (
               communities.map((community: any) => {
-                if (!community) return;
+                if (!community) return null;
                 const isActive = activeCommunityId === community._id;
                 return (
                   <button
                     key={community._id}
                     className={cn(
-                      "-px-4 w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
+                      "w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
                       isActive ? "bg-blue-500/20" : "bg-card"
                     )}
                     onClick={() => handleSelectCommunity(community)}
@@ -629,7 +627,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <span
                       className={cn(
                         "font-medium text-sm",
-                        isActive ? "text-blue-600 " : "text-gray-800"
+                        isActive ? "text-blue-600" : "text-gray-800"
                       )}
                     >
                       {community.name}

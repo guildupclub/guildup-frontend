@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
+import withPWA from "next-pwa";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
+
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -16,6 +19,7 @@ const nextConfig: NextConfig = {
       "random-image-pepebigotes.vercel.app",
       "storage.googleapis.com",
       "img.freepik.com",
+      "conqrr.vercel.app",
     ] ,
     remotePatterns: [
       {
@@ -34,4 +38,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA({
+  dest:"public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+})(nextConfig);
