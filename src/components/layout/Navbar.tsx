@@ -99,7 +99,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   // Function to determine MySpace link
   const getMySpaceLink = () => {
     if (activeCommunityId) {
-      return `${COMMUNITY_PATH}/${activeCommunityId}${COMMUNITY_FEED_PATH}`;
+      return `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`;
     } else {
       const firstCommunity = getFirstValidCommunity();
       if (firstCommunity) {
@@ -122,7 +122,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             })
           );
         }
-        return `${COMMUNITY_PATH}/${firstCommunity._id}${COMMUNITY_FEED_PATH}`;
+        return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
       }
       return FEED_PATH; // Fallback to /feed if no communities
     }
