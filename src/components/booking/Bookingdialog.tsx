@@ -191,7 +191,7 @@ export function BookingDialog({
 
       // Submit user information to wati API
       const watiResponse = await axios.post(
-        "http://localhost:8000/v1/profile/wati/addContact",
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/profile/wati/addContact`,
         {
           userId: userId,
           phone: phoneWithoutFormatting,
