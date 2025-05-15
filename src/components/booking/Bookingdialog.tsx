@@ -722,7 +722,10 @@ export function BookingDialog({
                     <p className="text-muted-foreground">Price</p>
                     <p className="font-medium">
                       {offering.price.currency}{" "}
-                      {offering.discounted_price || offering.price.amount}
+                      {offering.discounted_price !== null &&
+                      offering.discounted_price !== undefined
+                        ? offering.discounted_price
+                        : offering.price.amount}
                     </p>
                   </div>
                 </div>
