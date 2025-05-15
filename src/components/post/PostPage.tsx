@@ -13,11 +13,12 @@ import {
   Send,
 } from "lucide-react";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import moment from "moment";
 import DOMPurify from "dompurify";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import type { RootState } from "@/redux/store";
 
 // Import your components and constants
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
@@ -25,10 +26,16 @@ import { setCommunityData } from "@/redux/communitySlice";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { StringConstants } from "@/components/common/CommonText";
 import { API_FRONTEND_URL } from "@/config/constants";
-
+import { push, update, ref } from "firebase/database";
+import database from "../../../firebase";
+import { removeSpecialCharacters } from "@/components/utils/StringUtils";
+import { sendNotification } from "@/components/utils/notification";
+import { signIn } from "next-auth/react";
 export default function PostPage({ id }: { id: string }) {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { user } = useSelector((state: RootState) => state.user);
+  const userId = user?._id;
   const queryClient = useQueryClient();
   const [postDetails, setPostDetails] = useState<any>({
     post: {},
@@ -36,27 +43,39 @@ export default function PostPage({ id }: { id: string }) {
   });
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-  const fetchPost = async () => {
-    try {
+  // Check if user is authenticated
+  const isAuthenticated = !!userId;
+
+  const { data: postDetailsData, refetch } = useQuery({
+    queryKey: ["post", id],
+    queryFn: async () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${id}`
       );
-      setPostDetails(response.data.data);
-    } catch (error) {
-      console.error("Error fetching post:", error);
-    }
-  };
+      return response.data.data;
+    },
+    enabled: !!id,
+  });
 
   useEffect(() => {
-    if (id) {
-      fetchPost();
+    if (postDetailsData) {
+      setPostDetails(postDetailsData);
     }
-  }, [id]);
+  }, [postDetailsData]);
+
+  // Reset login prompt when user logs in
+  useEffect(() => {
+    if (isAuthenticated) {
+      setShowLoginPrompt(false);
+    }
+  }, [isAuthenticated]);
 
   const post = postDetails?.post || {};
   const community = post?.community_id || {};
-  const user = post?.user_id || {};
+  const postUser = post?.user_id || {};
 
   // Check if the current user has liked the post
   const isLiked = post?.upvote_userId?.includes(user?._id);
@@ -94,8 +113,53 @@ export default function PostPage({ id }: { id: string }) {
     return num?.toString();
   };
 
+  // Function to send notification
+  const sendLikeNotification = async () => {
+    try {
+      // Make sure we have the post owner's data
+      if (
+        !post.user_id ||
+        !post.user_id.email ||
+        user?._id === post.user_id._id
+      ) {
+        console.log("Skipping notification: missing user data or self-like");
+        return;
+      }
+
+      const email = removeSpecialCharacters(post?.user_id?.email);
+      console.log("Sending notification to:", email);
+
+      const notificationsRef = ref(database, `notification/${email}`);
+      const newNotificationRef = push(notificationsRef);
+
+      await update(newNotificationRef, {
+        userId: post.user_id._id,
+        type: "post_like",
+        message: `${user?.name} liked your post`,
+        read: false,
+        createdAt: new Date().toISOString(),
+        data: {
+          postId: post._id,
+          userId: user?._id,
+          userName: user?.name,
+          userImage: user?.image,
+        },
+      });
+
+      console.log("Like notification sent successfully");
+    } catch (error) {
+      console.error("Error sending like notification:", error);
+    }
+  };
+
   const likeMutation = useMutation({
     mutationFn: async () => {
+      if (!isAuthenticated) {
+        throw new Error("User not authenticated");
+      }
+
+      const wasLiked = isLiked;
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/vote`,
         {
@@ -105,70 +169,123 @@ export default function PostPage({ id }: { id: string }) {
           communityId: post.community_id._id,
         }
       );
+
+      if (!wasLiked) {
+        await sendLikeNotification();
+      }
+
       return response.data;
     },
     onMutate: async () => {
-      // Cancel any outgoing refetches to avoid overwriting our optimistic update
-      await queryClient.cancelQueries({ queryKey: ["post", post._id] });
+      // Optimistically update the UI
+      setPostDetails((prev) => {
+        const newPost = { ...prev.post };
 
-      // Snapshot the previous value
-      const previousPost = queryClient.getQueryData(["post", post._id]);
-
-      // Optimistically update to the new value
-      queryClient.setQueryData(["post", post._id], (old: any) => {
-        const newUpVotes = isLiked ? old.up_votes - 1 : old.up_votes + 1;
-        const newUpvoteUserIds = isLiked
-          ? old.upvote_userId.filter((id: string) => id !== user._id)
-          : [...old.upvote_userId, user._id];
+        if (isLiked) {
+          // Unlike: Remove user from upvote_userId and decrement up_votes
+          newPost.upvote_userId = newPost.upvote_userId.filter(
+            (id) => id !== user?._id
+          );
+          newPost.up_votes = (newPost.up_votes || 0) - 1;
+        } else {
+          // Like: Add user to upvote_userId and increment up_votes
+          newPost.upvote_userId = [...(newPost.upvote_userId || []), user?._id];
+          newPost.up_votes = (newPost.up_votes || 0) + 1;
+        }
 
         return {
-          ...old,
-          up_votes: newUpVotes,
-          upvote_userId: newUpvoteUserIds,
+          ...prev,
+          post: newPost,
         };
       });
-
-      // Return the previous value so we can roll back if something goes wrong
-      return { previousPost };
     },
-    onError: (err, variables, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
-      if (context?.previousPost) {
-        queryClient.setQueryData(["post", post._id], context.previousPost);
-      }
+    onError: (err) => {
+      console.error("Like mutation error:", err);
+      // Revert optimistic update by refetching
+      refetch();
     },
     onSettled: () => {
       // Always refetch after error or success to ensure we have the correct data
-      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+      refetch();
     },
   });
 
   const commentMutation = useMutation({
     mutationFn: async () => {
+      if (!isAuthenticated) {
+        throw new Error("User not authenticated");
+      }
+
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/comment`,
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/reply/post`,
         {
-          userId: user._id,
           postId: post._id,
-          body: newComment,
-          communityId: post.community_id._id,
+          comment: newComment,
+          userId: user._id,
         }
       );
-      return response.data;
+      return response.data.data;
     },
-    onSuccess: () => {
+    onSuccess: async (newComment) => {
       setNewComment("");
-      queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+
+      // Optimistically update the UI
+      setPostDetails((prev) => ({
+        ...prev,
+        post: {
+          ...prev.post,
+          reply_count: (prev.post.reply_count || 0) + 1,
+        },
+      }));
+
+      // Refetch to get the updated data
+      refetch();
+
+      // Send notification if needed
+      if (post.user_id?._id !== user?._id) {
+        await sendNotification(post.user_id?.email, {
+          userId: post.user_id._id,
+          type: "post_comment",
+          message: `${user?.name} commented on your post`,
+          read: false,
+          createdAt: new Date().toISOString(),
+          data: {
+            postId: post._id,
+            userId: user?._id,
+            userName: user?.name,
+            userImage: user?.image,
+            commentId: newComment._id,
+          },
+        });
+      }
+    },
+    onError: (error) => {
+      console.error("Comment mutation error:", error);
+      refetch();
     },
   });
 
   const handleLikeClick = () => {
-    if (!user?._id) return;
+    if (!isAuthenticated) {
+      console.log("User not authenticated, showing login prompt");
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    console.log("Attempting to like post with user:", user?._id);
     likeMutation.mutate();
   };
 
   const handleSendComment = () => {
-    if (!newComment.trim() || !user?._id) return;
+    if (!newComment.trim()) return;
+
+    if (!isAuthenticated) {
+      console.log("User not authenticated, showing login prompt");
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    console.log("Attempting to comment with user:", user?._id);
     commentMutation.mutate();
   };
 
@@ -186,6 +303,11 @@ export default function PostPage({ id }: { id: string }) {
     }
   };
 
+  const handleLogin = () => {
+    // Redirect to login page or open login modal
+    router.push("/login");
+  };
+
   const communityName = community?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
   const parsedBody =
@@ -198,9 +320,32 @@ export default function PostPage({ id }: { id: string }) {
     return <div className="p-4 text-center">Loading post...</div>;
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSendComment();
+    }
+  };
+
   return (
     <div className="flex justify-center items-start min-h-screen px-4">
       <div className="bg-card rounded-xl my-16 w-[700px] ">
+        {showLoginPrompt && (
+          <div className="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 p-3 text-center">
+            Please{" "}
+            <button
+              onClick={() =>
+                signIn(undefined, {
+                  callbackUrl: `${window.location.origin}?hero=2`,
+                })
+              }
+              className="font-bold underline"
+            >
+              log in
+            </button>{" "}
+            to like or comment on posts.
+          </div>
+        )}
+
         <div className="p-4">
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-10">
@@ -306,14 +451,17 @@ export default function PostPage({ id }: { id: string }) {
             <div className="px-4 py-4">
               <div className="flex gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/placeholder.svg" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarImage src={user?.image || "/placeholder.svg"} />
+                  <AvatarFallback>
+                    {user?.name?.charAt(0) || "U"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 relative">
                   <input
                     type="text"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Write a comment..."
                     className="w-full bg-background rounded-full px-4 py-2 text-sm text-accent focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
