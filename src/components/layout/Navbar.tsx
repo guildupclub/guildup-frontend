@@ -39,6 +39,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
   const PROFILE_PATH = "/profile";
+  const NO_COMMUNITIES_AVAILABLE = "/no-community";
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
@@ -124,7 +125,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         }
         return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
       }
-      return FEED_PATH; // Fallback to /feed if no communities
+      return NO_COMMUNITIES_AVAILABLE; // Fallback to /feed if no communities
     }
   };
 

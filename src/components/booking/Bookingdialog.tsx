@@ -429,7 +429,10 @@ export function BookingDialog({
                     <div className="text-left">
                       <p className="text-xs text-muted-foreground">Price</p>
                       <p className="text-sm font-medium">
-                        {offering.discounted_price || offering.price.amount}
+                        {offering.discounted_price !== null &&
+                        offering.discounted_price !== undefined
+                          ? offering.discounted_price
+                          : offering.price.amount}
                       </p>
                     </div>
                   </div>
