@@ -5,7 +5,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "../Loader";
-import { PostCard } from "./PostCard";
+import { PostCarde } from "./PostCard";
 import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
 import { StringConstants } from "../common/CommonText";
 
@@ -57,7 +57,7 @@ export function Feed() {
             <div className="text-center text-zinc-400">{StringConstants.NO_POST_AVAILABLE}</div>
           ) : (
             posts.map((post, index) => (
-              <PostCard
+              <PostCarde
                 key={post._id}
                 post={post}
                 userID={userId}

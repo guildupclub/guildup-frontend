@@ -1,15 +1,19 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaUsers } from "react-icons/fa";
 import { toast } from "sonner";
+import { Dialog } from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
+import { StringConstants } from "@/components/common/CommonText";
+import CreatorForm from "@/components/form/CreatorForm";
 
 const NoCommunitySelected = () => {
   const { data: session, status } = useSession();
   const [isMounted, setIsMounted] = useState(false);
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -20,6 +24,21 @@ const NoCommunitySelected = () => {
       return;
     }
   };
+  const handleCreatorButtonClick = () => {
+    if (!session) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}?hero=1`,
+            }),
+        },
+      });
+    } else {
+      setIsDialogOpen(true);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center">
@@ -28,19 +47,27 @@ const NoCommunitySelected = () => {
       <p className="text-gray-600 mt-2">
         Join or create a community to start interacting with other members.
       </p>
+      {/* <h2 className=" font-sans">Ready to Turn Your Expertise into income?</h2> */}
       <div className="mt-4 flex gap-4">
-        <Link
-          href="/"
-          className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+        <Button variant="outline">
+          <Link
+            href="/"
+            // className="px-4 py-2 border border-gray-400 rounded-md text-gray-700 hover:bg-gray-100"
+          >
+            Explore Communities
+          </Link>
+        </Button>
+        <Dialog
+          open={session ? isDialogOpen : false}
+          onOpenChange={setIsDialogOpen}
         >
-          Explore Communities
-        </Link>
-        {/* <button
-          onClick={handleCreateCommunity}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Create Community
-        </button> */}
+          <Button className="" onClick={handleCreatorButtonClick}>
+            <span className="text-amber-300 hidden sm:inline">👋</span>{" "}
+            {StringConstants.CREATE_A_PAGE}
+          </Button>
+
+          {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+        </Dialog>
       </div>
     </div>
   );

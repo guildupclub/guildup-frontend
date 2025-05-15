@@ -45,6 +45,7 @@ import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
+import { useParams } from "next/navigation";
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -150,6 +151,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
 
+  const params = useParams();
+  const communityIdFromParam = params.id;
+
   // Redux state
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
@@ -208,7 +212,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isOwner =
     memberDetails &&
     memberDetails.is_owner === true &&
-    memberDetails.community_id === community.communityId;
+    memberDetails.community_id === communityIdFromParam;
 
   // Fetch community profile data
   const { data: profile, isLoading } = useQuery({
@@ -947,7 +951,8 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                             {offering.title}
                           </h3>
 
-                          {offering.is_free ? (
+                          {offering.is_free ||
+                          offering.discounted_price === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"
@@ -956,17 +961,21 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                             </Badge>
                           ) : (
                             <div className="flex flex-col items-end">
-                              {offering?.discounted_price &&
-                              offering?.price?.amount ? (
+                              {offering.discounted_price !== null &&
+                              offering.discounted_price !== undefined ? (
                                 <>
-                                  <span className="text-xs text-gray-400 line-through">
-                                    ₹{offering.price.amount}
-                                  </span>
+                                  {offering.price?.amount !== null &&
+                                    offering.price?.amount !== undefined && (
+                                      <span className="text-xs text-gray-400 line-through">
+                                        ₹{offering.price.amount}
+                                      </span>
+                                    )}
                                   <span className="font-semibold text-gray-900">
                                     ₹{offering.discounted_price}
                                   </span>
                                 </>
-                              ) : offering?.price?.amount ? (
+                              ) : offering.price?.amount !== null &&
+                                offering.price?.amount !== undefined ? (
                                 <span className="font-semibold text-gray-900">
                                   ₹{offering.price.amount}
                                 </span>
