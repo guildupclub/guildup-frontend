@@ -50,6 +50,7 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
+        {/* Do not remove these script */}
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
@@ -63,6 +64,19 @@ export default async function RootLayout({
           gtag('config', 'G-B3B9W8GRQP');
           `}
         </script>
+        <Script
+          id="ms-clarity"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, "clarity", "script", "rgpxrvmq3a");
+            `
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
