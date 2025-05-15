@@ -52,7 +52,7 @@ interface PostCardProps {
   userID: string;
 }
 
-export function PostCard({ post, cardRef, userID }: PostCardProps) {
+export function PostCarde({ post, cardRef, userID }: PostCardProps) {
   const community_id = post.community_id?._id;
   const community_name = post.community_id?.name;
   const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
