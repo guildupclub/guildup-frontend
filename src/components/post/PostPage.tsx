@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +18,6 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import moment from "moment";
-import DOMPurify from "dompurify";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import type { RootState } from "@/redux/store";
 
@@ -31,6 +32,10 @@ import database from "../../../firebase";
 import { removeSpecialCharacters } from "@/components/utils/StringUtils";
 import { sendNotification } from "@/components/utils/notification";
 import { signIn } from "next-auth/react";
+import {
+  processPostContent,
+  youtubeEmbedStyles,
+} from "@/components/utils/embed-utils";
 
 export default function PostPage({ id }: { id: string }) {
   const dispatch = useDispatch();
@@ -68,6 +73,9 @@ export default function PostPage({ id }: { id: string }) {
   const postDetails = postData || { post: {}, comments: [] };
   const post = postDetails?.post || {};
   const community = post?.community_id || {};
+  const { originalContent, youtubeEmbed } = processPostContent(
+    post?.body || ""
+  );
 
   // Check if the current user has liked the post
   const isLiked =
@@ -301,22 +309,19 @@ export default function PostPage({ id }: { id: string }) {
       });
     } catch (error) {
       console.log(error);
+      navigator.clipboard.writeText(shareUrl);
+      console.log("Link copied to clipboard");
     }
   };
 
   const communityName = community?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
-  const parsedBody =
-    post?.body?.startsWith('"') && post?.body?.endsWith('"')
-      ? post?.body?.slice(1, -1)
-      : post?.body || "";
-  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
 
   if (!post._id) {
     return <div className="p-4 text-center">Loading post...</div>;
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendComment();
     }
@@ -379,10 +384,21 @@ export default function PostPage({ id }: { id: string }) {
 
         {/* Post content with bottom padding */}
         <div className="px-4 pb-6">
-          <p
-            className="text-sm text-accent"
-            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-          />
+          {/* Original content without YouTube URLs */}
+          {originalContent && originalContent.trim() !== "" && (
+            <p
+              className="text-sm text-accent"
+              dangerouslySetInnerHTML={{ __html: originalContent }}
+            />
+          )}
+
+          {/* YouTube embed if available */}
+          {youtubeEmbed && (
+            <div
+              className="mt-4"
+              dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
+            />
+          )}
 
           {post?.media?.publicUrl && (
             <div className="mt-4">
@@ -495,6 +511,11 @@ export default function PostPage({ id }: { id: string }) {
             </div>
           </div>
         )}
+
+        {/* Add responsive styling for embedded iframes */}
+        <style jsx global>
+          {youtubeEmbedStyles}
+        </style>
       </div>
     </div>
   );

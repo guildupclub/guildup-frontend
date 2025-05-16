@@ -1,16 +1,11 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Heart,
-  MessageCircle,
-  MoreVertical,
-  Plus,
-  Send,
-  MessageCircleMore,
-} from "lucide-react";
+import { Heart, MoreVertical, Send, MessageCircleMore } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setActiveCommunity } from "@/redux/channelSlice";
@@ -18,7 +13,6 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import Image from "next/image";
 import moment from "moment";
-import DOMPurify from "dompurify";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CommentSection from "./CommentSection/CommentSection";
 import { StringConstants } from "../common/CommonText";
@@ -26,8 +20,9 @@ import { push, update, ref } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { sendNotification } from "../utils/notification";
+import { processPostContent, youtubeEmbedStyles } from "../utils/embed-utils";
 
-interface PostCardProps {
+interface PostCardeProps {
   post: {
     _id: string;
     title: string;
@@ -52,7 +47,7 @@ interface PostCardProps {
   userID: string;
 }
 
-export function PostCarde({ post, cardRef, userID }: PostCardProps) {
+export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const community_id = post.community_id?._id;
   const community_name = post.community_id?.name;
   const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
@@ -100,7 +95,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
     );
 
     router.push(COMMUNITY_PROFILE_PATH);
-  }, [dispatch, router, post]);
+  }, [dispatch, router, post, community_id, community_name, userID]);
 
   const commentMutation = useMutation({
     mutationFn: async (comment: string) => {
@@ -291,7 +286,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
     likeMutation.mutate();
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendComment();
     }
@@ -308,16 +303,17 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
       });
     } catch (error) {
       console.log(error);
+      // Fallback for browsers that don't support navigator.share
+      navigator.clipboard.writeText(shareUrl);
+      console.log("Link copied to clipboard");
     }
   };
 
+  // Process post body to handle YouTube URLs
+  const { originalContent, youtubeEmbed } = processPostContent(post.body);
+
   const communityName = post?.community_id?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
-  const parsedBody =
-    post.body.startsWith('"') && post.body.endsWith('"')
-      ? post.body.slice(1, -1)
-      : post.body;
-  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
 
   return (
     <div className="bg-card rounded-xl mb-4" ref={cardRef}>
@@ -360,10 +356,21 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
 
       {/* Post content with bottom padding */}
       <div className="px-4 pb-6">
-        <p
-          className="text-sm text-accent"
-          dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-        />
+        {/* Original content without YouTube URLs */}
+        {originalContent && originalContent.trim() !== "" && (
+          <p
+            className="text-sm text-accent"
+            dangerouslySetInnerHTML={{ __html: originalContent }}
+          />
+        )}
+
+        {/* YouTube embed if available */}
+        {youtubeEmbed && (
+          <div
+            className="mt-4"
+            dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
+          />
+        )}
 
         {post?.media?.publicUrl && (
           <div className="mt-4">
@@ -428,7 +435,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
             <div className="flex gap-2 mb-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user?.image || "/placeholder.svg"} />
-                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
               </Avatar>
               <div className="flex-1 relative">
                 <input
@@ -458,6 +465,11 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
           </div>
         </div>
       )}
+
+      {/* Add responsive styling for embedded iframes */}
+      <style jsx global>
+        {youtubeEmbedStyles}
+      </style>
     </div>
   );
 }
