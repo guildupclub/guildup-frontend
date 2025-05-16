@@ -13,7 +13,7 @@ interface GoogleSignInProps {
 
 const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   isLoading,
-  callbackUrl = "/",
+  callbackUrl = window.location.href,
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [finalCallbackUrl, setFinalCallbackUrl] = useState(callbackUrl);
@@ -29,18 +29,9 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   // Use useRouter only after the component has mounted
   useEffect(() => {
     if (isMounted) {
-      // if (isMounted && !isCreator) {
-      const currentUrl = window.location.href;
       const urlParams = new URLSearchParams(window.location.search);
-
-      const param = urlParams.get("callbackUrl");
-      const hero = param?.split("=")[1];
-
-      // Set the callbackUrl dynamically based on the `hero` query parameter
-      const newCallbackUrl =
-        hero === "2" ? `${window.location.origin}/` : currentUrl;
-
-      setFinalCallbackUrl(newCallbackUrl);
+      const cb = urlParams.get("callbackUrl");
+      setFinalCallbackUrl(cb || window.location.origin);
     }
   }, [isMounted]);
 
@@ -65,7 +56,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
         <Button
           variant="outline"
           className="w-full bg-slate-200 "
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => signIn("google", { callbackUrl: finalCallbackUrl })}
           disabled={isLoading}
         >
           <svg

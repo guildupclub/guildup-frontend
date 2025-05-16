@@ -410,7 +410,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <Button
                     onClick={() =>
                       signIn(undefined, {
-                        callbackUrl: `${window.location.origin}?hero=2`,
+                        callbackUrl: `${window.location.href}`,
                       })
                     }
                     className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
