@@ -1,5 +1,3 @@
-//
-
 "use client";
 
 import * as React from "react";
@@ -17,8 +15,12 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { StringConstants } from "@/components/common/CommonText";
 import { toast } from "sonner";
-import DOMPurify from "dompurify";
 import { useRouter } from "next/navigation";
+import {
+  processPostContent,
+  youtubeEmbedStyles,
+} from "@/components/utils/embed-utils";
+
 interface TrendingPost {
   _id: string;
   user_id: {
@@ -79,18 +81,6 @@ export function RightSidebar() {
     fetchTrendingPosts();
   }, []);
 
-  // const handleCreatorButtonClick = () => {
-  //   if (!session) {
-  //     toast("Please sign in to Build your Guild", {
-  //       action: {
-  //         label: "Sign In",
-  //         onClick: () => signIn(),
-  //       },
-  //     });
-  //   } else {
-  //     setIsDialogOpen(true);
-  //   }
-  // };
   const handleCreatorButtonClick = () => {
     if (!session) {
       toast("Sign in required", {
@@ -106,14 +96,16 @@ export function RightSidebar() {
       setIsDialogOpen(true);
     }
   };
+
   const handlePostClick = (postId: string) => {
     router.push(`/post/${postId}`);
   };
+
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
       {!isCreator && (
         <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold  font-sans">
+          <h1 className="font-semibold font-sans">
             Ready to Turn Your Expertise into income?
           </h1>
           <Dialog
@@ -162,82 +154,99 @@ export function RightSidebar() {
                 </div>
               ))
           ) : trendingPosts.length > 0 ? (
-            trendingPosts.map((post) => (
-              <div
-                key={post._id}
-                onClick={() => handlePostClick(post?._id)}
-                className="px-4 py-2 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Avatar className="h-6 w-6 ring-1 ring-zinc-200/50 shadow-sm">
-                      {post?.community_id?.image ? (
-                        <AvatarImage
-                          src={post?.community_id?.image}
-                          alt={post?.community_id?.name || "User"}
-                        />
-                      ) : (
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          <User className="h-3 w-3" />
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      {post?.community_id && post.community_id.name
-                        ? post.community_id.name
-                        : ""}
-                    </span>
-                  </div>
+            trendingPosts.map((post) => {
+              // Process post body to handle YouTube URLs
+              const { originalContent, youtubeEmbed } = processPostContent(
+                post.body
+              );
 
-                  <div className="flex flex-row gap-3 justify-between">
-                    {/* Description on the left */}
-                    <div
-                      className={`${
-                        post?.media?.publicUrl ? "flex-1" : "w-full"
-                      }`}
-                    >
-                      <p
-                        className="text-sm line-clamp-4 font-normal text-foreground/90"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(
-                            post.body.startsWith('"') && post.body.endsWith('"')
-                              ? post.body.slice(1, -1)
-                              : post.body
-                          ),
-                        }}
-                      />
-                      <div className="text-sm text-accent mt-2" />
+              return (
+                <div
+                  key={post._id}
+                  onClick={() => handlePostClick(post?._id)}
+                  className="px-4 py-2 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Avatar className="h-6 w-6 ring-1 ring-zinc-200/50 shadow-sm">
+                        {post?.community_id?.image ? (
+                          <AvatarImage
+                            src={
+                              post?.community_id?.image || "/placeholder.svg"
+                            }
+                            alt={post?.community_id?.name || "User"}
+                          />
+                        ) : (
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            <User className="h-3 w-3" />
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {post?.community_id && post.community_id.name
+                          ? post.community_id.name
+                          : ""}
+                      </span>
                     </div>
-                    {post?.media?.publicUrl && (
-                      <div className="flex-shrink-0 ml-2">
-                        {post?.media?.fileType === "image" && (
-                          <img
-                            src={post.media.publicUrl || "/placeholder.svg"}
-                            alt="Post Image"
-                            className="w-24 h-12 rounded-lg object-cover shadow-sm"
+
+                    <div className="gap-3 justify-between">
+                      {/* Description on the left */}
+                      <div
+                        className={`${
+                          post?.media?.publicUrl ? "flex-1" : "w-full"
+                        }`}
+                      >
+                        {/* Original content without YouTube URLs */}
+                        {originalContent && originalContent.trim() !== "" && (
+                          <p
+                            className="text-sm line-clamp-4 font-normal text-foreground/90"
+                            dangerouslySetInnerHTML={{
+                              __html: originalContent,
+                            }}
                           />
                         )}
-                        {post?.media?.fileType === "video" && (
-                          <video
-                            className="w-24 h-12 rounded-lg object-cover shadow-sm"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            disableRemotePlayback
-                          >
-                            <source
-                              src={post?.media?.publicUrl}
-                              type="video/mp4"
-                            />
-                          </video>
+
+                        {/* YouTube embed if available */}
+                        {youtubeEmbed && (
+                          <div
+                            className="mt-2 trending-youtube-embed"
+                            dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
+                          />
                         )}
+
+                        <div className="text-sm text-accent mt-2" />
                       </div>
-                    )}
+                      {post?.media?.publicUrl && (
+                        <div className="flex-shrink-0 ml-2 relative pb-[34.25%] h-0 overflow-hidden max-w-full mt-2 mb-2 rounded-md">
+                          {post?.media?.fileType === "image" && (
+                            <img
+                              src={post.media.publicUrl || "/placeholder.svg"}
+                              alt="Post Image"
+                              className="object-cover shadow-sm absolute top-0 left-0 w-full h-full rounded-md"
+                            />
+                          )}
+                          {post?.media?.fileType === "video" && (
+                            <video
+                              className="object-cover shadow-sm absolute top-0 left-0 w-full h-full rounded-md"
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              disableRemotePlayback
+                            >
+                              <source
+                                src={post?.media?.publicUrl}
+                                type="video/mp4"
+                              />
+                            </video>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="px-4 py-8 text-center">
               <p className="text-muted-foreground">
@@ -249,6 +258,9 @@ export function RightSidebar() {
       </div>
 
       <FooterLinks />
+      <style jsx global>
+        {youtubeEmbedStyles}
+      </style>
     </aside>
   );
 }
