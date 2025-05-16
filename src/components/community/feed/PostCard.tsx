@@ -10,7 +10,6 @@ import { formatDistanceToNow } from "date-fns";
 import { useSession } from "next-auth/react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/store";
-import DOMPurify from "dompurify";
 import axios from "axios";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -31,6 +30,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { sendNotification } from "@/components/utils/notification";
+import {
+  processPostContent,
+  youtubeEmbedStyles,
+} from "@/components/utils/embed-utils";
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
 import { BsSend } from "react-icons/bs";
 
@@ -298,11 +301,8 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
     }
   };
 
-  const parsedBody =
-    post.body.startsWith('"') && post.body.endsWith('"')
-      ? post.body.slice(1, -1)
-      : post.body;
-  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
+  // Process post body to handle YouTube URLs using our utility function
+  const { originalContent, youtubeEmbed } = processPostContent(post.body);
 
   const isCurrentUserAuthor = session?.user?.id === post.user_id?._id;
   const canModify = isAdmin || isCurrentUserAuthor;
@@ -364,10 +364,20 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
 
         {/* Content */}
         <div className="mt-4 text-foreground">
-          <div
-            className="text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-          />
+          <div className="text-sm leading-relaxed">
+            {/* Original content without YouTube URLs */}
+            {originalContent && originalContent.trim() !== "" && (
+              <div dangerouslySetInnerHTML={{ __html: originalContent }} />
+            )}
+
+            {/* YouTube embed if available */}
+            {youtubeEmbed && (
+              <div
+                className="mt-4"
+                dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
+              />
+            )}
+          </div>
 
           {post?.media?.publicUrl && post?.media?.fileType === "image" && (
             <img
@@ -510,6 +520,11 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Add responsive styling for embedded iframes */}
+      <style jsx global>
+        {youtubeEmbedStyles}
+      </style>
     </div>
   );
 }

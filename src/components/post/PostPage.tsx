@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +18,6 @@ import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import moment from "moment";
-import DOMPurify from "dompurify";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import type { RootState } from "@/redux/store";
 
@@ -31,25 +32,26 @@ import database from "../../../firebase";
 import { removeSpecialCharacters } from "@/components/utils/StringUtils";
 import { sendNotification } from "@/components/utils/notification";
 import { signIn } from "next-auth/react";
+import {
+  processPostContent,
+  youtubeEmbedStyles,
+} from "@/components/utils/embed-utils";
+
 export default function PostPage({ id }: { id: string }) {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
   const queryClient = useQueryClient();
-  const [postDetails, setPostDetails] = useState<any>({
-    post: {},
-    comments: [],
-  });
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // Check if user is authenticated
   const isAuthenticated = !!userId;
 
-  const { data: postDetailsData, refetch } = useQuery({
+  // Fetch post data using React Query
+  const { data: postData, refetch } = useQuery({
     queryKey: ["post", id],
     queryFn: async () => {
       const response = await axios.get(
@@ -58,13 +60,8 @@ export default function PostPage({ id }: { id: string }) {
       return response.data.data;
     },
     enabled: !!id,
+    refetchOnWindowFocus: false,
   });
-
-  useEffect(() => {
-    if (postDetailsData) {
-      setPostDetails(postDetailsData);
-    }
-  }, [postDetailsData]);
 
   // Reset login prompt when user logs in
   useEffect(() => {
@@ -73,12 +70,16 @@ export default function PostPage({ id }: { id: string }) {
     }
   }, [isAuthenticated]);
 
+  const postDetails = postData || { post: {}, comments: [] };
   const post = postDetails?.post || {};
   const community = post?.community_id || {};
-  const postUser = post?.user_id || {};
+  const { originalContent, youtubeEmbed } = processPostContent(
+    post?.body || ""
+  );
 
   // Check if the current user has liked the post
-  const isLiked = post?.upvote_userId?.includes(user?._id);
+  const isLiked =
+    post?.upvote_userId?.some((id: string) => id === userId) || false;
 
   const handleClickCommunity = useCallback(() => {
     if (!community?._id) {
@@ -152,12 +153,14 @@ export default function PostPage({ id }: { id: string }) {
     }
   };
 
+  // Use React Query mutation for likes with proper optimistic updates
   const likeMutation = useMutation({
     mutationFn: async () => {
       if (!isAuthenticated) {
         throw new Error("User not authenticated");
       }
 
+      // Store the current like state before the mutation
       const wasLiked = isLiked;
 
       const response = await axios.post(
@@ -170,6 +173,7 @@ export default function PostPage({ id }: { id: string }) {
         }
       );
 
+      // Only send notification if this was a like action (not an unlike)
       if (!wasLiked) {
         await sendLikeNotification();
       }
@@ -177,36 +181,49 @@ export default function PostPage({ id }: { id: string }) {
       return response.data;
     },
     onMutate: async () => {
-      // Optimistically update the UI
-      setPostDetails((prev) => {
-        const newPost = { ...prev.post };
+      // Cancel any outgoing refetches to avoid overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: ["post", id] });
+
+      // Snapshot the previous value
+      const previousPostData = queryClient.getQueryData(["post", id]);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(["post", id], (old: any) => {
+        if (!old || !old.post) return old;
+
+        const newPost = { ...old.post };
 
         if (isLiked) {
           // Unlike: Remove user from upvote_userId and decrement up_votes
           newPost.upvote_userId = newPost.upvote_userId.filter(
-            (id) => id !== user?._id
+            (id: string) => id !== userId
           );
-          newPost.up_votes = (newPost.up_votes || 0) - 1;
+          newPost.up_votes = Math.max((newPost.up_votes || 0) - 1, 0);
         } else {
           // Like: Add user to upvote_userId and increment up_votes
-          newPost.upvote_userId = [...(newPost.upvote_userId || []), user?._id];
+          newPost.upvote_userId = [...(newPost.upvote_userId || []), userId];
           newPost.up_votes = (newPost.up_votes || 0) + 1;
         }
 
         return {
-          ...prev,
+          ...old,
           post: newPost,
         };
       });
+
+      // Return the previous value so we can roll back if something goes wrong
+      return { previousPostData };
     },
-    onError: (err) => {
+    onError: (err, variables, context) => {
       console.error("Like mutation error:", err);
-      // Revert optimistic update by refetching
-      refetch();
+      // If the mutation fails, use the context returned from onMutate to roll back
+      if (context?.previousPostData) {
+        queryClient.setQueryData(["post", id], context.previousPostData);
+      }
     },
     onSettled: () => {
       // Always refetch after error or success to ensure we have the correct data
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
     },
   });
 
@@ -229,17 +246,10 @@ export default function PostPage({ id }: { id: string }) {
     onSuccess: async (newComment) => {
       setNewComment("");
 
-      // Optimistically update the UI
-      setPostDetails((prev) => ({
-        ...prev,
-        post: {
-          ...prev.post,
-          reply_count: (prev.post.reply_count || 0) + 1,
-        },
-      }));
-
-      // Refetch to get the updated data
-      refetch();
+      // Invalidate and refetch comments
+      queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
+      // Also invalidate post data to update comment count
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
 
       // Send notification if needed
       if (post.user_id?._id !== user?._id) {
@@ -261,7 +271,6 @@ export default function PostPage({ id }: { id: string }) {
     },
     onError: (error) => {
       console.error("Comment mutation error:", error);
-      refetch();
     },
   });
 
@@ -300,27 +309,19 @@ export default function PostPage({ id }: { id: string }) {
       });
     } catch (error) {
       console.log(error);
+      navigator.clipboard.writeText(shareUrl);
+      console.log("Link copied to clipboard");
     }
-  };
-
-  const handleLogin = () => {
-    // Redirect to login page or open login modal
-    router.push("/login");
   };
 
   const communityName = community?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
-  const parsedBody =
-    post?.body?.startsWith('"') && post?.body?.endsWith('"')
-      ? post?.body?.slice(1, -1)
-      : post?.body || "";
-  const sanitizedBody = DOMPurify.sanitize(parsedBody.trim());
 
   if (!post._id) {
     return <div className="p-4 text-center">Loading post...</div>;
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendComment();
     }
@@ -383,10 +384,21 @@ export default function PostPage({ id }: { id: string }) {
 
         {/* Post content with bottom padding */}
         <div className="px-4 pb-6">
-          <p
-            className="text-sm text-accent"
-            dangerouslySetInnerHTML={{ __html: sanitizedBody }}
-          />
+          {/* Original content without YouTube URLs */}
+          {originalContent && originalContent.trim() !== "" && (
+            <p
+              className="text-sm text-accent"
+              dangerouslySetInnerHTML={{ __html: originalContent }}
+            />
+          )}
+
+          {/* YouTube embed if available */}
+          {youtubeEmbed && (
+            <div
+              className="mt-4"
+              dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
+            />
+          )}
 
           {post?.media?.publicUrl && (
             <div className="mt-4">
@@ -415,6 +427,7 @@ export default function PostPage({ id }: { id: string }) {
           <button
             className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
             onClick={handleLikeClick}
+            disabled={likeMutation.isPending}
           >
             <Heart
               className={`h-5 w-5 ${
@@ -498,6 +511,11 @@ export default function PostPage({ id }: { id: string }) {
             </div>
           </div>
         )}
+
+        {/* Add responsive styling for embedded iframes */}
+        <style jsx global>
+          {youtubeEmbedStyles}
+        </style>
       </div>
     </div>
   );
