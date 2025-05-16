@@ -33,6 +33,7 @@ import {
 import { sendNotification } from "@/components/utils/notification";
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
 import { BsSend } from "react-icons/bs";
+import Image from "next/image";
 
 // Add this CSS class to your global CSS file
 // .xs\:inline { @media (min-width: 480px) { display: inline; } }
@@ -370,7 +371,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           />
 
           {post?.media?.publicUrl && post?.media?.fileType === "image" && (
-            <img
+            <Image
               src={post.media.publicUrl || "/placeholder.svg"}
               alt="Post Image"
               className="mt-4 w-full max-h-[400px] rounded-lg object-contain"

@@ -14,6 +14,7 @@ import {
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
 import moment from "moment";
+import Image from "next/image";
 interface Post {
   id: string;
   author: string;
@@ -139,7 +140,7 @@ function Chat() {
             {(posts || []).length > 0 ? (
               (posts || []).map((post) => (
                 <div key={post.id} className="flex gap-3 items-start">
-                  <img
+                  <Image
                     src={post.avatar || "/placeholder.svg?height=40&width=40"}
                     alt={post.author}
                     className="w-10 h-10 rounded-full"

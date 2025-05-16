@@ -32,6 +32,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import ConsultationForm from "./offeringForms/consultation";
 import WebinarForm from "./offeringForms/webinar";
+import Image from "next/image";
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
 }
@@ -414,6 +415,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       duration: 60,
       is_free: true,
       tags: "",
+      start_time: "",
+      link: "",
     });
 
     toast.info(
@@ -788,7 +791,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                           className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                           disabled={loading}
                         >
-                          <img
+                          <Image
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt="Google"
                             className="w-5 h-5 mr-2"
@@ -864,7 +867,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                           className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                           disabled={loading}
                         >
-                          <img
+                          <Image
                             src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                             alt="Google"
                             className="w-5 h-5 mr-2"

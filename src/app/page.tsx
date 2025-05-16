@@ -1,7 +1,6 @@
 "use client";
 import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
-import { API_BASE_URL } from "../config/constants";
 import CommunitySection from "@/components/explore/CommunitySection";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,10 +21,11 @@ import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
-import { ArrowRight, Plus } from "lucide-react";
-import { motion, useScroll } from "framer-motion";
+import { Plus } from "lucide-react";
+import { useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
+import { debounce } from "lodash";
 
 interface Category {
   _id: string;
@@ -78,78 +78,86 @@ function Page() {
     setIsMounted(true);
   }, []);
 
+  // Memoize the category conversion functions
+  const categoryToUrl = useCallback((name: string) => {
+    return name.replace(/\s+/g, "-");
+  }, []);
+
+  const urlToCategory = useCallback((url: string) => {
+    return url.replace(/-/g, " ");
+  }, []);
+
+  // Combine session and category effects
   useEffect(() => {
     if (!isMounted || status === "loading") return;
 
-    if (!session) {
-      router.push("/");
-    } else {
-      const fetchCommunities = async () => {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-            {
-              userId: session?.user._id,
-            }
-          );
-          dispatch(setUserFollowedCommunities(res.data.data));
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      fetchCommunities();
+    const controller = new AbortController();
 
-      if (session.user?.isNewUser) {
-        setIsModalOpen(true);
+    const initializeApp = async () => {
+      if (!session) {
+        router.push("/");
+        return;
       }
-    }
-  }, [session, status, isMounted, router]);
 
-  // Convert category name to URL-friendly format
-  const categoryToUrl = (name: string) => {
-    return name.replace(/\s+/g, "-");
-  };
-
-  // Convert URL-friendly format back to category name
-  const urlToCategory = (url: string) => {
-    return url.replace(/-/g, " ");
-  };
-
-  // Fetch categories
-  useEffect(() => {
-    const fetchCategory = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
+        // Fetch communities
+        const communitiesRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+          {
+            userId: session?.user._id,
+          },
+          { signal: controller.signal }
+        );
+        dispatch(setUserFollowedCommunities(communitiesRes.data.data));
+
+        // Fetch categories
+        const categoriesRes = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`,
+          { signal: controller.signal }
         );
 
         const categories = [
           { _id: "all", name: "All Category" },
-          ...response.data.data,
+          ...categoriesRes.data.data,
         ];
         setCategory(categories);
+
+        // Handle new user modal
+        if (session.user?.isNewUser) {
+          setIsModalOpen(true);
+        }
       } catch (error) {
-        console.error("Failed to fetch categories", error);
+        if (!axios.isCancel(error)) {
+          console.error("Error fetching data:", error);
+        }
       }
     };
-    fetchCategory();
-  }, []);
 
-  // Update URL when category changes
+    initializeApp();
+
+    return () => {
+      controller.abort();
+    };
+  }, [session, status, isMounted, router, dispatch]);
+
   useEffect(() => {
     if (!category.length) return;
 
-    if (selectedCategory === "All Category") {
-      router.replace("/", { scroll: false });
-    } else {
-      // Convert category name to URL-friendly format
-      router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
-        scroll: false,
-      });
-    }
-  }, [selectedCategory, router, category]);
+    const updateUrl = () => {
+      if (selectedCategory === "All Category") {
+        router.replace("/", { scroll: false });
+      } else {
+        router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
+          scroll: false,
+        });
+      }
+    };
 
-  const handleCreatorButtonClick = () => {
+    updateUrl();
+  }, [selectedCategory, router, category, categoryToUrl]);
+
+  // Memoize handlers
+  const handleCreatorButtonClick = useCallback(() => {
     if (!session) {
       toast("Sign in required", {
         action: {
@@ -163,22 +171,10 @@ function Page() {
     } else {
       setIsDialogOpen(true);
     }
-  };
+  }, [session]);
 
-  const handleScroll = () => {
-    if (targetRef.current) {
-      targetRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const handleCategorySelect = (categoryId: string) => {
-    // Start loading immediately to clear current content
-    setIsLoading(true);
-
-    // Update category state
-    const selectedCat = category.find(
-      (cat: Category) => cat._id === categoryId
-    );
+  const handleCategorySelect = useCallback((categoryId: string) => {
+    const selectedCat = category.find((cat: Category) => cat._id === categoryId);
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -187,36 +183,50 @@ function Page() {
       setSelectedCategoryId("all");
     }
 
-    // Perform scrolling immediately without timeout
     if (targetRef.current) {
       const headerOffset = 150;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: "smooth",
+        });
       });
     }
+  }, [category]);
 
-    // Stop loading immediately
-    setIsLoading(false);
-  };
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (targetRef.current) {
+        targetRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    }),
+    []
+  );
 
-  // Add scroll handler to detect when header becomes sticky
+  // Optimize intersection observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([e]) => {
         setIsSticky(!e.isIntersecting);
       },
-      { threshold: [1], rootMargin: "-200px 0px 0px 0px" } // 64px (top-16) + 20px offset
+      { 
+        threshold: [1], 
+        rootMargin: "-200px 0px 0px 0px"
+      }
     );
 
-    if (stickyTriggerRef.current) {
-      observer.observe(stickyTriggerRef.current);
+    const currentTrigger = stickyTriggerRef.current;
+    if (currentTrigger) {
+      observer.observe(currentTrigger);
     }
 
     return () => {
+      if (currentTrigger) {
+        observer.unobserve(currentTrigger);
+      }
       observer.disconnect();
     };
   }, []);

@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 type Testimonial = {
   _id: string;
@@ -254,10 +255,12 @@ export default function Testimonials() {
                         controls={false}
                       />
                     ) : (
-                      <img
+                      <Image
                         src={testimonial.imageUrl || "/placeholder.svg"}
                         alt="Testimonial"
                         className="w-auto h-48 object-cover"
+                        width={100}
+                        height={100}
                       />
                     )}
                   </div>
@@ -288,10 +291,12 @@ export default function Testimonials() {
                   autoPlay
                 />
               ) : (
-                <img
+                <Image
                   src={selectedTestimonial.imageUrl || "/placeholder.svg"}
                   alt="Testimonial"
                   className="max-w-full max-h-[400px] object-contain rounded-lg"
+                  width={100}
+                  height={100}
                 />
               )}
               <DialogFooter className="w-full flex justify-between sm:justify-between">

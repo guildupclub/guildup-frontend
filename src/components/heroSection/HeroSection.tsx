@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ArrowRight, Play } from "lucide-react";
 import SearchBar from "../SearchBar";
 import React, { useState } from "react";
 import Image from "next/image";
@@ -46,167 +46,145 @@ export default function Hero() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-1rem)] bg-gradient-to-r from-[#777BEA]/20 relative flex items-center justify-center">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-center md:min-h-[calc(100vh-4rem)]">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-4xl mx-auto"
-        >
-          <div className="mb-8 bg-gradient-to-r from-[#7175f0] to-[#9296F9]  w-fit flex gap-2 py-[6px] pl-3 pr-4 mx-auto rounded-full font-semibold text-white">
-            <Image
-              alt="stars icon"
-              src="https://conqrr.vercel.app/_next/static/media/bi_stars.7e13c393.svg"
-              width={20}
-              height={20}
-              className="h-5 w-5"
-            />
-            Real Experts, Real Guidance
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
-            <motion.span
-              className="text-indigo-400 block mb-2"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-            >
-              <span className="text-foreground"> Get Help That </span> Truly
-              Helps
-            </motion.span>
-            {/* <motion.span
-              className="text-foreground"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-            >
-              All in One Place
-            </motion.span> */}
+    <section className="relative min-h-screen bg-white text-black flex flex-col justify-between overflow-hidden">
+      <div className="container mx-auto px-6 py-16 flex flex-col lg:flex-row items-center justify-between relative z-10">
+        {/* Left: Header and Content */}
+        <div className="flex-1 flex flex-col justify-center items-start max-w-2xl mt-2">
+          <h1 className="font-sans font-black uppercase text-zinc-900 text-[2.5rem] sm:text-6xl md:text-8xl leading-[1.05] tracking-tight mb-6 drop-shadow-lg">
+            <span className="block text-zinc-900">Get Help That</span>
+            <span className="block text-zinc-900">Truly Helps</span>
           </h1>
-          <motion.p
-            className="mt-6 text-lg text-muted font-medium max-w-2xl mx-auto leading-tight"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-          >
-            From fitness and nutrition to <br className="lg:hidden" /> therapy
-            and coaching—find <br /> someone who gets you
-          </motion.p>
-
-          <motion.div
-            className="mt-10 mb-16 md:mb-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-          >
-            <SearchBar />
-          </motion.div>
-        </motion.div>
-
-        {!isCreator && (
-          <div className="md:hidden mt-2 flex flex-col items-center justify-center text-center mb-2 ">
-            <h2 className="font-medium px-4 leading-tight">
-              Are you a coach, therapist, or expert <br /> struggling to find
-              clients?
-            </h2>
-            <div className="flex gap-4">
-              <Dialog
-                open={session ? isDialogOpen : false}
-                onOpenChange={setIsDialogOpen}
-              >
-                <Button
-                  className="px-2 py-1 mt-2 "
-                  onClick={handleCreatorButtonClick}
-                >
-                  🚀 Sign up, it&apos;s free
-                </Button>
-
-                {session && (
-                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                )}
-              </Dialog>
-            </div>
+          {/* Avatars */}
+          <div className="flex items-center space-x-[-12px] mb-6">
+            <Image
+              src="https://randomuser.me/api/portraits/women/1.jpg"
+              alt="Avatar 1"
+              width={48}
+              height={48}
+              className="rounded-full border-2 border-black"
+            />
+            <Image
+              src="https://randomuser.me/api/portraits/women/2.jpg"
+              alt="Avatar 2"
+              width={48}
+              height={48}
+              className="rounded-full border-2 border-black"
+            />
+            <Image
+              src="https://randomuser.me/api/portraits/men/3.jpg"
+              alt="Avatar 3"
+              width={48}
+              height={48}
+              className="rounded-full border-2 border-black"
+            />
           </div>
-        )}
+          {/* Book Demo Call */}
+          <div className="mb-6 w-full max-w-xs">
+            <button
+              className={`
+                group relative flex items-center justify-between w-full
+                bg-primary border-2 border-white
+                rounded-full px-6 py-3
+                font-semibold text-white text-lg
+                shadow-lg
+                transition-all duration-200
+                hover:scale-105
+                focus:outline-none focus:ring-2 focus:ring-white/40
+                before:absolute before:inset-0 before:rounded-full
+                before:animate-glow before:z-[-1]
+                overflow-hidden
+              `}
+              style={{
+                boxShadow: "0 0 24px 0 rgba(255,255,255,0.15), 0 2px 8px 0 rgba(0,0,0,0.10)",
+              }}
+            >
+              <span>Book Demo Call</span>
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-white text-black ml-2 transition-transform duration-200 group-hover:translate-x-1 group-hover:scale-110">
+                <ArrowRight className="w-5 h-5" />
+              </span>
+            </button>
+            <style jsx>{`
+              .before\\:animate-glow::before {
+                content: "";
+                background: linear-gradient(90deg, #fff 0%, #6366f1 50%, #fff 100%);
+                opacity: 0.5;
+                filter: blur(8px);
+                z-index: -1;
+                animation: glowPulse 2s infinite alternate;
+              }
+              @keyframes glowPulse {
+                0% { opacity: 0.5; }
+                100% { opacity: 1; }
+              }
+            `}</style>
+          </div>
+          {/* Learn More */}
+          <div className="flex items-center gap-3 mb-6">
+            <button className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 border border-white/20">
+              <Play className="w-5 h-5" />
+            </button>
+            <span className="text-lg">Learn More <span className="text-gray-400">about us</span></span>
+          </div>
+          {/* Tags */}
+          {/* <div className="flex flex-wrap gap-3 mb-8">
+            <span className="px-4 py-2 rounded-full border border-white/20 bg-white/5 text-sm">DESIGN</span>
+            <span className="px-4 py-2 rounded-full border border-white/20 bg-white/5 text-sm">WEB DEVELOPMENT</span>
+            <span className="px-4 py-2 rounded-full border border-white/20 bg-white/5 text-sm">UI/UX</span>
+          </div> */}
+        </div>
+        {/* Right: Illustration */}
+        <div className="flex-1 flex justify-center items-center mt-12 lg:mt-0">
+          <div className="relative rounded-[2.5rem] w-[350px] h-[100px] flex items-center justify-center shadow-2xl">
+            <Image
+              src="hero_girl.png"
+              alt="Blush illustration"
+              width={1200}
+              height={1200}
+              className="object-contain rounded-[1.5rem] drop-shadow-xl"
+              priority
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Animated background elements with enhanced visibility */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-br from-blue-100/60 to-indigo-200/60 rounded-full"
-          animate={{
-            scale: [0.6, 0.9, 0.6],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
-        {/* <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-tl from-indigo-100/60 to-blue-200/60 rounded-full"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        /> */}
-        <motion.div
-          className="absolute top-1/4 lg:top-[70%] left-1/4 lg:left-[60%] w-16 h-16 bg-gradient-to-r from-blue-200 to-indigo-200 rounded-full blur-2xl"
-          animate={{
-            y: [0, -20, 0],
-            x: [0, 20, 0],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 lg:bottom-[80%] right-1/4 lg:right-[10%] w-12 h-12 bg-gradient-to-l from-indigo-200/70 to-blue-200/70 rounded-full blur-sm"
-          animate={{
-            y: [0, 40, 0],
-            x: [0, -40, 0],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+      {/* Bottom: Marketing Validators */}
+      <div className="w-full flex flex-col items-end mb-6">
+        <div className="flex flex-row gap-6 justify-center w-full max-w-4xl">
+          <div className="rounded-2xl bg-blue-600 text-white p-6 min-w-[220px] min-h-[100px] flex flex-col justify-center items-start shadow-lg">
+            <div className="font-bold text-lg mb-1">Certified Experts</div>
+            <div className="text-sm opacity-80">Only the best, verified for you</div>
+          </div>
+          <div className="rounded-2xl bg-black text-white p-6 min-w-[220px] min-h-[100px] flex flex-col justify-center items-start shadow-lg border border-white/10">
+            <div className="font-bold text-lg mb-1">One Stop Solution</div>
+            <div className="text-sm opacity-80">All your needs, one platform</div>
+          </div>
+          <div className="rounded-2xl bg-yellow-300 text-black p-6 min-w-[220px] min-h-[100px] flex flex-col justify-center items-start shadow-lg">
+            <div className="font-bold text-lg mb-1">Personalised Results</div>
+            <div className="text-sm opacity-80">Tailored just for you</div>
+          </div>
+        </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Scroll Indicator */}
-      <motion.div
-        className="hidden lg:block absolute bottom-8 inset-x-0 mx-auto flex flex-col items-center justify-center gap-2"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{
-          opacity: isVisible ? 1 : 0,
-          y: isVisible ? 0 : 20,
-        }}
-        transition={{ duration: 0.3 }}
-      >
-        <motion.p
-          className="text-sm text-gray-500 font-medium text-center"
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          Scroll to explore
-        </motion.p>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="text-primary flex justify-center"
-        >
-          <ChevronDown className="h-6 w-6" />
-        </motion.div>
-      </motion.div>
+function MarketingCard({ color, label, main, icon, number }) {
+  return (
+    <div className={`relative rounded-2xl shadow-lg p-6 min-w-[240px] min-h-[140px] flex flex-col justify-between ${color}`}>
+      {/* Tab/Notch */}
+      <div className={`absolute -top-3 left-0 w-16 h-6 rounded-tl-2xl rounded-tr-lg ${color} z-10`} />
+      {/* Content */}
+      <div className="z-20">
+        <div className="text-xs uppercase font-semibold mb-2">{label}</div>
+        {main && <div className="font-bold text-lg">{main}</div>}
+        {icon && <div className="text-4xl">{icon}</div>}
+        {number && <div className="font-bold text-3xl">{number}</div>}
+      </div>
+      {/* Optional Arrow */}
+      <div className="absolute top-3 right-4 text-black/60">
+        {/* Replace with your arrow icon */}
+        <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 13l4-4 4 4"/></svg>
+      </div>
     </div>
   );
 }

@@ -30,6 +30,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaRupeeSign } from "react-icons/fa";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import Image from "next/image";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -190,19 +191,19 @@ export function BookingDialog({
       }
 
       // Submit user information to wati API
-      const watiResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/profile/wati/addContact`,
-        {
-          userId: userId,
-          phone: phoneWithoutFormatting,
-        }
-      );
+      // const watiResponse = await axios.post(
+      //   `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/profile/wati/addContact`,
+      //   {
+      //     userId: userId,
+      //     phone: phoneWithoutFormatting,
+      //   }
+      // );
 
-      if (!watiResponse.data.data?.watiSync?.success) {
-        toast.error("Failed to register phone number");
-        setIsProcessing(false);
-        return;
-      }
+      // if (!watiResponse.data.data?.watiSync?.success) {
+      //   toast.error("Failed to register phone number");
+      //   setIsProcessing(false);
+      //   return;
+      // }
 
       // Add your booking API call here
       const dateObject = new Date(selectedSlot.start);
@@ -388,7 +389,7 @@ export function BookingDialog({
                 {/* Avatar */}
                 <div className="relative w-24 h-24 mx-auto my-4">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
-                  <img
+                  <Image
                     src={
                       activeCommunity?.image ||
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh" ||

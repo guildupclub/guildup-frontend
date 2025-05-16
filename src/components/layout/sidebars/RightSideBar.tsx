@@ -19,6 +19,7 @@ import { StringConstants } from "@/components/common/CommonText";
 import { toast } from "sonner";
 import DOMPurify from "dompurify";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 interface TrendingPost {
   _id: string;
   user_id: {
@@ -211,7 +212,7 @@ export function RightSidebar() {
                     {post?.media?.publicUrl && (
                       <div className="flex-shrink-0 ml-2">
                         {post?.media?.fileType === "image" && (
-                          <img
+                          <Image
                             src={post.media.publicUrl || "/placeholder.svg"}
                             alt="Post Image"
                             className="w-24 h-12 rounded-lg object-cover shadow-sm"
