@@ -134,7 +134,7 @@ export default function SignUp() {
         <Button
           variant="outline"
           className="w-full bg-slate-200 hover:bg-background"
-          onClick={() => signIn("google", { callbackUrl: "/explore" })}
+          onClick={() => signIn("google", { callbackUrl: window.location.href })}
           disabled={isLoading}
         >
           <svg
