@@ -284,6 +284,10 @@ export function BookingDialog({
           },
         };
 
+        // @Developer Note:
+        // Before opening any new dialog box close the other boxes.
+
+        onClose();
         const razorpayInstance = new window.Razorpay(razorpayOptions);
         razorpayInstance.open();
       } else {
