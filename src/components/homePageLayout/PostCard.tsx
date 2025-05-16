@@ -302,8 +302,8 @@ export function PostCarde({ post, cardRef, userID }: PostCardProps) {
 
     try {
       await navigator.share({
-        title: post.title,
-        text: post.body,
+        // title: post.title,
+        // text: post.body,
         url: shareUrl,
       });
     } catch (error) {
