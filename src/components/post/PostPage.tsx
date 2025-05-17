@@ -300,7 +300,7 @@ export default function PostPage({ id }: { id: string }) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${API_FRONTEND_URL}/feeds`;
+    const shareUrl = `${API_FRONTEND_URL}/post/${post._id}`;
 
     try {
       await navigator.share({
