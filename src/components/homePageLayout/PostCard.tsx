@@ -412,7 +412,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
         </button>
 
         {/* Middle Icon */}
-        <button
+        {/* <button
           className="flex items-center gap-2 text-muted-foreground"
           onClick={() => setShowComments(!showComments)}
         >
@@ -420,7 +420,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           <span className="text-sm">
             {post.reply_count} {StringConstants.COMMENT}
           </span>
-        </button>
+        </button> */}
 
         {/* Right Icon */}
         <button

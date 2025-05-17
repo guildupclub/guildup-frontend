@@ -441,7 +441,7 @@ export default function PostPage({ id }: { id: string }) {
             </span>
           </button>
 
-          {/* Middle Icon */}
+          {/* Middle Icon
           <button
             className="flex items-center gap-2 text-muted-foreground"
             onClick={() => setShowComments(!showComments)}
@@ -450,7 +450,7 @@ export default function PostPage({ id }: { id: string }) {
             <span className="text-sm">
               {post.reply_count || 0} {StringConstants.COMMENT}
             </span>
-          </button>
+          </button> */}
 
           {/* Right Icon */}
           <button

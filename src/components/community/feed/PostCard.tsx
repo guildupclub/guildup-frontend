@@ -420,7 +420,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
             </span>
           </Button>
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className={`rounded-full px-2 sm:px-4 gap-1 sm:gap-2 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
@@ -435,7 +435,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
               {" "}
               {post.reply_count} {StringConstants.COMMENT}
             </span>
-          </Button>
+          </Button> */}
 
           <Button
             variant="ghost"
