@@ -36,6 +36,7 @@ import {
   processPostContent,
   youtubeEmbedStyles,
 } from "@/components/utils/embed-utils";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 export default function PostPage({ id }: { id: string }) {
   const dispatch = useDispatch();
@@ -392,12 +393,13 @@ export default function PostPage({ id }: { id: string }) {
             />
           )}
 
-          {/* YouTube embed if available */}
+          {/* YouTube embed if available - UPDATED TO USE YouTubePlayer */}
           {youtubeEmbed && (
-            <div
-              className="mt-4"
-              dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
-            />
+            <div className="mt-4">
+              <YouTubePlayer
+                embedUrl={youtubeEmbed.match(/src="([^"]+)"/)?.[1] || ""}
+              />
+            </div>
           )}
 
           {post?.media?.publicUrl && (

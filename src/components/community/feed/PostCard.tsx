@@ -36,6 +36,7 @@ import {
 } from "@/components/utils/embed-utils";
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
 import { BsSend } from "react-icons/bs";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 // Add this CSS class to your global CSS file
 // .xs\:inline { @media (min-width: 480px) { display: inline; } }
@@ -372,10 +373,11 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
 
             {/* YouTube embed if available */}
             {youtubeEmbed && (
-              <div
-                className="mt-4"
-                dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
-              />
+              <div className="mt-4">
+                <YouTubePlayer
+                  embedUrl={youtubeEmbed.match(/src="([^"]+)"/)?.[1] || ""}
+                />
+              </div>
             )}
           </div>
 
