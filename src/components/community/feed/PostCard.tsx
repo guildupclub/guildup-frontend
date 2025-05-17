@@ -36,6 +36,7 @@ import {
 } from "@/components/utils/embed-utils";
 import CommentSection from "@/components/homePageLayout/CommentSection/CommentSection";
 import { BsSend } from "react-icons/bs";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 // Add this CSS class to your global CSS file
 // .xs\:inline { @media (min-width: 480px) { display: inline; } }
@@ -372,10 +373,11 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
 
             {/* YouTube embed if available */}
             {youtubeEmbed && (
-              <div
-                className="mt-4"
-                dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
-              />
+              <div className="mt-4">
+                <YouTubePlayer
+                  embedUrl={youtubeEmbed.match(/src="([^"]+)"/)?.[1] || ""}
+                />
+              </div>
             )}
           </div>
 
@@ -418,7 +420,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
             </span>
           </Button>
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="sm"
             className={`rounded-full px-2 sm:px-4 gap-1 sm:gap-2 text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
@@ -433,7 +435,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
               {" "}
               {post.reply_count} {StringConstants.COMMENT}
             </span>
-          </Button>
+          </Button> */}
 
           <Button
             variant="ghost"

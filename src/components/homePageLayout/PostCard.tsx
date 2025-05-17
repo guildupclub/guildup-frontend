@@ -21,6 +21,7 @@ import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { sendNotification } from "../utils/notification";
 import { processPostContent, youtubeEmbedStyles } from "../utils/embed-utils";
+import YouTubePlayer from "@/components/YouTubePlayer";
 
 interface PostCardeProps {
   post: {
@@ -364,12 +365,13 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           />
         )}
 
-        {/* YouTube embed if available */}
+        {/* YouTube embed if available - UPDATED TO USE YouTubePlayer */}
         {youtubeEmbed && (
-          <div
-            className="mt-4"
-            dangerouslySetInnerHTML={{ __html: youtubeEmbed }}
-          />
+          <div className="mt-4">
+            <YouTubePlayer
+              embedUrl={youtubeEmbed.match(/src="([^"]+)"/)?.[1] || ""}
+            />
+          </div>
         )}
 
         {post?.media?.publicUrl && (
@@ -410,7 +412,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
         </button>
 
         {/* Middle Icon */}
-        <button
+        {/* <button
           className="flex items-center gap-2 text-muted-foreground"
           onClick={() => setShowComments(!showComments)}
         >
@@ -418,7 +420,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           <span className="text-sm">
             {post.reply_count} {StringConstants.COMMENT}
           </span>
-        </button>
+        </button> */}
 
         {/* Right Icon */}
         <button

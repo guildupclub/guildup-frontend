@@ -1,4 +1,4 @@
-import DOMPurify from "dompurify"
+import DOMPurify from "dompurify";
 
 /**
  * Extracts YouTube video ID from a URL
@@ -6,10 +6,11 @@ import DOMPurify from "dompurify"
  * @returns Video ID or null if not found
  */
 export const extractYoutubeVideoId = (url: string): string | null => {
-  const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/
-  const match = url.match(regExp)
-  return match && match[7].length === 11 ? match[7] : null
-}
+  const regExp =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  const match = url.match(regExp);
+  return match && match[7].length === 11 ? match[7] : null;
+};
 
 /**
  * Converts a YouTube URL to an embed URL
@@ -18,22 +19,23 @@ export const extractYoutubeVideoId = (url: string): string | null => {
  */
 export const getYoutubeEmbedUrl = (url: string): string | null => {
   // Extract video ID
-  const videoId = extractYoutubeVideoId(url)
-  if (!videoId) return null
+  const videoId = extractYoutubeVideoId(url);
+  if (!videoId) return null;
 
   // Extract timestamp if present
-  const timeMatch = url.match(/[&?]t=(\d+)s/)
-  const timestamp = timeMatch ? `?start=${timeMatch[1]}` : ""
+  const timeMatch = url.match(/[&?]t=(\d+)s/);
+  const timestamp = timeMatch ? `?start=${timeMatch[1]}&` : "?";
 
-  return `https://www.youtube.com/embed/${videoId}${timestamp}`
-}
+  // Add enablejsapi=1 to enable the YouTube Player API
+  return `https://www.youtube.com/embed/${videoId}${timestamp}enablejsapi=1`;
+};
 
 /**
  * Interface for the result of processing post content
  */
 export interface ProcessedContent {
-  originalContent: string
-  youtubeEmbed: string | null
+  originalContent: string;
+  youtubeEmbed: string | null;
 }
 
 /**
@@ -43,51 +45,55 @@ export interface ProcessedContent {
  */
 export const processPostContent = (body: string): ProcessedContent => {
   try {
-    if (!body) return { originalContent: "", youtubeEmbed: null }
+    if (!body) return { originalContent: "", youtubeEmbed: null };
 
     // Remove outer quotes if they exist
-    let processedBody = body
+    let processedBody = body;
     if (processedBody.startsWith('"') && processedBody.endsWith('"')) {
-      processedBody = processedBody.slice(1, -1)
+      processedBody = processedBody.slice(1, -1);
     }
 
     // Unescape the string if it's escaped
     try {
-      processedBody = JSON.parse(`"${processedBody}"`)
+      processedBody = JSON.parse(`"${processedBody}"`);
     } catch (e) {
       // If parsing fails, use the original string
-      console.log("JSON parse error:", e)
+      console.log("JSON parse error:", e);
     }
 
     // Check if the body contains a YouTube URL
-    const youtubeUrlRegex = /(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/[^\s"'<>]+/g
-    const youtubeUrls = processedBody.match(youtubeUrlRegex)
-    let contentWithoutYoutubeUrls = processedBody
-    let youtubeEmbed = null
+    const youtubeUrlRegex =
+      /(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/[^\s"'<>]+/g;
+    const youtubeUrls = processedBody.match(youtubeUrlRegex);
+    let contentWithoutYoutubeUrls = processedBody;
+    let youtubeEmbed = null;
 
     if (youtubeUrls && youtubeUrls.length > 0) {
       // Get the first YouTube URL
-      const youtubeUrl = youtubeUrls[0]
-      const embedUrl = getYoutubeEmbedUrl(youtubeUrl)
+      const youtubeUrl = youtubeUrls[0];
+      const embedUrl = getYoutubeEmbedUrl(youtubeUrl);
 
       // Remove the YouTube URL from the content
       // This handles both plain text URLs and URLs inside HTML tags
       youtubeUrls.forEach((url) => {
         // Remove the URL if it's inside an <a> tag
         contentWithoutYoutubeUrls = contentWithoutYoutubeUrls.replace(
-          new RegExp(`<a[^>]*href=['"][^'"]*${url}[^'"]*['"][^>]*>[^<]*</a>`, "g"),
-          "",
-        )
+          new RegExp(
+            `<a[^>]*href=['"][^'"]*${url}[^'"]*['"][^>]*>[^<]*</a>`,
+            "g"
+          ),
+          ""
+        );
 
         // Remove the plain URL
-        contentWithoutYoutubeUrls = contentWithoutYoutubeUrls.replace(url, "")
-      })
+        contentWithoutYoutubeUrls = contentWithoutYoutubeUrls.replace(url, "");
+      });
 
       // Clean up any empty paragraphs or double spaces
       contentWithoutYoutubeUrls = contentWithoutYoutubeUrls
         .replace(/<p>\s*<\/p>/g, "")
         .replace(/\s{2,}/g, " ")
-        .trim()
+        .trim();
 
       if (embedUrl) {
         // Create an iframe for the YouTube embed
@@ -99,23 +105,25 @@ export const processPostContent = (body: string): ProcessedContent => {
           frameborder="0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
           referrerpolicy="strict-origin-when-cross-origin" 
-          allowfullscreen></iframe></div>`
+          allowfullscreen></iframe></div>`;
       }
     }
 
     // Return the content without YouTube URLs and the iframe
     return {
-      originalContent: contentWithoutYoutubeUrls ? DOMPurify.sanitize(contentWithoutYoutubeUrls) : "",
+      originalContent: contentWithoutYoutubeUrls
+        ? DOMPurify.sanitize(contentWithoutYoutubeUrls)
+        : "",
       youtubeEmbed,
-    }
+    };
   } catch (error) {
-    console.error("Error processing post content:", error)
+    console.error("Error processing post content:", error);
     return {
       originalContent: body ? DOMPurify.sanitize(body) : "",
       youtubeEmbed: null,
-    }
+    };
   }
-}
+};
 
 /**
  * CSS styles for YouTube embeds
@@ -146,4 +154,4 @@ export const youtubeEmbedStyles = `
     padding-bottom: 40%; /* Smaller aspect ratio for trending sidebar */
     max-height: 100px;
   }
-`
+`;
