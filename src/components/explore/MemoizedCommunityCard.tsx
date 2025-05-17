@@ -19,12 +19,10 @@ import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { FaLinkedinIn } from "react-icons/fa6";
 import numbro from "numbro";
-import { StringConstants } from "../common/CommonText";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setActiveCommunity } from "@/redux/channelSlice";
-import { Loader2 } from "lucide-react";
 import Loader from "../Loader";
 
 interface CommunityCardProps {
@@ -130,15 +128,40 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
             label: "Sign In",
             onClick: () =>
               signIn(undefined, {
-                callbackUrl: `${window.location.origin}?hero=1`,
+                callbackUrl: window.location.href,
               }),
           },
         });
         return;
       }
       setSelectedOffering(firstOffering);
+      if (communityDetails && communityDetails._id) {
+        setIsLoading(true);
+
+        dispatch(
+          setCommunityData({
+            communityId: communityDetails._id,
+            userId: communityDetails.user_id,
+          })
+        );
+
+        dispatch(
+          setActiveCommunity({
+            id: communityDetails._id,
+            name: communityDetails.name,
+            image: communityDetails.image || "",
+            background_image: communityDetails.background_image || "",
+            user_isBankDetailsAdded: false,
+            user_iscalendarConnected: false,
+          })
+        );
+
+        setTimeout(() => {
+          router.push(`/community/${communityDetails._id}/profile`);
+        }, 300);
+      }
     },
-    [session, firstOffering]
+    [session, firstOffering, communityDetails, dispatch, router]
   );
 
   const formatNumber = (num: any) => {
@@ -223,7 +246,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           <div className="relative group-hover:scale-105 transition-transform duration-500">
             <div className="relative">
               <Image
-                src={avatarImgUrl}
+                src={avatarImgUrl || "/placeholder.svg"}
                 alt="Profile"
                 width={80}
                 height={80}
