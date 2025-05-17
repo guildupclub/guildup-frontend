@@ -300,12 +300,12 @@ export default function PostPage({ id }: { id: string }) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${API_FRONTEND_URL}/post/${post._id}`;
+    const shareUrl = `${window.location.origin}/post/${post?._id}`;
 
     try {
       await navigator.share({
-        // title: post?.title,
-        // text: post?.body,
+        // title: post.title,
+        // text: post.body,
         url: shareUrl,
       });
     } catch (error) {
