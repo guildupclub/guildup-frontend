@@ -6,14 +6,7 @@ import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Heart,
-  MessageCircle,
-  MessageCircleMore,
-  MoreVertical,
-  Plus,
-  Send,
-} from "lucide-react";
+import { Heart, MessageCircle, MoreVertical, Plus, Send } from "lucide-react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
@@ -37,6 +30,7 @@ import {
   youtubeEmbedStyles,
 } from "@/components/utils/embed-utils";
 import YouTubePlayer from "@/components/YouTubePlayer";
+import { toast } from "sonner";
 
 export default function PostPage({ id }: { id: string }) {
   const dispatch = useDispatch();
@@ -47,7 +41,6 @@ export default function PostPage({ id }: { id: string }) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-
   // Check if user is authenticated
   const isAuthenticated = !!userId;
 
@@ -277,8 +270,15 @@ export default function PostPage({ id }: { id: string }) {
 
   const handleLikeClick = () => {
     if (!isAuthenticated) {
-      console.log("User not authenticated, showing login prompt");
-      setShowLoginPrompt(true);
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: window.location.href,
+            }),
+        },
+      });
       return;
     }
 
@@ -304,8 +304,8 @@ export default function PostPage({ id }: { id: string }) {
 
     try {
       await navigator.share({
-        title: post?.title,
-        text: post?.body,
+        // title: post?.title,
+        // text: post?.body,
         url: shareUrl,
       });
     } catch (error) {
@@ -337,7 +337,7 @@ export default function PostPage({ id }: { id: string }) {
             <button
               onClick={() =>
                 signIn(undefined, {
-                  callbackUrl: `${window.location.origin}?hero=2`,
+                  callbackUrl: window.location.href,
                 })
               }
               className="font-bold underline"

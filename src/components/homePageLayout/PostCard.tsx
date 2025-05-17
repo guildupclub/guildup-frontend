@@ -22,6 +22,8 @@ import { removeSpecialCharacters } from "../utils/StringUtils";
 import { sendNotification } from "../utils/notification";
 import { processPostContent, youtubeEmbedStyles } from "../utils/embed-utils";
 import YouTubePlayer from "@/components/YouTubePlayer";
+import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 interface PostCardeProps {
   post: {
@@ -283,7 +285,17 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   });
 
   const handleLikeClick = () => {
-    if (!user?._id) return;
+    if (!user?._id) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: window.location.href,
+            }),
+        },
+      });
+    }
     likeMutation.mutate();
   };
 

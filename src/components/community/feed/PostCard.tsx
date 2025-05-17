@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircleMore, Send, MoreVertical } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/redux/store";
 import axios from "axios";
@@ -242,7 +242,17 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   });
 
   const handleLikeClick = () => {
-    if (!userId) return;
+    if (!userId) {
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: window.location.href,
+            }),
+        },
+      });
+    }
     likeMutation.mutate();
   };
 
@@ -288,8 +298,8 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
 
     try {
       await navigator.share({
-        title: post.title,
-        text: post.body,
+        // title: post.title,
+        // text: post.body,
         url: shareUrl,
       });
     } catch (error) {
