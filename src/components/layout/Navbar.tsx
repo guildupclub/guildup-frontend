@@ -87,6 +87,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     (state: any) => state.channel.activeCommunity
   );
   const activeCommunityId = activeCommunity?.id;
+  const activeCommunityName = activeCommunity?.name;
 
   const communities = useSelector(
     (state: RootState) => state?.user?.userFollowedCommunities
@@ -97,10 +98,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return fetchedCommunities.find((community) => community && community._id);
   };
 
-  // Function to determine MySpace link
+  const cleanedCommunityName = activeCommunityName
+    ? activeCommunityName
+        .replace(/\s+/g, "-")
+        .replace(/\|/g, "-")
+        .replace(/-+/g, "-")
+    : "";
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParams = `${encodedCommunityName}-${activeCommunityId}`;
   const getMySpaceLink = () => {
     if (activeCommunityId) {
-      return `${COMMUNITY_PATH}/${activeCommunityId}${PROFILE_PATH}`;
+      return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
     } else {
       const firstCommunity = getFirstValidCommunity();
       if (firstCommunity) {
@@ -125,7 +133,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         }
         return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
       }
-      return NO_COMMUNITIES_AVAILABLE; // Fallback to /feed if no communities
+      return NO_COMMUNITIES_AVAILABLE;
     }
   };
 

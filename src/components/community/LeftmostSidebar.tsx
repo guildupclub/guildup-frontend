@@ -27,7 +27,7 @@ import {
   useJoinCommunity,
 } from "@/hook/queries/useCommunityMutations";
 import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 
 interface Community {
   _id: string;
@@ -42,73 +42,22 @@ interface Community {
 
 export function LeftmostSidebar() {
   const router = useRouter();
+  const pathname = usePathname(); // Add usePathname to get the current URL
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
-  // const [communities, setCommunities] = useState<Community[]>([]);
   const [newChannelName, setNewChannelName] = useState("");
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
-  const [showCreatorForm, setShowCreatorForm] = React.useState(false);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
 
-  const handleOpenForm = () => {
-    setShowCreatorForm((prev) => !prev);
-  };
-
-  const params = useParams();
   const dispatch = useDispatch();
+  const params = useParams();
+  const communityParam = params["community-Id"] as string; // e.g., "Adarsh-singh-Frontend-Developer-67cf3d9ac3642510085bbf8e"
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const activeCommunityId =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
 
   const user = useSelector((state: RootState) => state.user.user);
-
-  const activeCommunityId = params?.id;
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
-
-  // const fetchCommunities = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user`,
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           userId: userId,
-  //         }),
-  //       }
-  //     );
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch communities");
-  //     }
-
-  //     const result = await response.json();
-  //     console.log("comm", result);
-  //     const validCommunities = result.data.filter(
-  //       (community: Community | null) => community !== null
-  //     );
-  //     setCommunities(validCommunities);
-
-  //     dispatch(setUserFollowedCommunities(validCommunities));
-  //     // Set the first community as active if none is selected
-  //     if (validCommunities.length > 0 && !activeCommunityId) {
-  //       dispatch(
-  //         setActiveCommunity({
-  //           id: validCommunities[0]._id,
-  //           name: validCommunities[0].name, // Include name
-  //         })
-  //       );
-  //     }
-  //   } catch (err) {
-  //     setError(
-  //       err instanceof Error ? err.message : "Failed to fetch communities"
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   // Fetch communities function
   const fetchCommunities = async (): Promise<Community[]> => {
@@ -131,7 +80,6 @@ export function LeftmostSidebar() {
     const validCommunities = result?.data?.filter(
       (community: Community | null) => community !== null
     );
-    // setCommunitie(validCommunities);
 
     dispatch(setUserFollowedCommunities(validCommunities));
 
@@ -147,14 +95,10 @@ export function LeftmostSidebar() {
         })
       );
     }
-    // const result = await response.json();
     return result.data.filter(
       (community: Community | null) => community !== null
     );
   };
-
-  // Leave community mutation
-  const leaveCommunityMutation = useLeaveCommunity();
 
   // Use React Query for fetching communities
   const {
@@ -165,11 +109,9 @@ export function LeftmostSidebar() {
     queryKey: ["userCommunities", userId],
     queryFn: fetchCommunities,
     enabled: !!userId,
-    // Add this to ensure the component re-renders when the data changes
     staleTime: 0,
   });
 
-  // Add this near the top of your component function
   const queryClient = useQueryClient();
 
   // Join community mutation
@@ -183,8 +125,6 @@ export function LeftmostSidebar() {
       });
 
       toast.success("Successfully joined the community");
-
-      // The cache invalidation is handled in the mutation's onSuccess callback
     } catch (error) {
       toast.error("Failed to join community");
       console.error("Error joining community:", error);
@@ -193,7 +133,6 @@ export function LeftmostSidebar() {
 
   const handleCreateChannel = () => {
     if (newChannelName.trim()) {
-      // API call to create a new community can be placed here
       setNewChannelName("");
     }
   };
@@ -208,48 +147,30 @@ export function LeftmostSidebar() {
       .slice(0, 2);
   };
 
-  // const handleLeaveCommunity = async (communityId: string) => {
-  //   try {
-  //     await leaveCommunityMutation.mutateAsync({
-  //       userId: userId!,
-  //       communityId,
-  //     });
 
-  //     toast.success("Successfully left the community");
+  const handleNavigation = (community: { _id: string; name: string }) => {
+    const cleanedCommunityName = community.name
+      .replace(/\s+/g, "-") 
+      .replace(/\|/g, "-") 
+      .replace(/-+/g, "-"); 
+    const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+    const targetCommunityParam = `${encodedCommunityName}-${community._id}`;
 
-  //     // If the active community is the one being left, clear it
-  //     if (activeCommunityId === communityId) {
-  //       dispatch(setActiveCommunity(null));
-  //     }
+    const pathSegments = pathname.split("/");
+    const currentPage = pathSegments[3] || "profile"; 
 
-  //     // The cache invalidation is handled in the mutation's onSuccess callback
-  //   } catch (error) {
-  //     toast.error("Failed to leave community");
-  //     console.error("Error leaving community:", error);
-  //   }
-  // };
+    // Construct the target URL
+    const targetPath =
+      currentPage === "channel"
+        ? `/community/${targetCommunityParam}/profile` // Always go to profile if coming from a channel
+        : `/community/${targetCommunityParam}/${currentPage}`;
 
-  // const handleNavigation = (path: string) => {
-  //   router.push(path);
-  // };
-  const handleNavigation = (path: string, communityId: string) => {
-    const currentPath = window.location.pathname;
-    const pathSegments = currentPath.split("/");
-    const currentPage = pathSegments[3] || "profile"; // Default to profile if no page specified
-
-    // If we're switching communities, maintain the same page
-    if (currentPage == "channel") {
-      // For channels, always navigate to profile
-      router.push(`/community/${communityId}/profile`);
-    } else if (path.includes("community")) {
-      // const communityId = path.split('/community/')[1];
-      console.log(
-        "@communityId",
-        `/community/${communityId}/${currentPage}`,
-        communityId
-      );
-      router.push(`/community/${communityId}/${currentPage}`);
+    // Avoid navigating if we're already on the target path
+    if (pathname === targetPath) {
+      return; // Prevent infinite loop by not navigating to the same URL
     }
+
+    router.push(targetPath);
   };
 
   console.log("@communityDataLeftMostSideBar", communities);
@@ -262,7 +183,7 @@ export function LeftmostSidebar() {
   }
 
   return (
-    <div className="hidden md:flex md:bg-card  fixed left-0 h-screen w-20  flex-col items-center border-r border-background py-20 gap-3">
+    <div className="hidden md:flex md:bg-card fixed left-0 h-screen w-20 flex-col items-center border-r border-background py-20 gap-3">
       <div className="flex-1 w-full overflow-auto scrollbar-none cursor-pointer">
         <div className="flex flex-col items-center space-y-4 px-2 py-5">
           {isLoading ? (
@@ -281,7 +202,7 @@ export function LeftmostSidebar() {
                 key={community._id}
                 variant="ghost"
                 size="icon"
-                className={`relative rounded-lg  ${
+                className={`relative rounded-lg ${
                   activeCommunityId === community._id
                     ? "bg-blue-500/20 ring-2 ring-purple-500"
                     : "hover:bg-zinc-800"
@@ -303,10 +224,7 @@ export function LeftmostSidebar() {
                       userId: user._id,
                     })
                   );
-                  handleNavigation(
-                    `/community/${community._id}/profile`,
-                    community._id
-                  );
+                  handleNavigation(community); // Pass the community object directly
                 }}
               >
                 <Avatar className="w-full h-full !rounded-lg">
@@ -319,7 +237,6 @@ export function LeftmostSidebar() {
                     alt={community.name}
                     className="!rounded-lg"
                   />
-
                   <AvatarFallback className="!rounded-lg bg-primary text-white">
                     {getInitials(community.name)}
                   </AvatarFallback>
@@ -346,7 +263,6 @@ export function LeftmostSidebar() {
             <CreatorForm
               onClose={() => setIsCreatorFormOpen(false)}
               onSuccess={() => {
-                // Invalidate the cache when a new community is created
                 queryClient.invalidateQueries({
                   queryKey: ["userCommunities"],
                 });

@@ -113,8 +113,15 @@ function SearchPageContent() {
           name: communityData.community.name,
         })
       );
-
-      router.push(`/community/${communityData.community._id}/profile`);
+      const cleanedCommunityName = communityData.community.name
+        ? communityData.community.name
+            .replace(/\s+/g, "-")
+            .replace(/\|/g, "-")
+            .replace(/-+/g, "-")
+        : "";
+      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+      const communityParams = `${encodedCommunityName}-${communityData.community._id}`;
+      router.push(`/community/${communityParams}/profile`);
     },
     [dispatch, router]
   );
