@@ -45,7 +45,17 @@ export function Sidebar() {
     (state: RootState) => state.channel.activeChannel
   );
   const params = useParams();
-  const urlCommunityId = params.id as string;
+  const communityParam = params["community-Id"] as string; 
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityName =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(0, lastHyphenIndex)
+      : null;
+  const urlCommunityId =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
+
   const router = useRouter();
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
@@ -62,9 +72,20 @@ export function Sidebar() {
     type: "discussion",
     is_locked: false,
   });
-  const COMMUNITY_PROFILE_PATH = `/community/${urlCommunityId}/profile`;
-  const COMMUNITY_MEMBERS_PATH = `/community/${urlCommunityId}/members`;
-  const COMMUNITY_CHANNEL_PATH = `/community/${urlCommunityId}/channel`;
+
+  // Use the full communityParam for paths
+  const COMMUNITY_PROFILE_PATH = communityParam
+    ? `/community/${communityParam}/profile`
+    : "/community";
+  const COMMUNITY_MEMBERS_PATH = communityParam
+    ? `/community/${communityParam}/members`
+    : "/community";
+  const COMMUNITY_CHANNEL_PATH = communityParam
+    ? `/community/${communityParam}/channel`
+    : "/community";
+  const COMMUNITY_FEED_PATH = communityParam
+    ? `/community/${communityParam}/feed`
+    : "/community";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
 
@@ -245,7 +266,7 @@ export function Sidebar() {
 
   return (
     <>
-      <div className="md:fixed md:h-screen md:w-80  md:bg-card  md:p-4 md:py-24 md:flex flex-col hidden ">
+      <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
         <div className="flex items-center justify-between px-2">
           {isLoadingCommunity ? (
             <div className="h-6 w-32 bg-background animate-pulse rounded" />
@@ -256,22 +277,13 @@ export function Sidebar() {
               {communityDetails?.community?.name}
             </h2>
           )}
-
-          {/* {isAdmin && (
-      <button
-        className="p-1 rounded-md hover:bg-background transition"
-        onClick={() => setIsEditOpen(true)}
-      >
-        <FiEdit size={18} className="text-muted hover:text-primary" />
-      </button>
-    )} */}
         </div>
 
         <Separator />
         <div className="space-y-2">
           <div className="border-b border-background py-2">
             {isAdmin && (
-              <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
+              <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted">
                 <PostDialog />
               </div>
             )}
@@ -279,13 +291,11 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={`w-full justify-start gap-2 ${
-              pathname === `/community/${urlCommunityId}/profile`
+              pathname === COMMUNITY_PROFILE_PATH
                 ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                 : "hover:bg-background text-muted-foreground"
             }`}
-            onClick={() => {
-              handleNavigation(`/community/${urlCommunityId}/profile`);
-            }}
+            onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
           >
             <FaUserAlt />
             {StringConstants.PROFILE}
@@ -294,13 +304,11 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={`w-full justify-start gap-2 ${
-              pathname === `/community/${urlCommunityId}/feed`
+              pathname === COMMUNITY_FEED_PATH
                 ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                 : "hover:bg-background text-muted-foreground"
             }`}
-            onClick={() => {
-              handleNavigation(`/community/${urlCommunityId}/feed`);
-            }}
+            onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
           >
             <Rss className="h-4 w-4" />
             {StringConstants.FEED}
@@ -310,19 +318,16 @@ export function Sidebar() {
             <Button
               variant="ghost"
               className={`w-full justify-start gap-2 ${
-                pathname === `/community/${urlCommunityId}/members`
+                pathname === COMMUNITY_MEMBERS_PATH
                   ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                   : "hover:bg-background text-muted-foreground"
               }`}
-              onClick={() => {
-                handleNavigation(`/community/${urlCommunityId}/members`);
-              }}
+              onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
             >
               <FaUserGroup />
               {StringConstants.MEMBER}
             </Button>
           )}
-
           {/* Announcements */}
           {/* <Button
   variant="ghost"
@@ -353,6 +358,7 @@ export function Sidebar() {
   Announcements
 </Button> */}
 
+
           {isAdmin && (
             <Button
               className={`w-full text-white ${
@@ -367,8 +373,8 @@ export function Sidebar() {
           )}
 
           <div className="px-2 py-2 border-t border-background p-2">
-            <div className="flex items-center justify-between mb-2 ">
-              <h2 className="text-lg font-semibold text-muted ">Channels</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-muted">Channels</h2>
               <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
                 <DialogTrigger asChild>
                   {isAdmin && (
@@ -384,7 +390,7 @@ export function Sidebar() {
                     </Button>
                   )}
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-background  border-none">
+                <DialogContent className="sm:max-w-[425px] bg-background border-none">
                   <DialogHeader>
                     <DialogTitle>Create a New Channel</DialogTitle>
                   </DialogHeader>
@@ -398,7 +404,7 @@ export function Sidebar() {
                         onChange={(e) =>
                           setFormData({ ...formData, name: e.target.value })
                         }
-                        className="bg-card border-background "
+                        className="bg-card border-background"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -480,8 +486,8 @@ export function Sidebar() {
                     variant="ghost"
                     className={`w-full justify-start gap-2 ${
                       activeChannel.id === channel.id
-                        ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                        : " hover:bg-background text-muted-foreground"
+                        ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+                        : "hover:bg-background text-muted-foreground"
                     }`}
                     onClick={() => {
                       dispatch(
@@ -492,7 +498,7 @@ export function Sidebar() {
                         })
                       );
                       handleNavigation(
-                        `/community/${urlCommunityId}/channel/${channel.name}`
+                        `${COMMUNITY_CHANNEL_PATH}/${channel.name}`
                       );
                     }}
                   >
@@ -528,21 +534,11 @@ export function Sidebar() {
 
         <button
           className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
-            pathname === `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
+            pathname === COMMUNITY_FEED_PATH
               ? "text-gradient underline underline-offset-4 decoration-blue-500"
               : "hover:text-gradient"
           }`}
-          onClick={() => {
-            if (urlCommunityId) {
-              handleNavigation(
-                `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
-              );
-            } else {
-              console.warn(
-                "Active Community ID is null or undefined. Navigation is not triggered."
-              );
-            }
-          }}
+          onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
         >
           {StringConstants.FEED}
         </button>

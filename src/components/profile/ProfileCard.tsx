@@ -150,11 +150,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const { data: session } = useSession();
-
   const params = useParams();
-  const communityIdFromParam = params.id;
-
-  // Redux state
+  const communityParam = params["community-Id"] as string;
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityIdFromParam =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
+  // console.log("communityIdFromParam", communityIdFromParam);
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
@@ -213,6 +216,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     memberDetails &&
     memberDetails.is_owner === true &&
     memberDetails.community_id === communityIdFromParam;
+  console.log(">>>>>>>>>>>>>>>isOwner", isOwner);
 
   // Fetch community profile data
   const { data: profile, isLoading } = useQuery({

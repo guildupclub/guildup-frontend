@@ -7,7 +7,12 @@ import { useParams } from "next/navigation";
 
 export default function FeedPage() {
   const params = useParams();
-  const activeCommunityId =  params.id;
+  const communityParam = params["community-Id"] as string;
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const activeCommunityId =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
 
   return (
     <div className="min-h-screen flex grow bg-background">

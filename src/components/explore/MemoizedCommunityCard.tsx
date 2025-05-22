@@ -157,7 +157,14 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
         );
 
         setTimeout(() => {
-          router.push(`/community/${communityDetails._id}/profile`);
+          const cleanedCommunityName = communityDetails.name
+            .replace(/\s+/g, "-") // Replace spaces with hyphens
+            .replace(/\|/g, "-") // Replace pipe with hyphen
+            .replace(/-+/g, "-"); // Replace multiple hyphens with a single hyphen
+          const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+          const communityParam = `${encodedCommunityName}-${communityDetails._id}`;
+          router.push(`/community/${communityParam}/profile`);
+          // router.push(`/community/$${communityDetails._id}/profile`);
         }, 300);
       }
     },
@@ -200,7 +207,13 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
 
       // Add a small delay to show the loader
       setTimeout(() => {
-        router.push(`/community/${communityData.community._id}/profile`);
+        const cleanedCommunityName = communityDetails.name
+          .replace(/\s+/g, "-") // Replace spaces with hyphens
+          .replace(/\|/g, "-") // Replace pipe with hyphen
+          .replace(/-+/g, "-"); // Replace multiple hyphens with a single hyphen
+        const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+        const communityParam = `${encodedCommunityName}-${communityDetails._id}`;
+        router.push(`/community/${communityParam}/profile`);
       }, 300);
     },
     [dispatch, router]
