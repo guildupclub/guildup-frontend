@@ -153,11 +153,21 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const params = useParams();
   const communityParam = params["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityName =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(0, lastHyphenIndex)
+      : null;
   const communityIdFromParam =
     lastHyphenIndex !== -1
       ? communityParam.substring(lastHyphenIndex + 1)
       : null;
   // console.log("communityIdFromParam", communityIdFromParam);
+
+  const cleanedCommunityName =
+    communityName ||
+    "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParams = `${encodedCommunityName}-${communityIdFromParam}`;
   const userFollowedCommunities = useSelector(
     (state: RootState) => state.user.userFollowedCommunities
   );
@@ -452,7 +462,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${window.location.origin}/community/${communityId}/profile`;
+    const shareUrl = `${window.location.origin}/community/${communityParams}/profile`;
 
     try {
       await navigator.clipboard.writeText(shareUrl);
