@@ -6,6 +6,7 @@ import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from "next/headers";
 import Script from "next/script";
+import GoogleOneTap from "@/components/GoogleOneTap";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,6 +72,7 @@ export default async function RootLayout({
         <Providers>
           <NavbarClient />
           {children}
+          <GoogleOneTap />
           <Toaster richColors position="top-center" />
         </Providers>
       </body>
