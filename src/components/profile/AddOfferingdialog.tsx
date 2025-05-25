@@ -33,6 +33,7 @@ import Link from "next/link";
 import ConsultationForm from "./offeringForms/consultation";
 import WebinarForm from "./offeringForms/webinar";
 import PackageForm from "./offeringForms/package";
+import ClassForm from "./offeringForms/class";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -103,6 +104,15 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     is_private: false,
     meeting_link_option: "auto_generate",
     custom_meeting_link: "",
+    // Class specific fields
+    payment_mode: "upfront",
+    schedule: {
+      days_of_week: [],
+      time: "",
+    },
+    start_date: "",
+    duration_per_session: 60,
+    max_attendees: 50,
   });
 
   useEffect(() => {
@@ -199,6 +209,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           is_private: false,
           meeting_link_option: "auto_generate",
           custom_meeting_link: "",
+          payment_mode: "upfront",
+          schedule: {
+            days_of_week: [],
+            time: "",
+          },
+          start_date: "",
+          duration_per_session: 60,
+          max_attendees: 50,
         });
       } else {
         // Handle error
@@ -364,6 +382,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             is_private: false,
             meeting_link_option: "auto_generate",
             custom_meeting_link: "",
+            payment_mode: "upfront",
+            schedule: {
+              days_of_week: [],
+              time: "",
+            },
+            start_date: "",
+            duration_per_session: 60,
+            max_attendees: 50,
           });
           setOfferingCreated(false);
         }
@@ -418,6 +444,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       is_private: false,
       meeting_link_option: "auto_generate",
       custom_meeting_link: "",
+      payment_mode: "upfront",
+      schedule: {
+        days_of_week: [],
+        time: "",
+      },
+      start_date: "",
+      duration_per_session: 60,
+      max_attendees: 50,
     });
   };
 
@@ -454,6 +488,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       is_private: false,
       meeting_link_option: "auto_generate",
       custom_meeting_link: "",
+      payment_mode: "upfront",
+      schedule: {
+        days_of_week: [],
+        time: "",
+      },
+      start_date: "",
+      duration_per_session: 60,
+      max_attendees: 50,
     });
 
     toast.info(
@@ -1042,6 +1084,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "class" ? (
+                  <ClassForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1082,6 +1132,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                   />
                 ) : formData.type === "package" ? (
                   <PackageForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : formData.type === "class" ? (
+                  <ClassForm
                     formData={formData}
                     setFormData={setFormData}
                     handleOfferingSubmit={handleOfferingSubmit}
