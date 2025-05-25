@@ -32,6 +32,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import ConsultationForm from "./offeringForms/consultation";
 import WebinarForm from "./offeringForms/webinar";
+import PackageForm from "./offeringForms/package";
+
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
 }
@@ -93,6 +95,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
     tags: "",
     start_time: "",
     link: "",
+    // Package specific fields
+    total_price: 0,
+    number_of_sessions: 1,
+    session_duration: 60,
+    sessions: [],
+    is_private: false,
+    meeting_link_option: "auto_generate",
+    custom_meeting_link: "",
   });
 
   useEffect(() => {
@@ -182,6 +192,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           tags: "",
           start_time: "",
           link: "",
+          total_price: 0,
+          number_of_sessions: 1,
+          session_duration: 60,
+          sessions: [],
+          is_private: false,
+          meeting_link_option: "auto_generate",
+          custom_meeting_link: "",
         });
       } else {
         // Handle error
@@ -340,6 +357,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
             tags: "",
             start_time: "",
             link: "",
+            total_price: 0,
+            number_of_sessions: 1,
+            session_duration: 60,
+            sessions: [],
+            is_private: false,
+            meeting_link_option: "auto_generate",
+            custom_meeting_link: "",
           });
           setOfferingCreated(false);
         }
@@ -387,6 +411,13 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       tags: "",
       start_time: "",
       link: "",
+      total_price: 0,
+      number_of_sessions: 1,
+      session_duration: 60,
+      sessions: [],
+      is_private: false,
+      meeting_link_option: "auto_generate",
+      custom_meeting_link: "",
     });
   };
 
@@ -414,6 +445,15 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       duration: 60,
       is_free: true,
       tags: "",
+      start_time: "",
+      link: "",
+      total_price: 0,
+      number_of_sessions: 1,
+      session_duration: 60,
+      sessions: [],
+      is_private: false,
+      meeting_link_option: "auto_generate",
+      custom_meeting_link: "",
     });
 
     toast.info(
@@ -453,7 +493,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-[900px] bg-card">
+      <DialogContent className="sm:max-w-[900px] bg-card max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {currentStep === 3 && "Add Your Bank Details"}
@@ -994,6 +1034,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "package" ? (
+                  <PackageForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1026,6 +1074,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
               <div className="border-t">
                 {formData.type === "consultation" ? (
                   <ConsultationForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
+                ) : formData.type === "package" ? (
+                  <PackageForm
                     formData={formData}
                     setFormData={setFormData}
                     handleOfferingSubmit={handleOfferingSubmit}
