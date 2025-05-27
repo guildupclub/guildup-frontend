@@ -402,7 +402,7 @@ const ClassForm = ({
                         }
                     />
                     <Label htmlFor="is_private">
-                        Private Class (Custom offer - won't appear on your public profile)
+                        Private Class (Custom offer - wont&apos;t appear on your public profile)
                     </Label>
                 </div>
             </div>
