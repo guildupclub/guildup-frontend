@@ -176,12 +176,10 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       
       if (!newCommunity || !newCommunity._id) {
         toast.error("Its not you, its us. Please try again later.");
-        onClose();
         return;
       }
-      onClose();
       
-      toast.success("Community created successfully! 🎉");  
+      toast.success("Community created successfully! 🎉");
       
       // Update Redux state
       dispatch(
@@ -211,9 +209,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       });
       setCategoryId("");
       
-      // Close form immediately
-      onClose();
-      
       // Handle async operations
       await queryClient.invalidateQueries({ queryKey: ["communities"] });
       await queryClient.invalidateQueries({ queryKey: ["userCommunities"] });
@@ -222,7 +217,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     onError: (error: any) => {
       console.error("Community creation error:", error);
       toast.error(error.message || "Failed to create community");
-      onClose();
     },
   });
 
@@ -231,7 +225,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     if (!isStepValid(4)) {
       toast.error("Please complete all required fields.");
       return;
-    }
+    }    
     createCommunity.mutate();
     onClose();
     setCurrentStep(1);
