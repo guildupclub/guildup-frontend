@@ -308,14 +308,66 @@ function Page() {
             </div>
           )} */}
           <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
-            <div className="py-4 sm:py-8 border-b border-gray-100">
-              <div className="flex flex-col gap-4 sm:gap-6">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">
-                      Real Experts. Real Solutions.
-                    </h1>
-                    <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-full"></div>
+            <div className="py-6 sm:py-10 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50/30">
+              <div className="flex flex-col gap-6 sm:gap-8">
+                {/* Mobile Layout */}
+                <div className="sm:hidden space-y-6">
+                  <div className="text-center space-y-4">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
+                        Real Experts.<br />
+                        <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                          Real Solutions.
+                        </span>
+                      </h1>
+                      <div className="w-16 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full mx-auto shadow-sm"></div>
+                    </div>
+                    <p className="text-gray-600 text-sm max-w-xs mx-auto">
+                      GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-primary/5 p-4 rounded-xl border border-primary/20">
+                    <div className="text-center space-y-2">
+                      <p className="text-primary font-bold text-sm">
+                        Stop guessing.
+                      </p>
+                      <p className="text-gray-700 text-sm">
+                        Get real answers from real experts.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Dialog
+                    open={isCreatorFormOpen}
+                    onOpenChange={setIsCreatorFormOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={handleCreatorButtonClick}
+                        className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <span className="relative z-10">Join Now</span>
+                        <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Button>
+                    </DialogTrigger>
+                    <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+                  </Dialog>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden sm:flex items-center justify-between">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
+                        Real Experts. <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Real Solutions.</span>
+                      </h1>
+                      <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full shadow-sm"></div>
+                    </div>
+                    <p className="text-gray-600 text-lg font-medium max-w-lg">
+                      GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                    </p>
                   </div>
                   <Dialog
                     open={isCreatorFormOpen}
@@ -324,29 +376,21 @@ function Page() {
                     <DialogTrigger asChild>
                       <Button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-[0.98] border-2 border-black"
+                        className="group relative overflow-hidden flex items-center gap-3 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] border border-primary/20 text-lg"
                       >
-                        <span className="hidden sm:inline text-lg">
-                          Join Now
-                        </span>
-                        <ArrowRight className="h-4 w-4" />
-                        <span className="sm:hidden font-bold">Join</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <span className="relative z-10">Join Now</span>
+                        <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
 
-                <p className="hidden sm:block text-gray-700 font-medium text-lg max-w-3xl leading-relaxed">
+                <p className="hidden sm:block text-gray-700 font-medium text-xl max-w-4xl leading-relaxed">
                   Stop wasting time with fake gurus and questionable advice. 
                   <span className="font-bold text-gray-900"> Get direct access to verified professionals</span> who actually know what they're talking about.
                 </p>
-                
-                <div className="sm:hidden bg-gray-50 p-4 rounded-lg border-l-4 border-red-500">
-                  <p className="text-gray-800 font-semibold text-sm">
-                    <span className="text-red-600">Stop guessing.</span> Get real answers from real experts.
-                  </p>
-                </div>
               </div>
             </div>
 
