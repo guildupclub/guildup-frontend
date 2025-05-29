@@ -151,7 +151,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const params = useParams();
-  const communityParam = params["community-Id"] as string;
+  const communityParam = params?.["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
   const communityName =
     lastHyphenIndex !== -1
@@ -266,6 +266,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // Fetch user's followed communities
   const { data: followedCommunitiesData } = useQuery({
     queryKey: ["userFollowedCommunities"],
+    queryFn: async () => {
+      if (!user?._id) return [];
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+        {
+          userId: user._id,
+        }
+      );
+      return response.data.data;
+    },
     enabled: !!user?._id,
   });
 
@@ -393,30 +403,36 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           queryKey: ["userFollowedCommunities"],
         });
 
-        // Send notification to   community owner
-        console.log("data upon follow", data);
-        console.log("current user", user);
-        console.log("profile data", profile);
-        console.log("profile email", profile?.user?.user_email);
+        // Send notification to community owner (wrapped in try-catch to prevent join failure)
+        try {
+          console.log("data upon follow", data);
+          console.log("current user", user);
+          console.log("profile data", profile);
+          console.log("profile email", profile?.user?.user_email);
 
-        const email = removeSpecialCharacters(profile?.user?.user_email);
+          const email = removeSpecialCharacters(profile?.user?.user_email);
 
-        if (data.data?.user_id) {
-          const notificationsRef = ref(database, `notification/${email}`);
-          const newNotificationRef = push(notificationsRef);
-          console.log("new notification ref", newNotificationRef);
-          await update(newNotificationRef, {
-            type: "community_follow",
-            message: `${user.name} started following your community`,
-            read: false,
-            createdAt: new Date().toISOString(),
-            data: {
-              communityId: activeCommunityId,
-              userId: user._id,
-              userName: user.name,
-              userImage: user.image,
-            },
-          });
+          if (data.data?.user_id) {
+            const notificationsRef = ref(database, `notification/${email}`);
+            const newNotificationRef = push(notificationsRef);
+            console.log("new notification ref", newNotificationRef);
+            await update(newNotificationRef, {
+              type: "community_follow",
+              message: `${user.name} started following your community`,
+              read: false,
+              createdAt: new Date().toISOString(),
+              data: {
+                communityId: activeCommunityId,
+                userId: user._id,
+                userName: user.name,
+                userImage: user.image,
+              },
+            });
+            console.log("Notification sent successfully");
+          }
+        } catch (notificationError) {
+          console.warn("Failed to send notification, but community join was successful:", notificationError);
+          // Don't throw the error - community join should still succeed
         }
       }
     },
@@ -725,7 +741,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-                      {profile.user.user_languages.map((lang, index) => (
+                      {profile.user.user_languages.map((lang: string, index: number) => (
                         <Badge
                           key={index}
                           variant="outline"
@@ -966,7 +982,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </h3>
 
                           {offering.is_free ||
-                          offering.discounted_price === 0 ? (
+                          Number(offering.discounted_price) === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"

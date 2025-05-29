@@ -28,11 +28,11 @@ function CategoryBar({
           <button
             key={cat._id}
             onClick={() => handleCategorySelect(cat._id)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-150 flex-shrink-0 border
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex-shrink-0 border transform hover:shadow-md
               ${
                 selectedCategoryId === cat._id
                   ? "bg-primary/10 text-primary border-primary/30 shadow-sm"
-                  : "bg-white text-gray-700 border-gray-200 hover:text-primary"
+                  : "bg-white text-gray-700 border-gray-200 hover:text-primary hover:border-primary/20"
               }
             `}
           >
