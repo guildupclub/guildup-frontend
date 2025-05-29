@@ -264,44 +264,34 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
           <div className="flex grow items-center justify-between">
             <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
-              <AnimatePresence>
-                {!heroVisible && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="relative w-full max-w-xl md:max-w-[400px]"
+              <div className="relative w-full max-w-xl md:max-w-[400px]">
+                <div className="flex">
+                  <Input
+                    type="search"
+                    placeholder={
+                      isSmallScreen
+                        ? "Search..."
+                        : "Search creators, pages, or offerings..."
+                    }
+                    className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-6 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                  <button
+                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-8 md:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer"
+                    onClick={handleSearch}
                   >
-                    <div className="flex">
-                      <Input
-                        type="search"
-                        placeholder={
-                          isSmallScreen
-                            ? "Search..."
-                            : "Search creators, pages, or offerings..."
-                        }
-                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-6 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      />
-                      <button
-                        className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-8 md:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer transition-all duration-200"
-                        onClick={handleSearch}
-                      >
-                        <Search className="h-3 w-3 md:h-4 md:w-4" />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <Search className="h-3 w-3 md:h-4 md:w-4" />
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="hidden md:flex space-x-6 items-center justify-center">
               <div className="hidden md:flex items-center justify-center">
                 <ul className="flex items-center space-x-2 text-gray-600">
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+                  <li className="px-4 py-2 rounded-full transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
                         className={`h-5 w-5 ${
@@ -318,7 +308,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+                  <li className="px-4 py-2 rounded-full transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <MdOutlineRssFeed
                         className={`h-5 w-5 ${
@@ -334,7 +324,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+                  <li className="px-4 py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
                       className="flex flex-col items-center"

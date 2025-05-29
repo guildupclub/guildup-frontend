@@ -308,7 +308,7 @@ function Page() {
             </div>
           )} */}
           <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
-            <div className="sticky top-16 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6 bg-white border-b">
+            <div className="py-3 sm:py-6">
               <div className="flex flex-col gap-3 sm:gap-4">
                 <div className="flex items-center justify-between">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-500">
@@ -344,41 +344,44 @@ function Page() {
               </div>
             </div>
 
-            {/* Scrollable content */}
-            <div className="pt-3 sm:pt-6">
-              <div className="flex flex-col md:flex-row gap-5 sm:gap-8">
-                {/* Category Section - Top on Mobile, Right on Desktop */}
-                <div className="w-full md:w-80 flex-shrink-0 order-first md:order-last mb-3 md:mb-0">
-                  <div className="md:sticky top-60 z-51">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2 md:hidden">
-                      Categories
-                    </h2>
-                    <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 mb-6">
-                      Browse Categories
-                    </h2>
-                    <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white  ">
-                      <CategoryBar
-                        categorys={category}
-                        selectCategory={handleCategorySelect}
-                        selectedCategoryId={selectedCategory}
-                      />
+            {/* Categories Section - Now Sticky */}
+            <div className="sticky top-16 z-50 bg-white border-b py-1">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-lg font-semibold text-gray-800 md:hidden">
+                  Categories
+                </h2>
+                <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
+                  Browse Categories
+                </h2>
+                <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-white">
+                  <div className="overflow-x-auto -mx-3 sm:-mx-6 px-3 sm:px-6 scrollbar-hide">
+                    <div className="min-w-max">
+                      <div className="flex gap-2">
+                        <CategoryBar
+                          categorys={category}
+                          selectCategory={handleCategorySelect}
+                          selectedCategoryId={selectedCategory}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Main Content */}
-                <div className="flex-1 min-w-0" ref={targetRef}>
-                  <div className="rounded-xl sm:rounded-2xl">
-                    <div
-                      id="scroll-target-border"
-                      className="w-full h-1 mb-4 sm:mb-8"
-                    ></div>
-                    {isLoading ? (
-                      <Loader />
-                    ) : (
-                      <CommunitySection activeCategory={selectedCategoryId} />
-                    )}
-                  </div>
+            {/* Main Content */}
+            <div className="pt-3 sm:pt-6">
+              <div className="flex-1 min-w-0" ref={targetRef}>
+                <div className="rounded-xl sm:rounded-2xl">
+                  <div
+                    id="scroll-target-border"
+                    className="w-full h-1 mb-4 sm:mb-8"
+                  ></div>
+                  {isLoading ? (
+                    <Loader />
+                  ) : (
+                    <CommunitySection activeCategory={selectedCategoryId} />
+                  )}
                 </div>
               </div>
             </div>
