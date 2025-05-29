@@ -189,7 +189,7 @@ function Page() {
 
     // Perform scrolling immediately without timeout
     if (targetRef.current) {
-      const headerOffset = 150;
+      const headerOffset = 145;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
@@ -308,12 +308,36 @@ function Page() {
             </div>
           )} */}
           <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
-            <div className="sticky top-16 z-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 sm:py-6 bg-white border-b">
-              <div className="flex flex-col gap-3 sm:gap-4">
-                <div className="flex items-center justify-between">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-500">
-                    {StringConstants.TOP_EXPERTS}
-                  </h1>
+            <div className="py-6 sm:py-10 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50/30">
+              <div className="flex flex-col gap-6 sm:gap-8">
+                {/* Mobile Layout */}
+                <div className="sm:hidden space-y-6">
+                  <div className="text-center space-y-4">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
+                        Real Experts.<br />
+                        <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                          Real Solutions.
+                        </span>
+                      </h1>
+                      <div className="w-16 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full mx-auto shadow-sm"></div>
+                    </div>
+                    <p className="text-gray-600 text-sm max-w-xs mx-auto">
+                      GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-primary/5 p-4 rounded-xl border border-primary/20">
+                    <div className="text-center space-y-2">
+                      <p className="text-primary font-bold text-sm">
+                        Stop guessing.
+                      </p>
+                      <p className="text-gray-700 text-sm">
+                        Get real answers from real experts.
+                      </p>
+                    </div>
+                  </div>
+                  
                   <Dialog
                     open={isCreatorFormOpen}
                     onOpenChange={setIsCreatorFormOpen}
@@ -321,64 +345,87 @@ function Page() {
                     <DialogTrigger asChild>
                       <Button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg  active:scale-[0.98] "
+                        className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                       >
-                        <span className="text-amber-300 hidden sm:inline">
-                          👋
-                        </span>
-                        <span className="hidden sm:inline text-md">
-                          Sign up, it&apos;s free
-                        </span>
-                        <Plus className="hidden lg:block h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="lg:hidden">Get Started 🚀</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <span className="relative z-10">Join Now</span>
+                        <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                       </Button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
 
-                <p className="hidden sm:block text-gray-600  max-w-2xl description-text">
-                  GuildUp brings real experts together in one easy place—so you
-                  can get support without the stress.
-                </p>
+                {/* Desktop Layout */}
+                <div className="hidden sm:flex items-center justify-between">
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <h1 className="text-3xl sm:text-2xl lg:text-4xl font-black text-gray-900 tracking-tight">
+                        Real Experts. <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Real Solutions.</span>
+                      </h1>
+                      <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full shadow-sm"></div>
+                    </div>
+                    <p className="text-gray-600 text-md font-medium max-w-lg">
+                      GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                    </p>
+                  </div>
+                  <Dialog
+                    open={isCreatorFormOpen}
+                    onOpenChange={setIsCreatorFormOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        onClick={handleCreatorButtonClick}
+                        className="group relative overflow-hidden flex items-center gap-3 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] border border-primary/20 text-lg"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <span className="relative z-10">Join Now</span>
+                        <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                      </Button>
+                    </DialogTrigger>
+                    <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+                  </Dialog>
+                </div>
               </div>
             </div>
 
-            {/* Scrollable content */}
-            <div className="pt-3 sm:pt-6">
-              <div className="flex flex-col md:flex-row gap-5 sm:gap-8">
-                {/* Category Section - Top on Mobile, Right on Desktop */}
-                <div className="w-full md:w-80 flex-shrink-0 order-first md:order-last mb-3 md:mb-0">
-                  <div className="md:sticky top-60 z-51">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-2 md:hidden">
-                      Categories
-                    </h2>
-                    <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 mb-6">
-                      Browse Categories
-                    </h2>
-                    <div className="p-3 sm:p-6 rounded-xl sm:rounded-2xl border border-zinc-200 bg-white  ">
-                      <CategoryBar
-                        categorys={category}
-                        selectCategory={handleCategorySelect}
-                        selectedCategoryId={selectedCategory}
-                      />
+            <div className="sticky top-16 z-50 bg-white border-b py-1">
+              <div className="flex flex-col gap-2">
+                <h2 className="text-lg font-semibold text-gray-800 md:hidden">
+                  Categories
+                </h2>
+                <h2 className="hidden md:block text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
+                  Browse Categories
+                </h2>
+                <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-white">
+                  <div className="overflow-x-auto -mx-3 sm:-mx-6 px-3 sm:px-6 scrollbar-hide">
+                    <div className="min-w-max">
+                      <div className="flex gap-2">
+                        <CategoryBar
+                          categorys={category}
+                          selectCategory={handleCategorySelect}
+                          selectedCategoryId={selectedCategory}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Main Content */}
-                <div className="flex-1 min-w-0" ref={targetRef}>
-                  <div className="rounded-xl sm:rounded-2xl">
-                    <div
-                      id="scroll-target-border"
-                      className="w-full h-1 mb-4 sm:mb-8"
-                    ></div>
-                    {isLoading ? (
-                      <Loader />
-                    ) : (
-                      <CommunitySection activeCategory={selectedCategoryId} />
-                    )}
-                  </div>
+            {/* Main Content */}
+            <div className="pt-3 sm:pt-6">
+              <div className="flex-1 min-w-0" ref={targetRef}>
+                <div className="rounded-xl sm:rounded-2xl">
+                  <div
+                    id="scroll-target-border"
+                    className="w-full h-1 mb-4 sm:mb-8"
+                  ></div>
+                  {isLoading ? (
+                    <Loader />
+                  ) : (
+                    <CommunitySection activeCategory={selectedCategoryId} />
+                  )}
                 </div>
               </div>
             </div>
