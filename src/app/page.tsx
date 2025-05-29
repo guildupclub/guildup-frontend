@@ -308,12 +308,15 @@ function Page() {
             </div>
           )} */}
           <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
-            <div className="py-3 sm:py-6">
-              <div className="flex flex-col gap-3 sm:gap-4">
+            <div className="py-4 sm:py-8 border-b border-gray-100">
+              <div className="flex flex-col gap-4 sm:gap-6">
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-indigo-500">
-                    {StringConstants.TOP_EXPERTS}
-                  </h1>
+                  <div className="space-y-1">
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">
+                      Real Experts. Real Solutions.
+                    </h1>
+                    <div className="w-16 h-1 bg-gradient-to-r from-red-500 to-orange-500 rounded-full"></div>
+                  </div>
                   <Dialog
                     open={isCreatorFormOpen}
                     onOpenChange={setIsCreatorFormOpen}
@@ -321,30 +324,32 @@ function Page() {
                     <DialogTrigger asChild>
                       <Button
                         onClick={handleCreatorButtonClick}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg  active:scale-[0.98] "
+                        className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-xl hover:shadow-2xl active:scale-[0.98] border-2 border-black"
                       >
-                        <span className="text-amber-300 hidden sm:inline">
-                          👋
+                        <span className="hidden sm:inline text-lg">
+                          Join Now
                         </span>
-                        <span className="hidden sm:inline text-md">
-                          Sign up, it&apos;s free
-                        </span>
-                        <Plus className="hidden lg:block h-3 w-3 sm:h-4 sm:w-4" />
-                        <span className="lg:hidden">Get Started 🚀</span>
+                        <ArrowRight className="h-4 w-4" />
+                        <span className="sm:hidden font-bold">Join</span>
                       </Button>
                     </DialogTrigger>
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
 
-                <p className="hidden sm:block text-gray-600  max-w-2xl description-text">
-                  GuildUp brings real experts together in one easy place—so you
-                  can get support without the stress.
+                <p className="hidden sm:block text-gray-700 font-medium text-lg max-w-3xl leading-relaxed">
+                  Stop wasting time with fake gurus and questionable advice. 
+                  <span className="font-bold text-gray-900"> Get direct access to verified professionals</span> who actually know what they're talking about.
                 </p>
+                
+                <div className="sm:hidden bg-gray-50 p-4 rounded-lg border-l-4 border-red-500">
+                  <p className="text-gray-800 font-semibold text-sm">
+                    <span className="text-red-600">Stop guessing.</span> Get real answers from real experts.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Categories Section - Now Sticky */}
             <div className="sticky top-16 z-50 bg-white border-b py-1">
               <div className="flex flex-col gap-2">
                 <h2 className="text-lg font-semibold text-gray-800 md:hidden">
