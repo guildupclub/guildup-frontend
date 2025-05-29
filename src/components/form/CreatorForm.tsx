@@ -424,7 +424,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             className="flex-1 text-white bg-primary hover:bg-primary/90 h-7 text-sm"
           >
             {currentStep === 4 ? (
-              createCommunity.isPending ? "Creating..." : StringConstants.CREATE
+              createCommunity.isPending ? "Creating..." : "Join as Expert"
             ) : (
               <>
                 Next
