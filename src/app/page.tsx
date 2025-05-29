@@ -189,7 +189,7 @@ function Page() {
 
     // Perform scrolling immediately without timeout
     if (targetRef.current) {
-      const headerOffset = 150;
+      const headerOffset = 145;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - headerOffset;
 
@@ -360,12 +360,12 @@ function Page() {
                 <div className="hidden sm:flex items-center justify-between">
                   <div className="space-y-3">
                     <div className="space-y-2">
-                      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight">
+                      <h1 className="text-3xl sm:text-2xl lg:text-4xl font-black text-gray-900 tracking-tight">
                         Real Experts. <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Real Solutions.</span>
                       </h1>
                       <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full shadow-sm"></div>
                     </div>
-                    <p className="text-gray-600 text-lg font-medium max-w-lg">
+                    <p className="text-gray-600 text-md font-medium max-w-lg">
                       GuildUp brings real experts together in one easy place—so you can get support without the stress.
                     </p>
                   </div>
@@ -386,11 +386,6 @@ function Page() {
                     <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
                   </Dialog>
                 </div>
-
-                <p className="hidden sm:block text-gray-700 font-medium text-xl max-w-4xl leading-relaxed">
-                  Stop wasting time with fake gurus and questionable advice. 
-                  <span className="font-bold text-gray-900"> Get direct access to verified professionals</span> who actually know what they're talking about.
-                </p>
               </div>
             </div>
 
@@ -399,7 +394,7 @@ function Page() {
                 <h2 className="text-lg font-semibold text-gray-800 md:hidden">
                   Categories
                 </h2>
-                <h2 className="hidden md:block text-2xl lg:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
+                <h2 className="hidden md:block text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
                   Browse Categories
                 </h2>
                 <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-white">
