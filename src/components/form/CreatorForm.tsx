@@ -239,7 +239,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           <div className="h-full flex flex-col space-y-3 p-3 sm:p-2">
             <div className="text-center">
               <div className="text-xs text-primary mb-1 font-medium">Step 1 of 4</div>
-              <h3 className="text-base font-semibold mb-1">What's your Guild name?</h3>
+              <h3 className="text-base font-semibold mb-1">What&apos;s your Guild name?</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
                 Choose a name that represents your expertise and community
               </p>
