@@ -110,6 +110,12 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   // Use React Query to fetch post data including likes and comments
   const { data: postData } = useQuery({
     queryKey: ["post", post._id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${post._id}`
+      );
+      return response.data.data?.post || post;
+    },
     initialData: post,
     refetchOnWindowFocus: false,
   });

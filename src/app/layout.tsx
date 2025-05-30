@@ -47,6 +47,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { store } from "./src/redux/store";
 import AuthHandler from "@/components/AuthHandler";
 import { NotificationProvider } from "@/components/notifications/NotificationContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient()); // ✅ Ensures a stable QueryClient instance
@@ -15,8 +16,10 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
-            <AuthHandler />
-            {children}
+            <ChatProvider>
+              <AuthHandler />
+              {children}
+            </ChatProvider>
           </NotificationProvider>
         </QueryClientProvider>
       </Provider>

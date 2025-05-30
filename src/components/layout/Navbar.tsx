@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
+import { Compass, Users, ChevronDown, Search, Plus, MessageCircle } from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
+import { useChatContext } from "@/contexts/ChatContext";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/feed";
@@ -45,6 +46,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
+  const { unreadCount } = useChatContext();
   const [isUser, setIsUser] = useState(true);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -324,6 +326,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
+                  
                   <li className="px-4 py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
@@ -342,6 +345,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         }`}
                       >
                         {StringConstants.MY_SPACE}
+                      </span>
+                    </Link>
+                  </li>
+
+                  <li className="px-4 py-2 rounded-full transition-all duration-200">
+                    <Link href="/chat" className="flex flex-col items-center relative">
+                      <MessageCircle
+                        className={`h-5 w-5 ${
+                          isActive("/chat") ? "text-primary" : ""
+                        }`}
+                      />
+                      {user?._id && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
+                      <span
+                        className={`text-sm mt-1 ${
+                          isActive("/chat") ? "text-primary font-medium" : ""
+                        }`}
+                      >
+                        Chat
                       </span>
                     </Link>
                   </li>
@@ -380,6 +405,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
                           <Link href="/profile">Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
+                          <Link href="/chat" className="flex items-center justify-between">
+                            <span>Chat</span>
+                            {user?._id && unreadCount > 0 && (
+                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                              </span>
+                            )}
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
@@ -426,7 +464,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       </nav>
 
       <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
+        <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
           <Link
             href="/"
             className="flex flex-col items-center justify-center gap-1"
@@ -460,6 +498,31 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               }`}
             >
               {StringConstants.FEED}
+            </span>
+          </Link>
+
+          <Link
+            href="/chat"
+            className="flex flex-col items-center justify-center gap-1"
+          >
+            <div className="w-6 h-6 flex items-center justify-center relative">
+              <MessageCircle
+                className={`w-5 h-5 ${
+                  isActive("/chat") ? "text-primary" : ""
+                }`}
+              />
+              {user?._id && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span
+              className={`text-[10px] ${
+                isActive("/chat") ? "text-primary" : ""
+              }`}
+            >
+              Chat
             </span>
           </Link>
 
@@ -512,6 +575,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   className="hover:bg-primary-gradient border-b border-zinc-300"
                 >
                   <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link href="/chat" className="flex items-center justify-between">
+                    <span>Chat</span>
+                    {user?._id && unreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild

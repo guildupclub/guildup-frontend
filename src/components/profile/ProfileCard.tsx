@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { StringConstants } from "../common/CommonText";
 import Loader from "../Loader";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
+import { ChatSupportButton } from "../chat/ChatSupportButton";
 
 // Components
 import { Avatar } from "@radix-ui/react-avatar";
@@ -622,26 +623,44 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       Share Profile
                       <Share2 className="ml-2 h-5 w-5" />
                     </Button>
-                  ) : isCommunityFollowed ? (
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleLeaveCommunity}
-                    >
-                      {StringConstants.FOLLOWING}
-                      <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                    </Button>
                   ) : (
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleJoinCommunity}
-                    >
-                      <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                      {StringConstants.FOLLOW}
-                    </Button>
+                    <>
+                      {isCommunityFollowed ? (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                          onClick={handleLeaveCommunity}
+                        >
+                          {StringConstants.FOLLOWING}
+                          <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                          onClick={handleJoinCommunity}
+                        >
+                          <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                          {StringConstants.FOLLOW}
+                        </Button>
+                      )}
+                      
+                      {/* Chat Support Button - Only for verified experts */}
+                      {activeCommunityId && (
+                        <ChatSupportButton
+                          expertEmail={profile.user.user_email || ''}
+                          expertDetails={{
+                            name: profile.user.user_name || 'Expert',
+                            email: profile.user.user_email || '',
+                            image: profile.user.user_avatar || ''
+                          }}
+                          isBankConnected={isBankConnected}
+                          className="w-full mt-2"
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -837,26 +856,44 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     Share Profile
                     <Share2 className="ml-2 h-5 w-5" />
                   </Button>
-                ) : isCommunityFollowed ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleLeaveCommunity}
-                  >
-                    {StringConstants.FOLLOWING}
-                    <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                  </Button>
                 ) : (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleJoinCommunity}
-                  >
-                    <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                    {StringConstants.FOLLOW}
-                  </Button>
+                  <>
+                    {isCommunityFollowed ? (
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        onClick={handleLeaveCommunity}
+                      >
+                        {StringConstants.FOLLOWING}
+                        <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        onClick={handleJoinCommunity}
+                      >
+                        <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                        {StringConstants.FOLLOW}
+                      </Button>
+                    )}
+                    
+                    {/* Chat Support Button - Mobile Version */}
+                    {activeCommunityId && (
+                      <ChatSupportButton
+                        expertEmail={profile.user.user_email || ''}
+                        expertDetails={{
+                          name: profile.user.user_name || 'Expert',
+                          email: profile.user.user_email || '',
+                          image: profile.user.user_avatar || ''
+                        }}
+                        isBankConnected={isBankConnected}
+                        className="w-full mt-2"
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </div>
