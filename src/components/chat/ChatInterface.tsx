@@ -5,6 +5,7 @@ import { useChatContext } from '@/contexts/ChatContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +19,12 @@ import {
   Clock,
   ArrowLeft,
   CheckCheck,
-  Check
+  Check,
+  Reply,
+  Smile,
+  X,
+  Edit3,
+  Save
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
@@ -56,8 +62,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [lastSeenUsers, setLastSeenUsers] = useState<{[key: string]: number}>({});
   const [unreadCounts, setUnreadCounts] = useState<{[key: string]: number}>({});
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<any>(null);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [editingMessage, setEditingMessage] = useState<any>(null);
+  const [editText, setEditText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle mobile keyboard visibility
   useEffect(() => {
@@ -93,6 +103,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Close emoji picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showEmojiPicker && !(event.target as Element)?.closest('.emoji-picker')) {
+        setShowEmojiPicker(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showEmojiPicker]);
 
   // Auto-start chat if receiverEmail is provided
   useEffect(() => {
@@ -259,8 +281,105 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     if (!receiverInfo) return;
 
-    await sendMessage(receiverInfo.email, newMessage, receiverInfo);
+    // Include reply information if replying to a message
+    const messageToSend = replyingTo 
+      ? `@${replyingTo.senderName}: ${replyingTo.message}\n\n${newMessage}`
+      : newMessage;
+
+    await sendMessage(receiverInfo.email, messageToSend, receiverInfo);
     setNewMessage('');
+    setReplyingTo(null);
+    
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+  };
+
+  const handleReplyToMessage = (message: any) => {
+    setReplyingTo(message);
+    inputRef.current?.focus();
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setNewMessage(prev => prev + emoji);
+    setShowEmojiPicker(false);
+    inputRef.current?.focus();
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const canEditMessage = (message: any, userEmail: string) => {
+    if (!userEmail || !message.timestamp) return false;
+    
+    const sanitizedUserEmail = removeSpecialCharacters(userEmail);
+    const isOwnMessage = message.senderEmail === sanitizedUserEmail;
+    const messageTime = new Date(message.timestamp);
+    const now = new Date();
+    const timeDiff = now.getTime() - messageTime.getTime();
+    const fiveMinutesInMs = 5 * 60 * 1000; // 5 minutes in milliseconds
+    
+    return isOwnMessage && timeDiff <= fiveMinutesInMs;
+  };
+
+  const handleEditMessage = (message: any) => {
+    setEditingMessage(message);
+    // Extract the actual message text (handle replies)
+    const isReply = message.message.includes('@') && message.message.includes('\n\n');
+    const messageText = isReply ? message.message.split('\n\n')[1] : message.message;
+    setEditText(messageText);
+  };
+
+  const saveEditedMessage = async () => {
+    if (!editingMessage || !editText.trim() || !currentChat) return;
+
+    try {
+      // Update the message in Firebase
+      const messageRef = ref(chatDatabase, `messages/${currentChat}/${editingMessage.id}`);
+      const updatedMessage = {
+        ...editingMessage,
+        message: editText.trim(),
+        edited: true,
+        editedAt: Date.now()
+      };
+      
+      await set(messageRef, updatedMessage);
+      
+      setEditingMessage(null);
+      setEditText('');
+    } catch (error) {
+      console.error('Error editing message:', error);
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingMessage(null);
+    setEditText('');
+  };
+
+  // Link detection utility
+  const detectAndRenderLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    
+    return parts.map((part, index) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a 
+            key={index} 
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="underline hover:no-underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -268,6 +387,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       e.preventDefault();
       handleSendMessage();
     }
+    // Shift+Enter will naturally create a new line in textarea
+  };
+
+  // Auto-resize textarea based on content
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMessage(e.target.value);
+    
+    // Auto-resize textarea
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
   };
 
   const formatMessageTime = (timestamp: any) => {
@@ -436,7 +566,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            <div 
+              className={`flex-1 overflow-y-auto min-h-0 relative`}
+            >
               <div className="p-3 pb-0">
                 {loading ? (
                   <div className="flex items-center justify-center h-64">
@@ -451,32 +583,143 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     {messages.map((message) => {
                       const sanitizedUserEmail = user?.email ? removeSpecialCharacters(user.email) : '';
                       const isOwnMessage = message.senderEmail === sanitizedUserEmail;
+                      
+                      // Check if message is a reply
+                      const isReply = message.message.includes('@') && message.message.includes('\n\n');
+                      const replyData = isReply ? {
+                        original: message.message.split('\n\n')[0].substring(1), // Remove @
+                        reply: message.message.split('\n\n')[1]
+                      } : null;
+                      
                       return (
                         <div
                           key={message.id}
-                          className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
+                          className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} group`}
                         >
                           <div
-                            className={`max-w-[85%] sm:max-w-xs lg:max-w-sm px-3 py-2 rounded-lg ${
+                            className={`max-w-[85%] sm:max-w-xs lg:max-w-sm px-3 py-2 rounded-lg relative ${
                               isOwnMessage
                                 ? 'bg-primary text-white'
                                 : 'bg-gray-100 text-gray-900'
                             }`}
                           >
-                            <p className="text-sm">{message.message}</p>
-                            <div className={`flex items-center justify-end gap-1 mt-1 ${
+                            {/* Reply indicator */}
+                            {replyData && (
+                              <div className={`text-xs p-2 rounded mb-2 border-l-2 ${
+                                isOwnMessage 
+                                  ? 'bg-blue-600/20 border-blue-200 text-blue-100' 
+                                  : 'bg-gray-200 border-gray-400 text-gray-600'
+                              }`}>
+                                <p className="truncate">{replyData.original}</p>
+                              </div>
+                            )}
+                            
+                            {/* Message content - Edit mode or display mode */}
+                            {editingMessage?.id === message.id ? (
+                              <div className="space-y-2">
+                                <input
+                                  type="text"
+                                  value={editText}
+                                  onChange={(e) => setEditText(e.target.value)}
+                                  onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      saveEditedMessage();
+                                    } else if (e.key === 'Escape') {
+                                      cancelEdit();
+                                    }
+                                  }}
+                                  className="w-full bg-transparent border-none outline-none text-sm text-current placeholder-current/70"
+                                  placeholder="Edit message..."
+                                  autoFocus
+                                />
+                                <div className="flex items-center gap-2 justify-end">
+                                  <button
+                                    onClick={cancelEdit}
+                                    className={`p-1 rounded text-xs ${
+                                      isOwnMessage 
+                                        ? 'hover:bg-blue-600/20 text-blue-100' 
+                                        : 'hover:bg-gray-200 text-gray-600'
+                                    }`}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                  <button
+                                    onClick={saveEditedMessage}
+                                    disabled={!editText.trim()}
+                                    className={`p-1 rounded text-xs disabled:opacity-50 ${
+                                      isOwnMessage 
+                                        ? 'hover:bg-blue-600/20 text-blue-100' 
+                                        : 'hover:bg-gray-200 text-gray-600'
+                                    }`}
+                                  >
+                                    <Save className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                {/* Message text with link detection */}
+                                <div className="text-sm whitespace-pre-wrap">
+                                  {detectAndRenderLinks(replyData ? replyData.reply : message.message)}
+                                </div>
+                                
+                                {message.edited && (
+                                  <p className={`text-xs mt-1 ${
+                                    isOwnMessage ? 'text-blue-100' : 'text-gray-500'
+                                  }`}>
+                                    (edited)
+                                  </p>
+                                )}
+                              </>
+                            )}
+                            
+                            <div className={`flex items-center justify-between gap-2 mt-1 ${
                               isOwnMessage ? 'text-blue-100' : 'text-gray-500'
                             }`}>
                               <span className="text-xs">
                                 {formatMessageTime(message.timestamp)}
                               </span>
-                              {isOwnMessage && (
-                                message.read ? (
-                                  <CheckCheck className="h-3 w-3" />
-                                ) : (
-                                  <Check className="h-3 w-3" />
-                                )
-                              )}
+                              
+                              <div className="flex items-center gap-1">
+                                {/* Edit button - visible on hover for own messages within 5 minutes */}
+                                {canEditMessage(message, user?.email || '') && editingMessage?.id !== message.id && (
+                                  <button
+                                    onClick={() => handleEditMessage(message)}
+                                    className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ${
+                                      isOwnMessage 
+                                        ? 'hover:bg-blue-600/20' 
+                                        : 'hover:bg-gray-200'
+                                    }`}
+                                    title="Edit message"
+                                  >
+                                    <Edit3 className="h-3 w-3" />
+                                  </button>
+                                )}
+                                
+                                {/* Reply button - visible on hover */}
+                                {editingMessage?.id !== message.id && (
+                                  <button
+                                    onClick={() => handleReplyToMessage(message)}
+                                    className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded ${
+                                      isOwnMessage 
+                                        ? 'hover:bg-blue-600/20' 
+                                        : 'hover:bg-gray-200'
+                                    }`}
+                                    title="Reply to message"
+                                  >
+                                    <Reply className="h-3 w-3" />
+                                  </button>
+                                )}
+                                
+                                {isOwnMessage && (
+                                  message.read ? (
+                                    <CheckCheck className="h-3 w-3" />
+                                  ) : (
+                                    <Check className="h-3 w-3" />
+                                  )
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -489,14 +732,49 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
 
             {/* Message Input - Fixed at bottom with keyboard handling */}
-            <div className={`p-3 border-t border-gray-200 bg-white flex-shrink-0 ${
+            <div className={`p-2 md:p-3 border-t border-gray-200 bg-white flex-shrink-0 ${
               isKeyboardVisible ? 'pb-safe-area-inset-bottom' : ''
             }`}>
-              <div className="flex gap-2 items-center">
-                <Input
+              {/* Reply preview */}
+              {replyingTo && (
+                <div className="mb-2 md:mb-3 p-2 bg-gray-50 rounded-lg border-l-4 border-primary">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-gray-600">
+                      Replying to {replyingTo.senderName}
+                    </span>
+                    <button
+                      onClick={cancelReply}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-500 truncate">{replyingTo.message}</p>
+                </div>
+              )}
+
+              {/* Emoji Picker */}
+              {showEmojiPicker && (
+                <div className="emoji-picker absolute bottom-14 md:bottom-16 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50">
+                  <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+                    {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤐', '🤑', '🤠', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤝', '🙏', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '💥', '💫', '⭐', '🌟', '✨', '⚡', '🔥', '💨', '☀️', '🌙', '⭐', '🌈', '☘️', '🍀', '🌸', '🌺', '🌻', '🌷'].map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => handleEmojiSelect(emoji)}
+                        className="text-lg hover:bg-gray-100 p-1 rounded"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-1.5 md:gap-2 items-center relative">
+                <Textarea
                   ref={inputRef}
                   value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
+                  onChange={handleTextareaChange}
                   onKeyPress={handleKeyPress}
                   onFocus={() => {
                     // Ensure input stays visible on focus
@@ -504,16 +782,26 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 300);
                   }}
-                  placeholder="Type a message..."
-                  className="flex-1 text-sm rounded-full"
+                  placeholder={replyingTo ? "Type your reply... (Shift+Enter for new line)" : "Type a message... (Shift+Enter for new line)"}
+                  className="flex-1 text-sm rounded-lg pr-12 resize-none min-h-[36px] md:min-h-[40px] max-h-[120px]"
+                  rows={1}
                 />
+                
+                {/* Emoji button */}
+                <button
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="absolute right-10 md:right-12 top-2 text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <Smile className="h-4 w-4" />
+                </button>
+                
                 <Button 
                   onClick={handleSendMessage} 
                   disabled={!newMessage.trim()}
                   size="sm"
-                  className="rounded-full h-8 w-8 p-0"
+                  className="rounded-full h-7 w-7 md:h-8 md:w-8 p-0"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />
                 </Button>
               </div>
             </div>

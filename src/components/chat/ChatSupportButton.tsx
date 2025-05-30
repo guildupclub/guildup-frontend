@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { ChatInterface } from './ChatInterface';
 import { MessageCircle, Shield } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
+import { useRouter } from 'next/navigation';
 
 interface ChatSupportButtonProps {
   expertEmail: string;
@@ -26,7 +25,7 @@ export const ChatSupportButton: React.FC<ChatSupportButtonProps> = ({
   isBankConnected,
   className = ""
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
 
   // Don't show the button if:
@@ -36,29 +35,30 @@ export const ChatSupportButton: React.FC<ChatSupportButtonProps> = ({
     return null;
   }
 
+  const handleChatClick = () => {
+    // Navigate to chat page with expert details as URL parameters
+    const searchParams = new URLSearchParams({
+      expertEmail: expertDetails.email,
+      expertName: expertDetails.name,
+      expertImage: expertDetails.image || ''
+    });
+    
+    router.push(`/chat?${searchParams.toString()}`);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className={`flex items-center gap-2 bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 ${className}`}
-        >
-          <MessageCircle className="h-4 w-4" />
-          <span>Chat with Expert</span>
-          <Badge variant="secondary" className="ml-1 bg-green-100 text-green-700 text-xs">
-            <Shield className="h-3 w-3 mr-1" />
-            Verified
-          </Badge>
-        </Button>
-      </DialogTrigger>
-      
-      <DialogContent className="max-w-4xl max-h-[80vh] p-0">
-        <ChatInterface 
-          receiverEmail={expertEmail}
-          receiverDetails={expertDetails}
-        />
-      </DialogContent>
-    </Dialog>
+    <Button 
+      variant="outline" 
+      size="sm" 
+      onClick={handleChatClick}
+      className={`flex items-center gap-2 bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 ${className}`}
+    >
+      <MessageCircle className="h-4 w-4" />
+      <span>Chat with Expert</span>
+      <Badge variant="secondary" className="ml-1 bg-green-100 text-green-700 text-xs">
+        <Shield className="h-3 w-3 mr-1" />
+        Verified
+      </Badge>
+    </Button>
   );
 }; 

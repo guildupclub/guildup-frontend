@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useSelector } from 'react-redux';
@@ -10,9 +10,37 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 export default function ChatPage() {
   const user = useSelector((state: RootState) => state.user.user);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [expertDetails, setExpertDetails] = useState<{
+    email: string;
+    name: string;
+    image?: string;
+  } | null>(null);
+
+  // Check for expert details in URL parameters
+  useEffect(() => {
+    if (!searchParams) return;
+    
+    const expertEmail = searchParams.get('expertEmail');
+    const expertName = searchParams.get('expertName');
+    const expertImage = searchParams.get('expertImage');
+
+    if (expertEmail && expertName) {
+      setExpertDetails({
+        email: expertEmail,
+        name: expertName,
+        image: expertImage || undefined
+      });
+      
+      // Clean up URL after processing parameters
+      router.replace('/chat', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   if (!user?._id) {
     return (
@@ -54,8 +82,12 @@ export default function ChatPage() {
               <div className="flex items-center gap-3">
                 <MessageCircle className="h-6 w-6 text-primary" />
                 <div>
-                  <h1 className="text-xl font-semibold">Expert Support Chat</h1>
-                  <p className="text-sm text-muted-foreground">Manage your expert conversations</p>
+                  <h1 className="text-xl font-semibold">
+                    {expertDetails ? `Chat with ${expertDetails.name}` : 'Expert Support Chat'}
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    {expertDetails ? 'Start a conversation with this verified expert' : 'Manage your expert conversations'}
+                  </p>
                 </div>
               </div>
 
@@ -70,7 +102,14 @@ export default function ChatPage() {
         {/* Chat Interface - Full height on mobile, optimized container on desktop */}
         <div className="flex-1 min-h-0 w-full md:container md:mx-auto p-0 md:p-4">
           <div className="h-full w-full bg-background md:rounded-lg md:border md:shadow-sm">
-            <ChatInterface />
+            <ChatInterface 
+              receiverEmail={expertDetails?.email}
+              receiverDetails={expertDetails ? {
+                name: expertDetails.name,
+                email: expertDetails.email,
+                image: expertDetails.image,
+              } : undefined}
+            />
           </div>
         </div>
       </div>
