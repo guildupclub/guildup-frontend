@@ -15,6 +15,8 @@ interface ChatMessage {
   read: boolean;
   senderName: string;
   senderImage?: string;
+  edited?: boolean;
+  editedAt?: number;
 }
 
 interface ChatConversation {
@@ -127,7 +129,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         timestamp: Date.now(), // Use simple timestamp for reliability
         read: false,
         senderName: user.name || 'Anonymous',
-        senderImage: user.image || ''
+        senderImage: user.image || '',
       };
 
       console.log('Sending message data:', messageData);
