@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { ChatProvider } from '@/contexts/ChatContext';
 import { ChatInterface } from '@/components/chat/ChatInterface';
 import { useSelector } from 'react-redux';
@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 
-export default function ChatPage() {
+function ChatContent() {
   const user = useSelector((state: RootState) => state.user.user);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -107,12 +107,24 @@ export default function ChatPage() {
               receiverDetails={expertDetails ? {
                 name: expertDetails.name,
                 email: expertDetails.email,
-                image: expertDetails.image,
+                image: expertDetails.image
               } : undefined}
             />
           </div>
         </div>
       </div>
     </ChatProvider>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    }>
+      <ChatContent />
+    </Suspense>
   );
 } 
