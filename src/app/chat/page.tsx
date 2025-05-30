@@ -37,13 +37,16 @@ export default function ChatPage() {
 
   return (
     <ChatProvider>
-      <div className="h-screen bg-background flex flex-col">
-        {/* Header */}
+      <div className="h-screen bg-background flex flex-col mobile-chat-container overflow-hidden" style={{
+        paddingTop: typeof window !== 'undefined' && window.innerWidth < 768 ? '56px' : '0',
+        paddingBottom: typeof window !== 'undefined' && window.innerWidth < 768 ? '56px' : '0'
+      }}>
+        {/* Header - Hidden on mobile to save space for chat content */}
         <div className="hidden md:block border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/profile">
+                <Link href="/">
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
               </Button>
@@ -64,9 +67,9 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Chat Interface - Takes remaining height */}
-        <div className="flex-1 min-h-0 container mx-auto p-0 md:p-4">
-          <div className="h-full bg-background md:rounded-lg md:border md:shadow-sm">
+        {/* Chat Interface - Full height on mobile, optimized container on desktop */}
+        <div className="flex-1 min-h-0 w-full md:container md:mx-auto p-0 md:p-4">
+          <div className="h-full w-full bg-background md:rounded-lg md:border md:shadow-sm">
             <ChatInterface />
           </div>
         </div>

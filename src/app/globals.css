@@ -95,6 +95,64 @@
     height: 100vh;
     height: 100dvh;
   }
+  
+  /* Ensure chat interface works well on mobile */
+  .mobile-chat-container {
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+  }
+  
+  /* Fix input field behavior on mobile */
+  .mobile-chat-input {
+    -webkit-appearance: none;
+    border-radius: 24px !important;
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    line-height: 1.5;
+  }
+  
+  /* Prevent zoom on input focus */
+  input[type="text"], 
+  input[type="email"], 
+  input[type="password"], 
+  textarea {
+    font-size: 16px;
+  }
+  
+  /* Better touch targets for mobile */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Mobile chat specific styles */
+  .mobile-chat-header {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  /* Ensure proper scrolling on mobile */
+  .mobile-chat-messages {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* Fix keyboard viewport issues */
+  .mobile-chat-input-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 12px 16px;
+    z-index: 20;
+  }
+  
+  /* Improve message bubbles on mobile */
+  .mobile-message-bubble {
+    max-width: 85%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 @theme inline {
