@@ -19,6 +19,7 @@ const categories = [
   { _id: "67a74cc7462d78176d24478c", name: "Business Coaching", icon: "📊" },
   { _id: "67a74c7c462d78176d244783", name: "Cryptocurrency", icon: "🪙" },
   { _id: "67a74c93462d78176d244786", name: "Digital Marketing", icon: "🎯" },
+  { _id: "67a74cd9462d78176d244799", name: "Diet Coaching", icon: "🥙" },
   { _id: "6702403bf7b07c3742024dc8", name: "EduLearn Hub", icon: "📖" },
   { _id: "67a74cd9462d78176d24478f", name: "Financial Literacy", icon: "📈" },
   { _id: "6702403bf7b07c3742024dc9", name: "Fashion Forward", icon: "👗" },
@@ -31,6 +32,7 @@ const categories = [
   { _id: "67a74c4f462d78176d24477d", name: "Graphic Design", icon: "🎨" },
   { _id: "67a74d05462d78176d244795", name: "Leadership", icon: "🏆" },
   { _id: "67a74d62462d78176d2447a2", name: "Life Coaching", icon: "🧠" },
+  { _id: "67a74cd9462d78176d244798", name: "Mental Health Coaching", icon: "🧘‍♀️" },
   {
     _id: "6702403bf7b07c3742024dd3",
     name: "Mental Health Matters",
@@ -46,6 +48,7 @@ const categories = [
   { _id: "6702403bf7b07c3742024dd5", name: "Science Seekers", icon: "🔬" },
   { _id: "6702403bf7b07c3742024dc7", name: "Tech Innovators", icon: "💻" },
   { _id: "67a74bb9462d78176d24477a", name: "Technology", icon: "💻" },
+  { _id: "67a74cd9462d78176d244797", name: "Training & Development", icon: "📚" },
   { _id: "67a74cb6462d78176d244789", name: "Travel", icon: "✈️" },
   { _id: "6702403bf7b07c3742024dd1", name: "Travel Wanderers", icon: "🌍" },
   { _id: "67a74c60462d78176d244780", name: "Writing", icon: "📝" },

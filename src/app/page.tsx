@@ -27,6 +27,7 @@ import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import BenefitCards from "@/components/heroSection/BenefitCards";
+import VideoPlaceholder from "@/components/VideoPlaceholder";
 
 interface Category {
   _id: string;
@@ -279,6 +280,34 @@ function Page() {
           <div className="absolute inset-0 pointer-events-none" />
           <div ref={heroRef}>
             <Hero />
+          </div>
+
+          {/* Video Showcase Section */}
+          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div className="text-center mb-8 sm:mb-12">
+              <motion.h2 
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+              >
+                See GuildUp in{" "}
+                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Action
+                </span>
+              </motion.h2>
+              <motion.p 
+                className="text-gray-600 text-lg max-w-2xl mx-auto"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                viewport={{ once: true }}
+              >
+                Watch how our platform connects you with expert coaches and transforms your growth journey
+              </motion.p>
+            </div>
+            <VideoPlaceholder className="mb-16" />
           </div>
           {/* {!isCreator && (
             <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4 ">
