@@ -30,6 +30,8 @@ import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
 import { chatDatabase } from '../../../firebase-chat';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
+import { VoiceCallButton } from '@/components/voice-call/VoiceCallButton';
+import { CallParticipant } from '@/services/webrtcService';
 
 interface ChatInterfaceProps {
   receiverEmail?: string;
@@ -560,6 +562,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </p>
                       </div>
                     </div>
+                    
+                    {/* Voice Call Button */}
+                    <VoiceCallButton
+                      callee={{
+                        id: otherParticipant.email, // Using email as ID for now
+                        email: otherParticipant.email,
+                        name: otherParticipant.name
+                      } as CallParticipant}
+                      variant="ghost"
+                      size="icon"
+                      className="flex-shrink-0"
+                    />
                   </>
                 ) : null;
               })()}

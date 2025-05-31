@@ -7,6 +7,8 @@ import { store } from "./src/redux/store";
 import AuthHandler from "@/components/AuthHandler";
 import { NotificationProvider } from "@/components/notifications/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { VoiceCallProvider } from "@/contexts/VoiceCallContext";
+import { VoiceCallInterface } from "@/components/voice-call/VoiceCallInterface";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient()); // ✅ Ensures a stable QueryClient instance
@@ -17,8 +19,11 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <ChatProvider>
-              <AuthHandler />
-              {children}
+              <VoiceCallProvider>
+                <AuthHandler />
+                {children}
+                <VoiceCallInterface />
+              </VoiceCallProvider>
             </ChatProvider>
           </NotificationProvider>
         </QueryClientProvider>
