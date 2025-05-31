@@ -53,7 +53,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   
   // Initialize performance monitoring and route preloading
   usePerformanceMonitor();
-  const preloader = useRoutePreloader(router);
   
   const [isUser, setIsUser] = useState(true);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
@@ -83,13 +82,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     noCommunitiesAvailable: "/no-community"
   }), []);
 
-  // Initialize route preloading on component mount
   useEffect(() => {
+    const preloader = useRoutePreloader(router);
+    
     if (userId) {
       preloader.preloadUserSpecificRoutes(userId);
     }
     preloader.preloadCommonRoutes();
-  }, [userId, preloader]);
+  }, [userId, router]);
 
   // Optimized search handler with useCallback
   const handleSearch = useCallback(() => {
@@ -146,11 +146,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     router.push(communityPath);
     setIsSidebarOpen(false);
     
-    // Preload related community routes
-    preloader.preloadCommunityRoutes(community._id);
+    // Preload related community routes after navigation
+    setTimeout(() => {
+      const preloader = useRoutePreloader(router);
+      preloader.preloadCommunityRoutes(community._id);
+    }, 100);
     
     setTimeout(() => setIsNavigating(false), 200);
-  }, [dispatch, user?._id, router, preloader]);
+  }, [dispatch, user?._id, router]);
 
   // Optimized sign out handler
   const handleSignOut = useCallback(() => {
@@ -203,13 +206,25 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     : "";
   const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
   const communityParams = `${encodedCommunityName}-${activeCommunityId}`;
-  const getMySpaceLink = () => {
+
+  // Memoized getMySpaceLink to prevent state updates during render
+  const getMySpaceLink = useMemo(() => {
     if (activeCommunityId) {
       return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
     } else {
       const firstCommunity = getFirstValidCommunity();
       if (firstCommunity) {
-        // Set the first community as active
+        return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
+      }
+      return NO_COMMUNITIES_AVAILABLE;
+    }
+  }, [activeCommunityId, communityParams, fetchedCommunities]);
+
+  // Handle community initialization separately from render
+  useEffect(() => {
+    if (!activeCommunityId && fetchedCommunities.length > 0) {
+      const firstCommunity = getFirstValidCommunity();
+      if (firstCommunity) {
         dispatch(
           setActiveCommunity({
             id: firstCommunity._id,
@@ -228,11 +243,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             })
           );
         }
-        return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
       }
-      return NO_COMMUNITIES_AVAILABLE;
     }
-  };
+  }, [activeCommunityId, fetchedCommunities, user?._id, dispatch]);
 
   const getInitials = (name: string) => {
     return name
