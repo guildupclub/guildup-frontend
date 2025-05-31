@@ -423,6 +423,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
+                          <Link href="/blogs">Blogs</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
                           <Link href="/booking">Bookings</Link>
                         </DropdownMenuItem>
                         {isUser && (
@@ -588,6 +594,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     )}
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link href="/blogs">Blogs</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
