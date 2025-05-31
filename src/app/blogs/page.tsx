@@ -197,7 +197,7 @@ export default function BlogsPage() {
               Coming Soon
             </h3>
             <p className="text-gray-600 text-lg max-w-md mx-auto mb-6">
-              We're working on adding great content for this category. 
+              We&apos;re working on adding great content for this category. 
               Check back soon or explore other topics.
             </p>
             <Button 
