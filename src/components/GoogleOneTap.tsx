@@ -49,31 +49,28 @@ export default function GoogleOneTap() {
         window.google.accounts.id.initialize({
           client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
           callback: handleCredentialResponse,
-          auto_select: true,
+          auto_select: false,
           context: "signin",
           itp_support: true,
-          // Avoid unnecessary flags like use_fedcm_for_prompt or cancel_on_tap_outside unless you really need them
+          use_fedcm_for_prompt: true,
         });
 
-        window.google.accounts.id.prompt((notification: any) => {
+        window.google.accounts.id.prompt((notification) => {
           if (notification.isNotDisplayed()) {
             console.log(
-              "Not displayed, reason:",
+              "One Tap UI not displayed:",
               notification.getNotDisplayedReason()
             );
-          }
-          if (notification.isSkippedMoment()) {
-            console.log("Skipped, reason:", notification.getSkippedReason());
-          }
-          if (notification.isDismissedMoment()) {
-            console.log(
-              "Dismissed, reason:",
-              notification.getDismissedReason()
-            );
+          } else if (notification.isSkippedMoment()) {
+            console.log("User skipped the One Tap UI.");
+          } else if (notification.isDismissedMoment()) {
+            console.log("One Tap UI dismissed.");
+          } else {
+            console.log("One Tap UI displayed.");
           }
         });
       } catch (error) {
-        console.error("One Tap init error:", error);
+        console.error("One Tap initialization error:", error);
       }
     }
   }, [session, handleCredentialResponse]);
