@@ -159,7 +159,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            Connect with expert coaches and mentors who'll guide your 
+            Connect with expert coaches and mentors who&apos;ll guide your 
             <span className="hidden md:inline"> personal and professional</span>
             <span className="md:hidden font-semibold text-gray-700"> personal</span> growth journey
           </motion.p>
