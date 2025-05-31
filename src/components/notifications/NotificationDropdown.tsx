@@ -63,7 +63,7 @@ const NotificationDropdown = () => {
                 </Badge>
               )}
             </button>
-            <span className="text-gray-600 text-sm hidden lg:block ">
+            <span className="text-gray-600 text-xs lg:text-sm hidden md:block">
               Notifications
             </span>
           </div>
@@ -157,7 +157,7 @@ const NotificationDropdown = () => {
             </Badge>
           )}
         </div>
-        <span className="text-sm ">Notifications</span>
+        <span className="text-xs lg:text-sm hidden md:block">Notifications</span>
       </div>
     );
   }
