@@ -28,6 +28,7 @@ import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
+import Footer from "@/components/layout/Footer";
 
 interface Category {
   _id: string;
@@ -276,7 +277,7 @@ function Page() {
       }
     >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
-        <div className="min-h-[100vh] bg-white relative">
+        <div className="min-h-screen bg-white relative">
           {/* Grid pattern background for entire page */}
           <div className="fixed inset-0 pointer-events-none z-0">
             <div 
@@ -467,6 +468,12 @@ function Page() {
             </div>
           </div>
         </div>
+        
+        {/* White spacing before footer */}
+        <div className="bg-white py-8"></div>
+        
+        {/* Footer */}
+        <Footer />
       </SearchParamsProvider>
     </Suspense>
   );
