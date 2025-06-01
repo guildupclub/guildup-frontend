@@ -271,7 +271,7 @@ function Page() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-[75vh] flex items-center justify-center">
+        <div className="min-h-[100vh] flex items-center justify-center">
           <Loader />
         </div>
       }
@@ -280,18 +280,18 @@ function Page() {
         <div className="min-h-screen bg-white relative">
           {/* Grid pattern background for entire page */}
           <div className="fixed inset-0 pointer-events-none z-0">
-            <div 
+            <div
               className="absolute inset-0 opacity-[0.35] animate-pulse"
               style={{
                 backgroundImage: `
                   radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.6) 2px, transparent 0)
                 `,
-                backgroundSize: '40px 40px',
-                animation: 'gridMove 20s ease-in-out infinite'
+                backgroundSize: "40px 40px",
+                animation: "gridMove 20s ease-in-out infinite",
               }}
             />
           </div>
-          
+
           <div className="relative z-10">
             <div ref={heroRef}>
               <Hero />
@@ -300,7 +300,7 @@ function Page() {
             {/* Video Showcase Section */}
             <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
               <div className="text-center mb-8 sm:mb-12">
-                <motion.h2 
+                <motion.h2
                   className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -312,14 +312,15 @@ function Page() {
                     Action
                   </span>
                 </motion.h2>
-                <motion.p 
+                <motion.p
                   className="text-gray-600 text-lg max-w-2xl mx-auto"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                   viewport={{ once: true }}
                 >
-                  Watch how our platform connects you with expert coaches and transforms your growth journey
+                  Watch how our platform connects you with expert coaches and
+                  transforms your growth journey
                 </motion.p>
               </div>
               <VideoPlaceholder className="mb-16" />
@@ -360,7 +361,8 @@ function Page() {
                     <div className="text-center space-y-4">
                       <div className="space-y-2">
                         <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
-                          Real Experts.<br />
+                          Real Experts.
+                          <br />
                           <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                             Real Solutions.
                           </span>
@@ -368,12 +370,13 @@ function Page() {
                         <div className="w-16 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full mx-auto shadow-sm"></div>
                       </div>
                       <p className="text-gray-600 text-sm max-w-xs mx-auto">
-                        GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                        GuildUp brings real experts together in one easy
+                        place—so you can get support without the stress.
                       </p>
                     </div>
-                    
+
                     <BenefitCards />
-                    
+
                     <Dialog
                       open={isCreatorFormOpen}
                       onOpenChange={setIsCreatorFormOpen}
@@ -384,11 +387,15 @@ function Page() {
                           className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">Sign up, it&apos;s free</span>
+                          <span className="relative z-10">
+                            Sign up, it&apos;s free
+                          </span>
                           <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
                       </DialogTrigger>
-                      <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+                      <CreatorForm
+                        onClose={() => setIsCreatorFormOpen(false)}
+                      />
                     </Dialog>
                   </div>
 
@@ -397,12 +404,16 @@ function Page() {
                     <div className="space-y-3">
                       <div className="space-y-2">
                         <h1 className="text-3xl sm:text-2xl lg:text-4xl font-black text-gray-900 tracking-tight">
-                          Real Experts. <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Real Solutions.</span>
+                          Real Experts.{" "}
+                          <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                            Real Solutions.
+                          </span>
                         </h1>
                         <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full shadow-sm"></div>
                       </div>
                       <p className="text-gray-600 text-md font-medium max-w-lg">
-                        GuildUp brings real experts together in one easy place—so you can get support without the stress.
+                        GuildUp brings real experts together in one easy
+                        place—so you can get support without the stress.
                       </p>
                     </div>
                     <Dialog
@@ -419,7 +430,9 @@ function Page() {
                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
                       </DialogTrigger>
-                      <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+                      <CreatorForm
+                        onClose={() => setIsCreatorFormOpen(false)}
+                      />
                     </Dialog>
                   </div>
                 </div>
@@ -468,10 +481,10 @@ function Page() {
             </div>
           </div>
         </div>
-        
+
         {/* White spacing before footer */}
         <div className="bg-white py-8"></div>
-        
+
         {/* Footer */}
         <Footer />
       </SearchParamsProvider>

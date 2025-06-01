@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Volume2, Maximize, Clock } from "lucide-react";
+import { Play, Clock } from "lucide-react";
 
 interface VideoPlaceholderProps {
   title?: string;
@@ -18,11 +19,12 @@ export default function VideoPlaceholder({
   videoUrl = "https://www.youtube.com/watch?v=lEmW6Vyi2qg",
   className = "",
 }: VideoPlaceholderProps) {
-  // Function to handle play button click
-  const handlePlayClick = () => {
-    if (videoUrl) {
-      window.open(videoUrl, "_blank"); // Opens the YouTube video in a new tab
-    }
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // Extract the YouTube video ID
+  const getYoutubeEmbedUrl = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+    return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : "";
   };
 
   return (
@@ -49,51 +51,58 @@ export default function VideoPlaceholder({
           />
         </div>
 
-        {/* Thumbnail/Content Area */}
+        {/* Thumbnail or iFrame */}
         <div className="absolute inset-0 flex items-center justify-center">
-          {thumbnail ? (
+          {isPlaying ? (
+            <iframe
+              className="w-full h-full"
+              src={getYoutubeEmbedUrl(videoUrl)}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
             <img
               src={thumbnail}
               alt={title}
               className="w-full h-full object-cover"
             />
-          ) : (
-            <div className="text-center space-y-4">
-              {/* Play Button */}
-              <motion.button
-                onClick={handlePlayClick} // Added click handler
-                className="group relative w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl hover:bg-white transition-all duration-300"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-              >
-                <Play
-                  className="w-8 h-8 text-gray-800 ml-1 group-hover:text-blue-600 transition-colors"
-                  fill="currentColor"
-                />
-
-                {/* Ripple Effect */}
-                <div className="absolute inset-0 rounded-full border-2 border-white/50 animate-ping"></div>
-                <div className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping animation-delay-75"></div>
-              </motion.button>
-
-              {/* Video Title */}
-              <motion.h3
-                className="text-white text-lg font-semibold px-8 text-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-              >
-                {title}
-              </motion.h3>
-            </div>
           )}
         </div>
 
+        {/* Play button */}
+        {!isPlaying && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+            <motion.button
+              onClick={() => setIsPlaying(true)}
+              className="group relative w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl hover:bg-white transition-all duration-300"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Play
+                className="w-8 h-8 text-gray-800 ml-1 group-hover:text-blue-600 transition-colors"
+                fill="currentColor"
+              />
+              <div className="absolute inset-0 rounded-full border-2 border-white/50 animate-ping"></div>
+              <div className="absolute inset-0 rounded-full border-2 border-white/30 animate-ping animation-delay-75"></div>
+            </motion.button>
+
+            <motion.h3
+              className="text-white text-lg font-semibold px-8 text-center mt-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              {title}
+            </motion.h3>
+          </div>
+        )}
+
         {/* Duration Badge */}
-        <motion.div
+        {/* <motion.div
           className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-lg text-sm font-medium flex items-center gap-1"
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -101,35 +110,7 @@ export default function VideoPlaceholder({
         >
           <Clock className="w-3 h-3" />
           {duration}
-        </motion.div>
-
-        {/* Video Controls Bar */}
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-        >
-          <div className="flex items-center justify-between">
-            {/* Progress Bar */}
-            {/* <div className="flex-1 mx-4">
-              <div className="h-1 bg-white/30 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                  initial={{ width: "0%" }}
-                  animate={{ width: "35%" }}
-                  transition={{ duration: 2, delay: 1 }}
-                />
-              </div>
-            </div> */}
-
-            {/* Control Icons */}
-            {/* <div className="flex items-center gap-3 text-white">
-              <Volume2 className="w-4 h-4 opacity-70 hover:opacity-100 cursor-pointer transition-opacity" />
-              <Maximize className="w-4 h-4 opacity-70 hover:opacity-100 cursor-pointer transition-opacity" />
-            </div> */}
-          </div>
-        </motion.div>
+        </motion.div> */}
       </div>
 
       {/* Bottom Section */}
@@ -149,7 +130,7 @@ export default function VideoPlaceholder({
             </p>
           </div>
           <motion.button
-            onClick={handlePlayClick} // Added click handler to Watch Now button
+            onClick={() => window.open(videoUrl, "_blank")}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
