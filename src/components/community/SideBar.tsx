@@ -539,31 +539,33 @@ export function Sidebar() {
                     <div className="h-3 w-3 ml-auto opacity-50 flex flex-row items-center justify-center">
                       {channel.locked && <Lock className="mx-2" />}
 
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full  "
+                      {isAdmin && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full  "
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-40 bg-gray-100"
                           >
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          align="end"
-                          className="w-40 bg-gray-100"
-                        >
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setSelectedChannelId(channel.id);
-                              setShowDeleteDialog(true);
-                            }}
-                            className="text-muted-foreground cursor-pointer"
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedChannelId(channel.id);
+                                setShowDeleteDialog(true);
+                              }}
+                              className="text-muted-foreground cursor-pointer"
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   </Button>
                 ))}
