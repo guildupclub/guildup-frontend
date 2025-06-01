@@ -301,8 +301,11 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
   const handleOfferingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.discounted_price > formData.price.amount) {
+    const originalPrice =
+      formData.type === "class" || formData.type === "package"
+        ? formData.total_price
+        : formData.price.amount;
+    if (formData.discounted_price > originalPrice) {
       toast.error(
         "Discounted price cannot be greater than the original price."
       );
