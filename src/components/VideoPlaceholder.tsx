@@ -149,7 +149,7 @@ export default function VideoPlaceholder({
             </p>
           </div>
           <motion.button
-            onClick={handlePlayClick} 
+            onClick={handlePlayClick} // Added click handler to Watch Now button
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-medium hover:shadow-lg transition-all duration-300"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -160,3 +160,4 @@ export default function VideoPlaceholder({
       </motion.div>
     </motion.div>
   );
+}
