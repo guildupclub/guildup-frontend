@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Users, ChevronDown, Search, Plus, MessageCircle } from "lucide-react";
+import {
+  Compass,
+  Users,
+  ChevronDown,
+  Search,
+  Plus,
+  MessageCircle,
+} from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -188,7 +195,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         })
       );
     }
-    router.push(`/community/${community._id}/feed`);
+    const cleanedName = community.name
+      .replace(/\s+/g, "-")
+      .replace(/\|/g, "-")
+      .replace(/-+/g, "-");
+
+    const encodedName = encodeURIComponent(cleanedName);
+
+    router.push(`/community/${encodedName}-${community._id}/profile`);
     setIsSidebarOpen(false);
   }
 
@@ -326,7 +340,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  
+
                   <li className="px-4 py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
@@ -350,7 +364,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </li>
 
                   <li className="px-4 py-2 rounded-full transition-all duration-200">
-                    <Link href="/chat" className="flex flex-col items-center relative">
+                    <Link
+                      href="/chat"
+                      className="flex flex-col items-center relative"
+                    >
                       <MessageCircle
                         className={`h-5 w-5 ${
                           isActive("/chat") ? "text-primary" : ""
@@ -358,7 +375,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       />
                       {user?._id && unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                          {unreadCount > 9 ? '9+' : unreadCount}
+                          {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
                       )}
                       <span
@@ -410,11 +427,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
-                          <Link href="/chat" className="flex items-center justify-between">
+                          <Link
+                            href="/chat"
+                            className="flex items-center justify-between"
+                          >
                             <span>Chat</span>
                             {user?._id && unreadCount > 0 && (
                               <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {unreadCount > 9 ? '9+' : unreadCount}
+                                {unreadCount > 9 ? "9+" : unreadCount}
                               </span>
                             )}
                           </Link>
@@ -513,13 +533,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           >
             <div className="w-6 h-6 flex items-center justify-center relative">
               <MessageCircle
-                className={`w-5 h-5 ${
-                  isActive("/chat") ? "text-primary" : ""
-                }`}
+                className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : ""}`}
               />
               {user?._id && unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </div>
@@ -586,11 +604,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   asChild
                   className="hover:bg-primary-gradient border-b border-zinc-300"
                 >
-                  <Link href="/chat" className="flex items-center justify-between">
+                  <Link
+                    href="/chat"
+                    className="flex items-center justify-between"
+                  >
                     <span>Chat</span>
                     {user?._id && unreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {unreadCount > 9 ? '9+' : unreadCount}
+                        {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
                     )}
                   </Link>
