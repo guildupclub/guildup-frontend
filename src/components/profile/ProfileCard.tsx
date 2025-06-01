@@ -35,9 +35,9 @@ import {
 // Icons
 import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
-import { GrInstagram } from "react-icons/gr";
+import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
-import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
+import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { RiUserSharedFill } from "react-icons/ri";
 import { FaClock, FaShareAlt } from "react-icons/fa";
@@ -47,6 +47,13 @@ import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
+import {
+  HiOutlineUserGroup,
+  HiOutlineVideoCamera,
+  HiOutlineArchive,
+  HiOutlineBookOpen,
+} from "react-icons/hi";
+
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -432,7 +439,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             console.log("Notification sent successfully");
           }
         } catch (notificationError) {
-          console.warn("Failed to send notification, but community join was successful:", notificationError);
+          console.warn(
+            "Failed to send notification, but community join was successful:",
+            notificationError
+          );
           // Don't throw the error - community join should still succeed
         }
       }
@@ -534,6 +544,24 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
 
+  const typeToIcon: Record<string, { icon: JSX.Element; label: string }> = {
+    consultation: {
+      icon: <HiOutlineUserGroup className="text-blue-600 w-6 h-6" />,
+      label: "Consultation",
+    },
+    webinar: {
+      icon: <HiOutlineVideoCamera className="text-purple-600 w-6 h-6" />,
+      label: "Webinar",
+    },
+    package: {
+      icon: <MdOutlineClass className="text-orange-600 w-6 h-6" />,
+      label: "Package",
+    },
+    class: {
+      icon: <GrYoga className="text-green-600 w-6 h-6" />,
+      label: "Class",
+    },
+  };
   return (
     <div className="w-full">
       {/* Stepper for onboarding (only shown to owners) */}
@@ -646,15 +674,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           {StringConstants.FOLLOW}
                         </Button>
                       )}
-                      
+
                       {/* Chat Support Button - Only for verified experts */}
                       {activeCommunityId && (
                         <ChatSupportButton
-                          expertEmail={profile.user.user_email || ''}
+                          expertEmail={profile.user.user_email || ""}
                           expertDetails={{
-                            name: profile.user.user_name || 'Expert',
-                            email: profile.user.user_email || '',
-                            image: profile.user.user_avatar || ''
+                            name: profile.user.user_name || "Expert",
+                            email: profile.user.user_email || "",
+                            image: profile.user.user_avatar || "",
                           }}
                           isBankConnected={isBankConnected}
                           className="w-full mt-2"
@@ -760,15 +788,17 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-                      {profile.user.user_languages.map((lang: string, index: number) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="bg-teal-50 text-teal-700 border-teal-200"
-                        >
-                          {lang}
-                        </Badge>
-                      ))}
+                      {profile.user.user_languages.map(
+                        (lang: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-teal-50 text-teal-700 border-teal-200"
+                          >
+                            {lang}
+                          </Badge>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -879,15 +909,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         {StringConstants.FOLLOW}
                       </Button>
                     )}
-                    
+
                     {/* Chat Support Button - Mobile Version */}
                     {activeCommunityId && (
                       <ChatSupportButton
-                        expertEmail={profile.user.user_email || ''}
+                        expertEmail={profile.user.user_email || ""}
                         expertDetails={{
-                          name: profile.user.user_name || 'Expert',
-                          email: profile.user.user_email || '',
-                          image: profile.user.user_avatar || ''
+                          name: profile.user.user_name || "Expert",
+                          email: profile.user.user_email || "",
+                          image: profile.user.user_avatar || "",
                         }}
                         isBankConnected={isBankConnected}
                         className="w-full mt-2"
@@ -1056,15 +1086,28 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
-                      <FcClock size={28} className="text-primary-foreground" />
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                        <span className="text-base  font-semibold text-gray-700">
-                          Duration:
-                        </span>
-                        <span className="text-base text-gray-600">
-                          {offering.duration} min
-                        </span>
+                    <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
+                      <div className="flex items-center gap-2">
+                        <FcClock
+                          size={28}
+                          className="text-primary-foreground"
+                        />
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                          <span className="text-base  font-semibold text-gray-700">
+                            Duration:
+                          </span>
+                          <span className="text-base text-gray-600">
+                            {offering.duration} min
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        {offering?.type && typeToIcon[offering.type] && (
+                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+                            {typeToIcon[offering.type].icon}
+                            <span>{typeToIcon[offering.type].label}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
