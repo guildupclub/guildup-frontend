@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Hash, Plus, Rss, Crown, Lock, Info } from "lucide-react";
+import { Hash, Plus, Rss, Crown, Lock, Info, MoreVertical } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { setActiveChannel } from "@/redux/channelSlice";
@@ -10,6 +10,8 @@ import { usePathname, useRouter, useParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,7 +36,16 @@ import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
 import { useQuery } from "@tanstack/react-query";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import axios from "axios";
+import { toast } from "sonner";
 export function Sidebar() {
   const dispatch = useDispatch();
   const memberDetails = useSelector(
@@ -45,7 +56,7 @@ export function Sidebar() {
     (state: RootState) => state.channel.activeChannel
   );
   const params = useParams();
-  const communityParam = params["community-Id"] as string; 
+  const communityParam = params["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
   const communityName =
     lastHyphenIndex !== -1
@@ -57,12 +68,16 @@ export function Sidebar() {
       : null;
 
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const pathname = usePathname();
   const [channels, setChannels] = useState([]);
   const [isChannelOpen, setIsChannelOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -264,6 +279,24 @@ export function Sidebar() {
     }
   };
 
+  const handleDeleteChannel = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/delete`,
+        {
+          userId,
+          communityId: urlCommunityId,
+          channelId: selectedChannelId,
+        }
+      );
+
+      toast.success("Channel deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
   return (
     <>
       <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
@@ -357,7 +390,6 @@ export function Sidebar() {
   <GrAnnounce />
   Announcements
 </Button> */}
-
 
           {isAdmin && (
             <Button
@@ -478,13 +510,13 @@ export function Sidebar() {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 ">
               {channels &&
                 channels.map((channel: any) => (
                   <Button
                     key={channel?.id}
                     variant="ghost"
-                    className={`w-full justify-start gap-2 ${
+                    className={`w-full justify-start gap-2 border-b-2 border-background pb-4 ${
                       activeChannel.id === channel.id
                         ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                         : "hover:bg-background text-muted-foreground"
@@ -504,9 +536,35 @@ export function Sidebar() {
                   >
                     <Hash />
                     {channel.name}
-                    {channel.locked && (
-                      <Lock className="h-3 w-3 ml-auto opacity-50" />
-                    )}
+                    <div className="h-3 w-3 ml-auto opacity-50 flex flex-row items-center justify-center">
+                      {channel.locked && <Lock className="mx-2" />}
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full  "
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-40 bg-gray-100"
+                        >
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedChannelId(channel.id);
+                              setShowDeleteDialog(true);
+                            }}
+                            className="text-muted-foreground cursor-pointer"
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </Button>
                 ))}
             </div>
@@ -555,6 +613,7 @@ export function Sidebar() {
         </button>
 
         {/* Scrollable Channels */}
+
         {channels.map((channel: any) => (
           <button
             key={channel?.id}
@@ -571,6 +630,30 @@ export function Sidebar() {
             {channel.name}
           </button>
         ))}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Channel</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this channel? You won&apos;t be
+                able to undo this action.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex justify-between sm:justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteChannel}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );
