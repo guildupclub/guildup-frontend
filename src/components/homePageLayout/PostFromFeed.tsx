@@ -240,7 +240,7 @@ export default function PostFromFeed() {
           <DialogTrigger asChild>
             <input
               type="text"
-              placeholder="What's on your mind? Share with your community..."
+              placeholder="What&apos;s on your mind? Share with your community..."
               onClick={() => setIsOpen(true)}
               className=" w-full p-2 rounded-full border  text-gray-600 bg-gray-50 hover:bg-gray-100 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
             />
@@ -390,7 +390,7 @@ export default function PostFromFeed() {
                   />
                   {!content && (
                     <div className="absolute top-4 left-4 text-gray-400 pointer-events-none">
-                      What's happening in your community?
+                     What&apos;s happening in your community?
                     </div>
                   )}
                 </div>
