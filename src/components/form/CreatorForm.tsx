@@ -398,9 +398,6 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
                 className="w-full p-2 border border-gray-200 rounded-md focus:border-primary"
                 placeholder="Enter your mobile number"
               />
-              <p className="text-xs text-muted-foreground">
-                Your number is required for important Guild notifications
-              </p>
             </div>
           </div>
         );
