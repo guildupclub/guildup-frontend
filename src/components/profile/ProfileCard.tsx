@@ -544,7 +544,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
 
-  const typeToIcon: Record<string, { icon: JSX.Element; label: string }> = {
+  const typeToIcon: Record<string, { icon: React.ReactElement; label: string }> = {
     consultation: {
       icon: <HiOutlineUserGroup className="text-blue-600 w-6 h-6" />,
       label: "Consultation",
@@ -1211,7 +1211,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
-              <Testimonials />
+              <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
 
