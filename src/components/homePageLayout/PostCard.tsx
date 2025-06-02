@@ -62,9 +62,9 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const router = useRouter();
 
   const cleanedCommunityName = community_name
-    .replace(/\s+/g, "-")
-    .replace(/\|/g, "-")
-    .replace(/-+/g, "-");
+    ?.replace(/\s+/g, "-")
+    ?.replace(/\|/g, "-")
+    ?.replace(/-+/g, "-");
   const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
   const communityParam = `${encodedCommunityName}-${community_id}`;
   const COMMUNITY_PROFILE_PATH = `/community/${communityParam}/profile`;
