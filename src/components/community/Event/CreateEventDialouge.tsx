@@ -349,7 +349,7 @@ export function PostDialog() {
                   {(mediaPreview.type === "image" ||
                     mediaPreview.type === "gif") && (
                     <img
-                      src={mediaPreview.previewUrl || "/placeholder.svg"}
+                      src={mediaPreview.previewUrl}
                       className="h-10 w-10 object-cover rounded"
                       alt={mediaPreview.file.name}
                     />

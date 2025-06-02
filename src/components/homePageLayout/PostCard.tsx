@@ -53,7 +53,6 @@ interface PostCardeProps {
 export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const community_id = post.community_id?._id;
   const community_name = post.community_id?.name;
-  const COMMUNITY_PROFILE_PATH = `/community/${community_id}/profile`;
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const { user } = useSelector((state: any) => state.user);
@@ -62,9 +61,22 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const dispatch = useDispatch();
   const router = useRouter();
 
+  const cleanedCommunityName = community_name
+    .replace(/\s+/g, "-")
+    .replace(/\|/g, "-")
+    .replace(/-+/g, "-");
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParam = `${encodedCommunityName}-${community_id}`;
+  const COMMUNITY_PROFILE_PATH = `/community/${communityParam}/profile`;
   // Use React Query to fetch post data including likes and comments
   const { data: postData } = useQuery({
     queryKey: ["post", post._id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${post._id}`
+      );
+      return response.data.data?.post || post;
+    },
     initialData: post,
     refetchOnWindowFocus: false,
   });

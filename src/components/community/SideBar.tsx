@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Hash, Plus, Rss, Crown, Lock, Info } from "lucide-react";
+import { Hash, Plus, Rss, Crown, Lock, Info, MoreVertical } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { setActiveChannel } from "@/redux/channelSlice";
@@ -10,6 +10,8 @@ import { usePathname, useRouter, useParams } from "next/navigation";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,7 +36,16 @@ import { FiEdit } from "react-icons/fi";
 import { EditCommunityModal } from "../form/editCommunity";
 import { StringConstants } from "../common/CommonText";
 import { useQuery } from "@tanstack/react-query";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import axios from "axios";
+import { toast } from "sonner";
 export function Sidebar() {
   const dispatch = useDispatch();
   const memberDetails = useSelector(
@@ -45,14 +56,28 @@ export function Sidebar() {
     (state: RootState) => state.channel.activeChannel
   );
   const params = useParams();
-  const urlCommunityId = params.id as string;
+  const communityParam = params["community-Id"] as string;
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityName =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(0, lastHyphenIndex)
+      : null;
+  const urlCommunityId =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
+
   const router = useRouter();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const sessionId = useSelector((state: RootState) => state.user.sessionId);
   const pathname = usePathname();
   const [channels, setChannels] = useState([]);
   const [isChannelOpen, setIsChannelOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,9 +87,20 @@ export function Sidebar() {
     type: "discussion",
     is_locked: false,
   });
-  const COMMUNITY_PROFILE_PATH = `/community/${urlCommunityId}/profile`;
-  const COMMUNITY_MEMBERS_PATH = `/community/${urlCommunityId}/members`;
-  const COMMUNITY_CHANNEL_PATH = `/community/${urlCommunityId}/channel`;
+
+  // Use the full communityParam for paths
+  const COMMUNITY_PROFILE_PATH = communityParam
+    ? `/community/${communityParam}/profile`
+    : "/community";
+  const COMMUNITY_MEMBERS_PATH = communityParam
+    ? `/community/${communityParam}/members`
+    : "/community";
+  const COMMUNITY_CHANNEL_PATH = communityParam
+    ? `/community/${communityParam}/channel`
+    : "/community";
+  const COMMUNITY_FEED_PATH = communityParam
+    ? `/community/${communityParam}/feed`
+    : "/community";
   const COMMUNITY_PATH = "/community";
   const FEED_PATH = "/feed";
 
@@ -243,9 +279,27 @@ export function Sidebar() {
     }
   };
 
+  const handleDeleteChannel = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/delete`,
+        {
+          userId,
+          communityId: urlCommunityId,
+          channelId: selectedChannelId,
+        }
+      );
+
+      toast.success("Channel deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
   return (
     <>
-      <div className="md:fixed md:h-screen md:w-80  md:bg-card  md:p-4 md:py-24 md:flex flex-col hidden ">
+      <div className="md:fixed md:h-screen md:w-80 md:bg-card md:p-4 md:py-24 md:flex flex-col hidden">
         <div className="flex items-center justify-between px-2">
           {isLoadingCommunity ? (
             <div className="h-6 w-32 bg-background animate-pulse rounded" />
@@ -256,22 +310,13 @@ export function Sidebar() {
               {communityDetails?.community?.name}
             </h2>
           )}
-
-          {/* {isAdmin && (
-      <button
-        className="p-1 rounded-md hover:bg-background transition"
-        onClick={() => setIsEditOpen(true)}
-      >
-        <FiEdit size={18} className="text-muted hover:text-primary" />
-      </button>
-    )} */}
         </div>
 
         <Separator />
         <div className="space-y-2">
           <div className="border-b border-background py-2">
             {isAdmin && (
-              <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted ">
+              <div className="w-full justify-start gap-2 p-1 rounded-lg bg-background hover:bg-zinc-400 text-muted">
                 <PostDialog />
               </div>
             )}
@@ -279,13 +324,11 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={`w-full justify-start gap-2 ${
-              pathname === `/community/${urlCommunityId}/profile`
+              pathname === COMMUNITY_PROFILE_PATH
                 ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                 : "hover:bg-background text-muted-foreground"
             }`}
-            onClick={() => {
-              handleNavigation(`/community/${urlCommunityId}/profile`);
-            }}
+            onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
           >
             <FaUserAlt />
             {StringConstants.PROFILE}
@@ -294,13 +337,11 @@ export function Sidebar() {
           <Button
             variant="ghost"
             className={`w-full justify-start gap-2 ${
-              pathname === `/community/${urlCommunityId}/feed`
+              pathname === COMMUNITY_FEED_PATH
                 ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                 : "hover:bg-background text-muted-foreground"
             }`}
-            onClick={() => {
-              handleNavigation(`/community/${urlCommunityId}/feed`);
-            }}
+            onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
           >
             <Rss className="h-4 w-4" />
             {StringConstants.FEED}
@@ -310,19 +351,16 @@ export function Sidebar() {
             <Button
               variant="ghost"
               className={`w-full justify-start gap-2 ${
-                pathname === `/community/${urlCommunityId}/members`
+                pathname === COMMUNITY_MEMBERS_PATH
                   ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
                   : "hover:bg-background text-muted-foreground"
               }`}
-              onClick={() => {
-                handleNavigation(`/community/${urlCommunityId}/members`);
-              }}
+              onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
             >
               <FaUserGroup />
               {StringConstants.MEMBER}
             </Button>
           )}
-
           {/* Announcements */}
           {/* <Button
   variant="ghost"
@@ -367,8 +405,8 @@ export function Sidebar() {
           )}
 
           <div className="px-2 py-2 border-t border-background p-2">
-            <div className="flex items-center justify-between mb-2 ">
-              <h2 className="text-lg font-semibold text-muted ">Channels</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold text-muted">Channels</h2>
               <Dialog open={isChannelOpen} onOpenChange={setIsChannelOpen}>
                 <DialogTrigger asChild>
                   {isAdmin && (
@@ -384,7 +422,7 @@ export function Sidebar() {
                     </Button>
                   )}
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-background  border-none">
+                <DialogContent className="sm:max-w-[425px] bg-background border-none">
                   <DialogHeader>
                     <DialogTitle>Create a New Channel</DialogTitle>
                   </DialogHeader>
@@ -398,7 +436,7 @@ export function Sidebar() {
                         onChange={(e) =>
                           setFormData({ ...formData, name: e.target.value })
                         }
-                        className="bg-card border-background "
+                        className="bg-card border-background"
                       />
                     </div>
                     <div className="grid gap-2">
@@ -472,16 +510,16 @@ export function Sidebar() {
                 </DialogContent>
               </Dialog>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-1 ">
               {channels &&
                 channels.map((channel: any) => (
                   <Button
                     key={channel?.id}
                     variant="ghost"
-                    className={`w-full justify-start gap-2 ${
+                    className={`w-full justify-start gap-2 border-b-2 border-background pb-4 ${
                       activeChannel.id === channel.id
-                        ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30 "
-                        : " hover:bg-background text-muted-foreground"
+                        ? "bg-[#334BFF]/20 text-primary hover:bg-[#334BFF]/30"
+                        : "hover:bg-background text-muted-foreground"
                     }`}
                     onClick={() => {
                       dispatch(
@@ -492,15 +530,43 @@ export function Sidebar() {
                         })
                       );
                       handleNavigation(
-                        `/community/${urlCommunityId}/channel/${channel.name}`
+                        `${COMMUNITY_CHANNEL_PATH}/${channel.name}`
                       );
                     }}
                   >
                     <Hash />
                     {channel.name}
-                    {channel.locked && (
-                      <Lock className="h-3 w-3 ml-auto opacity-50" />
-                    )}
+                    <div className="h-3 w-3 ml-auto opacity-50 flex flex-row items-center justify-center">
+                      {channel.locked && <Lock className="mx-2" />}
+
+                      {isAdmin && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full  "
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-40 bg-gray-100"
+                          >
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedChannelId(channel.id);
+                                setShowDeleteDialog(true);
+                              }}
+                              className="text-muted-foreground cursor-pointer"
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
                   </Button>
                 ))}
             </div>
@@ -528,21 +594,11 @@ export function Sidebar() {
 
         <button
           className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
-            pathname === `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
+            pathname === COMMUNITY_FEED_PATH
               ? "text-gradient underline underline-offset-4 decoration-blue-500"
               : "hover:text-gradient"
           }`}
-          onClick={() => {
-            if (urlCommunityId) {
-              handleNavigation(
-                `${COMMUNITY_PATH}/${urlCommunityId}${FEED_PATH}`
-              );
-            } else {
-              console.warn(
-                "Active Community ID is null or undefined. Navigation is not triggered."
-              );
-            }
-          }}
+          onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
         >
           {StringConstants.FEED}
         </button>
@@ -559,6 +615,7 @@ export function Sidebar() {
         </button>
 
         {/* Scrollable Channels */}
+
         {channels.map((channel: any) => (
           <button
             key={channel?.id}
@@ -575,6 +632,30 @@ export function Sidebar() {
             {channel.name}
           </button>
         ))}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Delete Channel</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this channel? You won&apos;t be
+                able to undo this action.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex justify-between sm:justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteChannel}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

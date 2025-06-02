@@ -190,7 +190,13 @@ export function LeftSidebar() {
         userId: userId,
       })
     );
-    router.push(`/community/${community._id}/profile`);
+     const cleanedCommunityName = community.name
+      .replace(/\s+/g, "-")
+      .replace(/\|/g, "-")
+      .replace(/-+/g, "-");
+    const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+    const communityParam = `${encodedCommunityName}-${community._id}`;
+    router.push(`/community/${communityParam}/profile`);
   };
   function handleSelectChange(communityId: string) {
     setSelectedCommunities((prev) =>

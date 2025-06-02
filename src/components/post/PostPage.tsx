@@ -98,7 +98,13 @@ export default function PostPage({ id }: { id: string }) {
         user_iscalendarConnected: false,
       })
     );
-    router.push(`/community/${community._id}/profile`);
+    const cleanedCommunityName = community.name
+      .replace(/\s+/g, "-")
+      .replace(/\|/g, "-")
+      .replace(/-+/g, "-");
+    const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+    const communityParam = `${encodedCommunityName}-${community._id}`;
+    router.push(`/community/${communityParam}/profile`);
   }, [dispatch, router, community, user]);
 
   const formatNumber = (num: number) => {

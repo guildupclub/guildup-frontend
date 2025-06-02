@@ -2,7 +2,7 @@ import { Description } from "@radix-ui/react-dialog";
 import Members from "../community/members/Members";
 
 export const StringConstants = {
-  CREATE_A_PAGE: "Sign up, it's free",
+  CREATE_A_PAGE: "Become an Expert",
   TAGS: "Tags",
   PAGE_NAME: "Page Name",
   EDIT_PAGE: "Edit Page",
@@ -73,7 +73,7 @@ export const StringConstants = {
   NO_POST_AVAILABLE: "No posts available",
   ERROR_LOADING_PAGES: "Error loading Pages.",
   PROFILE: "Profile",
-  FEED: "Feed",
+  FEED: "Discovery",
   CREATOR_STUDIO: "Creator Studio",
   CHANNEL_TYPE: "Channel type",
   DISCUSSION: "Discussion",
@@ -91,10 +91,10 @@ export const StringConstants = {
   SEARCH: "Search",
   SEARCH_FOR: "Search for",
   TRY_SEARCH_WITH_DIFFERENT_KEYWORDS: "Try searching with different keywsords",
-  HOME: "Home",
-  EXPLORE: "Explore",
+  HOME: "Discover",
+  EXPLORE: "Find Experts",
   EXPERTS: "Experts",
-  MY_SPACE: "My Space",
+  MY_SPACE: "My Guild",
   SIGN_OUT: "Sign out",
   EXPLORE_COMMUNITY: "Explore Community",
   DURATION: "Duration",
