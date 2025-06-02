@@ -178,7 +178,6 @@ export function EditCommunityModal({
       // Validate mandatory fields
       const mandatoryFields = {
         name: "Page Name",
-        description: "Page Description",
         tags: "Tags"
       };
 
@@ -305,7 +304,6 @@ export function EditCommunityModal({
             <div className="grid gap-2">
               <Label htmlFor="description">
                 {StringConstants.PAGE_DESCRIPTION}
-                <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="description"
