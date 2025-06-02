@@ -22,6 +22,8 @@ import { setActiveCommunity } from "@/redux/channelSlice";
 import { setCommunityData } from "@/redux/communitySlice";
 import { ChevronLeft, ChevronRight, X, Check } from "lucide-react";
 import { setLoading } from "@/redux/memberSlice";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -47,6 +49,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     tags: [] as string[],
     instaFollowers: "",
     youtubeSubscribers: "",
+    phone: "",
   });
   const [categoryId, setCategoryId] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -117,7 +120,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       case 3:
         return formData.tags.length > 0;
       case 4:
-        return formData.description.trim() !== "";
+        return formData.phone.trim() !== "";
+      case 5:
+        return true; // Description is now optional
       default:
         return false;
     }
@@ -125,9 +130,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
   // Navigation functions
   const nextStep = () => {
-    if (currentStep < 4 && isStepValid(currentStep)) {
+    if (currentStep < 5 && isStepValid(currentStep)) {
       setCurrentStep(currentStep + 1);
-    } else if (currentStep < 4) {
+    } else if (currentStep < 5) {
       toast.error("Please complete this step before continuing.");
     }
   };
@@ -149,7 +154,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           body: JSON.stringify({
             user_id: userId,
             name: formData.name,
-            description: formData.description,
+            description: formData.description || "",
             additional_tags: formData.tags,
             category_id: categoryId,
             instagram_followers: formData.instaFollowers,
@@ -177,6 +182,31 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       if (!newCommunity || !newCommunity._id) {
         toast.error("Its not you, its us. Please try again later.");
         return;
+      }
+
+      // Update user profile with phone number if provided
+      if (formData.phone) {
+        try {
+          const profileResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit`,
+            {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                userId: userId,
+                updateData: {
+                  phone: formData.phone,
+                },
+              }),
+            }
+          );
+
+          if (!profileResponse.ok) {
+            console.error("Failed to update user phone number");
+          }
+        } catch (error) {
+          console.error("Error updating user phone number:", error);
+        }
       }
       
       toast.success("Community created successfully! 🎉");
@@ -206,6 +236,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         tags: [],
         instaFollowers: "",
         youtubeSubscribers: "",
+        phone: "",
       });
       setCategoryId("");
       
@@ -222,7 +253,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
   // Handle submit action
   const handleSubmit = () => {
-    if (!isStepValid(4)) {
+    if (!isStepValid(4)) { // Only validate up to step 4 (phone)
       toast.error("Please complete all required fields.");
       return;
     }    
@@ -238,7 +269,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         return (
           <div className="h-full flex flex-col space-y-3 p-3 sm:p-2">
             <div className="text-center">
-              <div className="text-xs text-primary mb-1 font-medium">Step 1 of 4</div>
+              <div className="text-xs text-primary mb-1 font-medium">Step 1 of 5</div>
               <h3 className="text-base font-semibold mb-1">What&apos;s your Guild name?</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
                 Choose a name that represents your expertise and community
@@ -263,7 +294,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         return (
           <div className="h-full flex flex-col p-3 sm:p-2">
             <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 2 of 4</div>
+              <div className="text-xs text-primary mb-1 font-medium">Step 2 of 5</div>
               <h3 className="text-base font-semibold mb-1">Select your expertise</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
                 Choose the category that best describes your Guild
@@ -295,7 +326,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
         return (
           <div className="h-full flex flex-col p-3 sm:p-2">
             <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 3 of 4</div>
+              <div className="text-xs text-primary mb-1 font-medium">Step 3 of 5</div>
               <h3 className="text-base font-semibold mb-1">Add keywords</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
                 Type keywords and press Enter to help users find your Guild
@@ -347,17 +378,43 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
       case 4:
         return (
+          <div className="h-full flex flex-col space-y-3 p-3 sm:p-2">
+            <div className="text-center">
+              <div className="text-xs text-primary mb-1 font-medium">Step 4 of 5</div>
+              <h3 className="text-base font-semibold mb-1">Your mobile number</h3>
+              <p className="text-xs text-muted-foreground px-2 opacity-75">
+                We&apos;ll use this to send you important updates about your Guild
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm">
+                Mobile Number&nbsp;<span className="text-red-500">*</span>
+              </Label>
+              <PhoneInput
+                international
+                defaultCountry="IN"
+                value={formData.phone}
+                onChange={(value) => setFormData({ ...formData, phone: value || "" })}
+                className="w-full p-2 border border-gray-200 rounded-md focus:border-primary"
+                placeholder="Enter your mobile number"
+              />
+            </div>
+          </div>
+        );
+
+      case 5:
+        return (
           <div className="h-full flex flex-col p-3 sm:p-2">
             <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 4 of 4</div>
+              <div className="text-xs text-primary mb-1 font-medium">Step 5 of 5</div>
               <h3 className="text-base font-semibold mb-1">Describe your Guild</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
-                Tell people what they can expect from your Guild
+                Tell people what they can expect from your Guild (optional)
               </p>
             </div>
             <div className="flex-1 flex flex-col space-y-2 min-h-0">
               <Label className="flex-shrink-0 text-sm">
-                About your Guild&nbsp;<span className="text-red-500">*</span>
+                About your Guild
               </Label>
               <Textarea
                 name="description"
@@ -386,7 +443,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
         {/* Progress indicator */}
         <div className="flex space-x-2 mb-1 flex-shrink-0 px-1">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3, 4, 5].map((step) => (
             <div
               key={step}
               className={`flex-1 h-2 rounded-full transition-colors duration-300 ${
@@ -419,11 +476,11 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           </Button>
 
           <Button
-            onClick={currentStep === 4 ? handleSubmit : nextStep}
+            onClick={currentStep === 5 ? handleSubmit : nextStep}
             disabled={!isStepValid(currentStep) || createCommunity.isPending}
             className="flex-1 text-white bg-primary hover:bg-primary/90 h-7 text-sm"
           >
-            {currentStep === 4 ? (
+            {currentStep === 5 ? (
               createCommunity.isPending ? "Creating..." : "Join as Expert"
             ) : (
               <>
