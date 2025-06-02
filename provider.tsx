@@ -7,6 +7,7 @@ import { store } from "./src/redux/store";
 import AuthHandler from "@/components/AuthHandler";
 import { NotificationProvider } from "@/components/notifications/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
+import { GoogleMeetProvider } from "@/contexts/GoogleMeetContext";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient()); // ✅ Ensures a stable QueryClient instance
@@ -17,8 +18,10 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <ChatProvider>
-              <AuthHandler />
-              {children}
+              <GoogleMeetProvider>
+                <AuthHandler />
+                {children}
+              </GoogleMeetProvider>
             </ChatProvider>
           </NotificationProvider>
         </QueryClientProvider>

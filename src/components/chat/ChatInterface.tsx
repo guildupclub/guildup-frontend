@@ -30,6 +30,7 @@ import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
 import { chatDatabase } from '../../../firebase-chat';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
+import { GoogleMeetButton } from '@/components/google-meet/GoogleMeetButton';
 
 interface ChatInterfaceProps {
   receiverEmail?: string;
@@ -430,6 +431,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ? `${(window as any).visualViewport.height}px` 
         : undefined
     }}>
+      
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
         <div className="p-3 border-b border-gray-200 bg-white">
@@ -560,6 +562,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </p>
                       </div>
                     </div>
+                    
+                    {/* Google Meet Button */}
+                    <GoogleMeetButton
+                      receiverEmail={otherParticipant.email}
+                      receiverName={otherParticipant.name}
+                      size="sm"
+                      variant="ghost"
+                    />
                   </>
                 ) : null;
               })()}
