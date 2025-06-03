@@ -79,19 +79,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         if (visualViewport) {
           const keyboardOpen = visualViewport.height < window.innerHeight * 0.75;
           setIsKeyboardVisible(keyboardOpen);
-          
-          // Scroll input into view when keyboard opens
-          if (keyboardOpen && inputRef.current) {
-            setTimeout(() => {
-              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-          }
         }
       };
 
+      // Use visual viewport API for better keyboard detection
       if ((window as any).visualViewport) {
         (window as any).visualViewport.addEventListener('resize', handleResize);
-        return () => (window as any).visualViewport.removeEventListener('resize', handleResize);
+        (window as any).visualViewport.addEventListener('scroll', handleResize);
+        return () => {
+          (window as any).visualViewport.removeEventListener('resize', handleResize);
+          (window as any).visualViewport.removeEventListener('scroll', handleResize);
+        };
       } else {
         // Fallback for browsers without visual viewport
         window.addEventListener('resize', handleResize);
@@ -425,12 +423,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   return (
-    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white" style={{
-      // Only apply visual viewport height on mobile when keyboard is visible
-      height: typeof window !== 'undefined' && (window as any).visualViewport && window.innerWidth < 768 && isKeyboardVisible
-        ? `${(window as any).visualViewport.height}px` 
-        : undefined
-    }}>
+    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white">
       
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
@@ -741,13 +734,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               </div>
             </div>
 
-            {/* Message Input - Fixed at bottom with keyboard handling */}
-            <div className={`p-2 md:p-3 border-t border-gray-200 bg-white flex-shrink-0 ${
-              isKeyboardVisible ? 'pb-safe-area-inset-bottom' : ''
-            }`}>
+            {/* Message Input - Fixed at bottom with simplified mobile positioning */}
+            <div className="border-t border-gray-200 bg-white flex-shrink-0 p-3">
               {/* Reply preview */}
               {replyingTo && (
-                <div className="mb-2 md:mb-3 p-2 bg-gray-50 rounded-lg border-l-4 border-primary">
+                <div className="mb-2 p-2 bg-gray-50 rounded-lg border-l-4 border-primary">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-600">
                       Replying to {replyingTo.senderName}
@@ -765,7 +756,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
               {/* Emoji Picker */}
               {showEmojiPicker && (
-                <div className="emoji-picker absolute bottom-14 md:bottom-16 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50">
+                <div className="emoji-picker absolute bottom-20 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50">
                   <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
                     {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤐', '🤑', '🤠', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤝', '🙏', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '💥', '💫', '⭐', '🌟', '✨', '⚡', '🔥', '💨', '☀️', '🌙', '⭐', '🌈', '☘️', '🍀', '🌸', '🌺', '🌻', '🌷'].map((emoji) => (
                       <button
@@ -780,27 +771,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </div>
               )}
 
-              <div className="flex gap-1.5 md:gap-2 items-center relative">
+              <div className="flex gap-2 items-center relative">
                 <Textarea
                   ref={inputRef}
                   value={newMessage}
                   onChange={handleTextareaChange}
                   onKeyPress={handleKeyPress}
-                  onFocus={() => {
-                    // Ensure input stays visible on focus
-                    setTimeout(() => {
-                      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-                  }}
-                  placeholder={replyingTo ? "Type your reply... (Shift+Enter for new line)" : "Type a message... (Shift+Enter for new line)"}
-                  className="flex-1 text-sm rounded-lg pr-12 resize-none min-h-[36px] md:min-h-[40px] max-h-[120px]"
+                  placeholder={replyingTo ? "Type your reply..." : "Type a message..."}
+                  className="flex-1 text-sm md:text-base rounded-xl pr-12 resize-none min-h-[40px] max-h-[120px] mobile-chat-input"
                   rows={1}
                 />
                 
                 {/* Emoji button */}
                 <button
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="absolute right-10 md:right-12 top-2 text-gray-400 hover:text-gray-600 p-1"
+                  className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                 >
                   <Smile className="h-4 w-4" />
                 </button>
@@ -809,9 +794,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   onClick={handleSendMessage} 
                   disabled={!newMessage.trim()}
                   size="sm"
-                  className="rounded-full h-7 w-7 md:h-8 md:w-8 p-0"
+                  className="rounded-full h-8 w-8 p-0 mobile-touch-target"
                 >
-                  <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             </div>
