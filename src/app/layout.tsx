@@ -51,6 +51,15 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
+        
+        {/* PWA Meta Tags */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="GuildUp" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#0A0A0A" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        
         {/* Do not remove these script */}
         <script
           async
@@ -63,6 +72,23 @@ export default async function RootLayout({
           gtag('js', new Date());
 
           gtag('config', 'G-B3B9W8GRQP');
+          `}
+        </script>
+        
+        {/* Service Worker Registration */}
+        <script>
+          {`
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js')
+                .then(function(registration) {
+                  console.log('PWA: ServiceWorker registration successful');
+                })
+                .catch(function(error) {
+                  console.log('PWA: ServiceWorker registration failed');
+                });
+            });
+          }
           `}
         </script>
       </head>

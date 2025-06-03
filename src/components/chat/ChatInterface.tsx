@@ -125,6 +125,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, []);
 
+  // Auto-scroll input into view when keyboard appears
+  useEffect(() => {
+    if (isKeyboardVisible && inputRef.current) {
+      // Small delay to ensure keyboard is fully visible
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 150);
+    }
+  }, [isKeyboardVisible]);
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -748,7 +761,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Chat Area - Full screen on mobile */}
-      <div className={`${showConversations ? 'hidden' : 'flex'} md:flex flex-col flex-1 min-w-0 relative`}>
+      <div className={`${showConversations ? 'hidden' : 'flex'} md:flex flex-col flex-1 min-w-0 relative ${
+        isKeyboardVisible ? 'pb-16 md:pb-0' : ''
+      }`}>
         {/* Drag and Drop Overlay */}
         {isDragOver && (
           <div className="absolute inset-0 bg-blue-50/90 border-2 border-dashed border-blue-300 z-50 flex items-center justify-center">
@@ -830,7 +845,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Messages */}
             <div 
-              className={`flex-1 overflow-y-auto min-h-0 relative`}
+              className={`flex-1 overflow-y-auto min-h-0 relative ${
+                isKeyboardVisible ? 'mb-safe-area-inset-bottom' : ''
+              }`}
             >
               <div className="p-3 pb-0">
                 {loading ? (
@@ -1109,7 +1126,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
 
             {/* Message Input - Fixed at bottom with simplified mobile positioning */}
-            <div className="border-t border-gray-200 bg-white flex-shrink-0 p-3">
+            <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 ${
+              isKeyboardVisible 
+                ? 'fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto' 
+                : ''
+            }`}>
               {/* Attachment Preview */}
               {attachments.length > 0 && (
                 <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
@@ -1232,7 +1253,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
               {/* Emoji Picker */}
               {showEmojiPicker && (
-                <div className="emoji-picker absolute bottom-20 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50">
+                <div className={`emoji-picker absolute ${
+                  isKeyboardVisible ? 'bottom-16' : 'bottom-20'
+                } right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50 max-w-xs`}>
                   <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
                     {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤐', '🤑', '🤠', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤝', '🙏', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '💥', '💫', '⭐', '🌟', '✨', '⚡', '🔥', '💨', '☀️', '🌙', '⭐', '🌈', '☘️', '🍀', '🌸', '🌺', '🌻', '🌷'].map((emoji) => (
                       <button
@@ -1268,7 +1291,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   onChange={handleTextareaChange}
                   onKeyPress={handleKeyPress}
                   placeholder={replyingTo ? "Type your reply..." : "Type a message..."}
-                  className="flex-1 text-sm md:text-base rounded-xl pr-12 resize-none min-h-[40px] max-h-[120px] mobile-chat-input"
+                  className="flex-1 text-sm md:text-base rounded-xl pr-16 md:pr-20 resize-none min-h-[40px] max-h-[120px] mobile-chat-input"
                   rows={1}
                   disabled={isUploading}
                 />
@@ -1276,8 +1299,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 {/* Emoji button */}
                 <button
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                  className="absolute right-12 md:right-14 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1.5 touch-manipulation transition-colors"
                   disabled={isUploading}
+                  style={{ zIndex: 10 }}
+                  title="Add emoji"
                 >
                   <Smile className="h-4 w-4" />
                 </button>
@@ -1286,7 +1311,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   onClick={handleSendMessage} 
                   disabled={(!newMessage.trim() && attachments.length === 0) || isUploading}
                   size="sm"
-                  className="rounded-full h-8 w-8 p-0 mobile-touch-target"
+                  className="rounded-full h-8 w-8 p-0 flex-shrink-0 touch-manipulation min-w-[32px] min-h-[32px]"
+                  title="Send message"
                 >
                   {isUploading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />

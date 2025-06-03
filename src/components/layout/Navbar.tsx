@@ -41,6 +41,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
 import { useChatContext } from "@/contexts/ChatContext";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/feed";
@@ -413,7 +414,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
               <div className="hidden md:block ml-2 lg:ml-4 xl:ml-6">
                 {user?._id ? (
-                  <div className="flex items-center ">
+                  <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
@@ -488,16 +489,18 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </DropdownMenu>
                   </div>
                 ) : (
-                  <Button
-                    onClick={() =>
-                      signIn(undefined, {
-                        callbackUrl: `${window.location.href}`,
-                      })
-                    }
-                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
-                  >
-                    Sign In
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() =>
+                        signIn(undefined, {
+                          callbackUrl: `${window.location.href}`,
+                        })
+                      }
+                      className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
+                    >
+                      Sign In
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
