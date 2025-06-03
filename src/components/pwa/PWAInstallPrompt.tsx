@@ -177,7 +177,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             <div className="p-3 bg-gray-50 rounded-lg">
               <p className="text-xs text-gray-600 mb-2 font-medium">How it works:</p>
               <p className="text-xs text-gray-500">
-                Click "Install" below and the app will be added to your device. 
+                Click &quot;Install&quot; below and the app will be added to your device. 
                 You can uninstall it anytime from your device settings.
               </p>
             </div>
@@ -208,8 +208,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                     Add GuildUp to your home screen for quick access:
                   </p>
                   <div className="text-xs text-gray-500 space-y-1">
-                    <p><strong>Chrome/Android:</strong> Menu → "Add to Home screen"</p>
-                    <p><strong>Safari/iOS:</strong> Share → "Add to Home Screen"</p>
+                    <p><strong>Chrome/Android:</strong> Menu → &quot;Add to Home screen&quot;</p>
+                    <p><strong>Safari/iOS:</strong> Share → &quot;Add to Home Screen&quot;</p>
                   </div>
                 </div>
               )}
