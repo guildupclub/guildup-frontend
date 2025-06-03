@@ -17,6 +17,13 @@ interface ChatMessage {
   senderImage?: string;
   edited?: boolean;
   editedAt?: number;
+  attachments?: Array<{
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+    url: string;
+  }>;
 }
 
 interface ChatConversation {
@@ -40,7 +47,7 @@ interface ChatContextType {
   messages: ChatMessage[];
   loading: boolean;
   unreadCount: number;
-  sendMessage: (receiverEmail: string, message: string, receiverDetails: { name: string; email: string; image?: string }) => Promise<void>;
+  sendMessage: (receiverEmail: string, message: string | { message: string; attachments?: any[] }, receiverDetails: { name: string; email: string; image?: string }) => Promise<void>;
   setCurrentChat: (chatId: string | null) => void;
   markAsRead: (chatId: string) => void;
   startNewChat: (receiverEmail: string, receiverDetails: { name: string; email: string; image?: string }) => string;
@@ -107,8 +114,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Send a message
-  const sendMessage = async (receiverEmail: string, message: string, receiverDetails: { name: string; email: string; image?: string }) => {
-    if (!user?.email || !message.trim()) return;
+  const sendMessage = async (receiverEmail: string, message: string | { message: string; attachments?: any[] }, receiverDetails: { name: string; email: string; image?: string }) => {
+    // Extract message text and attachments from the parameter
+    const messageText = typeof message === 'string' ? message : message.message;
+    const attachments = typeof message === 'object' ? message.attachments : undefined;
+    
+    if (!user?.email || !messageText.trim()) return;
 
     const chatId = generateChatId(user.email, receiverEmail);
     const sanitizedUserEmail = removeSpecialCharacters(user.email);
@@ -125,11 +136,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const messageData = {
         senderEmail: sanitizedUserEmail,
         receiverEmail: sanitizedReceiverEmail,
-        message: message.trim(),
+        message: messageText.trim(),
         timestamp: Date.now(), // Use simple timestamp for reliability
         read: false,
         senderName: user.name || 'Anonymous',
         senderImage: user.image || '',
+        ...(attachments && attachments.length > 0 && { attachments })
       };
 
       console.log('Sending message data:', messageData);
@@ -137,7 +149,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const conversationRef = ref(chatDatabase, `conversations/${chatId}`);
       await update(conversationRef, {
-        lastMessage: message.trim(),
+        lastMessage: messageText.trim(),
         lastMessageTime: Date.now()
       });
 
