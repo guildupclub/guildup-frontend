@@ -58,57 +58,29 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Push notification event handler
+// Push notification event (for future use)
 self.addEventListener('push', (event) => {
-  if (!event.data) return;
-
-  try {
-    const data = event.data.json();
-    const options = {
-      body: data.message,
-      icon: '/guildup_logo_final.png',
-      badge: '/icons/frame-96.png',
-      vibrate: [100, 50, 100],
-      data: {
-        ...data.data,
-        url: data.url || '/',
-        dateOfArrival: Date.now()
-      },
-      actions: [
-        {
-          action: 'open',
-          title: 'Open'
-        }
-      ]
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(data.title || 'GuildUp', options)
-    );
-  } catch (error) {
-    console.error('Error showing notification:', error);
-  }
-});
-
-// Notification click event handler
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  const urlToOpen = event.notification.data?.url || '/';
-  const actionType = event.action;
+  const options = {
+    body: event.data ? event.data.text() : 'New notification from GuildUp',
+    icon: '/guildup_logo_final.png',
+    badge: '/guildup_logo_final.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    }
+  };
 
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then((windowClients) => {
-      // Check if there is already a window/tab open with the target URL
-      for (let client of windowClients) {
-        if (client.url === urlToOpen && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      // If no window/tab is open, open a new one
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
-      }
-    })
+    self.registration.showNotification('GuildUp', options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.openWindow('/')
   );
 });

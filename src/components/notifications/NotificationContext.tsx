@@ -6,15 +6,13 @@ import {
   useContext,
   useState,
   useEffect,
-  useCallback,
   type ReactNode,
 } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import database from "../../../firebase";
-import { ref, onValue, push, update, get } from "firebase/database";
+import { ref, onValue, push, update } from "firebase/database";
 import { removeSpecialCharacters } from "../utils/StringUtils";
-import { subscribeToPushNotifications } from "@/utils/pushNotifications";
 
 interface Notification {
   _id: string;
@@ -38,12 +36,10 @@ interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
   loading: boolean;
-  pushEnabled: boolean;
   fetchNotifications: () => Promise<void>;
   markAsRead: (notificationId: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   addNotification: (notification: Omit<Notification, "_id">) => Promise<void>;
-  enablePushNotifications: () => Promise<PushSubscription>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
@@ -66,7 +62,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [pushEnabled, setPushEnabled] = useState(false);  const fetchNotifications = useCallback(async () => {
+
+  const fetchNotifications = async () => {
     if (!user?.email) return;
 
     try {
@@ -85,6 +82,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
             })
           );
 
+        
           notificationsArray.sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
             const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -108,7 +106,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       console.error("Error fetching notifications:", error);
       setLoading(false);
     }
-  }, [user?.email]);
+  };
 
   const markAsRead = async (notificationId: string) => {
     if (!user?.email) return;
@@ -164,112 +162,28 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       console.error("Error marking all notifications as read:", error);
     }
   };
+
   const addNotification = async (notification: Omit<Notification, "_id">) => {
     if (!notification.userId) return;
 
     try {
-      // Add notification to Firebase
       const notificationsRef = ref(
         database,
         `notification/${notification.userId}`
       );
       const newNotificationRef = push(notificationsRef);
 
-      const newNotification = {
+      await update(newNotificationRef, {
         ...notification,
         createdAt: new Date().toISOString(),
         read: false,
-      };
-
-      await update(newNotificationRef, newNotification);
-
-      // Get user's push subscription if it exists
-      const userRef = ref(
-        database,
-        `users/${notification.userId}/pushSubscription`
-      );
-      const snapshot = await get(userRef);
-      const pushSubscription = snapshot.val();
-
-      if (pushSubscription) {
-        // Send push notification to your backend
-        try {
-          await fetch("/api/push-notification", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              subscription: pushSubscription,
-              notification: {
-                title: "GuildUp",
-                message: notification.message,
-                data: notification.data,
-                url:
-                  window.location.origin +
-                  (notification.data?.postId
-                    ? `/post/${notification.data.postId}`
-                    : "/"),
-              },
-            }),
-          });
-        } catch (error) {
-          console.error("Error sending push notification:", error);
-        }
-      }
+      });
     } catch (error) {
       console.error("Error adding notification:", error);
     }
   };
 
-  const enablePushNotifications = async () => {
-    try {
-      if (!("Notification" in window)) {
-        throw new Error("This browser does not support notifications");
-      }
-
-      // Request notification permission
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        throw new Error("Notification permission denied");
-      }
-
-      // Subscribe to push notifications
-      const subscription = await subscribeToPushNotifications();
-
-      // Save the subscription to your backend
-      if (user?.email) {
-        const email = removeSpecialCharacters(user.email);
-        const userRef = ref(database, `users/${email}/pushSubscription`);
-        await update(userRef, {
-          endpoint: subscription.endpoint,
-          keys: {
-            p256dh: subscription.getKey("p256dh"),
-            auth: subscription.getKey("auth"),
-          },
-        });
-      }
-
-      setPushEnabled(true);
-      return subscription;
-    } catch (error) {
-      console.error("Failed to enable push notifications:", error);
-      setPushEnabled(false);
-      throw error;
-    }
-  };
-
-  // Check push notification status on mount
-  useEffect(() => {
-    const checkPushStatus = async () => {
-      if ("Notification" in window) {
-        const permission = Notification.permission;
-        setPushEnabled(permission === "granted");
-      }
-    };
-    checkPushStatus();
-  }, []);
-  // Fetch notifications when user changes  // Fetch notifications when user changes
+  // Fetch notifications when user changes
   useEffect(() => {
     if (user?.email) {
       fetchNotifications();
@@ -277,18 +191,16 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       setNotifications([]);
       setUnreadCount(0);
     }
-  }, [user?.email, fetchNotifications]);
+  }, [user?.email]);
 
   const value = {
     notifications,
     unreadCount,
     loading,
-    pushEnabled,
     fetchNotifications,
     markAsRead,
     markAllAsRead,
     addNotification,
-    enablePushNotifications,
   };
 
   return (
