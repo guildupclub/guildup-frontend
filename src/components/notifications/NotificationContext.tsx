@@ -6,6 +6,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
 import { useSelector } from "react-redux";
@@ -65,9 +66,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [pushEnabled, setPushEnabled] = useState(false);
-
-  const fetchNotifications = async () => {
+  const [pushEnabled, setPushEnabled] = useState(false);  const fetchNotifications = useCallback(async () => {
     if (!user?.email) return;
 
     try {
@@ -109,7 +108,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       console.error("Error fetching notifications:", error);
       setLoading(false);
     }
-  };
+  }, [user?.email]);
 
   const markAsRead = async (notificationId: string) => {
     if (!user?.email) return;
@@ -270,8 +269,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     };
     checkPushStatus();
   }, []);
-
-  // Fetch notifications when user changes
+  // Fetch notifications when user changes  // Fetch notifications when user changes
   useEffect(() => {
     if (user?.email) {
       fetchNotifications();
@@ -279,7 +277,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
       setNotifications([]);
       setUnreadCount(0);
     }
-  }, [user?.email]);
+  }, [user?.email, fetchNotifications]);
 
   const value = {
     notifications,
