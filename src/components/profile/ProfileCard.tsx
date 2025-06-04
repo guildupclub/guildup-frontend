@@ -39,7 +39,7 @@ import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn } from "react-icons/fa6";
-import { RiUserSharedFill } from "react-icons/ri";
+import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
 import { FaClock, FaShareAlt } from "react-icons/fa";
 import { useNotifications } from "../notifications/NotificationContext";
 import { ref, push, update } from "firebase/database";
@@ -544,7 +544,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
 
-  const typeToIcon: Record<string, { icon: React.ReactElement; label: string }> = {
+  const typeToIcon: Record<
+    string,
+    { icon: React.ReactElement; label: string }
+  > = {
     consultation: {
       icon: <HiOutlineUserGroup className="text-blue-600 w-6 h-6" />,
       label: "Consultation",
@@ -697,22 +700,39 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             {/* Right Column - Community Details */}
             <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10 pt-20 lg:pt-4 ">
               <div className="space-y-2">
-                <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
-                  {profile?.community?.name}
+                <div className="flex items-center  justify-between">
+                  <div className="flex items-center space-x-2">
+                    <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
+                      {profile?.community?.name}
+                      {/* {isOwner && (
+                        <button
+                          className="rounded-md p-1 transition hover:bg-background"
+                          onClick={() => setIsEditOpen(true)}
+                          aria-label="Edit community"
+                        >
+                          <Pencil
+                            size={18}
+                            className="text-muted hover:text-primary"
+                          />
+                        </button>
+                      )} */}
+                    </h1>{" "}
+                    {isBankConnected && (
+                      <RiVerifiedBadgeFill className="text-blue-600 h-8 w-8" />
+                    )}
+                  </div>
                   {isOwner && (
-                    <button
-                      className="rounded-md p-1 transition hover:bg-background"
-                      onClick={() => setIsEditOpen(true)}
-                      aria-label="Edit community"
-                    >
-                      <Pencil
-                        size={18}
-                        className="text-muted hover:text-primary"
-                      />
-                    </button>
+                    <div>
+                      <Button
+                        className="border border-gray-400 px-6"
+                        variant="outline"
+                        onClick={() => setIsEditOpen(true)}
+                      >
+                        Edit Profile
+                      </Button>
+                    </div>
                   )}
-                </h1>
-
+                </div>
                 {/* Creator Info */}
                 <p className="text-md text-muted-foreground mt-1 mb-4">
                   {StringConstants.CREATED_BY}{" "}
@@ -720,7 +740,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile.user.user_name}
                   </span>
                 </p>
-
                 {/* Years of Experience */}
                 {profile.user?.user_year_of_experience > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -743,7 +762,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Years of experience</span>
                   </div>
                 )}
-
                 {/* Sessions Conducted */}
                 {profile.user?.user_session_conducted > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -766,7 +784,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Sessions Conducted</span>
                   </div>
                 )}
-
                 {/* Languages */}
                 {profile.user?.user_languages?.length > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -802,7 +819,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </div>
                   </div>
                 )}
-
                 {/* Community Stats */}
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-2">
                   {/* Members */}
