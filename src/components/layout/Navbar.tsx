@@ -61,6 +61,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
@@ -358,7 +359,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  
+
                   <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
@@ -383,7 +384,10 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </li>
 
                   <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
-                    <Link href="/chat" className="flex flex-col items-center relative">
+                    <Link
+                      href="/chat"
+                      className="flex flex-col items-center relative"
+                    >
                       <MessageCircle
                         className={`h-5 w-5 ${
                           isActive("/chat") ? "text-primary" : ""
@@ -496,13 +500,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           callbackUrl: `${window.location.href}`,
                         })
                       }
-                      className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
+                      className="px-6 border border-blue-500 transition-all duration-200"
+                      variant="outline"
                     >
                       Sign In
                     </Button>
                   </div>
                 )}
               </div>
+              <Dialog
+                open={session ? isDialogOpen : false}
+                onOpenChange={setIsDialogOpen}
+              >
+                <Button
+                  className="border border-gray-300 "
+                  onClick={handleCreatorButtonClick}
+                >
+                  Join as Expert
+                </Button>
+                {session && (
+                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                )}
+              </Dialog>
             </div>
           </div>
         </div>
