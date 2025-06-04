@@ -38,9 +38,9 @@ import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
-import { FaLinkedinIn } from "react-icons/fa6";
+import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
 import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
-import { FaClock, FaShareAlt } from "react-icons/fa";
+import { FaClock, FaEdit, FaShareAlt } from "react-icons/fa";
 import { useNotifications } from "../notifications/NotificationContext";
 import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
@@ -652,7 +652,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       title="Share Profile"
                     >
                       Share Profile
-                      <Share2 className="ml-2 h-5 w-5" />
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
                     </Button>
                   ) : (
                     <>
@@ -718,13 +718,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       )} */}
                     </h1>{" "}
                     {isBankConnected && (
-                      <RiVerifiedBadgeFill className="text-blue-600 h-8 w-8" />
+                      <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
                     )}
                   </div>
                   {isOwner && (
                     <div>
                       <Button
-                        className="border border-gray-400 px-6"
+                        className="border border-blue-600 px-6 hidden md:block"
                         variant="outline"
                         onClick={() => setIsEditOpen(true)}
                       >
@@ -892,16 +892,25 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile?.community?.name} - {profile.user.user_name}
                   </h1> */}
                 {isOwner ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleShareClick}
-                    title="Share Profile"
-                  >
-                    Share Profile
-                    <Share2 className="ml-2 h-5 w-5" />
-                  </Button>
+                  <div>
+                    <Button
+                      className="border border-blue-300 px-6 w-full my-2"
+                      variant="outline"
+                      onClick={() => setIsEditOpen(true)}
+                    >
+                      Edit Profile <FaEdit className="ml-2 h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                      onClick={handleShareClick}
+                      title="Share Profile"
+                    >
+                      Share Profile
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     {isCommunityFollowed ? (
@@ -957,7 +966,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   onClick={() => setIsEditOpen(true)}
                   aria-label="Edit about section"
                 >
-                  <Pencil size={18} className="text-muted hover:text-primary" />
+                  <FaEdit className="text-muted hover:text-primary h-5 w-5" />
                 </button>
               )}
             </h2>
