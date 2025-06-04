@@ -326,7 +326,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
               <div className="hidden md:flex items-center">
                 <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
-                  <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
                         className={`h-5 w-5 ${
@@ -343,7 +343,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <MdOutlineRssFeed
                         className={`h-5 w-5 ${
@@ -360,7 +360,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
                       className="flex flex-col items-center"
@@ -383,7 +383,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                     <Link
                       href="/chat"
                       className="flex flex-col items-center relative"
@@ -409,7 +409,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </li>
 
                   {user?._id && (
-                    <li className="px-1 lg:px-2 xl:px-4 py-2 rounded-full transition-all duration-200">
+                    <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                       <NotificationDropdown />
                     </li>
                   )}
