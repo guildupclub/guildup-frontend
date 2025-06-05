@@ -51,7 +51,7 @@ export const ChatSupportButton: React.FC<ChatSupportButtonProps> = ({
       variant="outline"
       size="sm"
       onClick={handleChatClick}
-      className={`flex items-center gap-2 bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 ${className}`}
+      className={`flex items-center mb-2 gap-2 bg-green-50 hover:bg-green-100 border-green-200 text-green-700 hover:text-green-800 ${className}`}
     >
       <MessageCircle className="h-4 w-4" />
       <span>Chat with Expert</span>
