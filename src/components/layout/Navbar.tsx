@@ -321,8 +321,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </button>
                 </div>
               </div>
+              <div
+                className="
+            md:hidden"
+              >
+                {" "}
+                {user?._id && <NotificationDropdown />}
+              </div>
             </div>
-
             <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
               <div className="hidden md:flex items-center">
                 <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
