@@ -203,7 +203,7 @@ export default function Hero() {
                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
                   🌱
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
+                <span className="text-xs font-semibold text-gray-800 leading-[1.2] block w-[80px]">
                   Personalized Coaching
                 </span>
               </div>
@@ -212,18 +212,17 @@ export default function Hero() {
                 <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
                   🎯
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
+                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
                   Clear Roadmaps
                 </span>
               </div>
 
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-purple-100 text-center">
                 <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                   💬
+                  💬
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
-                  Real 
-                  <br /> Conversations
+                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
+                  Real Conversations
                 </span>
               </div>
             </div>
@@ -344,14 +343,18 @@ export default function Hero() {
                       <span className="text-lg">📱</span>
                     </div>
                     <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-gray-900">Get the GuildUp App</p>
-                      <p className="text-xs text-gray-600">Access coaching on-the-go</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        Get the GuildUp App
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Access coaching on-the-go
+                      </p>
                     </div>
                   </div>
-                  <PWAInstallPrompt 
-                    showOnLoad={true} 
-                    mode="full" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200" 
+                  <PWAInstallPrompt
+                    showOnLoad={true}
+                    mode="full"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                   />
                 </div>
 
@@ -362,14 +365,18 @@ export default function Hero() {
                       <span className="text-xl">📱</span>
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">Get the GuildUp App</p>
-                      <p className="text-xs text-gray-600">Native app experience with offline support</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        Get the GuildUp App
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Native app experience with offline support
+                      </p>
                     </div>
                   </div>
-                  <PWAInstallPrompt 
-                    showOnLoad={true} 
-                    mode="full" 
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl px-6 py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200" 
+                  <PWAInstallPrompt
+                    showOnLoad={true}
+                    mode="full"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl px-6 py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
                   />
                 </div>
               </div>

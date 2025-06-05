@@ -766,9 +766,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       }`}
                     >
                       <AvatarImage
-                        src={`/placeholder.svg?text=${getInitials(
-                          community.name
-                        )}`}
+                        src={community.image || "/placeholder.svg"}
                         alt={community.name}
                         className="!rounded-lg"
                       />
