@@ -15,7 +15,7 @@ interface VideoPlaceholderProps {
 export default function VideoPlaceholder({
   title = "How GuildUp Transforms Your Coaching Journey",
   duration = "2:34",
-  thumbnail = "https://res.cloudinary.com/dzvdh7yez/image/upload/v1748794293/Screenshot_2025-06-01_214027_wiz2je.png",
+  thumbnail = "https://res.cloudinary.com/dzvdh7yez/image/upload/v1749150247/Screenshot_2025-06-06_003351_t9zwvy.png",
   videoUrl = "https://www.youtube.com/watch?v=lEmW6Vyi2qg",
   className = "",
 }: VideoPlaceholderProps) {
