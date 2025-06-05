@@ -445,7 +445,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
-                          <Link href="/profile">Profile</Link>
+                          <Link href="/dashboard">My Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
@@ -469,20 +469,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         >
                           <Link href="/blogs">Blogs</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          asChild
-                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                        >
-                          <Link href="/booking">Bookings</Link>
-                        </DropdownMenuItem>
-                        {isUser && (
-                          <DropdownMenuItem
-                            asChild
-                            className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                          >
-                            <Link href="/payments">Payments</Link>
-                          </DropdownMenuItem>
-                        )}
                         <DropdownMenuItem
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                           onClick={handleSignOut}
@@ -637,7 +623,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   asChild
                   className="hover:bg-primary-gradient border-b border-zinc-300"
                 >
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/dashboard">My Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
@@ -661,20 +647,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 >
                   <Link href="/blogs">Blogs</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
-                >
-                  <Link href="/booking">Bookings</Link>
-                </DropdownMenuItem>
-                {isUser && (
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:bg-primary-gradient border-b border-zinc-300"
-                  >
-                    <Link href="/payments">Payments</Link>
-                  </DropdownMenuItem>
-                )}
                 <DropdownMenuItem
                   className="hover:bg-primary-gradient"
                   onClick={handleSignOut}

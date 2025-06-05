@@ -23,6 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StringConstants } from "@/components/common/CommonText";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -49,7 +50,27 @@ interface User {
 }
 
 
+const ProfileRedirect = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to the new dashboard profile page
+    router.replace("/dashboard/profile");
+  }, [router]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-gray-600">Redirecting to your dashboard...</p>
+      </div>
+    </div>
+  );
+};
+
 const ProfilePage = () => {
+  return <ProfileRedirect />;
+  
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
   const [profile, setProfile] = React.useState<User | null>(null);
@@ -466,4 +487,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default ProfileRedirect;
