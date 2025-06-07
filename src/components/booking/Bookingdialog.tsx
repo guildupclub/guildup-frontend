@@ -21,15 +21,12 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { GoDotFill } from "react-icons/go";
-import {
-  loadRazorpayScript,
-  type RazorpayOptions,
-  type RazorpayResponse,
-} from "@/components/utils/razorpay";
+import { loadRazorpayScript } from "@/components/utils/razorpay";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRupeeSign } from "react-icons/fa";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -48,26 +45,11 @@ interface BookingDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
-// interface Offering {
-//   title: string;
-//   description: string;
-//   duration: number;
-//   price: {
-//     currency: string;
-//     amount: number;
-//   };
-// }
 
 interface TimeSlot {
   start: string;
   end: string;
 }
-
-// interface BookingDialogProps {
-//   isOpen: boolean;
-//   onClose: () => void;
-//   offering: Offering;
-// }
 
 export function BookingDialog({
   offering,
@@ -76,7 +58,6 @@ export function BookingDialog({
 }: BookingDialogProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
-
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -84,7 +65,6 @@ export function BookingDialog({
   const [bookingStep, setBookingStep] = useState<
     "date" | "time" | "confirmation"
   >("date");
-
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
 
@@ -95,17 +75,33 @@ export function BookingDialog({
   const user = useSelector((state: RootState) => state.user.user);
   const name = user?.name || "";
   const email = user?.email || "";
+
+  // Debug state changes
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+    console.log("BookingDialog State:", {
+      bookingSuccess,
+      isOpen,
+      bookingDetails,
+    });
+  }, [bookingSuccess, isOpen, bookingDetails]);
+
+  // Load Razorpay script on mount
+  useEffect(() => {
+    const loadScript = async () => {
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        console.error("Failed to load Razorpay script on mount");
+      }
+    };
+    loadScript();
   }, []);
 
+  // Set webinar-specific date and slot
   useEffect(() => {
     if (!offering) return;
 
     if (offering.type === "webinar") {
+      console.log("Setting webinar date and slot:", offering.when);
       setBookingStep("confirmation");
       const webinarDate = new Date(offering.when);
       setSelectedDate(webinarDate);
@@ -121,6 +117,7 @@ export function BookingDialog({
   const fetchAvailableSlots = async (date: Date) => {
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
+      console.log("Fetching available slots for date:", formattedDate);
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`,
         {
@@ -134,24 +131,28 @@ export function BookingDialog({
       console.log("Available slots:", response.data);
     } catch (error) {
       console.error("Error fetching slots:", error);
+      toast.error("Failed to fetch available slots");
     }
   };
 
   const handleDateSelect = (date: Date | undefined) => {
+    console.log("Date selected:", date);
     setSelectedDate(date);
     setSelectedSlot(null);
     setShowConfirmation(false);
     if (date) {
       fetchAvailableSlots(date);
-      setBookingStep("time"); // Add this line to change the view to time slots
+      setBookingStep("time");
     }
   };
 
   const handleBackToCalendar = () => {
+    console.log("Returning to calendar view");
     setBookingStep("date");
   };
 
   const handleSlotSelect = (slot: TimeSlot) => {
+    console.log("Slot selected:", slot);
     setSelectedSlot(slot);
     setShowConfirmation(true);
     setBookingStep("confirmation");
@@ -162,34 +163,30 @@ export function BookingDialog({
     return startHour >= 11 && startHour < 20; // 11 AM to 8 PM
   });
 
-  // const formatTime = (time: string) => {
-  //   const [hours, minutes] = time.split(":");
-  //   const date = new Date();
-  //   date.setHours(Number.parseInt(hours));
-  //   date.setMinutes(Number.parseInt(minutes));
-  //   return format(date, "h:mm a");
-  // };
-
-  // console.log("offfafhgwfvj:    ", offering);
+  const formatTime = (dateString: string) => {
+    return format(new Date(dateString), "hh:mm a");
+  };
 
   const handleBookSlot = async () => {
     setIsProcessing(true);
     if (!selectedDate || !selectedSlot) {
+      console.error("Missing date or slot:", { selectedDate, selectedSlot });
+      toast.error("Please select a date and time slot");
+      setIsProcessing(false);
       return;
     }
 
     try {
-      // First, submit user information to wati API
-      const phoneWithoutFormatting = phone.replace(/\D/g, ""); // Remove all non-digit characters
-
-      // Make sure phone has country code without + or spaces
+      // Validate and submit phone number to Wati API
+      const phoneWithoutFormatting = phone.replace(/\D/g, "");
       if (!phoneWithoutFormatting) {
+        console.error("Phone number is empty");
         toast.error("Phone number is required");
         setIsProcessing(false);
         return;
       }
 
-      // Submit user information to wati API
+      console.log("Submitting Wati API with phone:", phoneWithoutFormatting);
       const watiResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/profile/wati/addContact`,
         {
@@ -199,19 +196,27 @@ export function BookingDialog({
       );
 
       if (!watiResponse.data.data?.watiSync?.success) {
+        console.error("Wati API failed:", watiResponse.data);
         toast.error("Failed to register phone number");
         setIsProcessing(false);
         return;
       }
 
-      // Add your booking API call here
+      // Create booking order
       const dateObject = new Date(selectedSlot.start);
-
-      // Adjust for IST (UTC +5:30)
       dateObject.setMinutes(
         dateObject.getMinutes() - dateObject.getTimezoneOffset()
       );
       const startTime = dateObject.toISOString().slice(0, 19);
+
+      console.log("Creating order with payload:", {
+        offering_id: offering._id,
+        user_id: userId,
+        date: selectedDate,
+        slot: selectedSlot,
+        startTime,
+      });
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
@@ -224,187 +229,152 @@ export function BookingDialog({
       );
 
       if (response.data.r === "s") {
-        console.log("Order Created:", response.data.data);
+        console.log("Order Created Successfully:", response.data.data);
         if (offering.is_free) {
+          if (response.data.data) {
+            console.log(
+              "Setting booking details for free offering:",
+              response.data.data
+            );
+            setBookingDetails(response.data.data);
+            setBookingSuccess(true);
+            toast.success("Booking confirmed successfully!");
+          } else {
+            console.error(
+              "Invalid response data for free offering:",
+              response.data
+            );
+            toast.error("Failed to process free booking");
+            onClose();
+          }
           setIsProcessing(false);
-          // Store booking details and show success modal
-          setBookingDetails(response.data.data);
-          setBookingSuccess(true);
-          toast.success("Booking confirmed successfully!");
           return;
         }
-        // Start Razorpay payment process
+
+        // Ensure Razorpay script is loaded
+        console.log("Loading Razorpay script...");
+        const scriptLoaded = await loadRazorpayScript();
+        if (!scriptLoaded) {
+          console.error("Razorpay script failed to load");
+          toast.error("Failed to load payment gateway");
+          setIsProcessing(false);
+          onClose();
+          return;
+        }
+
+        // Initiate Razorpay payment for paid offerings
         const razorpayOptions = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
-          amount: response.data.data.amount, // Amount in paisa (100 INR = 10000)
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: response.data.data.amount,
           currency: response.data.data.currency || "INR",
-          name: "GuildUp", // Your business name
+          name: "GuildUp",
           description: "Slot Booking Payment",
-          order_id: response.data.data.id, // Razorpay order ID from backend
+          order_id: response.data.data.id,
           handler: async (paymentResponse: any) => {
-            console.log("Payment Success:", paymentResponse);
-            // After successful payment, call your backend to verify the payment
-            const dateObject = new Date(selectedSlot.start);
+            try {
+              console.log("Razorpay Payment Response:", paymentResponse);
+              const verifyResponse = await Promise.race([
+                axios.post(
+                  `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
+                  {
+                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                    razorpay_signature: paymentResponse.razorpay_signature,
+                    offering_id: offering._id,
+                    user_id: userId,
+                    startTime,
+                  }
+                ),
+                new Promise((_, reject) =>
+                  setTimeout(
+                    () => reject(new Error("Verification timeout")),
+                    10000
+                  )
+                ),
+              ]);
 
-            // Adjust for IST (UTC +5:30)
-            dateObject.setMinutes(
-              dateObject.getMinutes() - dateObject.getTimezoneOffset()
-            );
-            const startTime = dateObject.toISOString().slice(0, 19);
-
-            const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
-              {
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-                offering_id: offering._id,
-                user_id: userId, // Replace with actual user ID
-                startTime,
-              }
-            );
-
-            if (response.data.r === "s") {
-              setIsProcessing(false);
-              // Store booking details and show success modal
-              setBookingDetails(response.data.data);
-              setBookingSuccess(true);
-              setTimeout(() => {
+              const verifyData = (verifyResponse as { data: any }).data;
+              console.log(
+                "Payment Verification Response:",
+                verifyData
+              );
+              if (verifyData.r === "s") {
+                console.log("Payment verified, setting booking success...");
+                setBookingDetails(verifyData.data);
+                setBookingSuccess(true);
                 toast.success("Booking confirmed successfully!");
-              }, 300);
-              console.log("Booking confirmed successfully!");
-              // Don't close the dialog here
-            } else {
-              toast.error("Payment verification failed");
+              } else {
+                console.error(
+                  "Payment verification failed:",
+                  verifyData.message
+                );
+                toast.error(
+                  "Payment verification failed: " + verifyData.message
+                );
+                onClose();
+              }
+            } catch (error) {
+              console.error("Payment verification error:", error);
+              toast.error(
+                "Failed to verify payment: " +
+                  (error.message || "Unknown error")
+              );
               onClose();
             }
+          },
+          prefill: {
+            name: user?.name || "",
+            email: user?.email || "",
+            contact: phoneWithoutFormatting,
           },
           theme: {
             color: "#3399cc",
           },
         };
 
-        // @Developer Note:
-        // Before opening any new dialog box close the other boxes.
-
-        onClose();
+        console.log("Opening Razorpay modal with options:", razorpayOptions);
         const razorpayInstance = new window.Razorpay(razorpayOptions);
         razorpayInstance.open();
       } else {
-        console.error("Failed to create order:", response.data.message);
-        toast.error("Failed to create order");
+        console.error("Order creation failed:", response.data.message);
+        toast.error("Failed to create order: " + response.data.message);
+        onClose();
       }
     } catch (error) {
       console.error("Error booking slot:", error);
-      toast.error("Failed to process booking");
+      toast.error(
+        "Failed to process booking: " + (error.message || "Unknown error")
+      );
+      onClose();
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const formatTime = (dateString: string) => {
-    return format(new Date(dateString), "hh:mm a");
-  };
-
-  // const [isProcessing, setIsProcessing] = useState(false);
-  // const user = useSelector((state: RootState) => state?.user?.user);
-
-  const handlePayment = async (orderId: string) => {
-    const scriptLoaded = await loadRazorpayScript();
-    if (!scriptLoaded) {
-      toast.error("Failed to load payment gateway");
-      return;
-    }
-
-    const options: RazorpayOptions = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: offering.price.amount * 100, // Amount in smallest currency unit
-      currency: offering.price.currency,
-      name: "GuildUp",
-      description: `Booking for ${offering.title}`,
-      order_id: orderId,
-      handler: (response: RazorpayResponse) => {
-        handlePaymentVerification(response);
-      },
-      prefill: {
-        name: user?.name || "",
-        email: user?.email || "",
-      },
-      notes: {
-        offering_id: offering._id,
-      },
-      theme: {
-        color: "#2563EB",
-      },
-    };
-
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
-  };
-
-  const handlePaymentVerification = async (paymentResponse: any) => {
-    try {
-      console.log("Payment response:", paymentResponse);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/verify-payment`,
-        {
-          razorpay_payment_id: paymentResponse.razorpay_payment_id,
-          razorpay_order_id: paymentResponse.razorpay_order_id,
-          razorpay_signature: paymentResponse.razorpay_signature,
-          user_id: user?._id,
-          offering_id: offering._id,
-          startTime: selectedSlot!.start,
-        }
-      );
-
-      if (response.data.booking) {
-        // Don't close the dialog here
-        setIsProcessing(false);
-        // Store booking details and show success modal
-        setBookingDetails(response.data.booking);
-        setBookingSuccess(true);
-        toast.success("Booking confirmed successfully!");
-        console.log("Booking confirmed successfully!");
-      } else {
-        toast.error("Payment verification failed");
-        onClose();
-      }
-    } catch (error) {
-      console.error("Payment verification error:", error);
-      onClose();
-    }
-    setIsProcessing(false);
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <div className="flex justify-center items-center  ">
-        <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted  border border-border/50 rounded-xl shadow-xl  ">
-          <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0 ">
+      <div className="flex justify-center items-center">
+        <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted border border-border/50 rounded-xl shadow-xl">
+          <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Left Section - Welcome Panel */}
             <div className="p-8 flex flex-col items-center text-center border-r border-border/20">
               <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm">
-                {/* Title */}
                 <h1 className="text-muted font-bold text-2xl">
                   Hello {user?.name}
                 </h1>
-
-                {/* Avatar */}
                 <div className="relative w-24 h-24 mx-auto my-4">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
                   <img
                     src={
                       activeCommunity?.image ||
-                      "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh" ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg"
+                      `https://api.dicebear.com/7.x/avataaars/svg?seed=${
+                        user?.name || "adarsh"
+                      }`
                     }
                     alt="User"
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-md"
                   />
                 </div>
-
                 <div className="text-center space-y-2">
                   <p className="text-xl font-semibold text-primary">
                     Booking {offering.title}
@@ -414,9 +384,7 @@ export function BookingDialog({
                     {offering?.type}
                   </p>
                 </div>
-                {/* Details (Duration & Price) */}
                 <div className="grid grid-cols-2 gap-4 w-full mt-4 px-2 py-4 bg-primary-muted/20 rounded-lg">
-                  {/* Duration */}
                   <div className="flex items-center gap-2">
                     <Clock className="w-5 h-5 text-blue-500 shrink-0" />
                     <div className="text-left">
@@ -426,8 +394,6 @@ export function BookingDialog({
                       </p>
                     </div>
                   </div>
-
-                  {/* Price */}
                   <div className="flex items-center gap-2">
                     <FaRupeeSign className="h-5 w-5 text-green-500 shrink-0" />
                     <div className="text-left">
@@ -447,7 +413,7 @@ export function BookingDialog({
             {/* Right Section - Booking Panel */}
             <div className="p-6 bg-background">
               <DialogHeader className="mb-6">
-                <DialogTitle className="text-2xl font-bold  text-center">
+                <DialogTitle className="text-2xl font-bold text-center">
                   Fill Basic Information for Booking
                 </DialogTitle>
               </DialogHeader>
@@ -467,7 +433,7 @@ export function BookingDialog({
                         mode="single"
                         selected={selectedDate}
                         onSelect={handleDateSelect}
-                        className="rounded-md border-none shadow-none "
+                        className="rounded-md border-none shadow-none"
                         disabled={(date) => date < new Date()}
                       />
                     </div>
@@ -492,19 +458,17 @@ export function BookingDialog({
                         variant="default"
                         size="sm"
                         onClick={handleBackToCalendar}
-                        className="flex items-center gap-1 text-white "
+                        className="flex items-center gap-1 text-white"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Change Date
                       </Button>
                     </div>
-
                     <div className="bg-card/30 p-4 rounded-lg border border-border/30 shadow-sm">
                       <p className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
                         <CalendarIcon className="w-4 h-4 text-primary/70" />
                         {format(selectedDate!, "PPP")}
                       </p>
-
                       <div className="grid grid-cols-2 gap-3">
                         {filteredSlots.map((slot, index) => (
                           <Button
@@ -531,23 +495,6 @@ export function BookingDialog({
                     className="space-y-6"
                   >
                     <div className="bg-card/30 p-6 rounded-lg space-y-6 shadow-sm border border-border/30">
-                      {/* <div className="space-y-3">
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                          <CalendarIcon className="w-5 h-5 text-primary" />
-                          Selected Date & Time
-                        </h3>
-                        <div className="bg-background/50 p-3 rounded-md text-sm text-muted-foreground">
-                          <p className="font-medium text-foreground">
-                            {format(selectedDate!, "PPP")}
-                          </p>
-                          <p className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-primary/70" />
-                            {formatTime(selectedSlot!.start)} -{" "}
-                            {formatTime(selectedSlot!.end)}
-                          </p>
-                        </div>
-                      </div> */}
-
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <label htmlFor="phone" className="font-medium">
@@ -567,7 +514,6 @@ export function BookingDialog({
                             confirmation
                           </p>
                         </div>
-
                         <div className="space-y-2">
                           <label htmlFor="name">Name</label>
                           <input
@@ -579,7 +525,6 @@ export function BookingDialog({
                             disabled
                           />
                         </div>
-
                         <div className="space-y-2">
                           <label htmlFor="email">Email</label>
                           <input
@@ -592,49 +537,12 @@ export function BookingDialog({
                           />
                         </div>
                       </div>
-
-                      {/* <div className="space-y-3 pt-2 border-t border-border/30"> */}
-                      {/* <h3 className="font-semibold text-lg flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-primary" />
-                          Offering Details
-                        </h3>
-                        <p className="text-sm text-muted-foreground whitespace-pre-line">
-                          {offering.description}
-                        </p> */}
-
-                      {/* <div className="grid grid-cols-2 gap-2 pt-2"> */}
-                      {/* <div className="bg-background/50 p-3 rounded-md flex items-center gap-2"> */}
-                      {/* <Clock className="w-4 h-4 text-primary/70" /> */}
-                      {/* <div>
-                              <p className="text-xs text-muted-foreground">
-                                Duration
-                              </p>
-                              <p className="text-sm font-medium">
-                                {offering.duration} minutes
-                              </p>
-                            </div> */}
-                      {/* </div> */}
-                      {/* <div className="bg-background/50 p-3 rounded-md flex items-center gap-2"> */}
-                      {/* <FaRupeeSign className="h-5 w-5 text-green-500" /> */}
-                      {/* <div> */}
-                      {/* <p className="text-xs text-muted-foreground"> */}
-                      {/* Price */}
-                      {/* </p> */}
-                      {/* <p className="text-sm font-medium"> */}
-                      {/* {offering.price.currency}{" "} */}
-                      {/* {offering.discounted_price || */}
-                      {/* offering.price.amount} */}
-                      {/* </p> */}
-                      {/* </div> */}
-                      {/* </div> */}
-                      {/* </div> */}
-                      {/* </div> */}
                     </div>
-
                     <div className="flex justify-end gap-3 pt-2">
                       <Button
                         variant="outline"
                         onClick={() => {
+                          console.log("Back button clicked");
                           setShowConfirmation(false);
                           setBookingStep("time");
                         }}
@@ -645,7 +553,7 @@ export function BookingDialog({
                       </Button>
                       <Button
                         onClick={handleBookSlot}
-                        className="bg-primary  hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
+                        className="bg-primary hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
                         disabled={isProcessing}
                       >
                         {isProcessing ? (
@@ -672,7 +580,9 @@ export function BookingDialog({
         <Dialog
           open={bookingSuccess}
           onOpenChange={() => {
+            console.log("Closing confirmation dialog");
             setBookingSuccess(false);
+            setBookingDetails(null);
             onClose();
           }}
         >
@@ -688,16 +598,13 @@ export function BookingDialog({
                 Your booking has been successfully confirmed.
               </p>
             </div>
-
             <div className="space-y-4 mb-6">
               <div className="bg-background p-4 rounded-lg">
-                <h2 className="text-center font-semibold">Booking Detaills </h2>
-
+                <h2 className="text-center font-semibold">Booking Details</h2>
                 <div>
                   <p className="text-muted-foreground">Service Name</p>
                   <p className="font-medium">{offering.title}</p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <p className="text-muted-foreground">Date</p>
@@ -705,7 +612,6 @@ export function BookingDialog({
                       {selectedDate ? format(selectedDate, "PPP") : "N/A"}
                     </p>
                   </div>
-
                   <div>
                     <p className="text-muted-foreground">Time</p>
                     <p className="font-medium">
@@ -716,12 +622,10 @@ export function BookingDialog({
                         : "N/A"}
                     </p>
                   </div>
-
                   <div>
                     <p className="text-muted-foreground">Duration</p>
                     <p className="font-medium">{offering.duration} minutes</p>
                   </div>
-
                   <div>
                     <p className="text-muted-foreground">Price</p>
                     <p className="font-medium">
@@ -735,12 +639,13 @@ export function BookingDialog({
                 </div>
               </div>
             </div>
-
             <div className="flex gap-3 justify-center">
               <Button
                 variant="outline"
                 onClick={() => {
+                  console.log("Close button clicked");
                   setBookingSuccess(false);
+                  setBookingDetails(null);
                   onClose();
                 }}
               >
@@ -748,7 +653,9 @@ export function BookingDialog({
               </Button>
               <Button
                 onClick={() => {
+                  console.log("Go to Bookings button clicked");
                   setBookingSuccess(false);
+                  setBookingDetails(null);
                   onClose();
                   window.location.href = "/booking";
                 }}
