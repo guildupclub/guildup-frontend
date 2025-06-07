@@ -252,29 +252,34 @@ export function BookingDialog({
             );
             const startTime = dateObject.toISOString().slice(0, 19);
 
-            const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
-              {
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-                offering_id: offering._id,
-                user_id: userId, // Replace with actual user ID
-                startTime,
-              }
-            );
+            try {
+              const response = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
+                {
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                  offering_id: offering._id,
+                  user_id: userId,
+                  startTime,
+                }
+              );
 
-            if (response.data.r === "s") {
-              setIsProcessing(false);
-              // Store booking details and show success modal
-              setBookingDetails(response.data.data);
-              setBookingSuccess(true);
-              setTimeout(() => {
-                toast.success("Booking confirmed successfully!");
-              }, 300);
-              console.log("Booking confirmed successfully!");
-              // Don't close the dialog here
-            } else {
+              if (response.data.r === "s") {
+                setIsProcessing(false);
+                // Store booking details and show success modal
+                setBookingDetails(response.data.data);
+                setBookingSuccess(true); // Set this before closing the dialog
+                setTimeout(() => {
+                  toast.success("Booking confirmed successfully!");
+                }, 300);
+                console.log("Booking confirmed successfully!");
+              } else {
+                toast.error("Payment verification failed");
+                onClose();
+              }
+            } catch (error) {
+              console.error("Payment verification error:", error);
               toast.error("Payment verification failed");
               onClose();
             }
