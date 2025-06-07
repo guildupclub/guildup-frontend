@@ -27,11 +27,11 @@ export const metadata: Metadata = {
     title: "GuildUp",
     description:
       "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help.",
-    url: "/guildup_logo_final.png",
+    url: "https://guildup.club",
     siteName: "GuildUp",
     images: [
       {
-        url: "https://guildup.club/og-image-v2.png",
+        url: "/guildup-logo.png",
         width: 1200,
         height: 630,
         alt: "GuildUp Open Graph Image",
