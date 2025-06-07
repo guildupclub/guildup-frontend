@@ -1,8 +1,6 @@
 "use client";
-import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
-import { API_BASE_URL } from "../config/constants";
-import CommunitySection from "@/components/explore/CommunitySection";
+import EnhancedCommunitySection from "@/components/community/enhanced-community-section";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
@@ -15,14 +13,14 @@ import React, {
   useCallback,
 } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 import Hero from "@/components/heroSection/HeroSection";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
@@ -46,7 +44,6 @@ function SearchParamsProvider({
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Handle category from URL
     const categoryFromUrl = searchParams?.get("category");
     onCategoryFromUrl(categoryFromUrl ?? null);
   }, [searchParams, onCategoryFromUrl]);
@@ -77,6 +74,7 @@ function Page() {
   const { scrollY } = useScroll();
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
   const userId = session?.user._id;
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -108,17 +106,14 @@ function Page() {
     }
   }, [session, status, isMounted, router]);
 
-  // Convert category name to URL-friendly format
   const categoryToUrl = (name: string) => {
     return name.replace(/\s+/g, "-");
   };
 
-  // Convert URL-friendly format back to category name
   const urlToCategory = (url: string) => {
     return url.replace(/-/g, " ");
   };
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -138,14 +133,12 @@ function Page() {
     fetchCategory();
   }, []);
 
-  // Update URL when category changes
   useEffect(() => {
     if (!category.length) return;
 
     if (selectedCategory === "All Category") {
       router.replace("/", { scroll: false });
     } else {
-      // Convert category name to URL-friendly format
       router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
         scroll: false,
       });
@@ -175,10 +168,8 @@ function Page() {
   };
 
   const handleCategorySelect = (categoryId: string) => {
-    // Start loading immediately to clear current content
     setIsLoading(true);
 
-    // Update category state
     const selectedCat = category.find(
       (cat: Category) => cat._id === categoryId
     );
@@ -190,7 +181,6 @@ function Page() {
       setSelectedCategoryId("all");
     }
 
-    // Perform scrolling immediately without timeout
     if (targetRef.current) {
       const headerOffset = 145;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
@@ -202,17 +192,15 @@ function Page() {
       });
     }
 
-    // Stop loading immediately
     setIsLoading(false);
   };
 
-  // Add scroll handler to detect when header becomes sticky
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([e]) => {
         setIsSticky(!e.isIntersecting);
       },
-      { threshold: [1], rootMargin: "-200px 0px 0px 0px" } // 64px (top-16) + 20px offset
+      { threshold: [1], rootMargin: "-200px 0px 0px 0px" }
     );
 
     if (stickyTriggerRef.current) {
@@ -224,7 +212,6 @@ function Page() {
     };
   }, []);
 
-  // Handle category from URL
   const handleCategoryFromUrl = useCallback(
     (categoryFromUrl: string | null) => {
       if (categoryFromUrl && category.length > 0) {
@@ -242,14 +229,11 @@ function Page() {
     [category]
   );
 
-  // Add scroll handler to detect when hero section is visible
   useEffect(() => {
     if (!heroRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Consider the hero "visible" only if more than 20% is showing
-        // This means the search bar appears when 80% or more is out of view
         const visiblePercentage = entry.intersectionRatio;
         dispatch(setHeroVisible(visiblePercentage > 0.2));
       },
@@ -325,34 +309,7 @@ function Page() {
               </div>
               <VideoPlaceholder className="mb-16" />
             </div>
-            {/* {!isCreator && (
-              <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4 ">
-                <h2 className="text-xl font-semibold">
-                  Join or create a community to start interacting with other
-                  members.
-                </h2>
-                <div className="flex gap-4 mt-4">
-                  <Button onClick={handleScroll} className="px-2 py-1 ">
-                    Explore Communities
-                  </Button>
-                  <Dialog
-                    open={session ? isDialogOpen : false}
-                    onOpenChange={setIsDialogOpen}
-                  >
-                    <Button
-                      className="px-2 py-1 "
-                      onClick={handleCreatorButtonClick}
-                    >
-                      {StringConstants.CREATE_A_PAGE}
-                    </Button>
 
-                    {session && (
-                      <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                    )}
-                  </Dialog>
-                </div>
-              </div>
-            )} */}
             <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
               <div className="py-6 sm:py-10 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50/30">
                 <div className="flex flex-col gap-6 sm:gap-8">
@@ -462,7 +419,7 @@ function Page() {
                 </div>
               </div>
 
-              {/* Main Content */}
+              {/* Main Content with Enhanced Filtering */}
               <div className="pt-3 sm:pt-6">
                 <div className="flex-1 min-w-0" ref={targetRef}>
                   <div className="rounded-xl sm:rounded-2xl">
@@ -473,7 +430,9 @@ function Page() {
                     {isLoading ? (
                       <Loader />
                     ) : (
-                      <CommunitySection activeCategory={selectedCategoryId} />
+                      <EnhancedCommunitySection
+                        activeCategory={selectedCategoryId}
+                      />
                     )}
                   </div>
                 </div>
