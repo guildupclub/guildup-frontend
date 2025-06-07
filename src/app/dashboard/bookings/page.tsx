@@ -114,7 +114,7 @@ const DashboardBookingsPage = () => {
             <div className="text-sm text-gray-600">Upcoming</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-semibold text-green-600">{completedBookings.length}</div>
+            <div className="text-lg font-semibold text-blue-500">{completedBookings.length}</div>
             <div className="text-sm text-gray-600">Completed</div>
           </div>
         </div>
@@ -168,26 +168,26 @@ const DashboardBookingsPage = () => {
 
       {/* Tabs for different views */}
       <Tabs defaultValue="upcoming" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="upcoming" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-3 bg-blue-50 p-1">
+          <TabsTrigger value="upcoming" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white text-blue-700">
             <Calendar className="h-4 w-4" />
             Upcoming
             {upcomingBookings.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge variant="secondary" className="ml-1 bg-blue-100 text-blue-800">
                 {upcomingBookings.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="completed" className="flex items-center gap-2">
+          <TabsTrigger value="completed" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white text-blue-700">
             <User className="h-4 w-4" />
             Completed
             {completedBookings.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge variant="secondary" className="ml-1 bg-blue-100 text-blue-800">
                 {completedBookings.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="availability" className="flex items-center gap-2">
+          <TabsTrigger value="availability" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white text-blue-700">
             <Clock className="h-4 w-4" />
             Set Availability
           </TabsTrigger>
@@ -211,11 +211,11 @@ const DashboardBookingsPage = () => {
                     <BookingCard
                       key={booking._id}
                       profileImage="/default-profile.jpg"
-                      name={booking.offering_id?.community_id?.name || "Community"}
+                      name={booking.offering_id?.community_id?.name}
                       role={booking.offering_id?.type}
                       service={booking.offering_id?.title}
                       host={booking.provider_id?.name}
-                      guest={booking?.client_id?.name || "Guest"}
+                      guest={booking?.client_id?.name}
                       bookedOn={new Date(booking?.start_time).toLocaleString()}
                       amount={booking.offering_id?.price?.amount}
                       status="upcoming"
@@ -245,11 +245,11 @@ const DashboardBookingsPage = () => {
                     <BookingCard
                       key={booking._id}
                       profileImage="/default-profile.jpg"
-                      name={booking.offering_id?.community_id?.name || "Community"}
+                      name={booking.offering_id?.community_id?.name}
                       role={booking.offering_id?.type}
                       service={booking.offering_id?.title}
                       host={booking.provider_id?.name}
-                      guest={booking?.client_id?.name || "Guest"}
+                      guest={booking?.client_id?.name}
                       bookedOn={new Date(booking?.start_time).toLocaleString()}
                       amount={booking.offering_id?.price?.amount}
                       status="completed"

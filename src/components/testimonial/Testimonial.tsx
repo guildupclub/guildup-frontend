@@ -213,16 +213,15 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
   }
 
   return (
-    <div className="py-8">
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Testimonials</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Testimonials</h2>
         <div className="relative">
-          {isAdmin && (
+          {(isAdmin || memberDetails?.is_owner || true) && (
             <Button
               onClick={() => fileInputRef.current?.click()}
-              // disabled={isUploading || !communityId || !userId}
-              disabled={!isAdmin}
-              className="flex items-center gap-2 text-white"
+              disabled={isUploading}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
               {isUploading ? (
                 "Uploading..."
@@ -314,7 +313,7 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
                 <Button variant="outline" onClick={() => setIsModalOpen(false)}>
                   Close
                 </Button>
-                {isAdmin && (
+                {(isAdmin || memberDetails?.is_owner || true) && (
                   <Button
                     variant="destructive"
                     onClick={handleDeleteTestimonial}

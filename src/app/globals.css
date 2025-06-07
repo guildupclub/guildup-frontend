@@ -190,6 +190,22 @@
   }
 }
 
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Hide scrollbars for horizontal scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 @theme inline {
   --animate-scroll: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
 

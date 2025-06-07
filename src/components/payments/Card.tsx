@@ -122,7 +122,7 @@ const Dashboard = () => {
         Financial Overview
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {/* Balance Card */}
         <Card className="overflow-hidden border-slate-200 transition-all duration-200 hover:shadow-md">
           <CardHeader className="pb-2 pt-6">
@@ -195,38 +195,7 @@ const Dashboard = () => {
           </CardFooter>
         </Card>
 
-        {/* Bank Details Card */}
-        <Card className="overflow-hidden border-slate-200 transition-all duration-200 hover:shadow-md">
-          <CardHeader className="pb-2 pt-6">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-base font-medium text-slate-600">
-                Bank Details
-              </CardTitle>
-              <Building2 className="h-5 w-5 text-amber-500" />
-            </div>
-          </CardHeader>
-          <CardContent className="flex flex-col h-[calc(100%-80px)] justify-end">
-            {loading ? (
-              <Skeleton className="h-10 w-full mt-2" />
-            ) : (
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full mt-2 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                  >
-                    <span>Update Bank Details</span>
-                    <ArrowUpRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </DialogTrigger>
-                <BankDetails onClose={() => setIsDialogOpen(false)} />
-              </Dialog>
-            )}
-          </CardContent>
-          <CardFooter className="pt-0 pb-4">
-            <p className="text-xs text-slate-500">For receiving payments</p>
-          </CardFooter>
-        </Card>
+
       </div>
 
       {/* Loading Overlay */}

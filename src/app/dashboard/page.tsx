@@ -67,20 +67,20 @@ const DashboardOverview = () => {
       buttonText: "View All"
     },
     {
+      title: "My Guild",
+      description: "Manage your communities and guild",
+      href: "/dashboard/guild",
+      icon: Users,
+      color: "bg-indigo-50 text-indigo-600",
+      buttonText: "View Guild"
+    },
+    {
       title: "Check Payments",
       description: "Review earnings and transactions",
       href: "/dashboard/payments",
       icon: CreditCard,
       color: "bg-green-50 text-green-600",
       buttonText: "View Wallet"
-    },
-    {
-      title: "Update Profile",
-      description: "Keep your information current",
-      href: "/dashboard/profile",
-      icon: Users,
-      color: "bg-purple-50 text-purple-600",
-      buttonText: "Edit Profile"
     }
   ];
 
@@ -222,7 +222,7 @@ const DashboardOverview = () => {
       </div>
 
       {/* Performance Summary */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>This Month's Performance</CardTitle>
         </CardHeader>
@@ -242,7 +242,7 @@ const DashboardOverview = () => {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

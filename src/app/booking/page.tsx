@@ -21,13 +21,18 @@ interface Booking {
     description: string;
     type: string;
     duration: number;
+    community_id?: {
+      name: string;
+    };
   };
   provider_id: {
     _id: string;
     name: string;
     email: string;
   };
-  client_id: string;
+  client_id: string | {
+    name: string;
+  };
   start_time: string;
   status: string;
   payment_status: string;
@@ -158,7 +163,7 @@ const BookingPage = () => {
                 role={booking.offering_id?.type}
                 service={booking.offering_id?.title}
                 host={booking.provider_id?.name}
-                guest={booking?.client_id?.name}
+                guest={typeof booking.client_id === 'object' ? booking.client_id?.name : booking.client_id}
                 bookedOn={new Date(booking?.start_time).toLocaleString()}
                 amount={booking.offering_id?.price?.amount}
               />

@@ -445,7 +445,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
-                          <Link href="/dashboard">My Dashboard</Link>
+                          <Link href="/dashboard/guild">My Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
