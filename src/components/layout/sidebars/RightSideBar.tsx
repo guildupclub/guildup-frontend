@@ -116,8 +116,8 @@ export function RightSidebar() {
               className="w-full text-white shadow-md"
               onClick={handleCreatorButtonClick}
             >
-              <span className="text-amber-300 hidden sm:inline">👋</span>{" "}
-              {StringConstants.CREATE_A_PAGE}
+              {/* <span className="text-amber-300 hidden sm:inline">👋</span> */}
+              Join as Expert
             </Button>
 
             {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}

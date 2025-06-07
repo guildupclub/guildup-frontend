@@ -23,6 +23,23 @@ export const metadata: Metadata = {
   title: "GuildUp",
   description:
     "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+  openGraph: {
+    title: "GuildUp",
+    description:
+      "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help.",
+    url: "/guildup_logo_final.png",
+    siteName: "GuildUp",
+    images: [
+      {
+        url: "https://guildup.club/og-image-v2.png",
+        width: 1200,
+        height: 630,
+        alt: "GuildUp Open Graph Image",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
   generator: "Next.js",
   manifest: "/manifest.json",
   applicationName: "GuildUp Club",
@@ -47,11 +64,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+        />
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
-        
+
         {/* PWA Meta Tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -59,7 +79,7 @@ export default async function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-        
+
         {/* Do not remove these script */}
         <script
           async
@@ -74,7 +94,7 @@ export default async function RootLayout({
           gtag('config', 'G-B3B9W8GRQP');
           `}
         </script>
-        
+
         {/* Service Worker Registration */}
         <script>
           {`

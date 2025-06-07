@@ -384,11 +384,11 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">
-                            Sign up, it&apos;s free
+                          <span className="relative z-10 font-medium">
+                            Join as Expert{" "}
                           </span>
                           <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
@@ -423,10 +423,10 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group relative overflow-hidden flex items-center gap-3 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] border border-primary/20 text-lg"
+                          className="group relative overflow-hidden flex items-center gap-3  hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] px-6"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">Join Now</span>
+                          <span className="relative z-10">Join as Expert</span>
                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
                       </DialogTrigger>
