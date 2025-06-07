@@ -175,21 +175,20 @@ export function BookingDialog({
   const handleBookSlot = async () => {
     setIsProcessing(true);
     if (!selectedDate || !selectedSlot) {
+      setIsProcessing(false);
       return;
     }
 
     try {
-      // First, submit user information to wati API
-      const phoneWithoutFormatting = phone.replace(/\D/g, ""); // Remove all non-digit characters
-
-      // Make sure phone has country code without + or spaces
+      // Phone validation
+      const phoneWithoutFormatting = phone.replace(/\D/g, "");
       if (!phoneWithoutFormatting) {
         toast.error("Phone number is required");
         setIsProcessing(false);
         return;
       }
 
-      // Submit user information to wati API
+      // Register phone with Wati
       const watiResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/profile/wati/addContact`,
         {
@@ -204,14 +203,13 @@ export function BookingDialog({
         return;
       }
 
-      // Add your booking API call here
+      // Create order
       const dateObject = new Date(selectedSlot.start);
-
-      // Adjust for IST (UTC +5:30)
       dateObject.setMinutes(
         dateObject.getMinutes() - dateObject.getTimezoneOffset()
       );
       const startTime = dateObject.toISOString().slice(0, 19);
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
@@ -224,80 +222,86 @@ export function BookingDialog({
       );
 
       if (response.data.r === "s") {
-        console.log("Order Created:", response.data.data);
+        // Handle free offerings
         if (offering.is_free) {
-          setIsProcessing(false);
-          // Store booking details and show success modal
           setBookingDetails(response.data.data);
           setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
+          setIsProcessing(false);
           return;
         }
-        // Start Razorpay payment process
+
+        // Handle paid offerings
         const razorpayOptions = {
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
-          amount: response.data.data.amount, // Amount in paisa (100 INR = 10000)
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: response.data.data.amount,
           currency: response.data.data.currency || "INR",
-          name: "GuildUp", // Your business name
-          description: "Slot Booking Payment",
-          order_id: response.data.data.id, // Razorpay order ID from backend
+          name: "GuildUp",
+          description: `Booking for ${offering.title}`,
+          order_id: response.data.data.id,
+          prefill: {
+            name: user?.name || "",
+            email: user?.email || "",
+            contact: phoneWithoutFormatting,
+          },
           handler: async (paymentResponse: any) => {
-            console.log("Payment Success:", paymentResponse);
-            // After successful payment, call your backend to verify the payment
-            const dateObject = new Date(selectedSlot.start);
+            try {
+              const verificationResponse = await axios.post(
+                `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
+                {
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                  offering_id: offering._id,
+                  user_id: userId,
+                  startTime,
+                }
+              );
 
-            // Adjust for IST (UTC +5:30)
-            dateObject.setMinutes(
-              dateObject.getMinutes() - dateObject.getTimezoneOffset()
-            );
-            const startTime = dateObject.toISOString().slice(0, 19);
-
-            const response = await axios.post(
-              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
-              {
-                razorpay_order_id: paymentResponse.razorpay_order_id,
-                razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                razorpay_signature: paymentResponse.razorpay_signature,
-                offering_id: offering._id,
-                user_id: userId, // Replace with actual user ID
-                startTime,
-              }
-            );
-
-            if (response.data.r === "s") {
-              setIsProcessing(false);
-              // Store booking details and show success modal
-              setBookingDetails(response.data.data);
-              setBookingSuccess(true);
-              setTimeout(() => {
+              if (verificationResponse.data.r === "s") {
+                // Important: Update states in this order
+                setIsProcessing(false);
+                setBookingDetails(verificationResponse.data.data);
+                setBookingSuccess(true);
                 toast.success("Booking confirmed successfully!");
-              }, 300);
-              console.log("Booking confirmed successfully!");
-              // Don't close the dialog here
-            } else {
+              } else {
+                setIsProcessing(false);
+                toast.error("Payment verification failed");
+              }
+            } catch (error) {
+              setIsProcessing(false);
+              console.error("Payment verification error:", error);
               toast.error("Payment verification failed");
-              onClose();
             }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessing(false);
+            },
+            escape: true,
+            backdrop_close: true,
           },
           theme: {
             color: "#3399cc",
           },
         };
 
-        // @Developer Note:
-        // Before opening any new dialog box close the other boxes.
+        // Create new instance for each payment attempt
+        const razorpay = new window.Razorpay(razorpayOptions);
 
-        onClose();
-        const razorpayInstance = new window.Razorpay(razorpayOptions);
-        razorpayInstance.open();
+        // Handle any errors during Razorpay initialization
+        razorpay.on("payment.failed", function (response: any) {
+          setIsProcessing(false);
+          toast.error("Payment failed. Please try again.");
+        });
+
+        razorpay.open();
       } else {
-        console.error("Failed to create order:", response.data.message);
-        toast.error("Failed to create order");
+        throw new Error("Failed to create order");
       }
     } catch (error) {
       console.error("Error booking slot:", error);
       toast.error("Failed to process booking");
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -308,73 +312,6 @@ export function BookingDialog({
 
   // const [isProcessing, setIsProcessing] = useState(false);
   // const user = useSelector((state: RootState) => state?.user?.user);
-
-  const handlePayment = async (orderId: string) => {
-    const scriptLoaded = await loadRazorpayScript();
-    if (!scriptLoaded) {
-      toast.error("Failed to load payment gateway");
-      return;
-    }
-
-    const options: RazorpayOptions = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-      amount: offering.price.amount * 100, // Amount in smallest currency unit
-      currency: offering.price.currency,
-      name: "GuildUp",
-      description: `Booking for ${offering.title}`,
-      order_id: orderId,
-      handler: (response: RazorpayResponse) => {
-        handlePaymentVerification(response);
-      },
-      prefill: {
-        name: user?.name || "",
-        email: user?.email || "",
-      },
-      notes: {
-        offering_id: offering._id,
-      },
-      theme: {
-        color: "#2563EB",
-      },
-    };
-
-    const razorpay = new (window as any).Razorpay(options);
-    razorpay.open();
-  };
-
-  const handlePaymentVerification = async (paymentResponse: any) => {
-    try {
-      console.log("Payment response:", paymentResponse);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/verify-payment`,
-        {
-          razorpay_payment_id: paymentResponse.razorpay_payment_id,
-          razorpay_order_id: paymentResponse.razorpay_order_id,
-          razorpay_signature: paymentResponse.razorpay_signature,
-          user_id: user?._id,
-          offering_id: offering._id,
-          startTime: selectedSlot!.start,
-        }
-      );
-
-      if (response.data.booking) {
-        // Don't close the dialog here
-        setIsProcessing(false);
-        // Store booking details and show success modal
-        setBookingDetails(response.data.booking);
-        setBookingSuccess(true);
-        toast.success("Booking confirmed successfully!");
-        console.log("Booking confirmed successfully!");
-      } else {
-        toast.error("Payment verification failed");
-        onClose();
-      }
-    } catch (error) {
-      console.error("Payment verification error:", error);
-      onClose();
-    }
-    setIsProcessing(false);
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
