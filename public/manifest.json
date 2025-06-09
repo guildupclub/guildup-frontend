@@ -1,34 +1,40 @@
 {
-    "name": "GuildUp",
-    "short_name": "GuildUp",
-    "description": "Connect and grow with your community on GuildUp.",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#0A0A0A",
-    "orientation": "portrait",
-    "icons": [
-      {
-        "src": "/icons/frame-48.png",
-        "type": "image/png",
-        "sizes": "48x48"
-      },
-      {
-        "src": "/icons/frame-64.png",
-        "type": "image/png",
-        "sizes": "64x64"
-      },
-      {
-        "src": "/icons/frame-180.png",
-        "type": "image/png",
-        "sizes": "180x180",
-        "purpose": "any maskable"
-      },
-      {
-        "src": "/icons/frame-192.png",
-        "type": "image/png",
-        "sizes": "192x192"
-      }
-    ]
-  }
-  
+  "name": "GuildUp",
+  "short_name": "GuildUp",
+  "description": "Connect and grow with your community on GuildUp.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0A0A0A",
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/frame-48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "/icons/frame-64.png",
+      "type": "image/png",
+      "sizes": "64x64"
+    },
+    {
+      "src": "/icons/frame-180.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/frame-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/frame-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
