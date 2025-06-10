@@ -488,7 +488,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
               <div className="text-xs text-primary mb-1 font-medium">Step 5 of 5</div>
               <h3 className="text-base font-semibold mb-1">Add your phone number</h3>
               <p className="text-xs text-muted-foreground px-2 opacity-75">
-                We'll use this to send you updates about bookings and important notifications
+                We&apos;ll use this to send you updates about bookings and important notifications
               </p>
             </div>
             <div className="flex-1 flex flex-col space-y-2 min-h-0">
