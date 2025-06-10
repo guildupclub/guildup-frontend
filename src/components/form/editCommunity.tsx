@@ -205,14 +205,14 @@ export function EditCommunityModal({
       formDataToSend.append("description", formData.description);
       formDataToSend.append("userId", userId);
 
-      // Add tags as a comma-separated string
-      formDataToSend.append("additional_tags", formData.tags.join(","));
-      formDataToSend.append(
-        "instagram_followers",
-        formData.instagram_followers
-      );
-      formDataToSend.append("youtube_followers", formData.youtube_followers);
-      formDataToSend.append("linkedin_followers", formData.linkedin_followers);
+      // Clean and add tags - fix TypeScript error
+      const cleanedTags = formData.tags.map((tag: string) => tag.replace(/[\[\]{}()]/g, '').trim()).filter(Boolean);
+      formDataToSend.append("additional_tags", cleanedTags.join(","));
+
+      // Add numeric fields
+      formDataToSend.append("instagram_followers", formData.instagram_followers || "0");
+      formDataToSend.append("youtube_followers", formData.youtube_followers || "0");
+      formDataToSend.append("linkedin_followers", formData.linkedin_followers || "0");
 
       // Add rules if available
       if (formData.rules) {
@@ -232,6 +232,21 @@ export function EditCommunityModal({
       if (bgImageFile) {
         formDataToSend.append("background_image", bgImageFile);
       }
+
+      // Log the request data for debugging - including HEIC file info
+      console.log('Sending request with data:', {
+        communityId,
+        userId,
+        name: formData.name,
+        description: formData.description,
+        tags: cleanedTags,
+        hasImage: !!imageFile,
+        hasBgImage: !!bgImageFile,
+        imageFileType: imageFile?.type,
+        bgImageFileType: bgImageFile?.type,
+        imageFileName: imageFile?.name,
+        bgImageFileName: bgImageFile?.name
+      });
 
       const response = await fetch(API_ENDPOINTS.editCommunity, {
         method: "POST",
@@ -254,7 +269,7 @@ export function EditCommunityModal({
               rules: formData.rules,
               additional_tags: formData.tags,
               image: data.data?.image || formData.image,
-              bgImage: data.data?.bgImage || formData.bgImage,
+              bgImage: data.data?.background_image || formData.bgImage,
             },
           },
         });
@@ -267,6 +282,15 @@ export function EditCommunityModal({
 
         toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
+
+        // Update the background image URL after successful upload
+        if (data.data && data.data.background_image) {
+          setFormData(prev => ({
+            ...prev,
+            bgImage: data.data.background_image
+          }));
+          // setBackgroundImagePreview(data.data.background_image);
+        }
       } else {
         toast.error(data.e || StringConstants.PAGE_UPDATION_FAILED);
       }
