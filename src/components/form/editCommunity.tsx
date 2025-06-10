@@ -68,6 +68,11 @@ export function EditCommunityModal({
 
   const [newTag, setNewTag] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Add state for background image preview
+  const [backgroundImagePreview, setBackgroundImagePreview] = useState<string | null>(null);
 
   const user = useSelector((state: RootState) => state.user.user);
   const community: any = useSelector((state: RootState) => state.community);
@@ -103,28 +108,48 @@ export function EditCommunityModal({
   }, [isOpen, profile, communityData]);
 
   // Handle image selection
-  const handleImageSelect = (file: File, type: "profile" | "background") => {
-    // Check file size (5MB = 5 * 1024 * 1024 bytes)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (file.size > maxSize) {
-      toast.error(`File size exceeds 5MB limit for ${type === "profile" ? "profile" : "background"} image`);
-      return;
-    }
+  const handleImageSelect = async (file: File, type: "profile" | "background") => {
+    try {
+      setUploadError(null);
+      setIsUploading(true);
 
-    if (type === "profile") {
-      setImageFile(file);
-      // Create a temporary URL for preview
-      setFormData({
-        ...formData,
-        image: URL.createObjectURL(file),
-      });
-    } else {
-      setBgImageFile(file);
-      // Create a temporary URL for preview
-      setFormData({
-        ...formData,
-        bgImage: URL.createObjectURL(file),
-      });
+      // Check file size (10MB = 10 * 1024 * 1024 bytes)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > maxSize) {
+        setUploadError(`File size exceeds 10MB limit for ${type === "profile" ? "profile" : "background"} image`);
+        return;
+      }
+
+      // Check file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      const isHeic = fileExtension === 'heic' || fileExtension === 'heif';
+      
+      if (!allowedTypes.includes(file.type) && !isHeic) {
+        setUploadError('Only JPEG, PNG, GIF, WebP, and HEIC images are allowed');
+        return;
+      }
+
+      if (type === "profile") {
+        setImageFile(file);
+        // Create a temporary URL for preview
+        setFormData({
+          ...formData,
+          image: URL.createObjectURL(file),
+        });
+      } else {
+        setBgImageFile(file);
+        // Create a temporary URL for preview
+        setFormData({
+          ...formData,
+          bgImage: URL.createObjectURL(file),
+        });
+      }
+    } catch (error) {
+      console.error('Error handling image:', error);
+      setUploadError('Failed to process image. Please try again.');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -157,10 +182,13 @@ export function EditCommunityModal({
 
   // Handle tag management
   const handleAddTag = () => {
-    if (newTag && !formData.tags.includes(newTag)) {
-      setFormData({ ...formData, tags: [...formData.tags, newTag] });
-
-      setNewTag("");
+    if (newTag) {
+      // Clean the tag by removing any special characters and trimming
+      const cleanedTag = newTag.replace(/[\[\]{}()]/g, '').trim();
+      if (cleanedTag && !formData.tags.includes(cleanedTag)) {
+        setFormData({ ...formData, tags: [...formData.tags, cleanedTag] });
+        setNewTag("");
+      }
     }
   };
 
@@ -172,9 +200,22 @@ export function EditCommunityModal({
     });
   };
 
+  // Update handleBackgroundImageChange to set preview and handle file
+  const handleBackgroundImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setBackgroundImagePreview(URL.createObjectURL(file));
+      // Call handleImageSelect to properly store the file
+      handleImageSelect(file, "background");
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async () => {
     try {
+      setUploadError(null);
+      setIsLoading(true);
+
       // Validate mandatory fields
       const mandatoryFields = {
         name: "Page Name",
@@ -194,8 +235,6 @@ export function EditCommunityModal({
         return;
       }
 
-      setIsLoading(true);
-
       // Create FormData object for multipart/form-data submission
       const formDataToSend = new FormData();
 
@@ -205,14 +244,14 @@ export function EditCommunityModal({
       formDataToSend.append("description", formData.description);
       formDataToSend.append("userId", userId);
 
-      // Add tags as a comma-separated string
-      formDataToSend.append("additional_tags", formData.tags.join(","));
-      formDataToSend.append(
-        "instagram_followers",
-        formData.instagram_followers
-      );
-      formDataToSend.append("youtube_followers", formData.youtube_followers);
-      formDataToSend.append("linkedin_followers", formData.linkedin_followers);
+      // Clean and add tags
+      const cleanedTags = formData.tags.map(tag => tag.replace(/[\[\]{}()]/g, '').trim()).filter(Boolean);
+      formDataToSend.append("additional_tags", cleanedTags.join(","));
+
+      // Add numeric fields
+      formDataToSend.append("instagram_followers", formData.instagram_followers || "0");
+      formDataToSend.append("youtube_followers", formData.youtube_followers || "0");
+      formDataToSend.append("linkedin_followers", formData.linkedin_followers || "0");
 
       // Add rules if available
       if (formData.rules) {
@@ -226,19 +265,49 @@ export function EditCommunityModal({
 
       // Add image files if selected
       if (imageFile) {
+        // Validate image file before sending
+        if (imageFile.size > 10 * 1024 * 1024) {
+          throw new Error("Profile image size exceeds 10MB limit");
+        }
         formDataToSend.append("image", imageFile);
       }
 
       if (bgImageFile) {
+        // Validate background image file before sending
+        if (bgImageFile.size > 10 * 1024 * 1024) {
+          throw new Error("Background image size exceeds 10MB limit");
+        }
         formDataToSend.append("background_image", bgImageFile);
       }
 
-      const response = await fetch(API_ENDPOINTS.editCommunity, {
-        method: "POST",
-        body: formDataToSend, // No Content-Type header needed, browser sets it with boundary
+      // Log the request data for debugging
+      console.log('Sending request with data:', {
+        communityId,
+        userId,
+        name: formData.name,
+        description: formData.description,
+        tags: cleanedTags,
+        hasImage: !!imageFile,
+        hasBgImage: !!bgImageFile
       });
 
+      const response = await fetch(API_ENDPOINTS.editCommunity, {
+        method: "POST",
+        body: formDataToSend,
+      });
+
+      // Log the response status and headers for debugging
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        console.error('Error response:', errorData);
+        throw new Error(errorData?.e || `HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log('Success response:', data);
 
       if (data.r === "s") {
         // Update Redux store if needed
@@ -252,7 +321,7 @@ export function EditCommunityModal({
               description: formData.description,
               category: formData.category,
               rules: formData.rules,
-              additional_tags: formData.tags,
+              additional_tags: cleanedTags,
               image: data.data?.image || formData.image,
               bgImage: data.data?.bgImage || formData.bgImage,
             },
@@ -267,12 +336,28 @@ export function EditCommunityModal({
 
         toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
+
+        if (data.data && data.data.background_image) {
+          setFormData(prev => ({
+            ...prev,
+            bgImage: data.data.background_image
+          }));
+          setBackgroundImagePreview(data.data.background_image);
+        } else if (data.data && data.data.community && data.data.community.background_image) {
+          setFormData(prev => ({
+            ...prev,
+            bgImage: data.data.community.background_image
+          }));
+          setBackgroundImagePreview(data.data.community.background_image);
+        }
       } else {
-        toast.error(data.e || StringConstants.PAGE_UPDATION_FAILED);
+        throw new Error(data.e || StringConstants.PAGE_UPDATION_FAILED);
       }
     } catch (error) {
-      console.error(StringConstants.PAGE_UPDATION_FAILED, error);
-      toast.error(StringConstants.PAGE_UPDATION_FAILED);
+      console.error('Edit community error:', error);
+      const errorMessage = error instanceof Error ? error.message : StringConstants.PAGE_UPDATION_FAILED;
+      setUploadError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -419,65 +504,69 @@ export function EditCommunityModal({
                     <button
                       onClick={() => handleRemoveImage("profile")}
                       className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
+                      disabled={isUploading}
                     >
                       <X className="h-3 w-3 text-white" />
                     </button>
                   </div>
                 )}
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    e.target.files?.[0] &&
-                    handleImageSelect(e.target.files[0], "profile")
-                  }
-                  key={formData.image}
-                />
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,.heic,.heif"
+                    onChange={(e) =>
+                      e.target.files?.[0] &&
+                      handleImageSelect(e.target.files[0], "profile")
+                    }
+                    key={formData.image}
+                    disabled={isUploading}
+                  />
+                  {isUploading && (
+                    <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+                  )}
+                  {uploadError && (
+                    <p className="text-sm text-red-500 mt-1">{uploadError}</p>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="grid gap-2">
-              <Label>{StringConstants.BACKGROUND_IMAGE}</Label>
-              <div className="flex items-center gap-4">
-                {formData.bgImage && (
-                  <div className="relative">
-                    <Image
-                      src={formData.bgImage}
-                      alt="Background"
-                      width={128}
-                      height={64}
-                      className="h-16 w-32 object-cover rounded"
-                    />
-                    <button
-                      onClick={() => handleRemoveImage("background")}
-                      className="absolute -top-2 -right-2 bg-red-500 rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </button>
-                  </div>
-                )}
+              <Label>Background Image</Label>
+              {backgroundImagePreview && (
+                <img
+                  src={backgroundImagePreview}
+                  alt="Background Preview"
+                  style={{ width: '100%', maxHeight: 200, objectFit: 'cover', marginBottom: 8 }}
+                />
+              )}
+              <div className="flex-1">
                 <Input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,.heic,.heif"
                   data-bg
-                  onChange={(e) =>
-                    e.target.files?.[0] &&
-                    handleImageSelect(e.target.files[0], "background")
-                  }
+                  onChange={handleBackgroundImageChange}
                   key={formData.bgImage}
+                  disabled={isUploading}
                 />
+                {isUploading && (
+                  <p className="text-sm text-gray-500 mt-1">Uploading...</p>
+                )}
+                {uploadError && (
+                  <p className="text-sm text-red-500 mt-1">{uploadError}</p>
+                )}
               </div>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-4 pt-4 border-t mt-4 px-6">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading || isUploading}>
             {StringConstants.CANCEL}
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
             className="bg-blue-600 text-white"
           >
             {isLoading ? "Saving..." : "Save Changes"}
