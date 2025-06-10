@@ -244,8 +244,8 @@ export function EditCommunityModal({
       formDataToSend.append("description", formData.description);
       formDataToSend.append("userId", userId);
 
-      // Clean and add tags
-      const cleanedTags = formData.tags.map(tag => tag.replace(/[\[\]{}()]/g, '').trim()).filter(Boolean);
+      // Clean and add tags - fix TypeScript error
+      const cleanedTags = formData.tags.map((tag: string) => tag.replace(/[\[\]{}()]/g, '').trim()).filter(Boolean);
       formDataToSend.append("additional_tags", cleanedTags.join(","));
 
       // Add numeric fields
@@ -280,7 +280,7 @@ export function EditCommunityModal({
         formDataToSend.append("background_image", bgImageFile);
       }
 
-      // Log the request data for debugging
+      // Log the request data for debugging - including HEIC file info
       console.log('Sending request with data:', {
         communityId,
         userId,
@@ -288,7 +288,11 @@ export function EditCommunityModal({
         description: formData.description,
         tags: cleanedTags,
         hasImage: !!imageFile,
-        hasBgImage: !!bgImageFile
+        hasBgImage: !!bgImageFile,
+        imageFileType: imageFile?.type,
+        bgImageFileType: bgImageFile?.type,
+        imageFileName: imageFile?.name,
+        bgImageFileName: bgImageFile?.name
       });
 
       const response = await fetch(API_ENDPOINTS.editCommunity, {
@@ -323,7 +327,7 @@ export function EditCommunityModal({
               rules: formData.rules,
               additional_tags: cleanedTags,
               image: data.data?.image || formData.image,
-              bgImage: data.data?.bgImage || formData.bgImage,
+              bgImage: data.data?.background_image || formData.bgImage,
             },
           },
         });
@@ -337,18 +341,13 @@ export function EditCommunityModal({
         toast.success(StringConstants.PAGE_UPDATION_SUCCESS);
         onClose();
 
+        // Update the background image URL after successful upload
         if (data.data && data.data.background_image) {
           setFormData(prev => ({
             ...prev,
             bgImage: data.data.background_image
           }));
           setBackgroundImagePreview(data.data.background_image);
-        } else if (data.data && data.data.community && data.data.community.background_image) {
-          setFormData(prev => ({
-            ...prev,
-            bgImage: data.data.community.background_image
-          }));
-          setBackgroundImagePreview(data.data.community.background_image);
         }
       } else {
         throw new Error(data.e || StringConstants.PAGE_UPDATION_FAILED);

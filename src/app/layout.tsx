@@ -85,32 +85,35 @@ export default async function RootLayout({
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
         ></script>
-        <script>
-          {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){window.dataLayer.push(arguments);}
-          gtag('js', new Date());
-
-          gtag('config', 'G-B3B9W8GRQP');
-          `}
-        </script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){window.dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-B3B9W8GRQP');
+            `,
+          }}
+        />
 
         {/* Service Worker Registration */}
-        <script>
-          {`
-          if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/sw.js')
-                .then(function(registration) {
-                  console.log('PWA: ServiceWorker registration successful');
-                })
-                .catch(function(error) {
-                  console.log('PWA: ServiceWorker registration failed');
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                      console.log('PWA: ServiceWorker registration successful');
+                    })
+                    .catch(function(error) {
+                      console.log('PWA: ServiceWorker registration failed');
+                    });
                 });
-            });
-          }
-          `}
-        </script>
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
