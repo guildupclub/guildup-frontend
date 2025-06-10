@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-     "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
@@ -86,6 +86,7 @@
     "@types/emoji-mart": "^3.0.14",
     "@types/firebase": "^3.2.3",
     "@types/he": "^1.2.3",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
