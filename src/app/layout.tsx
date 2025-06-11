@@ -87,7 +87,7 @@ export default async function RootLayout({
             `,
           }}
         />
-         <ScriptAdd commentMore actions
+        <Script
           id="ms-clarity"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
