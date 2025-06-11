@@ -11,6 +11,7 @@ import { MessageCircle, Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 function ChatContent() {
   const user = useSelector((state: RootState) => state.user.user);
@@ -54,9 +55,6 @@ function ChatContent() {
             <p className="text-muted-foreground mb-4">
               Please sign in to access your expert support chat
             </p>
-            <Button asChild>
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>
