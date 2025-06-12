@@ -52,7 +52,7 @@ export default function HiringPage() {
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold">Join Our Team</h1>
           <p className="text-xl text-foreground">
-            We're looking for talented individuals to help us build the future
+            We&apos;re looking for talented individuals to help us build the future
           </p>
         </div>
 
