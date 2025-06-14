@@ -84,13 +84,14 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
         screenResolution: typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : '',
       };
 
-              const payload = {
-          cookies: allCookies,
-          preferences,
-          userInfo,
-          consentType,
-          timestamp: new Date().toISOString(),
-        };
+      const payload = {
+        cookies: allCookies,
+        preferences,
+        userInfo,
+        consentType,
+        timestamp: new Date().toISOString(),
+      };
+
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5000';
       

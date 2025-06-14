@@ -24,10 +24,14 @@ import { ArrowRight } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
+import { useTracking } from "@/hooks/useTracking";
+import { PageTracker } from "@/components/analytics/PageTracker";
+
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 import { on } from "events";
+
 
 interface Category {
   _id: string;
@@ -75,6 +79,8 @@ function Page() {
   const { scrollY } = useScroll();
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
   const userId = session?.user._id;
+  const tracking = useTracking();
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -84,8 +90,27 @@ function Page() {
     if (!isMounted || status === "loading") return;
 
     if (!session) {
+      tracking.trackCustomEvent('home_page_viewed_anonymous', {
+        is_initial_load: isInitialLoad
+      });
       router.push("/");
     } else {
+      // Track authenticated user viewing home page
+      tracking.trackCustomEvent('home_page_viewed_authenticated', {
+        user_id: session.user._id,
+        is_new_user: session.user?.isNewUser,
+        is_creator: session.user?.is_creator,
+        is_initial_load: isInitialLoad
+      });
+      
+      // Identify user for PostHog
+      tracking.identifyUser(session.user._id, {
+        email: session.user.email,
+        name: session.user.name,
+        is_creator: session.user?.is_creator,
+        signup_date: session.user?.createdAt
+      });
+
       const fetchCommunities = async () => {
         try {
           const res = await axios.post(
@@ -95,17 +120,32 @@ function Page() {
             }
           );
           dispatch(setUserFollowedCommunities(res.data.data));
+          
+          // Track communities loaded
+          tracking.trackCustomEvent('user_communities_loaded', {
+            user_id: session.user._id,
+            communities_count: res.data.data?.length || 0
+          });
         } catch (error) {
           console.error(error);
+          tracking.trackError('api_error', 'Failed to fetch user communities', error?.toString());
         }
       };
       fetchCommunities();
 
       if (session.user?.isNewUser) {
+        tracking.trackCustomEvent('new_user_modal_shown', {
+          user_id: session.user._id
+        });
         setIsModalOpen(true);
       }
     }
-  }, [session, status, isMounted, router]);
+    
+    // Mark initial load as complete
+    if (isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [session, status, isMounted, router, isInitialLoad, dispatch]);
 
   const categoryToUrl = (name: string) => {
     return name.replace(/\s+/g, "-");
@@ -148,25 +188,71 @@ function Page() {
 
   
   const handleCreatorButtonClick = () => {
+    // Track the creator button click
+    tracking.trackClick('creator_signup_button', {
+      section: 'header',
+      user_signed_in: !!session,
+      user_id: session?.user._id
+    });
+
     if (!session) {
-      signIn(undefined, {
-        callbackUrl: window.location.origin,
+      tracking.trackUserAction('signup_prompt_shown', {
+        trigger: 'creator_button',
+        location: 'home_page'
       });
+      
+      toast("Sign in required", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            tracking.trackClick('signin_from_toast', {
+              trigger: 'creator_button_prompt'
+            });
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}`,
+            });
+          }
+        },
+      });
+    } else {
+      tracking.trackUserAction('creator_form_opened', {
+        source: 'header_button',
+        user_id: session.user._id
+      });
+      setIsDialogOpen(true);
+
     }
   };
 
   const handleScroll = () => {
+    tracking.trackClick('explore_communities_button', {
+      section: 'hero',
+      action: 'scroll_to_communities'
+    });
+    
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
   const handleCategorySelect = (categoryId: string) => {
-    setIsLoading(true);
-
+    // Track category selection
     const selectedCat = category.find(
       (cat: Category) => cat._id === categoryId
     );
+    
+    tracking.trackClick('category_filter', {
+      category_id: categoryId,
+      category_name: selectedCat?.name || 'All Category',
+      previous_category: selectedCategory,
+      user_id: session?.user._id
+    });
+
+    // Start loading immediately to clear current content
+    setIsLoading(true);
+
+    // Update category state
+
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -441,6 +527,23 @@ function Page() {
         {/* Footer */}
         <Footer />
       </SearchParamsProvider>
+      <PageTracker 
+        pageName="Home"
+        pageCategory="landing"
+        metadata={{
+          selected_category: selectedCategory,
+          selected_category_id: selectedCategoryId,
+          user_signed_in: !!session,
+          user_id: session?.user._id,
+          is_creator: session?.user?.is_creator,
+          is_new_user: session?.user?.isNewUser,
+          categories_count: category.length,
+          is_loading: isLoading
+        }}
+        trackScrollDepth={true}
+        trackTimeOnPage={true}
+        trackClicks={true}
+      />
     </Suspense>
   );
 }

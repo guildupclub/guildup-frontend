@@ -7,6 +7,8 @@ import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from "next/headers";
 import Script from "next/script";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
+import { PostHogProvider } from "@/contexts/PostHogProvider";
+
 import CookieConsent from "@/components/cookies/CookieConsent";
 
 const geistSans = Geist({
@@ -121,12 +123,15 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CookieConsentProvider>
-          <Providers>
-            <NavbarClient />
-            {children}
-            <Toaster richColors position="top-center" />
-            <CookieConsent />
-          </Providers>
+          <PostHogProvider>
+            <Providers>
+              <NavbarClient />
+              {children}
+              <Toaster richColors position="top-center" />
+              <CookieConsent />
+            </Providers>
+          </PostHogProvider>
+
         </CookieConsentProvider>
       </body>
     </html>
