@@ -34,7 +34,6 @@ import { on } from "events";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
 
-
 interface Category {
   _id: string;
   name: string;
@@ -83,7 +82,6 @@ function Page() {
   const userId = session?.user._id;
   const tracking = useTracking();
 
-
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -92,25 +90,25 @@ function Page() {
     if (!isMounted || status === "loading") return;
 
     if (!session) {
-      tracking.trackCustomEvent('home_page_viewed_anonymous', {
-        is_initial_load: isInitialLoad
+      tracking.trackCustomEvent("home_page_viewed_anonymous", {
+        is_initial_load: isInitialLoad,
       });
       router.push("/");
     } else {
       // Track authenticated user viewing home page
-      tracking.trackCustomEvent('home_page_viewed_authenticated', {
+      tracking.trackCustomEvent("home_page_viewed_authenticated", {
         user_id: session.user._id,
         is_new_user: session.user?.isNewUser,
         is_creator: session.user?.is_creator,
-        is_initial_load: isInitialLoad
+        is_initial_load: isInitialLoad,
       });
-      
+
       // Identify user for PostHog
       tracking.identifyUser(session.user._id, {
         email: session.user.email,
         name: session.user.name,
         is_creator: session.user?.is_creator,
-        signup_date: session.user?.createdAt
+        signup_date: session.user?.createdAt,
       });
 
       const fetchCommunities = async () => {
@@ -122,27 +120,31 @@ function Page() {
             }
           );
           dispatch(setUserFollowedCommunities(res.data.data));
-          
+
           // Track communities loaded
-          tracking.trackCustomEvent('user_communities_loaded', {
+          tracking.trackCustomEvent("user_communities_loaded", {
             user_id: session.user._id,
-            communities_count: res.data.data?.length || 0
+            communities_count: res.data.data?.length || 0,
           });
         } catch (error) {
           console.error(error);
-          tracking.trackError('api_error', 'Failed to fetch user communities', error?.toString());
+          tracking.trackError(
+            "api_error",
+            "Failed to fetch user communities",
+            error?.toString()
+          );
         }
       };
       fetchCommunities();
 
       if (session.user?.isNewUser) {
-        tracking.trackCustomEvent('new_user_modal_shown', {
-          user_id: session.user._id
+        tracking.trackCustomEvent("new_user_modal_shown", {
+          user_id: session.user._id,
         });
         setIsModalOpen(true);
       }
     }
-    
+
     // Mark initial load as complete
     if (isInitialLoad) {
       setIsInitialLoad(false);
@@ -190,56 +192,43 @@ function Page() {
 
   const handleCreatorButtonClick = () => {
     // Track the creator button click
-    tracking.trackClick('creator_signup_button', {
-      section: 'header',
+    tracking.trackClick("creator_signup_button", {
+      section: "header",
       user_signed_in: !!session,
-      user_id: session?.user._id
+      user_id: session?.user._id,
     });
 
     if (!session) {
-      tracking.trackUserAction('signup_prompt_shown', {
-        trigger: 'creator_button',
-        location: 'home_page'
+      tracking.trackUserAction("signup_prompt_shown", {
+        trigger: "creator_button",
+        location: "home_page",
       });
-      
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () => {
-            tracking.trackClick('signin_from_toast', {
-              trigger: 'creator_button_prompt'
-            });
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}`,
-            });
-          }
-        },
-      });
-    } else {
-      tracking.trackUserAction('creator_form_opened', {
-        source: 'header_button',
-        user_id: session.user._id
-      });
-      setIsDialogOpen(true);
 
-    }
-  };
+      tracking.trackClick("signin_from_redirect", {
+        trigger: "creator_button_prompt",
+      });
 
-  const handleJoinBtn = () => {
-    if (!session) {
       signIn(undefined, {
-        callbackUrl: window.location.origin,
+        callbackUrl: `${window.location.origin}`,
       });
-    } else {
+
+      return;
     }
+
+    tracking.trackUserAction("creator_form_opened", {
+      source: "header_button",
+      user_id: session.user._id,
+    });
+
+    setIsDialogOpen(true);
   };
 
   const handleScroll = () => {
-    tracking.trackClick('explore_communities_button', {
-      section: 'hero',
-      action: 'scroll_to_communities'
+    tracking.trackClick("explore_communities_button", {
+      section: "hero",
+      action: "scroll_to_communities",
     });
-    
+
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -250,12 +239,12 @@ function Page() {
     const selectedCat = category.find(
       (cat: Category) => cat._id === categoryId
     );
-    
-    tracking.trackClick('category_filter', {
+
+    tracking.trackClick("category_filter", {
       category_id: categoryId,
-      category_name: selectedCat?.name || 'All Category',
+      category_name: selectedCat?.name || "All Category",
       previous_category: selectedCategory,
-      user_id: session?.user._id
+      user_id: session?.user._id,
     });
 
     // Start loading immediately to clear current content
@@ -563,7 +552,7 @@ function Page() {
         {/* Footer */}
         <Footer />
       </SearchParamsProvider>
-      <PageTracker 
+      <PageTracker
         pageName="Home"
         pageCategory="landing"
         metadata={{
@@ -574,7 +563,7 @@ function Page() {
           is_creator: session?.user?.is_creator,
           is_new_user: session?.user?.isNewUser,
           categories_count: category.length,
-          is_loading: isLoading
+          is_loading: isLoading,
         }}
         trackScrollDepth={true}
         trackTimeOnPage={true}

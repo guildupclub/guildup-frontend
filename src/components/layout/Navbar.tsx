@@ -42,6 +42,7 @@ import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
 import { useChatContext } from "@/contexts/ChatContext";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { useTracking } from "@/hooks/useTracking";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/feed";
@@ -74,6 +75,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
   const isCreator = user?.user?.is_creator ? true : false;
   console.log(isCreator);
+  const tracking = useTracking();
 
   useEffect(() => {
     async function fetchCommunities() {
@@ -234,12 +236,45 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return path !== "/" && pathname?.startsWith(path);
   };
 
+  // const handleCreatorButtonClick = () => {
+  //   if (!session) {
+  //     signIn(undefined, {
+  //       callbackUrl: `${window.location.origin}?hero=1`,
+  //     });
+  //   }
+  // };
+
   const handleCreatorButtonClick = () => {
+    // Track the creator button click
+    tracking.trackClick("creator_signup_button", {
+      section: "header",
+      user_signed_in: !!session,
+      user_id: session?.user._id,
+    });
+
     if (!session) {
-      signIn(undefined, {
-        callbackUrl: `${window.location.origin}?hero=1`,
+      tracking.trackUserAction("signup_prompt_shown", {
+        trigger: "creator_button",
+        location: "home_page",
       });
+
+      tracking.trackClick("signin_from_redirect", {
+        trigger: "creator_button_prompt",
+      });
+
+      signIn(undefined, {
+        callbackUrl: `${window.location.origin}`,
+      });
+
+      return;
     }
+
+    tracking.trackUserAction("creator_form_opened", {
+      source: "header_button",
+      user_id: session.user._id,
+    });
+
+    setIsDialogOpen(true);
   };
 
   useEffect(() => {
