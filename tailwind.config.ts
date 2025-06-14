@@ -88,7 +88,11 @@ export default {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+			arrowBounce: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(4px)' },
+        },
   		}
   	}
   },

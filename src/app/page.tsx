@@ -31,6 +31,8 @@ import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 import { on } from "events";
+import { FaArrowRightLong } from "react-icons/fa6";
+import { HiSparkles } from "react-icons/hi2";
 
 
 interface Category {
@@ -186,7 +188,6 @@ function Page() {
     }
   }, [selectedCategory, router, category]);
 
-  
   const handleCreatorButtonClick = () => {
     // Track the creator button click
     tracking.trackClick('creator_signup_button', {
@@ -221,6 +222,15 @@ function Page() {
       });
       setIsDialogOpen(true);
 
+    }
+  };
+
+  const handleJoinBtn = () => {
+    if (!session) {
+      signIn(undefined, {
+        callbackUrl: window.location.origin,
+      });
+    } else {
     }
   };
 
@@ -355,6 +365,32 @@ function Page() {
               }}
             />
           </div>
+
+          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+            <DialogTrigger asChild>
+              {/* <Button
+                onClick={handleCreatorButtonClick}
+                className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <span className="relative z-10 font-medium">
+                  Join as Expert{" "}
+                </span>
+                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </Button> */}
+              {!isCreator && (
+                <div className="bg-gradient-to-r from-blue-600 to-blue-400 py-2 w-full h-10 text-white text-sm font-semibold text-center flex items-center justify-center relative z-20 mt-16  mx-auto  ">
+                  <HiSparkles className="h-6 w-6 text-yellow-300 mx-2" /> Join
+                  as Expert
+                  <FaArrowRightLong
+                    onClick={handleCreatorButtonClick}
+                    className="h-5 w-5 ml-4 animate-arrow-bounce hover:scale-x-150 transition-transform duration-300 cursor-pointer"
+                  />
+                </div>
+              )}
+            </DialogTrigger>
+            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+          </Dialog>
 
           <div className="relative z-10">
             <div ref={heroRef}>
