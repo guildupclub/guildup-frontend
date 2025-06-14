@@ -110,6 +110,12 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   // Use React Query to fetch post data including likes and comments
   const { data: postData } = useQuery({
     queryKey: ["post", post._id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/${post._id}`
+      );
+      return response.data.data?.post || post;
+    },
     initialData: post,
     refetchOnWindowFocus: false,
   });
@@ -331,14 +337,16 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
         {/* Header */}
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-purple-500 ring-2 ring-purple-100 dark:ring-purple-900/30">
-            <AvatarImage src={communityImage || "/placeholder.svg"} />
+            <AvatarImage src={post.community_id?.image || "/placeholder.svg"} />
             <AvatarFallback className="bg-purple-100 text-purple-700 font-semibold">
-              {getInitials(name || "")}
+              {post.community_id?.name || ""}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 text-muted-foreground leading-tight">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground">{name}</span>
+              <span className="font-semibold text-foreground">
+                {post.community_id?.name}
+              </span>
               {isAdmin && (
                 <Badge
                   variant="secondary"

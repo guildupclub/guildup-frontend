@@ -101,6 +101,12 @@ const WebinarForm = ({
             <SelectItem value="webinar">
                 {OFFERING_TYPES.WEBINAR}
             </SelectItem>
+            <SelectItem value="package">
+                Package
+            </SelectItem>
+            <SelectItem value="class">
+                Class
+            </SelectItem>
             </SelectContent>
         </Select>
         </div>
