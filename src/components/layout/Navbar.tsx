@@ -72,6 +72,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   // State to store fetchCommunities API response
   const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
+  const isCreator = user?.user?.is_creator ? true : false;
+  console.log(isCreator);
 
   useEffect(() => {
     async function fetchCommunities() {
@@ -506,20 +508,22 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </div>
                 )}
               </div>
-              <Dialog
-                open={session ? isDialogOpen : false}
-                onOpenChange={setIsDialogOpen}
-              >
-                <Button
-                  className="border border-gray-300 "
-                  onClick={handleCreatorButtonClick}
+              {!isCreator && (
+                <Dialog
+                  open={session ? isDialogOpen : false}
+                  onOpenChange={setIsDialogOpen}
                 >
-                  Join as Expert
-                </Button>
-                {session && (
-                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                )}
-              </Dialog>
+                  <Button
+                    className="border border-gray-300 "
+                    onClick={handleCreatorButtonClick}
+                  >
+                    Join as Expert
+                  </Button>
+                  {session && (
+                    <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                  )}
+                </Dialog>
+              )}
             </div>
           </div>
         </div>
