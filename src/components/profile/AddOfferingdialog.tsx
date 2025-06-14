@@ -414,6 +414,8 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       duration: 60,
       is_free: true,
       tags: "",
+      start_time: "",
+      link: "",
     });
 
     toast.info(

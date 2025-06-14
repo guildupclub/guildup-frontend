@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useTracking } from "@/hooks/useTracking";
 
 interface BankDetailsProps{
   onClose: ()=> void;
@@ -38,6 +39,7 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
   const {user}= useSelector((state: RootState)=> state.user);
   const userId= user?._id;
   const user_isBankDetailsAdded= user?.isBankDetailsAdded;
+  const tracking = useTracking();
   const [bankDetails, setBankDetails] = React.useState({
     benificiaryName: "",
     accountNumber: "",
@@ -98,6 +100,16 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
     // @tanishq can you if we need to change this to 1 second or 3 seconds
     if (isSubmitting) return;
     
+    // Track bank details save attempt
+    tracking.trackClick('save_bank_details_button', {
+      user_id: userId,
+      is_update: user_isBankDetailsAdded,
+      has_beneficiary_name: !!bankDetails.benificiaryName,
+      has_account_number: !!bankDetails.accountNumber,
+      has_ifsc: !!bankDetails.ifsc,
+      source: 'payments_page'
+    });
+    
     try {
       setIsSubmitting(true);
       let response;
@@ -120,6 +132,16 @@ const BankDetails = ({ onClose }: BankDetailsProps) => {
       }
       
       if (response.data.r === "s") {
+        // Track successful bank details save
+        tracking.trackUserAction('bank_details_saved', 
+          {
+            type: user_isBankDetailsAdded ? "update" : "add",
+            user_id: userId,
+            is_update: user_isBankDetailsAdded,
+            source: 'payments_page'
+          }
+        );
+        
         await fetchBankDetails();
         onClose();
         toast.success(response.data.data);

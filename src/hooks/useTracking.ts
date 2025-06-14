@@ -132,7 +132,7 @@ export const useTracking = () => {
 
   // Track user actions specific to your app
   const trackUserAction = useCallback((
-    action: 'join_community' | 'create_post' | 'book_session' | 'make_payment' | 'send_message',
+    action: 'join_community' | 'create_post' | 'book_session' | 'make_payment' | 'send_message' | 'free_booking_confirmed' | 'paid_booking_confirmed' | 'paid_booking_confirmed_v2' | 'paid_booking_confirmed_v3' | 'user_registered' | 'user_signed_in' | 'user_signed_up'| 'bank_details_saved' |'signup_completed'  ,
     details?: Record<string, any>
   ) => {
     if (!isEnabled) return;
