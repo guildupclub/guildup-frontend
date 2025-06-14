@@ -10,12 +10,14 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "@/components/common/CommonText";
+import { useTracking } from "@/hooks/useTracking";
 
 export default function SignUp() {
 
   const router = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const tracking = useTracking();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,12 +29,27 @@ export default function SignUp() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    // Track signup attempt
+    tracking.trackClick('signup_form_submit', {
+      signup_method: 'email',
+      has_name: !!name,
+      has_email: !!email,
+      has_password: !!password
+    });
+
     try {
       // First register the user
       await axios.post(`${API_BASE_URL}/v1/auth/register`, {
         name,
         email,
         password,
+      });
+
+      // Track successful registration
+      tracking.trackUserAction('user_registered', {
+        signup_method: 'email',
+        user_name: name,
+        user_email: email
       });
 
       // Then sign them in automatically
@@ -43,20 +60,51 @@ export default function SignUp() {
       });
 
       if (result?.error) {
+        tracking.trackError('auto_signin_failed', 
+         ` ${result.error} , type:email`
+        );
         setError(result.error);
       } else {
+        // Track successful signup and signin
+        tracking.trackUserAction('user_signed_up', { method: `email`});
+        
         toast.success("Account created and signed in successfully!");
         router.push("/explore");
         router.refresh();
       }
     } catch (error: any) {
       console.error("Registration error:", error);
+      
+      // Track registration error
+      tracking.trackError('registration_failed', 
+        ` ${error.response?.data?.error || error.message} , type:email`
+      );
+      
       setError(
         error.response?.data?.error || "An error occurred during registration"
       );
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSignup = () => {
+    // Track Google signup attempt
+    tracking.trackClick('google_signup_button', {
+      signup_method: 'google',
+      page: 'signup'
+    });
+    
+    signIn("google", { callbackUrl: window.location.href });
+  };
+
+  const handleSignInRedirect = () => {
+    // Track redirect to signin
+    tracking.trackClick('signin_redirect_from_signup', {
+      source: 'signup_page'
+    });
+    
+    signIn();
   };
 
   return (
@@ -134,7 +182,7 @@ export default function SignUp() {
         <Button
           variant="outline"
           className="w-full bg-slate-200 hover:bg-background"
-          onClick={() => signIn("google", { callbackUrl: window.location.href })}
+          onClick={handleGoogleSignup}
           disabled={isLoading}
         >
           <svg
@@ -158,7 +206,7 @@ export default function SignUp() {
         <div className="text-center text-sm text-muted-foreground">
           {StringConstants.ALREADY_AN_ACCOUNT}{" "}
           <button
-            onClick={() => signIn()}
+            onClick={handleSignInRedirect}
             className="text-gradient hover:underline"
           >
             {StringConstants.SIGN_IN}
