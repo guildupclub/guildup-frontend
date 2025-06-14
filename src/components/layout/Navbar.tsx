@@ -234,17 +234,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}?hero=1`,
-            }),
-        },
+      signIn(undefined, {
+        callbackUrl: `${window.location.origin}?hero=1`,
       });
-    } else {
-      setIsCreatorFormOpen(true);
     }
   };
 
