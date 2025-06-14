@@ -9,9 +9,11 @@ import { PostCarde } from "./PostCard";
 import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
 import { StringConstants } from "../common/CommonText";
 import PostFromFeed from "./PostFromFeed";
+import { useSession } from "next-auth/react";
 
 export function Feed() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
+  const { data: session } = useSession();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfinitePosts(userId);
@@ -47,7 +49,7 @@ export function Feed() {
   return (
     <div className="max-w-4xl mx-auto h-screen overflow-scroll scrollbar-hide">
       <Tabs defaultValue="feed" className="w-full">
-        <PostFromFeed />
+        {session && <PostFromFeed />}
         <TabsContent value="feed" className="mt-0 p-4">
           {posts.length === 0 ? (
             <div className="text-center text-zinc-400">

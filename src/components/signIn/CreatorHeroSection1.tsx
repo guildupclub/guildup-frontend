@@ -16,13 +16,15 @@ export const CreatorHeroSection1: React.FC = () => {
       <div className="flex flex-col items-center gap-8 w-full max-w-3xl">
         <div className="flex flex-col gap-3 text-center">
           <h1 className="text-4xl font-bold">
-            Be found. GuildUp makes it easy.
+            Grow your impact. GuildUp is <br className="hidden md:block" /> your
+            gateway.
           </h1>
-          <p className="text-xl font-normal">
-            Sign up on GuildUp and grow your Guild with thousands of users
-            looking for top coaches, consultants, and professionals.{" "}
-            <span className="font-semibold text-[#334BFF]">
-              Build your custom community and start earning in under 30 minutes!
+          <p className="text-xl font-normal my-2">
+            Join 70+ coaches, therapists, and professionals building their
+            digital presence on GuildUp. Create your space. Offer sessions. Earn
+            — all in under 30 minutes.{" "}
+            <span className="font-semibold text-[#334BFF] ">
+              ✨ Build your expert page and start offering services today →
             </span>
           </p>
         </div>

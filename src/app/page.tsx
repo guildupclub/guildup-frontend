@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
+import { on } from "events";
 
 interface Category {
   _id: string;
@@ -145,19 +146,12 @@ function Page() {
     }
   }, [selectedCategory, router, category]);
 
+  
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}`,
-            }),
-        },
+      signIn(undefined, {
+        callbackUrl: window.location.origin,
       });
-    } else {
-      setIsDialogOpen(true);
     }
   };
 
