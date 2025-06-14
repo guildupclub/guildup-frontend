@@ -6,6 +6,8 @@ import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from "next/headers";
 import Script from "next/script";
+import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
+import CookieConsent from "@/components/cookies/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,11 +70,14 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <NavbarClient />
-          {children}
-          <Toaster richColors position="top-center" />
-        </Providers>
+        <CookieConsentProvider>
+          <Providers>
+            <NavbarClient />
+            {children}
+            <Toaster richColors position="top-center" />
+            <CookieConsent />
+          </Providers>
+        </CookieConsentProvider>
       </body>
     </html>
   );
