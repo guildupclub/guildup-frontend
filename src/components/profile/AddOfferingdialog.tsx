@@ -484,6 +484,7 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
       tags: "",
       start_time: "",
       link: "",
+
       total_price: 0,
       number_of_sessions: 1,
       session_duration: 60,

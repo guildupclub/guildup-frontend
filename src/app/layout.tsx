@@ -7,7 +7,7 @@ import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from "next/headers";
 import Script from "next/script";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
-import { PostHogProvider } from "@/contexts/PostHogProvider";
+import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 
 import CookieConsent from "@/components/cookies/CookieConsent";
 
@@ -50,8 +50,7 @@ export const metadata: Metadata = {
   authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
-  themeColor: "#ffffff",
-  colorScheme: "light",
+
 
   icons: {
     icon: "/guildup-logo.png",
@@ -123,14 +122,14 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <CookieConsentProvider>
-          <PostHogProvider>
+          <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
               {children}
               <Toaster richColors position="top-center" />
               <CookieConsent />
             </Providers>
-          </PostHogProvider>
+          </PostHogProviderWrapper>
 
         </CookieConsentProvider>
       </body>
