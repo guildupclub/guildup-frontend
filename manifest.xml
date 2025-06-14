@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <!-- Homepage -->
+    <url>
+        <loc>https://www.guildup.club/</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+    </url>
+
+    <!-- Main Navigation Pages -->
+    <url>
+        <loc>https://www.guildup.club/find-experts</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/discovery</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/my-guild</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/chat</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Search API Endpoints -->
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Mental%20Health</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Anxiety</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Diet%20and%20Nutrition</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Relationship%20Issues</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Stress%20Management</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Self%20Awareness</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Mindfulness</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Confidence</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Therapy</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/api/search?q=Weight%20Management</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Main Categories Page -->
+    <url>
+        <loc>https://www.guildup.club/?category=All-Category</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Category Pages -->
+    <url>
+        <loc>https://www.guildup.club/?category=Fitness-and-Yoga</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Personal-Growth</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Nutrition-and-Diet</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Relationship-and-Parenting</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Mental-Health</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Others</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Sub-categories and Related Pages -->
+    <url>
+        <loc>https://www.guildup.club/?category=Yoga</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Fitness</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Meditation</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/?category=Life-Coaching</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Authentication Pages -->
+    <url>
+        <loc>https://www.guildup.club/sign-in</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
+    </url>
+
+    <url>
+        <loc>https://www.guildup.club/become-expert</loc>
+        <lastmod>2024-03-20</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+</urlset>

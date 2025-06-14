@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Compass, Users, ChevronDown, Search, Plus } from "lucide-react";
+import {
+  Compass,
+  Users,
+  ChevronDown,
+  Search,
+  Plus,
+  MessageCircle,
+} from "lucide-react";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -33,6 +40,8 @@ import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
+import { useChatContext } from "@/contexts/ChatContext";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/feed";
@@ -45,12 +54,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
+  const { unreadCount } = useChatContext();
   const [isUser, setIsUser] = useState(true);
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
@@ -137,6 +148,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     }
   };
 
+  const handleMySpaceClick = (e: React.MouseEvent) => {
+    if (!session) {
+      e.preventDefault();
+      toast("Sign in required to view your guild", {
+        action: {
+          label: "Sign In",
+          onClick: () =>
+            signIn(undefined, {
+              callbackUrl: `${window.location.origin}`,
+            }),
+        },
+      });
+      return;
+    }
+    // If signed in, let the normal navigation happen
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -186,7 +214,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         })
       );
     }
-    router.push(`/community/${community._id}/feed`);
+    const cleanedName = community.name
+      .replace(/\s+/g, "-")
+      .replace(/\|/g, "-")
+      .replace(/-+/g, "-");
+
+    const encodedName = encodeURIComponent(cleanedName);
+
+    router.push(`/community/${encodedName}-${community._id}/profile`);
     setIsSidebarOpen(false);
   }
 
@@ -235,15 +270,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 border-b border-gray-10 bg-[#F4F4FB] pt-2 lg:px-20 w-full flex",
+          "fixed top-0 z-50 border-b border-gray-10 bg-[#F4F4FB] pt-2 lg:px-8 xl:px-12 w-full flex",
           props.className
         )}
         {...props}
       >
-        <div className="container flex h-14 items-center px-4 ">
-          <div className="flex gap-6 items-center">
+        <div className="container flex h-14 items-center px-3 md:px-4 lg:px-6 max-w-full">
+          <div className="flex gap-3 md:gap-4 lg:gap-6 items-center">
             <button
-              className="md:hidden flex items-center justify-center"
+              className="md:hidden flex items-center justify-center p-1"
               onClick={() => setIsSidebarOpen((prev) => !prev)}
             >
               <FaBars className="h-5 w-5 text-gray-700" />
@@ -263,45 +298,41 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
 
           <div className="flex grow items-center justify-between">
-            <div className="flex flex-1 items-center md:ml-8 lg:ml-12 ml-2">
-              <AnimatePresence>
-                {!heroVisible && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                    className="relative w-full max-w-xl md:max-w-[400px]"
+            <div className="flex flex-1 items-center md:ml-4 lg:ml-8 xl:ml-12 ml-2">
+              <div className="relative w-full max-w-xs lg:max-w-sm xl:max-w-[400px]">
+                <div className="flex">
+                  <Input
+                    type="search"
+                    placeholder={
+                      isSmallScreen
+                        ? "Search..."
+                        : "Search creators, pages, or offerings..."
+                    }
+                    className="w-full bg-white outline-1 rounded-full pl-3 md:pl-4 lg:pl-5 pr-8 md:pr-10 lg:pr-12 py-1.5 md:py-2 lg:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
+                  <button
+                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer"
+                    onClick={handleSearch}
                   >
-                    <div className="flex">
-                      <Input
-                        type="search"
-                        placeholder={
-                          isSmallScreen
-                            ? "Search..."
-                            : "Search creators, pages, or offerings..."
-                        }
-                        className="w-full bg-white outline-1 rounded-full pl-3 md:pl-5 pr-6 md:pr-12 py-1.5 md:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      />
-                      <button
-                        className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-8 md:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer transition-all duration-200"
-                        onClick={handleSearch}
-                      >
-                        <Search className="h-3 w-3 md:h-4 md:w-4" />
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <Search className="h-3 w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" />
+                  </button>
+                </div>
+              </div>
+              <div
+                className="
+            md:hidden"
+              >
+                {" "}
+                {user?._id && <NotificationDropdown />}
+              </div>
             </div>
-
-            <div className="hidden md:flex space-x-6 items-center justify-center">
-              <div className="hidden md:flex items-center justify-center">
-                <ul className="flex items-center space-x-2 text-gray-600">
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+            <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
+              <div className="hidden md:flex items-center">
+                <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
                         className={`h-5 w-5 ${
@@ -309,7 +340,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         }`}
                       />
                       <span
-                        className={`text-sm mt-1 ${
+                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
                           isActive("/") ? "text-primary font-medium" : ""
                         }`}
                       >
@@ -318,7 +349,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <MdOutlineRssFeed
                         className={`h-5 w-5 ${
@@ -326,7 +357,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         }`}
                       />
                       <span
-                        className={`text-sm mt-1 ${
+                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
                           isActive("/feeds") ? "text-primary font-medium" : ""
                         }`}
                       >
@@ -334,10 +365,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-                  <li className="px-4 py-2 rounded-full hover:bg-gray-50 transition-all duration-200">
+
+                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
                       className="flex flex-col items-center"
+                      onClick={handleMySpaceClick}
                     >
                       <Users
                         className={`w-5 h-5 ${
@@ -345,7 +378,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         }`}
                       />
                       <span
-                        className={`text-sm mt-1 ${
+                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
                           isActive("/community")
                             ? "text-primary font-medium"
                             : ""
@@ -356,13 +389,42 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  {user?._id && <NotificationDropdown />}
+                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
+                    <Link
+                      href="/chat"
+                      className="flex flex-col items-center relative"
+                    >
+                      <MessageCircle
+                        className={`h-5 w-5 ${
+                          isActive("/chat") ? "text-primary" : ""
+                        }`}
+                      />
+                      {user?._id && unreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                          {unreadCount > 9 ? "9+" : unreadCount}
+                        </span>
+                      )}
+                      <span
+                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
+                          isActive("/chat") ? "text-primary font-medium" : ""
+                        }`}
+                      >
+                        Chat
+                      </span>
+                    </Link>
+                  </li>
+
+                  {user?._id && (
+                    <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
+                      <NotificationDropdown />
+                    </li>
+                  )}
                 </ul>
               </div>
 
-              <div className="hidden md:block ml-8">
+              <div className="hidden md:block ml-2 lg:ml-4 xl:ml-6">
                 {user?._id ? (
-                  <div className="flex items-center ">
+                  <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
@@ -395,6 +457,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           asChild
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                         >
+                          <Link
+                            href="/chat"
+                            className="flex items-center justify-between"
+                          >
+                            <span>Chat</span>
+                            {user?._id && unreadCount > 0 && (
+                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                {unreadCount > 9 ? "9+" : unreadCount}
+                              </span>
+                            )}
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
+                          <Link href="/blogs">Blogs</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
                           <Link href="/booking">Bookings</Link>
                         </DropdownMenuItem>
                         {isUser && (
@@ -415,28 +499,42 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </DropdownMenu>
                   </div>
                 ) : (
-                  <Button
-                    onClick={() =>
-                      signIn(undefined, {
-                        callbackUrl: `${window.location.href}`,
-                      })
-                    }
-                    className="px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-medium transition-all duration-200"
-                  >
-                    Sign In
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() =>
+                        signIn(undefined, {
+                          callbackUrl: `${window.location.href}`,
+                        })
+                      }
+                      className="px-6 border border-blue-500 transition-all duration-200"
+                      variant="outline"
+                    >
+                      Sign In
+                    </Button>
+                  </div>
                 )}
               </div>
+              <Dialog
+                open={session ? isDialogOpen : false}
+                onOpenChange={setIsDialogOpen}
+              >
+                <Button
+                  className="border border-gray-300 "
+                  onClick={handleCreatorButtonClick}
+                >
+                  Join as Expert
+                </Button>
+                {session && (
+                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                )}
+              </Dialog>
             </div>
-          </div>
-          <div className="lg:hidden">
-            {user?._id && <NotificationDropdown />}
           </div>
         </div>
       </nav>
 
       <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
+        <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
           <Link
             href="/"
             className="flex flex-col items-center justify-center gap-1"
@@ -474,8 +572,32 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </Link>
 
           <Link
+            href="/chat"
+            className="flex flex-col items-center justify-center gap-1"
+          >
+            <div className="w-6 h-6 flex items-center justify-center relative">
+              <MessageCircle
+                className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : ""}`}
+              />
+              {user?._id && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </div>
+            <span
+              className={`text-[10px] ${
+                isActive("/chat") ? "text-primary" : ""
+              }`}
+            >
+              Chat
+            </span>
+          </Link>
+
+          <Link
             href={getMySpaceLink()}
             className="flex flex-col items-center justify-center gap-1"
+            onClick={handleMySpaceClick}
           >
             <div className="w-6 h-6 flex items-center justify-center">
               <Users
@@ -522,6 +644,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   className="hover:bg-primary-gradient border-b border-zinc-300"
                 >
                   <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link
+                    href="/chat"
+                    className="flex items-center justify-between"
+                  >
+                    <span>Chat</span>
+                    {user?._id && unreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link href="/blogs">Blogs</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
@@ -622,9 +766,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       }`}
                     >
                       <AvatarImage
-                        src={`/placeholder.svg?text=${getInitials(
-                          community.name
-                        )}`}
+                        src={community.image || "/placeholder.svg"}
                         alt={community.name}
                         className="!rounded-lg"
                       />

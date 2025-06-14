@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { StringConstants } from "../common/CommonText";
 import Loader from "../Loader";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
+import { ChatSupportButton } from "../chat/ChatSupportButton";
 
 // Components
 import { Avatar } from "@radix-ui/react-avatar";
@@ -34,18 +35,25 @@ import {
 // Icons
 import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
-import { GrInstagram } from "react-icons/gr";
+import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
-import { MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
-import { FaLinkedinIn } from "react-icons/fa6";
-import { RiUserSharedFill } from "react-icons/ri";
-import { FaClock, FaShareAlt } from "react-icons/fa";
+import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
+import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
+import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
+import { FaClock, FaEdit, FaShareAlt } from "react-icons/fa";
 import { useNotifications } from "../notifications/NotificationContext";
 import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
+import {
+  HiOutlineUserGroup,
+  HiOutlineVideoCamera,
+  HiOutlineArchive,
+  HiOutlineBookOpen,
+} from "react-icons/hi";
+
 interface CommunityProfile {
   user: {
     user_name: string;
@@ -151,7 +159,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const params = useParams();
-  const communityParam = params["community-Id"] as string;
+  const communityParam = params?.["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
   const communityName =
     lastHyphenIndex !== -1
@@ -266,6 +274,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // Fetch user's followed communities
   const { data: followedCommunitiesData } = useQuery({
     queryKey: ["userFollowedCommunities"],
+    queryFn: async () => {
+      if (!user?._id) return [];
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
+        {
+          userId: user._id,
+        }
+      );
+      return response.data.data;
+    },
     enabled: !!user?._id,
   });
 
@@ -393,30 +411,39 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           queryKey: ["userFollowedCommunities"],
         });
 
-        // Send notification to   community owner
-        console.log("data upon follow", data);
-        console.log("current user", user);
-        console.log("profile data", profile);
-        console.log("profile email", profile?.user?.user_email);
+        // Send notification to community owner (wrapped in try-catch to prevent join failure)
+        try {
+          console.log("data upon follow", data);
+          console.log("current user", user);
+          console.log("profile data", profile);
+          console.log("profile email", profile?.user?.user_email);
 
-        const email = removeSpecialCharacters(profile?.user?.user_email);
+          const email = removeSpecialCharacters(profile?.user?.user_email);
 
-        if (data.data?.user_id) {
-          const notificationsRef = ref(database, `notification/${email}`);
-          const newNotificationRef = push(notificationsRef);
-          console.log("new notification ref", newNotificationRef);
-          await update(newNotificationRef, {
-            type: "community_follow",
-            message: `${user.name} started following your community`,
-            read: false,
-            createdAt: new Date().toISOString(),
-            data: {
-              communityId: activeCommunityId,
-              userId: user._id,
-              userName: user.name,
-              userImage: user.image,
-            },
-          });
+          if (data.data?.user_id) {
+            const notificationsRef = ref(database, `notification/${email}`);
+            const newNotificationRef = push(notificationsRef);
+            console.log("new notification ref", newNotificationRef);
+            await update(newNotificationRef, {
+              type: "community_follow",
+              message: `${user.name} started following your community`,
+              read: false,
+              createdAt: new Date().toISOString(),
+              data: {
+                communityId: activeCommunityId,
+                userId: user._id,
+                userName: user.name,
+                userImage: user.image,
+              },
+            });
+            console.log("Notification sent successfully");
+          }
+        } catch (notificationError) {
+          console.warn(
+            "Failed to send notification, but community join was successful:",
+            notificationError
+          );
+          // Don't throw the error - community join should still succeed
         }
       }
     },
@@ -517,6 +544,27 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
 
+  const typeToIcon: Record<
+    string,
+    { icon: React.ReactElement; label: string }
+  > = {
+    consultation: {
+      icon: <HiOutlineUserGroup className="text-blue-600 w-6 h-6" />,
+      label: "Consultation",
+    },
+    webinar: {
+      icon: <HiOutlineVideoCamera className="text-purple-600 w-6 h-6" />,
+      label: "Webinar",
+    },
+    package: {
+      icon: <MdOutlineClass className="text-orange-600 w-6 h-6" />,
+      label: "Package",
+    },
+    class: {
+      icon: <GrYoga className="text-green-600 w-6 h-6" />,
+      label: "Class",
+    },
+  };
   return (
     <div className="w-full">
       {/* Stepper for onboarding (only shown to owners) */}
@@ -604,28 +652,46 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       title="Share Profile"
                     >
                       Share Profile
-                      <Share2 className="ml-2 h-5 w-5" />
-                    </Button>
-                  ) : isCommunityFollowed ? (
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleLeaveCommunity}
-                    >
-                      {StringConstants.FOLLOWING}
-                      <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
                     </Button>
                   ) : (
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleJoinCommunity}
-                    >
-                      <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                      {StringConstants.FOLLOW}
-                    </Button>
+                    <>
+                      {isCommunityFollowed ? (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                          onClick={handleLeaveCommunity}
+                        >
+                          {StringConstants.FOLLOWING}
+                          <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                          onClick={handleJoinCommunity}
+                        >
+                          <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                          {StringConstants.FOLLOW}
+                        </Button>
+                      )}
+
+                      {/* Chat Support Button - Only for verified experts */}
+                      {activeCommunityId && (
+                        <ChatSupportButton
+                          expertEmail={profile.user.user_email || ""}
+                          expertDetails={{
+                            name: profile.user.user_name || "Expert",
+                            email: profile.user.user_email || "",
+                            image: profile.user.user_avatar || "",
+                          }}
+                          isBankConnected={isBankConnected}
+                          className="w-full mt-2"
+                        />
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -634,22 +700,39 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             {/* Right Column - Community Details */}
             <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10 pt-20 lg:pt-4 ">
               <div className="space-y-2">
-                <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
-                  {profile?.community?.name}
+                <div className="flex items-center  justify-between">
+                  <div className="flex items-center space-x-2">
+                    <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
+                      {profile?.community?.name}
+                      {/* {isOwner && (
+                        <button
+                          className="rounded-md p-1 transition hover:bg-background"
+                          onClick={() => setIsEditOpen(true)}
+                          aria-label="Edit community"
+                        >
+                          <Pencil
+                            size={18}
+                            className="text-muted hover:text-primary"
+                          />
+                        </button>
+                      )} */}
+                    </h1>{" "}
+                    {isBankConnected && (
+                      <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
+                    )}
+                  </div>
                   {isOwner && (
-                    <button
-                      className="rounded-md p-1 transition hover:bg-background"
-                      onClick={() => setIsEditOpen(true)}
-                      aria-label="Edit community"
-                    >
-                      <Pencil
-                        size={18}
-                        className="text-muted hover:text-primary"
-                      />
-                    </button>
+                    <div>
+                      <Button
+                        className="border border-blue-600 px-6 hidden md:block"
+                        variant="outline"
+                        onClick={() => setIsEditOpen(true)}
+                      >
+                        Edit Profile
+                      </Button>
+                    </div>
                   )}
-                </h1>
-
+                </div>
                 {/* Creator Info */}
                 <p className="text-md text-muted-foreground mt-1 mb-4">
                   {StringConstants.CREATED_BY}{" "}
@@ -657,7 +740,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile.user.user_name}
                   </span>
                 </p>
-
                 {/* Years of Experience */}
                 {profile.user?.user_year_of_experience > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -680,7 +762,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Years of experience</span>
                   </div>
                 )}
-
                 {/* Sessions Conducted */}
                 {profile.user?.user_session_conducted > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -703,7 +784,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Sessions Conducted</span>
                   </div>
                 )}
-
                 {/* Languages */}
                 {profile.user?.user_languages?.length > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -725,19 +805,20 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-                      {profile.user.user_languages.map((lang, index) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="bg-teal-50 text-teal-700 border-teal-200"
-                        >
-                          {lang}
-                        </Badge>
-                      ))}
+                      {profile.user.user_languages.map(
+                        (lang: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="bg-teal-50 text-teal-700 border-teal-200"
+                          >
+                            {lang}
+                          </Badge>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
-
                 {/* Community Stats */}
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-2">
                   {/* Members */}
@@ -811,36 +892,63 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile?.community?.name} - {profile.user.user_name}
                   </h1> */}
                 {isOwner ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleShareClick}
-                    title="Share Profile"
-                  >
-                    Share Profile
-                    <Share2 className="ml-2 h-5 w-5" />
-                  </Button>
-                ) : isCommunityFollowed ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleLeaveCommunity}
-                  >
-                    {StringConstants.FOLLOWING}
-                    <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                  </Button>
+                  <div>
+                    <Button
+                      className="border border-blue-300 px-6 w-full my-2"
+                      variant="outline"
+                      onClick={() => setIsEditOpen(true)}
+                    >
+                      Edit Profile <FaEdit className="ml-2 h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                      onClick={handleShareClick}
+                      title="Share Profile"
+                    >
+                      Share Profile
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+                    </Button>
+                  </div>
                 ) : (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleJoinCommunity}
-                  >
-                    <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                    {StringConstants.FOLLOW}
-                  </Button>
+                  <>
+                    {isCommunityFollowed ? (
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        onClick={handleLeaveCommunity}
+                      >
+                        {StringConstants.FOLLOWING}
+                        <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        onClick={handleJoinCommunity}
+                      >
+                        <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                        {StringConstants.FOLLOW}
+                      </Button>
+                    )}
+
+                    {/* Chat Support Button - Mobile Version */}
+                    {activeCommunityId && (
+                      <ChatSupportButton
+                        expertEmail={profile.user.user_email || ""}
+                        expertDetails={{
+                          name: profile.user.user_name || "Expert",
+                          email: profile.user.user_email || "",
+                          image: profile.user.user_avatar || "",
+                        }}
+                        isBankConnected={isBankConnected}
+                        className="w-full mt-2"
+                      />
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -858,7 +966,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   onClick={() => setIsEditOpen(true)}
                   aria-label="Edit about section"
                 >
-                  <Pencil size={18} className="text-muted hover:text-primary" />
+                  <FaEdit className="text-muted hover:text-primary h-5 w-5" />
                 </button>
               )}
             </h2>
@@ -966,7 +1074,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </h3>
 
                           {offering.is_free ||
-                          offering.discounted_price === 0 ? (
+                          Number(offering.discounted_price) === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"
@@ -1003,15 +1111,28 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
-                      <FcClock size={28} className="text-primary-foreground" />
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                        <span className="text-base  font-semibold text-gray-700">
-                          Duration:
-                        </span>
-                        <span className="text-base text-gray-600">
-                          {offering.duration} min
-                        </span>
+                    <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
+                      <div className="flex items-center gap-2">
+                        <FcClock
+                          size={28}
+                          className="text-primary-foreground"
+                        />
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                          <span className="text-base  font-semibold text-gray-700">
+                            Duration:
+                          </span>
+                          <span className="text-base text-gray-600">
+                            {offering.duration} min
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        {offering?.type && typeToIcon[offering.type] && (
+                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+                            {typeToIcon[offering.type].icon}
+                            <span>{typeToIcon[offering.type].label}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -1115,7 +1236,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
-              <Testimonials />
+              <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
 
