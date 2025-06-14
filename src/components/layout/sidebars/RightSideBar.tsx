@@ -83,17 +83,9 @@ export function RightSidebar() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}?hero=1`,
-            }),
-        },
+      signIn(undefined, {
+        callbackUrl: `${window.location.origin}?hero=1`,
       });
-    } else {
-      setIsDialogOpen(true);
     }
   };
 
@@ -116,8 +108,8 @@ export function RightSidebar() {
               className="w-full text-white shadow-md"
               onClick={handleCreatorButtonClick}
             >
-              <span className="text-amber-300 hidden sm:inline">👋</span>{" "}
-              {StringConstants.CREATE_A_PAGE}
+              {/* <span className="text-amber-300 hidden sm:inline">👋</span> */}
+              Join as Expert
             </Button>
 
             {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}

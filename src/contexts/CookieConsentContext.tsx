@@ -92,6 +92,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
         timestamp: new Date().toISOString(),
       };
 
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:5000';
       
       const response = await fetch(`${backendUrl}/v1/user/data`, {
