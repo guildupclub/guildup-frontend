@@ -1,10 +1,16 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { X, Cookie, Shield, BarChart3, Users } from 'lucide-react';
-import { useCookieConsent } from '@/hooks/useCookieConsent';
+"use client";
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { X, Cookie, Shield, BarChart3, Users } from "lucide-react";
+import { useCookieConsent } from "@/hooks/useCookieConsent";
 
 interface CookieCategory {
   id: string;
@@ -16,37 +22,40 @@ interface CookieCategory {
 }
 
 export default function CookieConsent() {
-  const { showConsent, acceptAll, acceptSelected, rejectAll, closeBanner } = useCookieConsent();
+  const { showConsent, acceptAll, acceptSelected, rejectAll, closeBanner } =
+    useCookieConsent();
   const [showDetails, setShowDetails] = useState(false);
   const [categories, setCategories] = useState<CookieCategory[]>([
     {
-      id: 'necessary',
-      name: 'Necessary Cookies',
-      description: 'Essential for the website to function properly. These cannot be disabled.',
+      id: "necessary",
+      name: "Necessary Cookies",
+      description:
+        "Essential for the website to function properly. These cannot be disabled.",
       icon: <Shield className="w-4 h-4" />,
       required: true,
       enabled: true,
     },
     {
-      id: 'functional',
-      name: 'Functional Cookies',
-      description: 'Enable enhanced functionality and personalization.',
+      id: "functional",
+      name: "Functional Cookies",
+      description: "Enable enhanced functionality and personalization.",
       icon: <Cookie className="w-4 h-4" />,
       required: false,
       enabled: true,
     },
     {
-      id: 'analytics',
-      name: 'Analytics Cookies',
-      description: 'Help us understand how visitors interact with our website.',
+      id: "analytics",
+      name: "Analytics Cookies",
+      description: "Help us understand how visitors interact with our website.",
       icon: <BarChart3 className="w-4 h-4" />,
       required: false,
       enabled: true,
     },
     {
-      id: 'marketing',
-      name: 'Marketing Cookies',
-      description: 'Used to track visitors across websites for advertising purposes.',
+      id: "marketing",
+      name: "Marketing Cookies",
+      description:
+        "Used to track visitors across websites for advertising purposes.",
       icon: <Users className="w-4 h-4" />,
       required: false,
       enabled: false,
@@ -56,8 +65,8 @@ export default function CookieConsent() {
   if (!showConsent) return null;
 
   const handleCategoryToggle = (categoryId: string) => {
-    setCategories(prev =>
-      prev.map(cat =>
+    setCategories((prev) =>
+      prev.map((cat) =>
         cat.id === categoryId && !cat.required
           ? { ...cat, enabled: !cat.enabled }
           : cat
@@ -67,8 +76,8 @@ export default function CookieConsent() {
 
   const handleAcceptSelected = () => {
     const selectedCategories = categories
-      .filter(cat => cat.enabled)
-      .map(cat => cat.id);
+      .filter((cat) => cat.enabled)
+      .map((cat) => cat.id);
     acceptSelected(selectedCategories);
   };
 
@@ -91,17 +100,16 @@ export default function CookieConsent() {
             </Button>
           </div>
           <CardDescription>
-            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
+            We use cookies to enhance your browsing experience, serve
+            personalized ads or content, and analyze our traffic. By clicking
+            &quot;Accept All&quot;, you consent to our use of cookies.
           </CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {!showDetails ? (
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                onClick={acceptAll}
-                className="flex-1"
-              >
+              <Button onClick={acceptAll} className="flex-1">
                 Accept All
               </Button>
               <Button
@@ -111,11 +119,7 @@ export default function CookieConsent() {
               >
                 Customize
               </Button>
-              <Button
-                variant="outline"
-                onClick={rejectAll}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={rejectAll} className="flex-1">
                 Reject All
               </Button>
             </div>
@@ -147,12 +151,18 @@ export default function CookieConsent() {
                               checked={category.enabled}
                               onChange={() => handleCategoryToggle(category.id)}
                             />
-                            <div className={`w-11 h-6 rounded-full ${
-                              category.enabled ? 'bg-primary' : 'bg-gray-200'
-                            } relative transition-colors`}>
-                              <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                                category.enabled ? 'translate-x-5' : 'translate-x-0'
-                              }`} />
+                            <div
+                              className={`w-11 h-6 rounded-full ${
+                                category.enabled ? "bg-primary" : "bg-gray-200"
+                              } relative transition-colors`}
+                            >
+                              <div
+                                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                                  category.enabled
+                                    ? "translate-x-5"
+                                    : "translate-x-0"
+                                }`}
+                              />
                             </div>
                           </label>
                         )}
@@ -165,10 +175,7 @@ export default function CookieConsent() {
               <Separator />
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Button
-                  onClick={handleAcceptSelected}
-                  className="flex-1"
-                >
+                <Button onClick={handleAcceptSelected} className="flex-1">
                   Save Preferences
                 </Button>
                 <Button
@@ -183,7 +190,7 @@ export default function CookieConsent() {
           )}
 
           <div className="text-xs text-muted-foreground text-center">
-            You can change these settings at any time in your{' '}
+            You can change these settings at any time in your{" "}
             <button className="underline hover:text-primary">
               Privacy Settings
             </button>
@@ -192,4 +199,4 @@ export default function CookieConsent() {
       </Card>
     </div>
   );
-} 
+}
