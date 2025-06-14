@@ -1,3 +1,4 @@
+"use client";
 import { Sidebar } from "@/components/community/SideBar";
 import { LeftmostSidebar } from "@/components/community/LeftmostSidebar";
 import type { ReactNode } from "react";
