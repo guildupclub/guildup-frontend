@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import Script from "next/script";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import { PostHogProvider } from "@/contexts/PostHogProvider";
+
 import CookieConsent from "@/components/cookies/CookieConsent";
 
 const geistSans = Geist({
@@ -130,6 +131,7 @@ export default async function RootLayout({
               <CookieConsent />
             </Providers>
           </PostHogProvider>
+
         </CookieConsentProvider>
       </body>
     </html>
