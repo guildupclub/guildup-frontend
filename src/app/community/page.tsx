@@ -1,3 +1,4 @@
+'use client';
 import CommunityChat from "@/components/community/CommunityChat";
 import React from "react";
 

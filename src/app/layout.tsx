@@ -6,6 +6,9 @@ import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
 import { headers } from "next/headers";
 import Script from "next/script";
+import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
+import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
+import CookieConsent from "@/components/cookies/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,8 +32,7 @@ export const metadata: Metadata = {
   authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
-  themeColor: "#ffffff",
-  colorScheme: "light",
+
 
   icons: {
     icon: "/guildup-logo.png",
@@ -104,11 +106,16 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <NavbarClient />
-          {children}
-          <Toaster richColors position="top-center" />
-        </Providers>
+        <CookieConsentProvider>
+          <PostHogProviderWrapper>
+            <Providers>
+              <NavbarClient />
+              {children}
+              <Toaster richColors position="top-center" />
+              <CookieConsent />
+            </Providers>
+          </PostHogProviderWrapper>
+        </CookieConsentProvider>
       </body>
     </html>
   );

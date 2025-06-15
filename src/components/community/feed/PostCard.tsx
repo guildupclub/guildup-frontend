@@ -254,7 +254,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
           label: "Sign In",
           onClick: () =>
             signIn(undefined, {
-              callbackUrl: window.location.href,
+              callbackUrl: `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}`,
             }),
         },
       });
@@ -300,7 +300,7 @@ export function PostCard({ post, onDelete, onUpdate }: PostCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${window.location.origin}/post/${post?._id}`;
+    const shareUrl = `${process.env.NEXT_PUBLIC_FRONTEND_BASE_URL}/post/${post?._id}`;
 
     try {
       await navigator.share({

@@ -290,7 +290,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   // Check if the current community is followed by the user
   const isCommunityFollowed = React.useMemo(() => {
     if (followedCommunitiesData) {
-      return followedCommunitiesData.some(
+      return (followedCommunitiesData as any).some(
         (c: any) => c?._id === activeCommunityId
       );
     }
@@ -788,6 +788,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
+
                       {profile.user.user_languages.map(
                         (lang: string, index: number) => (
                           <Badge
