@@ -23,11 +23,23 @@ type Testimonial = {
   userId: string;
   mediaType?: "image" | "video";
 };
+
+interface TestimonialsProps {
+  communityId: string;
+}
+
 const videoExtensions = [".mp4", ".webm", ".ogg", ".mov", ".avi", ".mkv"];
-export default function Testimonials() {
+export default function Testimonials({ communityId: propCommunityId }: TestimonialsProps) {
+  
   const dispatch = useDispatch();
   const params = useParams();
-  const communityId = params?.id as string;
+  
+  // Use prop communityId first, then fall back to URL params
+  const urlCommunityId = params?.id as string;
+  const urlCommunityParam = params?.["community-Id"] as string;
+  const urlExtractedId = urlCommunityParam ? urlCommunityParam.substring(urlCommunityParam.lastIndexOf("-") + 1) : null;
+  
+  const communityId = propCommunityId || urlExtractedId || urlCommunityId;  
   // const activeCommunity = useSelector(
   //   (state: RootState) => state.channel.activeCommunity
   // );
@@ -125,9 +137,13 @@ export default function Testimonials() {
         }
       );
 
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log("Error response:", errorText);
         throw new Error("Failed to upload testimonials");
       }
+
 
       toast({
         title: "Success",

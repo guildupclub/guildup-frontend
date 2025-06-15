@@ -14,6 +14,24 @@ import {
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
 import moment from "moment";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import axios from "axios";
+import { toast } from "sonner";
+import { useParams } from "next/navigation";
+
 interface Post {
   id: string;
   author: string;
@@ -24,6 +42,10 @@ interface Post {
 }
 
 function Chat() {
+  const memberDetails = useSelector(
+    (state: RootState) => state.member.memberDetails
+  );
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
   const queryClient = useQueryClient();
   const activeChannel = useSelector(
     (state: RootState) => state.channel.activeChannel
@@ -32,8 +54,22 @@ function Chat() {
   const userId = useSelector((state: RootState) => state.user.user?._id);
 
   const [postBody, setPostBody] = useState<string>("");
+  const [selectedChannelId, setSelectedChannelId] = useState<string | null>(
+    null
+  );
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const params = useParams();
+  const communityParam = params["community-Id"] as string;
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  // const communityName =
+  //   lastHyphenIndex !== -1
+  //     ? communityParam.substring(0, lastHyphenIndex)
+  //     : null;
+  const urlCommunityId =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
 
-  // ✅ Fetch chat messages using useQuery
   const {
     data: posts,
     isLoading,
@@ -65,7 +101,7 @@ function Chat() {
         }) || []
       );
     },
-    enabled: !!activeChannelId, // ✅ Only fetch when channel is active
+    enabled: !!activeChannelId,
   });
 
   const sendPostMutation = useMutation({
@@ -102,6 +138,25 @@ function Chat() {
     }
   };
 
+  const handleDeleteChannel = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/channel/delete`,
+        {
+          userId,
+          communityId: urlCommunityId,
+          channelId: selectedChannelId,
+        }
+      );
+
+      toast.success("Channel deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+    } finally {
+      setShowDeleteDialog(false);
+    }
+  };
+
   if (!activeChannel) {
     return (
       <div className="flex items-center justify-center h-screen text-zinc-400">
@@ -129,7 +184,30 @@ function Chat() {
         <h1 className="text-lg font-medium">
           {StringConstants.HASHTAG} {activeChannel.name || "Unnamed Channel"}
         </h1>
-        <Settings className="h-5 w-5" />
+        {isAdmin && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full  "
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40 bg-gray-100">
+              <DropdownMenuItem
+                onClick={() => {
+                  setSelectedChannelId(activeChannelId);
+                  setShowDeleteDialog(true);
+                }}
+                className="text-muted-foreground cursor-pointer"
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Chat Messages */}
@@ -184,6 +262,28 @@ function Chat() {
           </Button>
         </div>
       </div>
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Channel</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this channel? You won&apos;t be
+              able to undo this action.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-between sm:justify-between mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteChannel}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
