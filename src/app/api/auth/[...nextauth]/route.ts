@@ -12,20 +12,25 @@ const googleAuthClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const handler = NextAuth({
   adapter: MongoDBAdapter(client),
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile, token }) {
+      console.log("JWT Callback - Token:>>>>>>>>>>", token);
       // For Google One Tap, ensure we have a proper MongoDB ObjectId
       if (
         account?.provider === "googleonetap" ||
         account?.provider === "google"
       ) {
         try {
-          const db = client.db("Cluster0");
-          const usersCollection = db.collection("users");
+          // const db = client.db("test");
+          // const usersCollection = db.collection("users");
 
-          // Check if user exists by email
-          const existingUser = await usersCollection.findOne({
-            email: user.email,
-          });
+          // // Check if user exists by email
+          // const existingUser = await usersCollection.findOne({
+          //   email: user.email,
+          // });
+          const existingUser = await client
+            .db("test")
+            .collection("users")
+            .findOne({ email: user.email });
 
           if (existingUser) {
             // User exists, use their existing ObjectId
@@ -49,12 +54,19 @@ const handler = NextAuth({
 
       if (user) {
         try {
-          const db = client.db("Cluster0");
-          const usersCollection = db.collection("users");
+          // const db = client.db("Cluster0");
+          // const usersCollection = db.collection("users");
 
-          const userExists = await usersCollection.findOne({
-            email: user.email,
-          });
+          // const userExists = await usersCollection.findOne({
+          //   email: user.email,
+          // });
+          // console.log("User Exists:", userExists);
+
+          const userExists = await client
+            .db("test")
+            .collection("users")
+            .findOne({ email: user.email });
+
           console.log("User Exists:", userExists);
 
           if (!userExists) {
@@ -70,6 +82,7 @@ const handler = NextAuth({
           } else {
             token.isNewUser = false;
             token._id = userExists._id.toString();
+
             console.log("Existing User - Setting isNewUser flag to false");
           }
 
@@ -141,7 +154,7 @@ const handler = NextAuth({
             throw new Error("Email not verified or not available");
           }
 
-          const db = client.db("Cluster0");
+          const db = client.db("test");
           const usersCollection = db.collection("users");
 
           // Check if user already exists
