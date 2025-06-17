@@ -31,7 +31,10 @@ import { FaRupeeSign } from "react-icons/fa";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useTracking } from "@/hooks/useTracking";
-
+import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { MdLocalOffer } from "react-icons/md";
+import { BiSolidOffer } from "react-icons/bi";
+import { BsCalendarCheck } from "react-icons/bs";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -98,6 +101,24 @@ export function BookingDialog({
   const name = user?.name || "";
   const email = user?.email || "";
   const tracking = useTracking();
+  const [sessionConducted, setSessionConducted] = useState(false);
+  const [yearOfExperience, setYearOfExperience] = useState(0);
+  const [isBankAdded, setIsBankAdded] = useState(false);
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+
+  useEffect(() => {
+    const sc = JSON.parse(localStorage.getItem("sessionConducted") || "false");
+    const yoe = JSON.parse(localStorage.getItem("yearOfExperience") || "0");
+    const bank = JSON.parse(localStorage.getItem("isBankAdded") || "false");
+    const calendar = JSON.parse(
+      localStorage.getItem("isCalendarConnected") || "false"
+    );
+
+    setSessionConducted(sc);
+    setYearOfExperience(yoe);
+    setIsBankAdded(bank);
+    setIsCalendarConnected(calendar);
+  }, []);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -147,14 +168,14 @@ export function BookingDialog({
     setShowConfirmation(false);
     if (date) {
       // Track date selection
-      tracking.trackClick('booking_date_selected', {
+      tracking.trackClick("booking_date_selected", {
         offering_id: offering._id,
         offering_title: offering.title,
         offering_type: offering.type,
         selected_date: date.toISOString(),
-        user_id: userId
+        user_id: userId,
       });
-      
+
       fetchAvailableSlots(date);
       setBookingStep("time"); // Add this line to change the view to time slots
     }
@@ -166,16 +187,16 @@ export function BookingDialog({
 
   const handleSlotSelect = (slot: TimeSlot) => {
     // Track time slot selection
-    tracking.trackClick('booking_time_slot_selected', {
+    tracking.trackClick("booking_time_slot_selected", {
       offering_id: offering._id,
       offering_title: offering.title,
       offering_type: offering.type,
       selected_date: selectedDate?.toISOString(),
       selected_slot_start: slot.start,
       selected_slot_end: slot.end,
-      user_id: userId
+      user_id: userId,
     });
-    
+
     setSelectedSlot(slot);
     setShowConfirmation(true);
     setBookingStep("confirmation");
@@ -198,7 +219,7 @@ export function BookingDialog({
 
   const handleBookSlot = async () => {
     // Track booking confirmation attempt
-    tracking.trackClick('confirm_booking_button', {
+    tracking.trackClick("confirm_booking_button", {
       offering_id: offering._id,
       offering_title: offering.title,
       offering_type: offering.type,
@@ -209,9 +230,9 @@ export function BookingDialog({
       selected_slot_start: selectedSlot?.start,
       selected_slot_end: selectedSlot?.end,
       user_id: userId,
-      phone_provided: !!phone
+      phone_provided: !!phone,
     });
-    
+
     setIsProcessing(true);
     if (!selectedDate || !selectedSlot) {
       return;
@@ -270,20 +291,20 @@ export function BookingDialog({
           setBookingDetails(response.data.data);
           setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
-                      tracking.trackUserAction('free_booking_confirmed', {
-              offering_id: offering._id,
-              offering_title: offering.title,
-              offering_type: offering.type,
-              user_id: userId,
-              booking_date: selectedDate?.toISOString(),
-              booking_start_time: selectedSlot?.start,
-              booking_end_time: selectedSlot?.end,
-              phone: phoneWithoutFormatting
-            });
+          tracking.trackUserAction("free_booking_confirmed", {
+            offering_id: offering._id,
+            offering_title: offering.title,
+            offering_type: offering.type,
+            user_id: userId,
+            booking_date: selectedDate?.toISOString(),
+            booking_start_time: selectedSlot?.start,
+            booking_end_time: selectedSlot?.end,
+            phone: phoneWithoutFormatting,
+          });
           return;
         }
         // Track payment initiation
-        tracking.trackClick('payment_initiated', {
+        tracking.trackClick("payment_initiated", {
           offering_id: offering._id,
           offering_title: offering.title,
           offering_type: offering.type,
@@ -291,9 +312,9 @@ export function BookingDialog({
           currency: response.data.data.currency || "INR",
           order_id: response.data.data.id,
           user_id: userId,
-          payment_method: 'razorpay'
+          payment_method: "razorpay",
         });
-        
+
         // Start Razorpay payment process
         const razorpayOptions = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
@@ -334,19 +355,19 @@ export function BookingDialog({
                 toast.success("Booking confirmed successfully!");
               }, 300);
               console.log("Booking confirmed successfully!");
-                              tracking.trackUserAction('paid_booking_confirmed', {
-                  offering_id: offering._id,
-                  offering_title: offering.title,
-                  offering_type: offering.type,
-                  amount: response.data.data.amount,
-                  currency: response.data.data.currency || "INR",
-                  user_id: userId,
-                  booking_date: selectedDate?.toISOString(),
-                  booking_start_time: selectedSlot?.start,
-                  booking_end_time: selectedSlot?.end,
-                  payment_id: paymentResponse.razorpay_payment_id,
-                  order_id: paymentResponse.razorpay_order_id
-                });
+              tracking.trackUserAction("paid_booking_confirmed", {
+                offering_id: offering._id,
+                offering_title: offering.title,
+                offering_type: offering.type,
+                amount: response.data.data.amount,
+                currency: response.data.data.currency || "INR",
+                user_id: userId,
+                booking_date: selectedDate?.toISOString(),
+                booking_start_time: selectedSlot?.start,
+                booking_end_time: selectedSlot?.end,
+                payment_id: paymentResponse.razorpay_payment_id,
+                order_id: paymentResponse.razorpay_order_id,
+              });
               // Don't close the dialog here
             } else {
               toast.error("Payment verification failed");
@@ -439,15 +460,15 @@ export function BookingDialog({
         setBookingSuccess(true);
         toast.success("Booking confirmed successfully!");
         console.log("Booking confirmed successfully!");
-                  tracking.trackUserAction('paid_booking_confirmed_v2', {
-            offering_id: offering._id,
-            offering_title: offering.title,
-            offering_type: offering.type,
-            user_id: userId,
-            booking_start_time: selectedSlot!.start,
-            payment_id: paymentResponse.razorpay_payment_id,
-            order_id: paymentResponse.razorpay_order_id
-          });
+        tracking.trackUserAction("paid_booking_confirmed_v2", {
+          offering_id: offering._id,
+          offering_title: offering.title,
+          offering_type: offering.type,
+          user_id: userId,
+          booking_start_time: selectedSlot!.start,
+          payment_id: paymentResponse.razorpay_payment_id,
+          order_id: paymentResponse.razorpay_order_id,
+        });
       } else {
         toast.error("Payment verification failed");
         onClose();
@@ -468,59 +489,147 @@ export function BookingDialog({
             <div className="p-8 flex flex-col items-center text-center border-r border-border/20">
               <div className="space-y-6 bg-card p-6 rounded-lg shadow-lg w-full max-w-sm">
                 {/* Title */}
-                <h1 className="text-muted font-bold text-2xl">
-                  Hello {user?.name}
+                <h1 className="text-muted font-bold text-lg text-center">
+                  <span className="text-xl">
+                    {" "}
+                    You&apos;re Booking
+                    <br />{" "}
+                  </span>
+                  <span className="text-primary font-semibold">
+                    {offering.title}
+                  </span>
                 </h1>
+                {offering.type === "webinar" && (
+                  <div className="flex justify-between items-center mt-4 w-full bg-blue-100 font-bold px-4 py-2 rounded-md shadow-sm">
+                    {/* Date */}
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                      <span>
+                        {offering.when
+                          ? new Date(offering.when).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              }
+                            )
+                          : "No date set"}
+                      </span>
+                    </div>
+
+                    {/* Time */}
+                    <div className="text-sm text-gray-700">
+                      {offering.when
+                        ? new Date(offering.when).toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : ""}
+                    </div>
+                  </div>
+                )}
 
                 {/* Avatar */}
-                <div className="relative w-24 h-24 mx-auto my-4">
+                <div className="relative w-28 h-28 mx-auto my-4">
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-foreground/20 rounded-full blur-lg opacity-60"></div>
+
                   <img
                     src={
                       activeCommunity?.image ||
-                      "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh" ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg" ||
-                      "/placeholder.svg"
+                      "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh"
                     }
                     alt="User"
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-md"
                   />
+
+                  {isBankAdded && (
+                    <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-10 w-10 text-primary drop-shadow-md bg-white rounded-full" />
+                  )}
                 </div>
 
                 <div className="text-center space-y-2">
-                  <p className="text-xl font-semibold text-primary">
-                    Booking {offering.title}
-                  </p>
+                  <h1 className="font-bold">{activeCommunity?.name}</h1>
+
                   <p className="flex items-center justify-center gap-1 text-muted-foreground">
-                    <GoDotFill className="w-3 h-3" />
-                    {offering?.type}
+                    <BiSolidOffer className="h-5 w-5 text-green-600" />
+                    {offering?.type.toUpperCase()}
                   </p>
                 </div>
-                {/* Details (Duration & Price) */}
-                <div className="grid grid-cols-2 gap-4 w-full mt-4 px-2 py-4 bg-primary-muted/20 rounded-lg">
+
+                <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
+                  {/* Year of Experience */}
+                  <div className="flex items-center gap-3 border-b py-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-amber-500"
+                    >
+                      <circle cx="12" cy="8" r="7" />
+                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">
+                        Year of Experience
+                      </span>
+                      <span className="text-sm font-semibold text-gray-800">
+                        {yearOfExperience} years
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Sessions Conducted */}
+                  <div className="flex items-center gap-3 border-b py-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="h-6 w-6 text-violet-500"
+                    >
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg>
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">
+                        Sessions Conducted
+                      </span>
+                      <span className="text-sm font-semibold text-gray-800">
+                        {sessionConducted}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Duration */}
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-500 shrink-0" />
-                    <div className="text-left">
-                      <p className="text-xs text-muted-foreground">Duration</p>
-                      <p className="text-sm font-medium">
+                  <div className="flex items-center justify-center">
+                    <Clock className="w-6 h-6 text-blue-500 mx-2" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">Duration</span>
+                      <span className="text-sm font-semibold text-gray-800">
                         {offering.duration} min
-                      </p>
+                      </span>
                     </div>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-center gap-2">
-                    <FaRupeeSign className="h-5 w-5 text-green-500 shrink-0" />
-                    <div className="text-left">
-                      <p className="text-xs text-muted-foreground">Price</p>
-                      <p className="text-sm font-medium">
+                  <div className="flex items-center justify-center">
+                    <FaRupeeSign className="w-5 h-5 text-green-500 mx-2" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">Price</span>
+                      <span className="text-sm font-semibold text-gray-800">
                         {offering.discounted_price !== null &&
                         offering.discounted_price !== undefined
                           ? offering.discounted_price
                           : offering.price.amount}
-                      </p>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -646,8 +755,8 @@ export function BookingDialog({
                             placeholder="Enter your phone number"
                           />
                           <p className="text-xs text-muted-foreground">
-                            Your phone number is required for booking
-                            confirmation
+                            Your WhatsApp number is required for booking
+                            confirmation & reminders.
                           </p>
                         </div>
 
@@ -714,8 +823,8 @@ export function BookingDialog({
                       {/* </div> */}
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-2">
-                      <Button
+                    <div className=" pt-2">
+                      {/* <Button
                         variant="outline"
                         onClick={() => {
                           setShowConfirmation(false);
@@ -725,10 +834,10 @@ export function BookingDialog({
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Back
-                      </Button>
+                      </Button> */}
                       <Button
                         onClick={handleBookSlot}
-                        className="bg-primary  hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
+                        className="bg-primary  w-full hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
                         disabled={isProcessing}
                       >
                         {isProcessing ? (
@@ -737,10 +846,7 @@ export function BookingDialog({
                             Processing...
                           </>
                         ) : (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Confirm Booking
-                          </>
+                          <>Confirm Booking</>
                         )}
                       </Button>
                     </div>

@@ -36,7 +36,7 @@ import {
 import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
+import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
 import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
@@ -247,7 +247,31 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         }
       );
 
-      if (response.data.r === "s") {
+      if (response.data.r) {
+        try {
+          localStorage.setItem(
+            "sessionConducted",
+            JSON.stringify(response?.data?.data?.user?.user_session_conducted)
+          );
+          localStorage.setItem(
+            "yearOfExperience",
+            JSON.stringify(response?.data?.data?.user?.user_year_of_experience)
+          );
+          localStorage.setItem(
+            "isBankAdded",
+            JSON.stringify(response?.data?.data?.user?.user_isBankDetailsAdded)
+          );
+          localStorage.setItem(
+            "isCalendarConnected",
+            JSON.stringify(response?.data?.data?.user?.user_iscalendarConnected)
+          );
+          // localStorage.setItem("Date-Time",JSON.stringify(response?.data))
+        } catch (error) {
+          console.warn(
+            "Failed to store communityProfile in localStorage",
+            error
+          );
+        }
         if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
@@ -1117,6 +1141,40 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
                       </div>
                     </div>
+
+                    {offering.type === "webinar" && (
+                      <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
+                        {/* Date */}
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                          <span>
+                            {offering.when
+                              ? new Date(offering.when).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )
+                              : "No date set"}
+                          </span>
+                        </div>
+
+                        {/* Time */}
+                        <div className="text-sm text-gray-700">
+                          {offering.when
+                            ? new Date(offering.when).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                            : ""}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Buttons */}
                     <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
