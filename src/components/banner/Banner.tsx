@@ -72,16 +72,16 @@ export default function WelcomeBanner() {
           <X className="h-4 w-4" />
         </button>
 
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 p-6 shadow-2xl">
-          <div className="mb-2 flex items-center justify-between">
+        <div className=" relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 p-2 lg:p-4 shadow-2xl">
+          {/* <div className="mb-2 flex items-center justify-between hidden lg:block">
             <div className="flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-green-800"></div>
               <span className=" font-bold text-white">WELCOME TO GUILDUP</span>
             </div>
             <div className="text-lg font-bold text-gray-800">GuildUp</div>
-          </div>
+          </div> */}
 
-          <div className="mb-6">
+          <div className="mb-2 lg:mb-4">
             {/* <h2 className="mb-2 text-2xl font-bold text-gray-800 leading-tight">
               Discover Trusted Coaches & Experts
             </h2> */}
@@ -89,7 +89,7 @@ export default function WelcomeBanner() {
               Connect with professionals who can guide your journey to success
             </p> */}
           </div>
-          <div className="relative h-[500px] w-full mb-6">
+          <div className="relative h-[500px] w-full mb-2 lg:mb-4">
             <Image
               src="https://res.cloudinary.com/dzvdh7yez/image/upload/v1750171742/WhatsApp_Image_2025-06-17_at_20.16.45_400e029e_n4eh1y.jpg"
               alt="Welcome banner"
@@ -102,7 +102,7 @@ export default function WelcomeBanner() {
           {/* Action button */}
           <Button
             onClick={handleGoToProfile}
-            className="bg-gray-800 hover:bg-gray-700  px-6 py-2 rounded-lg font-medium transition-colors flex items-center justify-center animate-arrow-bounce hover:scale-x-105 transition-transform duration-300 cursor-pointer"
+            className="bg-gray-800 hover:bg-gray-700 w-full px-6 py-2 rounded-lg font-medium transition-colors flex items-center justify-center animate-arrow-bounce hover:scale-100 lg:hover:scale-x-105 transition-transform duration-300 cursor-pointer"
           >
             Book Your Spot <FaArrowRightLong />
           </Button>
