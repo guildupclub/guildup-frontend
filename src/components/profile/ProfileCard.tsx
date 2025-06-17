@@ -805,7 +805,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-
                       {profile.user.user_languages.map(
                         (lang: string, index: number) => (
                           <Badge
@@ -1075,7 +1074,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </h3>
 
                           {offering.is_free ||
-                          Number(offering.discounted_price) === 0 ? (
+                          Number(offering.price?.amount) === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"
@@ -1083,27 +1082,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               Free
                             </Badge>
                           ) : (
-                            <div className="flex flex-col items-end">
-                              {offering.discounted_price !== null &&
-                              offering.discounted_price !== undefined ? (
-                                <>
-                                  {offering.price?.amount !== null &&
-                                    offering.price?.amount !== undefined && (
-                                      <span className="text-xs text-gray-400 line-through">
-                                        ₹{offering.price.amount}
-                                      </span>
-                                    )}
-                                  <span className="font-semibold text-gray-900">
-                                    ₹{offering.discounted_price}
-                                  </span>
-                                </>
-                              ) : offering.price?.amount !== null &&
-                                offering.price?.amount !== undefined ? (
-                                <span className="font-semibold text-gray-900">
-                                  ₹{offering.price.amount}
-                                </span>
-                              ) : null}
-                            </div>
+                            <span className="font-semibold text-gray-900">
+                              ₹{offering.price?.amount}
+                            </span>
                           )}
                         </div>
 
