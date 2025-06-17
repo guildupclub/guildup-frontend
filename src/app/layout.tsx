@@ -1,14 +1,13 @@
+import type React from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import NavbarClient from "@/components/layout/NavbarClient";
-import { headers } from "next/headers";
-import Script from "next/script";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
-
+import WelcomeBanner from "@/components/banner/Banner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 
 const geistSans = Geist({
@@ -26,7 +25,7 @@ const guildup_logo_final = "/guildup_logo_final.png";
 export const metadata: Metadata = {
   title: "GuildUp",
   description:
-    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
   openGraph: {
     title: "GuildUp",
     description:
@@ -50,8 +49,6 @@ export const metadata: Metadata = {
   authors: [{ name: "GuildUp Club", url: "https://guildup.club" }],
   creator: "GuildUp Club",
   keywords: ["GuildUp Club", "Community", "Knowledge Sharing", "Monetization"],
-
-
   icons: {
     icon: "/guildup-logo.png",
     shortcut: "/guildup-logo.png",
@@ -128,9 +125,9 @@ export default async function RootLayout({
               {children}
               <Toaster richColors position="top-center" />
               <CookieConsent />
+              <WelcomeBanner />
             </Providers>
           </PostHogProviderWrapper>
-
         </CookieConsentProvider>
       </body>
     </html>
