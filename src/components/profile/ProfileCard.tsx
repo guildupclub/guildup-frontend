@@ -36,11 +36,11 @@ import {
 import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
+import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
-import { FaLinkedinIn } from "react-icons/fa6";
-import { RiUserSharedFill } from "react-icons/ri";
-import { FaClock, FaShareAlt } from "react-icons/fa";
+import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
+import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
+import { FaClock, FaEdit, FaShareAlt } from "react-icons/fa";
 import { useNotifications } from "../notifications/NotificationContext";
 import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
@@ -247,7 +247,31 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         }
       );
 
-      if (response.data.r === "s") {
+      if (response.data.r) {
+        try {
+          localStorage.setItem(
+            "sessionConducted",
+            JSON.stringify(response?.data?.data?.user?.user_session_conducted)
+          );
+          localStorage.setItem(
+            "yearOfExperience",
+            JSON.stringify(response?.data?.data?.user?.user_year_of_experience)
+          );
+          localStorage.setItem(
+            "isBankAdded",
+            JSON.stringify(response?.data?.data?.user?.user_isBankDetailsAdded)
+          );
+          localStorage.setItem(
+            "isCalendarConnected",
+            JSON.stringify(response?.data?.data?.user?.user_iscalendarConnected)
+          );
+          // localStorage.setItem("Date-Time",JSON.stringify(response?.data))
+        } catch (error) {
+          console.warn(
+            "Failed to store communityProfile in localStorage",
+            error
+          );
+        }
         if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
@@ -544,7 +568,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const isBankConnected = profile?.user?.user_isBankDetailsAdded;
   const isCalendarConnected = profile?.user?.user_iscalendarConnected;
 
-  const typeToIcon: Record<string, { icon: React.ReactElement; label: string }> = {
+  const typeToIcon: Record<
+    string,
+    { icon: React.ReactElement; label: string }
+  > = {
     consultation: {
       icon: <HiOutlineUserGroup className="text-blue-600 w-6 h-6" />,
       label: "Consultation",
@@ -649,7 +676,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       title="Share Profile"
                     >
                       Share Profile
-                      <Share2 className="ml-2 h-5 w-5" />
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
                     </Button>
                   ) : (
                     <>
@@ -697,22 +724,39 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             {/* Right Column - Community Details */}
             <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10 pt-20 lg:pt-4 ">
               <div className="space-y-2">
-                <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
-                  {profile?.community?.name}
+                <div className="flex items-center  justify-between">
+                  <div className="flex items-center space-x-2">
+                    <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
+                      {profile?.community?.name}
+                      {/* {isOwner && (
+                        <button
+                          className="rounded-md p-1 transition hover:bg-background"
+                          onClick={() => setIsEditOpen(true)}
+                          aria-label="Edit community"
+                        >
+                          <Pencil
+                            size={18}
+                            className="text-muted hover:text-primary"
+                          />
+                        </button>
+                      )} */}
+                    </h1>{" "}
+                    {isBankConnected && (
+                      <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
+                    )}
+                  </div>
                   {isOwner && (
-                    <button
-                      className="rounded-md p-1 transition hover:bg-background"
-                      onClick={() => setIsEditOpen(true)}
-                      aria-label="Edit community"
-                    >
-                      <Pencil
-                        size={18}
-                        className="text-muted hover:text-primary"
-                      />
-                    </button>
+                    <div>
+                      <Button
+                        className="border border-blue-600 px-6 hidden md:block"
+                        variant="outline"
+                        onClick={() => setIsEditOpen(true)}
+                      >
+                        Edit Profile
+                      </Button>
+                    </div>
                   )}
-                </h1>
-
+                </div>
                 {/* Creator Info */}
                 <p className="text-md text-muted-foreground mt-1 mb-4">
                   {StringConstants.CREATED_BY}{" "}
@@ -720,7 +764,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile.user.user_name}
                   </span>
                 </p>
-
                 {/* Years of Experience */}
                 {profile.user?.user_year_of_experience > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -743,7 +786,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Years of experience</span>
                   </div>
                 )}
-
                 {/* Sessions Conducted */}
                 {profile.user?.user_session_conducted > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -766,7 +808,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     <span>Sessions Conducted</span>
                   </div>
                 )}
-
                 {/* Languages */}
                 {profile.user?.user_languages?.length > 0 && (
                   <div className="flex items-center gap-1.5">
@@ -788,7 +829,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-
                       {profile.user.user_languages.map(
                         (lang: string, index: number) => (
                           <Badge
@@ -803,7 +843,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     </div>
                   </div>
                 )}
-
                 {/* Community Stats */}
                 <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-2">
                   {/* Members */}
@@ -877,16 +916,25 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     {profile?.community?.name} - {profile.user.user_name}
                   </h1> */}
                 {isOwner ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleShareClick}
-                    title="Share Profile"
-                  >
-                    Share Profile
-                    <Share2 className="ml-2 h-5 w-5" />
-                  </Button>
+                  <div>
+                    <Button
+                      className="border border-blue-300 px-6 w-full my-2"
+                      variant="outline"
+                      onClick={() => setIsEditOpen(true)}
+                    >
+                      Edit Profile <FaEdit className="ml-2 h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                      onClick={handleShareClick}
+                      title="Share Profile"
+                    >
+                      Share Profile
+                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+                    </Button>
+                  </div>
                 ) : (
                   <>
                     {isCommunityFollowed ? (
@@ -942,7 +990,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   onClick={() => setIsEditOpen(true)}
                   aria-label="Edit about section"
                 >
-                  <Pencil size={18} className="text-muted hover:text-primary" />
+                  <FaEdit className="text-muted hover:text-primary h-5 w-5" />
                 </button>
               )}
             </h2>
@@ -1050,7 +1098,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </h3>
 
                           {offering.is_free ||
-                          Number(offering.discounted_price) === 0 ? (
+                          Number(offering.price?.amount) === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"
@@ -1058,27 +1106,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               Free
                             </Badge>
                           ) : (
-                            <div className="flex flex-col items-end">
-                              {offering.discounted_price !== null &&
-                              offering.discounted_price !== undefined ? (
-                                <>
-                                  {offering.price?.amount !== null &&
-                                    offering.price?.amount !== undefined && (
-                                      <span className="text-xs text-gray-400 line-through">
-                                        ₹{offering.price.amount}
-                                      </span>
-                                    )}
-                                  <span className="font-semibold text-gray-900">
-                                    ₹{offering.discounted_price}
-                                  </span>
-                                </>
-                              ) : offering.price?.amount !== null &&
-                                offering.price?.amount !== undefined ? (
-                                <span className="font-semibold text-gray-900">
-                                  ₹{offering.price.amount}
-                                </span>
-                              ) : null}
-                            </div>
+                            <span className="font-semibold text-gray-900">
+                              ₹{offering.price?.amount}
+                            </span>
                           )}
                         </div>
 
@@ -1111,6 +1141,40 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
                       </div>
                     </div>
+
+                    {offering.type === "webinar" && (
+                      <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
+                        {/* Date */}
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                          <span>
+                            {offering.when
+                              ? new Date(offering.when).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )
+                              : "No date set"}
+                          </span>
+                        </div>
+
+                        {/* Time */}
+                        <div className="text-sm text-gray-700">
+                          {offering.when
+                            ? new Date(offering.when).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                            : ""}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Buttons */}
                     <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">

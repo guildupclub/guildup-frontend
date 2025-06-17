@@ -1,8 +1,6 @@
 "use client";
-import { StringConstants } from "@/components/common/CommonText";
 import CategoryBar from "@/components/explore/CategoryBar";
-import { API_BASE_URL } from "../config/constants";
-import CommunitySection from "@/components/explore/CommunitySection";
+import EnhancedCommunitySection from "@/components/community/enhanced-community-section";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
@@ -15,23 +13,29 @@ import React, {
   useCallback,
 } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 import Hero from "@/components/heroSection/HeroSection";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 
+import { useTracking } from "@/hooks/useTracking";
+import { PageTracker } from "@/components/analytics/PageTracker";
+
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
+import { on } from "events";
+import { FaArrowRightLong } from "react-icons/fa6";
+import { HiSparkles } from "react-icons/hi2";
 
 
 interface Category {
@@ -50,7 +54,6 @@ function SearchParamsProvider({
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Handle category from URL
     const categoryFromUrl = searchParams?.get("category");
     onCategoryFromUrl(categoryFromUrl ?? null);
   }, [searchParams, onCategoryFromUrl]);
@@ -91,25 +94,25 @@ function Page() {
     if (!isMounted || status === "loading") return;
 
     if (!session) {
-      tracking.trackCustomEvent('home_page_viewed_anonymous', {
-        is_initial_load: isInitialLoad
+      tracking.trackCustomEvent("home_page_viewed_anonymous", {
+        is_initial_load: isInitialLoad,
       });
       router.push("/");
     } else {
       // Track authenticated user viewing home page
-      tracking.trackCustomEvent('home_page_viewed_authenticated', {
+      tracking.trackCustomEvent("home_page_viewed_authenticated", {
         user_id: session.user._id,
         is_new_user: session.user?.isNewUser,
         is_creator: session.user?.is_creator,
-        is_initial_load: isInitialLoad
+        is_initial_load: isInitialLoad,
       });
-      
+
       // Identify user for PostHog
       tracking.identifyUser(session.user._id, {
         email: session.user.email,
         name: session.user.name,
         is_creator: session.user?.is_creator,
-        signup_date: session.user?.createdAt
+        signup_date: session.user?.createdAt,
       });
 
       const fetchCommunities = async () => {
@@ -121,44 +124,45 @@ function Page() {
             }
           );
           dispatch(setUserFollowedCommunities(res.data.data));
-          
+
           // Track communities loaded
-          tracking.trackCustomEvent('user_communities_loaded', {
+          tracking.trackCustomEvent("user_communities_loaded", {
             user_id: session.user._id,
-            communities_count: res.data.data?.length || 0
+            communities_count: res.data.data?.length || 0,
           });
         } catch (error) {
           console.error(error);
-          tracking.trackError('api_error', 'Failed to fetch user communities', error?.toString());
+          tracking.trackError(
+            "api_error",
+            "Failed to fetch user communities",
+            error?.toString()
+          );
         }
       };
       fetchCommunities();
 
       if (session.user?.isNewUser) {
-        tracking.trackCustomEvent('new_user_modal_shown', {
-          user_id: session.user._id
+        tracking.trackCustomEvent("new_user_modal_shown", {
+          user_id: session.user._id,
         });
         setIsModalOpen(true);
       }
     }
-    
+
     // Mark initial load as complete
     if (isInitialLoad) {
       setIsInitialLoad(false);
     }
   }, [session, status, isMounted, router, isInitialLoad, dispatch]);
 
-  // Convert category name to URL-friendly format
   const categoryToUrl = (name: string) => {
     return name.replace(/\s+/g, "-");
   };
 
-  // Convert URL-friendly format back to category name
   const urlToCategory = (url: string) => {
     return url.replace(/-/g, " ");
   };
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -178,14 +182,12 @@ function Page() {
     fetchCategory();
   }, []);
 
-  // Update URL when category changes
   useEffect(() => {
     if (!category.length) return;
 
     if (selectedCategory === "All Category") {
       router.replace("/", { scroll: false });
     } else {
-      // Convert category name to URL-friendly format
       router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
         scroll: false,
       });
@@ -194,46 +196,43 @@ function Page() {
 
   const handleCreatorButtonClick = () => {
     // Track the creator button click
-    tracking.trackClick('creator_signup_button', {
-      section: 'header',
+    tracking.trackClick("creator_signup_button", {
+      section: "header",
       user_signed_in: !!session,
-      user_id: session?.user._id
+      user_id: session?.user._id,
     });
 
     if (!session) {
-      tracking.trackUserAction('signup_prompt_shown', {
-        trigger: 'creator_button',
-        location: 'home_page'
+      tracking.trackUserAction("signup_prompt_shown", {
+        trigger: "creator_button",
+        location: "home_page",
       });
-      
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () => {
-            tracking.trackClick('signin_from_toast', {
-              trigger: 'creator_button_prompt'
-            });
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}`,
-            });
-          }
-        },
+
+      tracking.trackClick("signin_from_redirect", {
+        trigger: "creator_button_prompt",
       });
-    } else {
-      tracking.trackUserAction('creator_form_opened', {
-        source: 'header_button',
-        user_id: session.user._id
+
+      signIn(undefined, {
+        callbackUrl: `${window.location.origin}`,
       });
-      setIsDialogOpen(true);
+
+      return;
     }
+
+    tracking.trackUserAction("creator_form_opened", {
+      source: "header_button",
+      user_id: session.user._id,
+    });
+
+    setIsDialogOpen(true);
   };
 
   const handleScroll = () => {
-    tracking.trackClick('explore_communities_button', {
-      section: 'hero',
-      action: 'scroll_to_communities'
+    tracking.trackClick("explore_communities_button", {
+      section: "hero",
+      action: "scroll_to_communities",
     });
-    
+
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -244,18 +243,19 @@ function Page() {
     const selectedCat = category.find(
       (cat: Category) => cat._id === categoryId
     );
-    
-    tracking.trackClick('category_filter', {
+
+    tracking.trackClick("category_filter", {
       category_id: categoryId,
-      category_name: selectedCat?.name || 'All Category',
+      category_name: selectedCat?.name || "All Category",
       previous_category: selectedCategory,
-      user_id: session?.user._id
+      user_id: session?.user._id,
     });
 
     // Start loading immediately to clear current content
     setIsLoading(true);
 
     // Update category state
+
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -264,7 +264,6 @@ function Page() {
       setSelectedCategoryId("all");
     }
 
-    // Perform scrolling immediately without timeout
     if (targetRef.current) {
       const headerOffset = 145;
       const elementPosition = targetRef.current.getBoundingClientRect().top;
@@ -276,17 +275,15 @@ function Page() {
       });
     }
 
-    // Stop loading immediately
     setIsLoading(false);
   };
 
-  // Add scroll handler to detect when header becomes sticky
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([e]) => {
         setIsSticky(!e.isIntersecting);
       },
-      { threshold: [1], rootMargin: "-200px 0px 0px 0px" } // 64px (top-16) + 20px offset
+      { threshold: [1], rootMargin: "-200px 0px 0px 0px" }
     );
 
     if (stickyTriggerRef.current) {
@@ -298,7 +295,6 @@ function Page() {
     };
   }, []);
 
-  // Handle category from URL
   const handleCategoryFromUrl = useCallback(
     (categoryFromUrl: string | null) => {
       if (categoryFromUrl && category.length > 0) {
@@ -316,14 +312,11 @@ function Page() {
     [category]
   );
 
-  // Add scroll handler to detect when hero section is visible
   useEffect(() => {
     if (!heroRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Consider the hero "visible" only if more than 20% is showing
-        // This means the search bar appears when 80% or more is out of view
         const visiblePercentage = entry.intersectionRatio;
         dispatch(setHeroVisible(visiblePercentage > 0.2));
       },
@@ -366,6 +359,32 @@ function Page() {
             />
           </div>
 
+          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
+            <DialogTrigger asChild>
+              {/* <Button
+                onClick={handleCreatorButtonClick}
+                className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                <span className="relative z-10 font-medium">
+                  Join as Expert{" "}
+                </span>
+                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+              </Button> */}
+              {!isCreator && (
+                <div className="bg-gradient-to-r from-blue-600 to-blue-400 py-2 w-full h-10 text-white text-sm font-semibold text-center flex items-center justify-center relative z-20 mt-16  mx-auto  ">
+                  <HiSparkles className="h-6 w-6 text-yellow-300 mx-2" /> Join
+                  as Expert
+                  <FaArrowRightLong
+                    onClick={handleCreatorButtonClick}
+                    className="h-5 w-5 ml-4 animate-arrow-bounce hover:scale-x-150 transition-transform duration-300 cursor-pointer"
+                  />
+                </div>
+              )}
+            </DialogTrigger>
+            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+          </Dialog>
+
           <div className="relative z-10">
             <div ref={heroRef}>
               <Hero />
@@ -399,34 +418,7 @@ function Page() {
               </div>
               <VideoPlaceholder className="mb-16" />
             </div>
-            {/* {!isCreator && (
-              <div className="md:hidden mt-4 flex flex-col items-center justify-center text-center mb-4 ">
-                <h2 className="text-xl font-semibold">
-                  Join or create a community to start interacting with other
-                  members.
-                </h2>
-                <div className="flex gap-4 mt-4">
-                  <Button onClick={handleScroll} className="px-2 py-1 ">
-                    Explore Communities
-                  </Button>
-                  <Dialog
-                    open={session ? isDialogOpen : false}
-                    onOpenChange={setIsDialogOpen}
-                  >
-                    <Button
-                      className="px-2 py-1 "
-                      onClick={handleCreatorButtonClick}
-                    >
-                      {StringConstants.CREATE_A_PAGE}
-                    </Button>
 
-                    {session && (
-                      <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                    )}
-                  </Dialog>
-                </div>
-              </div>
-            )} */}
             <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
               <div className="py-6 sm:py-10 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50/30">
                 <div className="flex flex-col gap-6 sm:gap-8">
@@ -458,11 +450,11 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">
-                            Sign up, it&apos;s free
+                          <span className="relative z-10 font-medium">
+                            Join as Expert{" "}
                           </span>
                           <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
@@ -497,10 +489,10 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group relative overflow-hidden flex items-center gap-3 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] border border-primary/20 text-lg"
+                          className="group relative overflow-hidden flex items-center gap-3  hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] px-6"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">Join Now</span>
+                          <span className="relative z-10">Join as Expert</span>
                           <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
                         </Button>
                       </DialogTrigger>
@@ -536,7 +528,7 @@ function Page() {
                 </div>
               </div>
 
-              {/* Main Content */}
+              {/* Main Content with Enhanced Filtering */}
               <div className="pt-3 sm:pt-6">
                 <div className="flex-1 min-w-0" ref={targetRef}>
                   <div className="rounded-xl sm:rounded-2xl">
@@ -547,7 +539,9 @@ function Page() {
                     {isLoading ? (
                       <Loader />
                     ) : (
-                      <CommunitySection activeCategory={selectedCategoryId} />
+                      <EnhancedCommunitySection
+                        activeCategory={selectedCategoryId}
+                      />
                     )}
                   </div>
                 </div>
@@ -562,7 +556,7 @@ function Page() {
         {/* Footer */}
         <Footer />
       </SearchParamsProvider>
-      <PageTracker 
+      <PageTracker
         pageName="Home"
         pageCategory="landing"
         metadata={{
@@ -573,7 +567,7 @@ function Page() {
           is_creator: session?.user?.is_creator,
           is_new_user: session?.user?.isNewUser,
           categories_count: category.length,
-          is_loading: isLoading
+          is_loading: isLoading,
         }}
         trackScrollDepth={true}
         trackTimeOnPage={true}

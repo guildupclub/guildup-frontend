@@ -9,7 +9,7 @@ import Login_laptop from "./../../../public/Login_laptop.png";
 export const UserHeroSection: React.FC = () => {
   return (
     <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen overflow-hidden">
-      <div className="w-full flex justify-center p-6">
+      <div className="w-full flex justify-center p-6 py-10">
         <Image
           src={guildup_logo || "/placeholder.svg"}
           alt="GuildUp"
@@ -20,15 +20,13 @@ export const UserHeroSection: React.FC = () => {
       </div>
 
       <div className="flex-1 flex flex-col justify-between px-8 pb-6 overflow-y-auto">
-
         <div className="flex flex-col items-center max-w-2xl mx-auto w-full">
-    
           <div className="w-full mb-8">
-            <h1 className="font-semibold text-2xl md:text-3xl text-center mb-8">
-              Discover Expertise and Communities like never before
+            <h1 className="font-bold text-2xl md:text-3xl text-center mb-8">
+              Discover Expertise and Communities <br /> like never before
             </h1>
 
-            <div className="space-y-2">
+            <div className="space-y-2  mx-20">
               <div className="flex items-center gap-4">
                 <div className="flex-shrink-0 text-primary">
                   <Check className="w-5 h-5" />

@@ -24,12 +24,29 @@ import {
   Smile,
   X,
   Edit3,
-  Save
+  Save,
+  Paperclip,
+  Image as ImageIcon,
+  FileText,
+  Download,
+  Trash2
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
 import { chatDatabase } from '../../../firebase-chat';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
+import { GoogleMeetButton } from '@/components/google-meet/GoogleMeetButton';
+import { toast } from 'sonner';
+
+interface FileAttachment {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  url?: string;
+  localUrl?: string;
+  uploadProgress?: number;
+}
 
 interface ChatInterfaceProps {
   receiverEmail?: string;
@@ -66,8 +83,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [editingMessage, setEditingMessage] = useState<any>(null);
   const [editText, setEditText] = useState('');
+  
+  // File attachment states
+  const [attachments, setAttachments] = useState<FileAttachment[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  
+  // Image preview states
+  const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
 
   // Handle mobile keyboard visibility
   useEffect(() => {
@@ -78,19 +106,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         if (visualViewport) {
           const keyboardOpen = visualViewport.height < window.innerHeight * 0.75;
           setIsKeyboardVisible(keyboardOpen);
-          
-          // Scroll input into view when keyboard opens
-          if (keyboardOpen && inputRef.current) {
-            setTimeout(() => {
-              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-          }
         }
       };
 
+      // Use visual viewport API for better keyboard detection
       if ((window as any).visualViewport) {
         (window as any).visualViewport.addEventListener('resize', handleResize);
-        return () => (window as any).visualViewport.removeEventListener('resize', handleResize);
+        (window as any).visualViewport.addEventListener('scroll', handleResize);
+        return () => {
+          (window as any).visualViewport.removeEventListener('resize', handleResize);
+          (window as any).visualViewport.removeEventListener('scroll', handleResize);
+        };
       } else {
         // Fallback for browsers without visual viewport
         window.addEventListener('resize', handleResize);
@@ -98,6 +124,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       }
     }
   }, []);
+
+  // Auto-scroll input into view when keyboard appears
+  useEffect(() => {
+    if (isKeyboardVisible && inputRef.current) {
+      // Small delay to ensure keyboard is fully visible
+      setTimeout(() => {
+        inputRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 150);
+    }
+  }, [isKeyboardVisible]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -115,6 +154,27 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showEmojiPicker]);
+
+  // Handle image preview keyboard events
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && previewImage) {
+        setPreviewImage(null);
+      }
+    };
+
+    if (previewImage) {
+      document.addEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'unset';
+    };
+  }, [previewImage]);
 
   // Auto-start chat if receiverEmail is provided
   useEffect(() => {
@@ -266,8 +326,150 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return getLastSeenText(email);
   };
 
+  // File handling utilities
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+  const SUPPORTED_FILE_TYPES = {
+    // Images
+    'image/jpeg': ['.jpg', '.jpeg'],
+    'image/png': ['.png'],
+    'image/gif': ['.gif'],
+    'image/webp': ['.webp'],
+    'image/heic': ['.heic'],
+    'image/heif': ['.heif'],
+    // PDF
+    'application/pdf': ['.pdf']
+  };
+
+  const validateFile = (file: File): boolean => {
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`File "${file.name}" is too large. Maximum size is 20MB.`);
+      return false;
+    }
+
+    // Check file type
+    const isValidType = Object.keys(SUPPORTED_FILE_TYPES).includes(file.type) ||
+      Object.values(SUPPORTED_FILE_TYPES).flat().some(ext => 
+        file.name.toLowerCase().endsWith(ext)
+      );
+
+    if (!isValidType) {
+      toast.error(`File type "${file.type}" is not supported. Supported: Images (JPG, PNG, GIF, WebP, HEIC) and PDF.`);
+      return false;
+    }
+
+    return true;
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
+    if (type === 'application/pdf') return <FileText className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
+  };
+
+  // Convert blob URL to data URL for persistent storage
+  const blobToDataURL = async (blobUrl: string): Promise<string> => {
+    try {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch (error) {
+      console.error('Error converting blob to data URL:', error);
+      throw error;
+    }
+  };
+
+  const processFiles = async (files: FileList | File[]) => {
+    const fileArray = Array.from(files);
+    const validFiles: FileAttachment[] = [];
+
+    for (const file of fileArray) {
+      if (validateFile(file)) {
+        const attachment: FileAttachment = {
+          id: Date.now() + Math.random().toString(36).substr(2, 9),
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          localUrl: URL.createObjectURL(file),
+          uploadProgress: 0
+        };
+        validFiles.push(attachment);
+      }
+    }
+
+    if (validFiles.length > 0) {
+      setAttachments(prev => [...prev, ...validFiles]);
+    }
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments(prev => {
+      const attachment = prev.find(a => a.id === id);
+      // Don't revoke blob URLs immediately as they might be used in sent messages
+      // In a production app, you'd have a cleanup mechanism that runs after messages are sent
+      // if (attachment?.localUrl && attachment.localUrl.startsWith('blob:')) {
+      //   URL.revokeObjectURL(attachment.localUrl);
+      // }
+      return prev.filter(a => a.id !== id);
+    });
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      setIsDragOver(false);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      processFiles(files);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      processFiles(files);
+    }
+    // Reset input value to allow selecting the same file again
+    e.target.value = '';
+  };
+
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !currentChat) return;
+    if (!newMessage.trim() && attachments.length === 0) return;
+    if (!currentChat) return;
 
     const conversation = conversations.find(conv => conv.id === currentChat);
     if (!conversation || !user?.email) return;
@@ -281,13 +483,65 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     if (!receiverInfo) return;
 
+    // Handle file uploads first if there are attachments
+    let uploadedAttachments: any[] = [];
+    if (attachments.length > 0) {
+      setIsUploading(true);
+      try {
+        // Convert blob URLs to data URLs for persistent storage
+        uploadedAttachments = await Promise.all(
+          attachments.map(async (attachment) => {
+            let persistentUrl = attachment.localUrl;
+            
+            // Convert blob URL to data URL for persistence
+            if (attachment.localUrl && attachment.localUrl.startsWith('blob:')) {
+              try {
+                persistentUrl = await blobToDataURL(attachment.localUrl);
+                console.log('Converted blob to data URL for:', attachment.name);
+              } catch (error) {
+                console.error('Failed to convert blob URL for:', attachment.name, error);
+                // Keep the original blob URL as fallback
+                persistentUrl = attachment.localUrl;
+              }
+            }
+            
+            return {
+              id: attachment.id,
+              name: attachment.name,
+              size: attachment.size,
+              type: attachment.type,
+              url: persistentUrl, // Use persistent data URL instead of blob URL
+            };
+          })
+        );
+        
+        // Simulate upload delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.error('Error uploading files:', error);
+        toast.error('Failed to upload files. Please try again.');
+        setIsUploading(false);
+        return;
+      }
+      setIsUploading(false);
+    }
+
     // Include reply information if replying to a message
     const messageToSend = replyingTo 
       ? `@${replyingTo.senderName}: ${replyingTo.message}\n\n${newMessage}`
       : newMessage;
 
-    await sendMessage(receiverInfo.email, messageToSend, receiverInfo);
+    // Create message with attachments
+    const messageWithAttachments = {
+      message: messageToSend || (attachments.length > 0 ? `📎 ${attachments.length} file(s) attached` : ''),
+      attachments: uploadedAttachments.length > 0 ? uploadedAttachments : undefined
+    };
+
+    await sendMessage(receiverInfo.email, messageWithAttachments, receiverInfo);
+    
+    // Clear input and attachments
     setNewMessage('');
+    setAttachments([]);
     setReplyingTo(null);
     
     // Reset textarea height
@@ -424,12 +678,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   return (
-    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white" style={{
-      // Only apply visual viewport height on mobile when keyboard is visible
-      height: typeof window !== 'undefined' && (window as any).visualViewport && window.innerWidth < 768 && isKeyboardVisible
-        ? `${(window as any).visualViewport.height}px` 
-        : undefined
-    }}>
+    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white">
+      
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
         <div className="p-3 border-b border-gray-200 bg-white">
@@ -511,7 +761,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Chat Area - Full screen on mobile */}
-      <div className={`${showConversations ? 'hidden' : 'flex'} md:flex flex-col flex-1 min-w-0`}>
+      <div className={`${showConversations ? 'hidden' : 'flex'} md:flex flex-col flex-1 min-w-0 relative ${
+        isKeyboardVisible ? 'pb-16 md:pb-0' : ''
+      }`}>
+        {/* Drag and Drop Overlay */}
+        {isDragOver && (
+          <div className="absolute inset-0 bg-blue-50/90 border-2 border-dashed border-blue-300 z-50 flex items-center justify-center">
+            <div className="text-center">
+              <Paperclip className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+              <p className="text-lg font-semibold text-blue-700 mb-2">Drop files to attach</p>
+              <p className="text-sm text-blue-600">Support: Images (JPG, PNG, GIF, WebP, HEIC) and PDF up to 20MB</p>
+            </div>
+          </div>
+        )}
+        
         {!currentChat ? (
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="text-center">
@@ -521,7 +784,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
           </div>
         ) : (
-          <>
+          <div 
+            ref={dropZoneRef}
+            className="flex flex-col flex-1 min-h-0"
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
             {/* Chat Header */}
             <div className="flex items-center gap-3 p-3 border-b border-gray-200 bg-white flex-shrink-0">
               <Button
@@ -560,6 +830,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         </p>
                       </div>
                     </div>
+                    
+                    {/* Google Meet Button */}
+                    <GoogleMeetButton
+                      receiverEmail={otherParticipant.email}
+                      receiverName={otherParticipant.name}
+                      size="sm"
+                      variant="ghost"
+                    />
                   </>
                 ) : null;
               })()}
@@ -567,12 +845,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Messages */}
             <div 
-              className={`flex-1 overflow-y-auto min-h-0 relative`}
+              className={`flex-1 overflow-y-auto min-h-0 relative ${
+                isKeyboardVisible ? 'mb-safe-area-inset-bottom' : ''
+              }`}
             >
               <div className="p-3 pb-0">
                 {loading ? (
                   <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-primary"></div>
                   </div>
                 ) : messages.length === 0 ? (
                   <div className="flex items-center justify-center h-64">
@@ -664,6 +944,120 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                                   {detectAndRenderLinks(replyData ? replyData.reply : message.message)}
                                 </div>
                                 
+                                {/* Attachments */}
+                                {message.attachments && message.attachments.length > 0 && (
+                                  <div className="mt-2 space-y-2">
+                                    {message.attachments.map((attachment: any) => (
+                                      <div key={attachment.id} className={`flex items-center gap-2 p-2 rounded-lg border ${
+                                        isOwnMessage 
+                                          ? 'bg-blue-600/20 border-blue-200' 
+                                          : 'bg-gray-200 border-gray-300'
+                                      }`}>
+                                        <div className="flex-shrink-0">
+                                          {attachment.type.startsWith('image/') ? (
+                                            <div className="relative cursor-pointer group"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                const imageUrl = attachment.url || attachment.localUrl;
+                                                console.log('Image preview click:', {
+                                                  attachmentId: attachment.id,
+                                                  url: attachment.url,
+                                                  localUrl: attachment.localUrl,
+                                                  finalUrl: imageUrl,
+                                                  name: attachment.name,
+                                                  type: attachment.type,
+                                                  urlType: imageUrl?.startsWith('data:') ? 'data-url' : 
+                                                           imageUrl?.startsWith('blob:') ? 'blob-url' : 'other'
+                                                });
+                                                if (imageUrl) {
+                                                  setPreviewImage({url: imageUrl, name: attachment.name});
+                                                } else {
+                                                  console.error('No URL available for attachment:', attachment);
+                                                  toast.error('Image not available for preview.');
+                                                }
+                                              }}
+                                            >
+                                              <img
+                                                src={attachment.url || attachment.localUrl}
+                                                alt={attachment.name}
+                                                className="w-12 h-12 object-cover rounded"
+                                                onError={(e) => {
+                                                  console.log('Sent image failed to load:', attachment.url || attachment.localUrl);
+                                                  (e.target as HTMLImageElement).style.display = 'none';
+                                                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                                }}
+                                              />
+                                              <div className="hidden w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
+                                                {getFileIcon(attachment.type)}
+                                              </div>
+                                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+                                                <ImageIcon className="h-4 w-4 text-white" />
+                                              </div>
+                                            </div>
+                                          ) : (
+                                            <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                              {getFileIcon(attachment.type)}
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className={`text-xs font-medium truncate ${
+                                            isOwnMessage ? 'text-blue-100' : 'text-gray-900'
+                                          }`}>
+                                            {attachment.name}
+                                          </p>
+                                          <p className={`text-xs ${
+                                            isOwnMessage ? 'text-blue-200' : 'text-gray-500'
+                                          }`}>
+                                            {formatFileSize(attachment.size)}
+                                          </p>
+                                        </div>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            const fileUrl = attachment.url || attachment.localUrl;
+                                            if (fileUrl) {
+                                              try {
+                                                // For blob URLs, we need to handle them differently
+                                                if (fileUrl.startsWith('blob:')) {
+                                                  // Create a temporary link for blob download
+                                                  const link = document.createElement('a');
+                                                  link.href = fileUrl;
+                                                  link.download = attachment.name;
+                                                  document.body.appendChild(link);
+                                                  link.click();
+                                                  document.body.removeChild(link);
+                                                } else {
+                                                  // Regular file download
+                                                  const link = document.createElement('a');
+                                                  link.href = fileUrl;
+                                                  link.download = attachment.name;
+                                                  link.target = '_blank';
+                                                  link.click();
+                                                }
+                                              } catch (error) {
+                                                console.error('Download failed:', error);
+                                                toast.error('Download failed. Please try again.');
+                                              }
+                                            } else {
+                                              console.error('No URL available for download:', attachment);
+                                              toast.error('File not available for download.');
+                                            }
+                                          }}
+                                          className={`flex-shrink-0 p-1 rounded transition-colors ${
+                                            isOwnMessage 
+                                              ? 'hover:bg-blue-600/30 text-blue-100' 
+                                              : 'hover:bg-gray-300 text-gray-600'
+                                          }`}
+                                          title="Download"
+                                        >
+                                          <Download className="h-3 w-3" />
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
                                 {message.edited && (
                                   <p className={`text-xs mt-1 ${
                                     isOwnMessage ? 'text-blue-100' : 'text-gray-500'
@@ -731,13 +1125,107 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               </div>
             </div>
 
-            {/* Message Input - Fixed at bottom with keyboard handling */}
-            <div className={`p-2 md:p-3 border-t border-gray-200 bg-white flex-shrink-0 ${
-              isKeyboardVisible ? 'pb-safe-area-inset-bottom' : ''
+            {/* Message Input - Fixed at bottom with simplified mobile positioning */}
+            <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 ${
+              isKeyboardVisible 
+                ? 'fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto' 
+                : ''
             }`}>
+              {/* Attachment Preview */}
+              {attachments.length > 0 && (
+                <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      {attachments.length} file(s) attached
+                    </span>
+                    <button
+                      onClick={() => setAttachments([])}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {attachments.map((attachment) => (
+                      <div key={attachment.id} className="flex items-center gap-2 p-2 bg-white rounded border">
+                        <div className="flex-shrink-0">
+                          {attachment.type.startsWith('image/') ? (
+                            <div className="relative cursor-pointer group"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const imageUrl = attachment.url || attachment.localUrl;
+                                console.log('Image preview click:', {
+                                  attachmentId: attachment.id,
+                                  url: attachment.url,
+                                  localUrl: attachment.localUrl,
+                                  finalUrl: imageUrl,
+                                  name: attachment.name,
+                                  type: attachment.type,
+                                  urlType: imageUrl?.startsWith('data:') ? 'data-url' : 
+                                           imageUrl?.startsWith('blob:') ? 'blob-url' : 'other'
+                                });
+                                if (imageUrl) {
+                                  setPreviewImage({url: imageUrl, name: attachment.name});
+                                } else {
+                                  console.error('No URL available for attachment:', attachment);
+                                  toast.error('Image not available for preview.');
+                                }
+                              }}
+                            >
+                              <img
+                                src={attachment.url || attachment.localUrl}
+                                alt={attachment.name}
+                                className="w-12 h-12 object-cover rounded"
+                                onError={(e) => {
+                                  console.log('Sent image failed to load:', attachment.url || attachment.localUrl);
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                                }}
+                              />
+                              <div className="hidden w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
+                                {getFileIcon(attachment.type)}
+                              </div>
+                              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center">
+                                <ImageIcon className="h-4 w-4 text-white" />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                              {getFileIcon(attachment.type)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 truncate">
+                            {attachment.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(attachment.size)}
+                          </p>
+                          {attachment.uploadProgress !== undefined && attachment.uploadProgress < 100 && (
+                            <div className="mt-1 w-full bg-gray-200 rounded-full h-1">
+                              <div 
+                                className="bg-blue-600 h-1 rounded-full transition-all duration-300"
+                                style={{ width: `${attachment.uploadProgress}%` }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => removeAttachment(attachment.id)}
+                          className="flex-shrink-0 text-gray-400 hover:text-red-500 p-1"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Reply preview */}
               {replyingTo && (
-                <div className="mb-2 md:mb-3 p-2 bg-gray-50 rounded-lg border-l-4 border-primary">
+                <div className="mb-2 p-2 bg-gray-50 rounded-lg border-l-4 border-primary">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs font-medium text-gray-600">
                       Replying to {replyingTo.senderName}
@@ -753,9 +1241,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </div>
               )}
 
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,.pdf,.heic,.heif"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+
               {/* Emoji Picker */}
               {showEmojiPicker && (
-                <div className="emoji-picker absolute bottom-14 md:bottom-16 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50">
+                <div className={`emoji-picker absolute ${
+                  isKeyboardVisible ? 'bottom-16' : 'bottom-20'
+                } right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50 max-w-xs`}>
                   <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
                     {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤐', '🤑', '🤠', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤝', '🙏', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '💥', '💫', '⭐', '🌟', '✨', '⚡', '🔥', '💨', '☀️', '🌙', '⭐', '🌈', '☘️', '🍀', '🌸', '🌺', '🌻', '🌷'].map((emoji) => (
                       <button
@@ -770,44 +1270,151 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 </div>
               )}
 
-              <div className="flex gap-1.5 md:gap-2 items-center relative">
+              <div className="flex gap-2 items-center relative">
+                {/* Attachment button */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex-shrink-0 p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                  title="Attach files"
+                >
+                  {isUploading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-transparent" />
+                  ) : (
+                    <Paperclip className="h-4 w-4" />
+                  )}
+                </button>
+
                 <Textarea
                   ref={inputRef}
                   value={newMessage}
                   onChange={handleTextareaChange}
                   onKeyPress={handleKeyPress}
-                  onFocus={() => {
-                    // Ensure input stays visible on focus
-                    setTimeout(() => {
-                      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 300);
-                  }}
-                  placeholder={replyingTo ? "Type your reply... (Shift+Enter for new line)" : "Type a message... (Shift+Enter for new line)"}
-                  className="flex-1 text-sm rounded-lg pr-12 resize-none min-h-[36px] md:min-h-[40px] max-h-[120px]"
+                  placeholder={replyingTo ? "Type your reply..." : "Type a message..."}
+                  className="flex-1 text-sm md:text-base rounded-xl pr-16 md:pr-20 resize-none min-h-[40px] max-h-[120px] mobile-chat-input"
                   rows={1}
+                  disabled={isUploading}
                 />
                 
                 {/* Emoji button */}
                 <button
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="absolute right-10 md:right-12 top-2 text-gray-400 hover:text-gray-600 p-1"
+                  className="absolute right-12 md:right-14 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1.5 touch-manipulation transition-colors"
+                  disabled={isUploading}
+                  style={{ zIndex: 10 }}
+                  title="Add emoji"
                 >
                   <Smile className="h-4 w-4" />
                 </button>
                 
                 <Button 
                   onClick={handleSendMessage} 
-                  disabled={!newMessage.trim()}
+                  disabled={(!newMessage.trim() && attachments.length === 0) || isUploading}
                   size="sm"
-                  className="rounded-full h-7 w-7 md:h-8 md:w-8 p-0"
+                  className="rounded-full h-8 w-8 p-0 flex-shrink-0 touch-manipulation min-w-[32px] min-h-[32px]"
+                  title="Send message"
                 >
-                  <Send className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  {isUploading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
+      
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div className="relative max-w-full max-h-full">
+            {/* Close Button */}
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute -top-12 right-0 text-white/80 hover:text-white text-2xl z-10 p-2 rounded-full hover:bg-white/10 transition-colors"
+              title="Close (Esc)"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            
+            {/* Image */}
+            <div className="relative">
+              <img
+                src={previewImage.url}
+                alt={previewImage.name}
+                className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+                onError={(e) => {
+                  console.error('Error loading preview image:', previewImage?.url);
+                  console.error('URL type:', previewImage?.url?.startsWith('data:') ? 'data-url' : 
+                                           previewImage?.url?.startsWith('blob:') ? 'blob-url' : 'other');
+                  toast.error('Failed to load image preview. The image may have expired.');
+                  setPreviewImage(null);
+                }}
+              />
+              
+              {/* Image Info */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 rounded-b-lg">
+                <p className="text-white/90 text-sm font-medium truncate">
+                  {previewImage.name}
+                </p>
+                <div className="flex items-center gap-4 mt-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (previewImage) {
+                        try {
+                          // Use the same download logic as the attachment button
+                          if (previewImage.url.startsWith('blob:')) {
+                            // Create a temporary link for blob download
+                            const link = document.createElement('a');
+                            link.href = previewImage.url;
+                            link.download = previewImage.name;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                          } else {
+                            // Regular file download
+                            const link = document.createElement('a');
+                            link.href = previewImage.url;
+                            link.download = previewImage.name;
+                            link.target = '_blank';
+                            link.click();
+                          }
+                        } catch (error) {
+                          console.error('Download failed:', error);
+                          toast.error('Download failed. Please try again.');
+                        }
+                      }
+                    }}
+                    className="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (previewImage) {
+                        window.open(previewImage.url, '_blank');
+                      }
+                    }}
+                    className="text-white/80 hover:text-white text-sm flex items-center gap-1 hover:bg-white/10 px-2 py-1 rounded transition-colors"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                    Open in New Tab
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 

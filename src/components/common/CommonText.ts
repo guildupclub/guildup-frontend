@@ -91,7 +91,7 @@ export const StringConstants = {
   SEARCH: "Search",
   SEARCH_FOR: "Search for",
   TRY_SEARCH_WITH_DIFFERENT_KEYWORDS: "Try searching with different keywsords",
-  HOME: "Discover",
+  HOME: "Experts",
   EXPLORE: "Find Experts",
   EXPERTS: "Experts",
   MY_SPACE: "My Guild",

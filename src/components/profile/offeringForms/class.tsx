@@ -21,7 +21,7 @@ interface ClassFormData {
     description: string;
     type: string;
     total_price: number;
-    discounted_price: number;
+    // discounted_price: number;
     payment_mode: string;
     schedule: {
         days_of_week: string[];
@@ -189,7 +189,7 @@ const ClassForm = ({
                         />
                     </div>
 
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                         <Label htmlFor="discounted_price">
                             Discounted Price ({StringConstants.INR})
                         </Label>
@@ -204,7 +204,7 @@ const ClassForm = ({
                                 })
                             }
                         />
-                    </div>
+                    </div> */}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

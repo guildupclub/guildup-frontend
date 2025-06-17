@@ -136,7 +136,7 @@ const WebinarForm = ({
             />
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
             <Label htmlFor="discounted_price">
             {StringConstants.DISCOUNTED_PRICE} (
             {StringConstants.INR})
@@ -158,7 +158,7 @@ const WebinarForm = ({
             }}
             required
             />
-        </div>
+        </div> */}
         </div>
 
         <div className="grid grid-cols-2 gap-4">

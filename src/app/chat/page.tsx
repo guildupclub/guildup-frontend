@@ -11,6 +11,7 @@ import { MessageCircle, Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 function ChatContent() {
   const user = useSelector((state: RootState) => state.user.user);
@@ -54,9 +55,6 @@ function ChatContent() {
             <p className="text-muted-foreground mb-4">
               Please sign in to access your expert support chat
             </p>
-            <Button asChild>
-              <Link href="/auth/signin">Sign In</Link>
-            </Button>
           </CardContent>
         </Card>
       </div>
@@ -65,42 +63,40 @@ function ChatContent() {
 
   return (
     <ChatProvider>
-      <div className="h-screen bg-background flex flex-col mobile-chat-container overflow-hidden" style={{
-        paddingTop: typeof window !== 'undefined' && window.innerWidth < 768 ? '56px' : '0',
-        paddingBottom: typeof window !== 'undefined' && window.innerWidth < 768 ? '56px' : '0'
-      }}>
-        {/* Header - Hidden on mobile to save space for chat content */}
-        <div className="hidden md:block border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" asChild>
+      <div className="h-screen bg-background flex flex-col overflow-hidden">
+        {/* Header - Now always visible, sticky on mobile - positioned right under navbar */}
+        <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0 sticky top-0 z-40">
+          <div className="px-4 py-3 md:py-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" asChild className="p-1">
                 <Link href="/">
                   <ArrowLeft className="h-4 w-4" />
                 </Link>
               </Button>
               
-              <div className="flex items-center gap-3">
-                <MessageCircle className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                 <div>
-                  <h1 className="text-xl font-semibold">
+                  <h1 className="text-base md:text-lg font-semibold">
                     {expertDetails ? `Chat with ${expertDetails.name}` : 'Expert Support Chat'}
                   </h1>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground hidden md:block">
                     {expertDetails ? 'Start a conversation with this verified expert' : 'Manage your expert conversations'}
                   </p>
                 </div>
               </div>
 
-              <Badge variant="outline" className="ml-auto bg-green-50 text-green-700 border-green-200">
+              <Badge variant="outline" className="ml-auto bg-green-50 text-green-700 border-green-200 text-xs">
                 <Shield className="h-3 w-3 mr-1" />
-                Verified Expert
+                <span className="hidden sm:inline">Verified Expert</span>
+                <span className="sm:hidden">Expert</span>
               </Badge>
             </div>
           </div>
         </div>
 
-        {/* Chat Interface - Full height on mobile, optimized container on desktop */}
-        <div className="flex-1 min-h-0 w-full md:container md:mx-auto p-0 md:p-4">
+        {/* Chat Interface - Full height minus header and bottom navbar on mobile */}
+        <div className="flex-1 min-h-0 w-full md:container md:mx-auto p-0 md:p-4 pb-16 md:pb-0">
           <div className="h-full w-full bg-background md:rounded-lg md:border md:shadow-sm">
             <ChatInterface 
               receiverEmail={expertDetails?.email}

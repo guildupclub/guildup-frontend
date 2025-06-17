@@ -12,6 +12,8 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 export default function Hero() {
   const { data: session } = useSession();
@@ -19,6 +21,7 @@ export default function Hero() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const isCreator = user?.user?.is_creator ? true : false;
   const router = useRouter();
+  const { isInstalled } = usePWAInstall();
 
   const suggestionButtons = [
     "Mental Health",
@@ -35,17 +38,9 @@ export default function Hero() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}?hero=1`,
-            }),
-        },
+      signIn(undefined, {
+        callbackUrl: `${window.location.origin}?hero=1`,
       });
-    } else {
-      setIsDialogOpen(true);
     }
   };
 
@@ -149,7 +144,7 @@ export default function Hero() {
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
               Buy Services
             </span> */}
-            <span> Work 1-on-1 with trusted </span>
+            <span> Work 1:1 with trusted </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
               coaches,
             </span>{" "}
@@ -200,7 +195,7 @@ export default function Hero() {
                 <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
                   🌱
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
+                <span className="text-xs font-semibold text-gray-800 leading-[1.2] block w-[80px]">
                   Personalized Coaching
                 </span>
               </div>
@@ -209,18 +204,17 @@ export default function Hero() {
                 <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
                   🎯
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
+                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
                   Clear Roadmaps
                 </span>
               </div>
 
               <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-purple-100 text-center">
                 <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                   💬
+                  💬
                 </div>
-                <span className="text-xs font-semibold text-gray-800">
-                  Real 
-                  <br /> Conversations
+                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
+                  Real Conversations
                 </span>
               </div>
             </div>
@@ -325,13 +319,69 @@ export default function Hero() {
             </div>
           </motion.div>
 
+          {/* PWA Install Section */}
+          {!isInstalled && (
+            <motion.div
+              className="mb-8 md:mb-12"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0 }}
+            >
+              <div className="flex justify-center pt-5">
+                {/* Mobile version */}
+                <div className="md:hidden bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-blue-100 max-w-sm w-full mx-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                      <span className="text-lg">📱</span>
+                    </div>
+                    <div className="text-left flex-1">
+                      <p className="text-sm font-semibold text-gray-900">
+                        Get the GuildUp App
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Access coaching on-the-go
+                      </p>
+                    </div>
+                  </div>
+                  <PWAInstallPrompt
+                    showOnLoad={true}
+                    mode="full"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                  />
+                </div>
+
+                {/* Desktop version */}
+                <div className="hidden md:flex items-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-blue-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                      <span className="text-xl">📱</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">
+                        Get the GuildUp App
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Native app experience with offline support
+                      </p>
+                    </div>
+                  </div>
+                  <PWAInstallPrompt
+                    showOnLoad={true}
+                    mode="full"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl px-6 py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Mobile CTA - Enhanced for mobile only */}
           {!isCreator && (
             <motion.div
               className="md:hidden mt-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.1 }}
+              transition={{ duration: 0.6, delay: 1.3 }}
             >
               <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-blue-100 max-w-sm mx-auto text-center">
                 <div className="mb-4">
@@ -370,7 +420,7 @@ export default function Hero() {
               className="hidden md:block mt-16"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
             >
               <h2 className="font-medium px-4 leading-tight text-gray-700 mb-4">
                 Are you a coach or expert ready to make an impact?
