@@ -212,10 +212,10 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
             {/* Results Summary */}
             <div className="mb-6 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold">
+                {/* <h2 className="text-xl font-semibold">
                   {filteredAndSortedCommunities.length} Expert
                   {filteredAndSortedCommunities.length !== 1 ? "s" : ""} Found
-                </h2>
+                </h2> */}
                 <p className="text-sm text-muted-foreground">
                   {totalCount > 0 &&
                     `Showing ${filteredAndSortedCommunities.length} of ${totalCount} total experts`}
