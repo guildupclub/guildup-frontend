@@ -9,7 +9,7 @@ import {
   Plus,
   MessageCircle,
 } from "lucide-react";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaSignInAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -532,7 +532,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <Button
                       onClick={() =>
                         signIn(undefined, {
-                          callbackUrl: `${window.location.href}`,
+                          callbackUrl: `${window.location.href}?hero=2`,
                         })
                       }
                       className="px-6 border border-blue-500 transition-all duration-200"
@@ -732,7 +732,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
                 <Avatar className="h-4 w-4">
                   <AvatarImage src="/placeholder.svg" alt="User" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback>
+                    <FaSignInAlt />
+                  </AvatarFallback>
                 </Avatar>
               </div>
               <span className="text-[10px]">{StringConstants.SIGN_IN}</span>
