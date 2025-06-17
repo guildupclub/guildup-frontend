@@ -27,8 +27,6 @@ import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 
-import { useTracking } from "@/hooks/useTracking";
-import { PageTracker } from "@/components/analytics/PageTracker";
 
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
