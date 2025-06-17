@@ -36,7 +36,7 @@ import {
 import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
+import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
 import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
@@ -247,7 +247,31 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         }
       );
 
-      if (response.data.r === "s") {
+      if (response.data.r) {
+        try {
+          localStorage.setItem(
+            "sessionConducted",
+            JSON.stringify(response?.data?.data?.user?.user_session_conducted)
+          );
+          localStorage.setItem(
+            "yearOfExperience",
+            JSON.stringify(response?.data?.data?.user?.user_year_of_experience)
+          );
+          localStorage.setItem(
+            "isBankAdded",
+            JSON.stringify(response?.data?.data?.user?.user_isBankDetailsAdded)
+          );
+          localStorage.setItem(
+            "isCalendarConnected",
+            JSON.stringify(response?.data?.data?.user?.user_iscalendarConnected)
+          );
+          // localStorage.setItem("Date-Time",JSON.stringify(response?.data))
+        } catch (error) {
+          console.warn(
+            "Failed to store communityProfile in localStorage",
+            error
+          );
+        }
         if (response?.data?.data?.community?.image) {
           setAvatarImgUrl(response.data.data.community.image);
         } else {
@@ -805,7 +829,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <path d="M14 18h6" />
                     </svg>
                     <div className="flex flex-wrap gap-1">
-
                       {profile.user.user_languages.map(
                         (lang: string, index: number) => (
                           <Badge
@@ -1075,7 +1098,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           </h3>
 
                           {offering.is_free ||
-                          Number(offering.discounted_price) === 0 ? (
+                          Number(offering.price?.amount) === 0 ? (
                             <Badge
                               variant="outline"
                               className="border-green-200 bg-green-50 text-green-700"
@@ -1083,27 +1106,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                               Free
                             </Badge>
                           ) : (
-                            <div className="flex flex-col items-end">
-                              {offering.discounted_price !== null &&
-                              offering.discounted_price !== undefined ? (
-                                <>
-                                  {offering.price?.amount !== null &&
-                                    offering.price?.amount !== undefined && (
-                                      <span className="text-xs text-gray-400 line-through">
-                                        ₹{offering.price.amount}
-                                      </span>
-                                    )}
-                                  <span className="font-semibold text-gray-900">
-                                    ₹{offering.discounted_price}
-                                  </span>
-                                </>
-                              ) : offering.price?.amount !== null &&
-                                offering.price?.amount !== undefined ? (
-                                <span className="font-semibold text-gray-900">
-                                  ₹{offering.price.amount}
-                                </span>
-                              ) : null}
-                            </div>
+                            <span className="font-semibold text-gray-900">
+                              ₹{offering.price?.amount}
+                            </span>
                           )}
                         </div>
 
@@ -1136,6 +1141,40 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         )}
                       </div>
                     </div>
+
+                    {offering.type === "webinar" && (
+                      <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
+                        {/* Date */}
+                        <div className="flex items-center gap-2 text-sm text-gray-700">
+                          <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                          <span>
+                            {offering.when
+                              ? new Date(offering.when).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )
+                              : "No date set"}
+                          </span>
+                        </div>
+
+                        {/* Time */}
+                        <div className="text-sm text-gray-700">
+                          {offering.when
+                            ? new Date(offering.when).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )
+                            : ""}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Buttons */}
                     <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">

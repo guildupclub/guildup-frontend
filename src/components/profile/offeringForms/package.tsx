@@ -21,7 +21,7 @@ interface PackageFormData {
   description: string;
   type: string;
   total_price: number;
-  discounted_price: number;
+  // discounted_price: number;
   number_of_sessions: number;
   session_duration: number;
   sessions: { date: string; time: string }[];
@@ -172,7 +172,7 @@ const PackageForm = ({
             />
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="discounted_price">
               Discounted Price ({StringConstants.INR})
             </Label>
@@ -187,7 +187,7 @@ const PackageForm = ({
                 })
               }
             />
-          </div>
+          </div> */}
         </div>
       </div>
 
