@@ -54,7 +54,9 @@ export default function WelcomeBanner() {
         callbackUrl: `${window.location.origin}?hero=2`,
       });
     } else {
-      router.push("/profile");
+      router.push(
+        "https://www.guildup.club/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile"
+      );
     }
   };
 
