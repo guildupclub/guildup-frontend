@@ -25,7 +25,6 @@ import {
   AlignRight,
   List,
 } from "lucide-react";
-import heic2any from "heic2any";
 
 interface MediaPreview {
   file: File;
@@ -63,11 +62,11 @@ export function PostDialog() {
   // Use the React Query mutation hook
   const createPostMutation = useCreatePost();
 
-  const handleFileSelection = async (
+  const handleFileSelection = (
     event: React.ChangeEvent<HTMLInputElement>,
     fileType: "image" | "video" | "gif" | "link"
   ) => {
-    let file = event.target.files?.[0];
+    const file = event.target.files?.[0];
     if (!file) return;
 
     const MAX_FILE_SIZE = 20 * 1024 * 1024;
@@ -75,28 +74,9 @@ export function PostDialog() {
       toast.error(
         "File size exceeds 20MB limit. Please upload a smaller file."
       );
+
       event.target.value = "";
       return;
-    }
-
-    // Check for HEIC/HEIF and convert to JPG if needed
-    if (
-      fileType === "image" &&
-      (file.type === "image/heic" || file.type === "image/heif" || file.name.toLowerCase().endsWith(".heic") || file.name.toLowerCase().endsWith(".heif"))
-    ) {
-      try {
-        const convertedBlob = await heic2any({
-          blob: file,
-          toType: "image/jpeg",
-          quality: 0.9,
-        });
-        // heic2any returns a Blob or an array of Blobs
-        const jpgBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
-        file = new File([jpgBlob], file.name.replace(/\.(heic|heif)$/i, ".jpg"), { type: "image/jpeg" });
-      } catch (err) {
-        toast.error("Failed to convert HEIC/HEIF to JPG.");
-        return;
-      }
     }
 
     // Create a preview URL for the selected file
@@ -206,7 +186,7 @@ export function PostDialog() {
           >
             <Plus />
           </div>
-          {StringConstants.CREATE} 
+          {StringConstants.CREATE}
         </button>
       </DialogTrigger>
 
@@ -369,7 +349,7 @@ export function PostDialog() {
                   {(mediaPreview.type === "image" ||
                     mediaPreview.type === "gif") && (
                     <img
-                      src={mediaPreview.previewUrl}
+                      src={mediaPreview.previewUrl || "/placeholder.svg"}
                       className="h-10 w-10 object-cover rounded"
                       alt={mediaPreview.file.name}
                     />

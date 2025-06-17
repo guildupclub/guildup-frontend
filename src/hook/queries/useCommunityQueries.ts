@@ -22,7 +22,7 @@ export const useCommunityPosts = (communityId: string | undefined) => {
     queryKey: ["communityPosts", communityId],
     queryFn: async () => {
       if (!communityId) return [];
-
+      
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/post/community/post`,
         {
@@ -41,13 +41,9 @@ export const useCommunityPosts = (communityId: string | undefined) => {
         throw new Error("Failed to fetch posts");
       }
 
-      console.log("Fetching posts for community ID:", communityId);
-      console.log("Response status:", response.status);
       const result = await response.json();
-
-      console.log("Fetched posts:", result.data);
       return result.data as Post[];
     },
     enabled: !!communityId,
   });
-};
+}; 

@@ -111,10 +111,6 @@ function SearchPageContent() {
         setActiveCommunity({
           id: communityData.community._id,
           name: communityData.community.name,
-          image: "",
-          background_image: "",
-          user_isBankDetailsAdded: false,
-          user_iscalendarConnected: false
         })
       );
       const cleanedCommunityName = communityData.community.name

@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://www.guildup.club
-
-# Sitemaps
-Sitemap: https://www.guildup.club/sitemap.xml

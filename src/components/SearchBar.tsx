@@ -18,7 +18,7 @@ export default function SearchBar() {
         <Input
           type="search"
           placeholder="Search for Anxiety, Yoga or Relationship..."
-          className="w-full h-12 md:h-16 pl-6 md:pl-8 pr-16 md:pr-20 text-sm md:text-base lg:text-lg placeholder:text-xs md:placeholder:text-sm lg:placeholder:text-base rounded-full border border-gray-200 bg-white/90 backdrop-blur-sm focus:border-primary/30 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
+          className="w-full h-12 md:h-16 pl-6 md:pl-8 pr-16 md:pr-20 text-base md:text-lg rounded-full border border-gray-200 bg-white/90 backdrop-blur-sm focus:border-primary/30 focus:ring-2 focus:ring-primary/10 focus:outline-none transition-all duration-200"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}

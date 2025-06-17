@@ -30,8 +30,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaRupeeSign } from "react-icons/fa";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useTracking } from "@/hooks/useTracking";
-
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -97,8 +95,6 @@ export function BookingDialog({
   const user = useSelector((state: RootState) => state.user.user);
   const name = user?.name || "";
   const email = user?.email || "";
-  const tracking = useTracking();
-
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -146,15 +142,6 @@ export function BookingDialog({
     setSelectedSlot(null);
     setShowConfirmation(false);
     if (date) {
-      // Track date selection
-      tracking.trackClick('booking_date_selected', {
-        offering_id: offering._id,
-        offering_title: offering.title,
-        offering_type: offering.type,
-        selected_date: date.toISOString(),
-        user_id: userId
-      });
-      
       fetchAvailableSlots(date);
       setBookingStep("time"); // Add this line to change the view to time slots
     }
@@ -165,17 +152,6 @@ export function BookingDialog({
   };
 
   const handleSlotSelect = (slot: TimeSlot) => {
-    // Track time slot selection
-    tracking.trackClick('booking_time_slot_selected', {
-      offering_id: offering._id,
-      offering_title: offering.title,
-      offering_type: offering.type,
-      selected_date: selectedDate?.toISOString(),
-      selected_slot_start: slot.start,
-      selected_slot_end: slot.end,
-      user_id: userId
-    });
-    
     setSelectedSlot(slot);
     setShowConfirmation(true);
     setBookingStep("confirmation");
@@ -197,21 +173,6 @@ export function BookingDialog({
   // console.log("offfafhgwfvj:    ", offering);
 
   const handleBookSlot = async () => {
-    // Track booking confirmation attempt
-    tracking.trackClick('confirm_booking_button', {
-      offering_id: offering._id,
-      offering_title: offering.title,
-      offering_type: offering.type,
-      offering_price: offering.price.amount,
-      offering_currency: offering.price.currency,
-      is_free: offering.is_free,
-      selected_date: selectedDate?.toISOString(),
-      selected_slot_start: selectedSlot?.start,
-      selected_slot_end: selectedSlot?.end,
-      user_id: userId,
-      phone_provided: !!phone
-    });
-    
     setIsProcessing(true);
     if (!selectedDate || !selectedSlot) {
       return;
@@ -270,30 +231,8 @@ export function BookingDialog({
           setBookingDetails(response.data.data);
           setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
-                      tracking.trackUserAction('free_booking_confirmed', {
-              offering_id: offering._id,
-              offering_title: offering.title,
-              offering_type: offering.type,
-              user_id: userId,
-              booking_date: selectedDate?.toISOString(),
-              booking_start_time: selectedSlot?.start,
-              booking_end_time: selectedSlot?.end,
-              phone: phoneWithoutFormatting
-            });
           return;
         }
-        // Track payment initiation
-        tracking.trackClick('payment_initiated', {
-          offering_id: offering._id,
-          offering_title: offering.title,
-          offering_type: offering.type,
-          amount: response.data.data.amount,
-          currency: response.data.data.currency || "INR",
-          order_id: response.data.data.id,
-          user_id: userId,
-          payment_method: 'razorpay'
-        });
-        
         // Start Razorpay payment process
         const razorpayOptions = {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Razorpay Key ID (from env)
@@ -334,19 +273,6 @@ export function BookingDialog({
                 toast.success("Booking confirmed successfully!");
               }, 300);
               console.log("Booking confirmed successfully!");
-                              tracking.trackUserAction('paid_booking_confirmed', {
-                  offering_id: offering._id,
-                  offering_title: offering.title,
-                  offering_type: offering.type,
-                  amount: response.data.data.amount,
-                  currency: response.data.data.currency || "INR",
-                  user_id: userId,
-                  booking_date: selectedDate?.toISOString(),
-                  booking_start_time: selectedSlot?.start,
-                  booking_end_time: selectedSlot?.end,
-                  payment_id: paymentResponse.razorpay_payment_id,
-                  order_id: paymentResponse.razorpay_order_id
-                });
               // Don't close the dialog here
             } else {
               toast.error("Payment verification failed");
@@ -439,15 +365,6 @@ export function BookingDialog({
         setBookingSuccess(true);
         toast.success("Booking confirmed successfully!");
         console.log("Booking confirmed successfully!");
-                  tracking.trackUserAction('paid_booking_confirmed_v2', {
-            offering_id: offering._id,
-            offering_title: offering.title,
-            offering_type: offering.type,
-            user_id: userId,
-            booking_start_time: selectedSlot!.start,
-            payment_id: paymentResponse.razorpay_payment_id,
-            order_id: paymentResponse.razorpay_order_id
-          });
       } else {
         toast.error("Payment verification failed");
         onClose();
@@ -640,7 +557,7 @@ export function BookingDialog({
                             international
                             defaultCountry="IN"
                             value={phone}
-                            onChange={(value) => setPhone(value || "")}
+                            onChange={setPhone}
                             className="w-full p-2 shadow-md border border-border/30 rounded-md"
                             required
                             placeholder="Enter your phone number"
