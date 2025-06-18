@@ -589,55 +589,65 @@ export function BookingDialog({
 
                 <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
                   {/* Year of Experience */}
-                  <div className="flex items-center gap-3 border-b py-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-6 w-6 text-amber-500"
-                    >
-                      <circle cx="12" cy="8" r="7" />
-                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="text-xs text-gray-500">
-                        Year of Experience
-                      </span>
-                      <span className="text-sm font-semibold text-gray-800">
-                        {activeCommunityData?.user?.user_year_of_experience}{" "}
-                        years
-                      </span>
+                  {activeCommunityData?.user?.user_years_of_experience && (
+                    <div className="flex items-center gap-3 border-b py-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-violet-500"
+                      >
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" />
+                        <path d="M12 6v6l4.5 2.25" />
+                      </svg>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500">
+                          Years of Experience
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {activeCommunityData?.user?.user_years_of_experience}{" "}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Sessions Conducted */}
-                  <div className="flex items-center gap-3 border-b py-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-6 w-6 text-violet-500"
-                    >
-                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                    </svg>
-                    <div className="flex flex-col">
-                      <span className="text-xs text-gray-500">
-                        Sessions Conducted
-                      </span>
-                      <span className="text-sm font-semibold text-gray-800">
-                        {activeCommunityData?.user?.user_session_conducted}{" "}
-                      </span>
+                  {activeCommunityData?.user?.user_session_conducted && (
+                    <div className="flex items-center gap-3 border-b py-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="h-6 w-6 text-violet-500"
+                      >
+                        <rect
+                          x="2"
+                          y="7"
+                          width="20"
+                          height="14"
+                          rx="2"
+                          ry="2"
+                        />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                      </svg>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-gray-500">
+                          Sessions Conducted
+                        </span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {activeCommunityData?.user?.user_session_conducted}{" "}
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Duration */}
                   <div className="flex items-center justify-center">
