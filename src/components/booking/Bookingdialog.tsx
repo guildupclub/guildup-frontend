@@ -510,7 +510,7 @@ export function BookingDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <div className="flex justify-center items-center  ">
-        <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted  border border-border/50 rounded-xl shadow-xl  ">
+        <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted  border border-border/50 rounded-xl shadow-xl">
           <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0 ">
             {/* Left Section - Welcome Panel */}
             <div className="p-8 flex flex-col items-center text-center border-r border-border/20">
@@ -674,7 +674,7 @@ export function BookingDialog({
             </div>
 
             {/* Right Section - Booking Panel */}
-            <div className="p-6 bg-background">
+            <div className="p-6 bg-background pb-auto overflow-y-auto">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
                   Fill Basic Information for Booking
