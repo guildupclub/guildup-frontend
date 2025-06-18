@@ -35,6 +35,9 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { MdLocalOffer } from "react-icons/md";
 import { BiSolidOffer } from "react-icons/bi";
 import { BsCalendarCheck } from "react-icons/bs";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { setActiveCommunity } from "@/redux/channelSlice";
 interface BookingDialogProps {
   offering: {
     _id: string;
@@ -93,32 +96,57 @@ export function BookingDialog({
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
 
-  const activeCommunity = useSelector(
-    (state: RootState) => state.channel.activeCommunity
-  );
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const user = useSelector((state: RootState) => state.user.user);
   const name = user?.name || "";
   const email = user?.email || "";
   const tracking = useTracking();
-  const [sessionConducted, setSessionConducted] = useState(false);
-  const [yearOfExperience, setYearOfExperience] = useState(0);
-  const [isBankAdded, setIsBankAdded] = useState(false);
-  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+  const [avatarImgUrl, setAvatarImgUrl] = useState("");
+  const [activeCommunityData, setActiveCommunityData] = useState<any>(null);
+  const params = useParams();
+  const communityParam = params?.["community-Id"] as string;
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityName =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(0, lastHyphenIndex)
+      : null;
+  const communityIdFromParam =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
+  // console.log("communityIdFromParam", communityIdFromParam);
+  const cleanedCommunityName =
+    communityName ||
+    "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParams = `${encodedCommunityName}-${communityIdFromParam}`;
 
-  useEffect(() => {
-    const sc = JSON.parse(localStorage.getItem("sessionConducted") || "false");
-    const yoe = JSON.parse(localStorage.getItem("yearOfExperience") || "0");
-    const bank = JSON.parse(localStorage.getItem("isBankAdded") || "false");
-    const calendar = JSON.parse(
-      localStorage.getItem("isCalendarConnected") || "false"
-    );
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["communityProfile", communityIdFromParam],
+    queryFn: async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        {
+          communityId: communityIdFromParam,
+        }
+      );
+      setActiveCommunityData(response.data.data);
+      setActiveCommunity(response.data);
+      if (response.data.r) {
+        if (response?.data?.data?.community?.image) {
+          setAvatarImgUrl(response.data.data.community.image);
+        } else {
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+          );
+        }
 
-    setSessionConducted(sc);
-    setYearOfExperience(yoe);
-    setIsBankAdded(bank);
-    setIsCalendarConnected(calendar);
-  }, []);
+        return response.data.data;
+      }
+      throw new Error("Failed to fetch community profile");
+    },
+    enabled: !!communityIdFromParam,
+  });
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -536,20 +564,22 @@ export function BookingDialog({
 
                   <img
                     src={
-                      activeCommunity?.image ||
+                      avatarImgUrl ||
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh"
                     }
                     alt="User"
                     className="relative w-full h-full object-cover rounded-full border-4 border-background shadow-md"
                   />
 
-                  {isBankAdded && (
+                  {activeCommunityData?.user?.user_isBankDetailsAdded && (
                     <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-10 w-10 text-primary drop-shadow-md bg-white rounded-full" />
                   )}
                 </div>
 
                 <div className="text-center space-y-2">
-                  <h1 className="font-bold">{activeCommunity?.name}</h1>
+                  <h1 className="font-bold">
+                    {activeCommunityData?.community?.name}
+                  </h1>
 
                   <p className="flex items-center justify-center gap-1 text-muted-foreground">
                     <BiSolidOffer className="h-5 w-5 text-green-600" />
@@ -578,7 +608,8 @@ export function BookingDialog({
                         Year of Experience
                       </span>
                       <span className="text-sm font-semibold text-gray-800">
-                        {yearOfExperience} years
+                        {activeCommunityData?.user?.user_year_of_experience}{" "}
+                        years
                       </span>
                     </div>
                   </div>
@@ -603,7 +634,7 @@ export function BookingDialog({
                         Sessions Conducted
                       </span>
                       <span className="text-sm font-semibold text-gray-800">
-                        {sessionConducted}
+                        {activeCommunityData?.user?.user_session_conducted}{" "}
                       </span>
                     </div>
                   </div>
@@ -625,10 +656,7 @@ export function BookingDialog({
                     <div className="flex flex-col">
                       <span className="text-xs text-gray-500">Price</span>
                       <span className="text-sm font-semibold text-gray-800">
-                        {offering.discounted_price !== null &&
-                        offering.discounted_price !== undefined
-                          ? offering.discounted_price
-                          : offering.price.amount}
+                        {offering.price.amount}
                       </span>
                     </div>
                   </div>

@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
 const guildup_logo_final = "/guildup_logo_final.png";
+
 
 export const metadata: Metadata = {
   title: "GuildUp",
@@ -65,9 +65,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
-        <meta name="facebook-domain-verification" content="jiqk23ypswv5t4ozyxbhpy3z1mhrcd" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
+        />
+        <meta
+          name="facebook-domain-verification"
+          content="jiqk23ypswv5t4ozyxbhpy3z1mhrcd"
+        />
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
@@ -80,7 +85,7 @@ export default async function RootLayout({
         <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
 
-        {/* Do not remove these script */}
+         {/* Do not remove these script */} {/* Google Analytics */}
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
