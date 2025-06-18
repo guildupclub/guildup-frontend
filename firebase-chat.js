@@ -9,6 +9,7 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
+  
   apiKey: "AIzaSyAUmWxoCjotsy7kBKA5z7-EtELx4ckFbxg",
   authDomain: "gu-chat-34eac.firebaseapp.com",
   databaseURL: "https://gu-chat-34eac-default-rtdb.asia-southeast1.firebasedatabase.app",
