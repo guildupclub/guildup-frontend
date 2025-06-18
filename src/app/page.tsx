@@ -27,12 +27,14 @@ import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 
+
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 import { on } from "events";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
+
 
 interface Category {
   _id: string;
