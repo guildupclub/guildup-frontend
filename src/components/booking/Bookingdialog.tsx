@@ -674,7 +674,7 @@ export function BookingDialog({
             </div>
 
             {/* Right Section - Booking Panel */}
-            <div className="p-6 bg-background pb-auto overflow-y-auto">
+            <div className="p-6 bg-background pb-auto overflow-y-auto mb-16">
               <DialogHeader className="mb-6">
                 <DialogTitle className="text-2xl font-bold  text-center">
                   Fill Basic Information for Booking
