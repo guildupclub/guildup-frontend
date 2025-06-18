@@ -113,7 +113,7 @@ export function BookingDialog({
   const communityIdFromParam =
     lastHyphenIndex !== -1 && communityParam.substring(lastHyphenIndex + 1)
       ? communityParam.substring(lastHyphenIndex + 1)
-      : "67e8f91447265b8a46d4d48d";
+      : "683f18575411ca44bde8f746";
   const cleanedCommunityName =
     communityName ||
     "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
