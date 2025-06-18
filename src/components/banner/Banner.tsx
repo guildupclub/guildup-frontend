@@ -43,7 +43,7 @@ export default function WelcomeBanner() {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  const activeCommunityId = "683f18575411ca44bde8f746";;
+  const activeCommunityId = "683f18575411ca44bde8f746";
 
   // Consolidate pathname check into a single useEffect
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function WelcomeBanner() {
     if (status === "unauthenticated") {
       console.log("User not authenticated, triggering signIn");
       signIn(undefined, {
-        callbackUrl: `${window.location.origin}?hero=2`,
+        callbackUrl: `${window.location.origin}/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile`,
       });
     } else if (isLoading) {
       console.log("Offerings are still loading...");
@@ -134,7 +134,7 @@ export default function WelcomeBanner() {
               ✕
             </button>
             <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 lg:p-4 shadow-2xl">
-              <div className="relative h-[420px] lg:h-[570px] w-full mb-2 lg:mb-4">
+              <div className="relative h-[420px] lg:h-[570px] w-full mb-2 lg:mb-4 px-2">
                 <Image
                   src="https://res.cloudinary.com/dzvdh7yez/image/upload/v1750266032/Guildup_6_1_nfu8ku.jpg"
                   alt="Welcome banner"
