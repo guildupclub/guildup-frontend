@@ -1203,13 +1203,12 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <span>
+                              <div className="w-full">
                                 <Button
-                                  size="sm"
                                   disabled={
                                     !offering.is_free && !isBankConnected
                                   }
-                                  className={`flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
+                                  className={`flex items-center w-full  gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
                                     !isOwner
                                       ? "cursor-pointer"
                                       : "cursor-not-allowed opacity-50"
@@ -1225,7 +1224,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                   <span>Book Now</span>
                                   <ArrowRight className="h-4 w-4" />
                                 </Button>
-                              </span>
+                              </div>
                             </TooltipTrigger>
                             {!offering.is_free && !isBankConnected && (
                               <TooltipContent className="flex items-center gap-2 rounded border border-gray-200 bg-white px-3 py-2 text-black shadow-lg">

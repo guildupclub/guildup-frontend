@@ -125,7 +125,7 @@ export default function WelcomeBanner() {
     <>
       {isVisible && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="relative mx-2 lg:mx-4 lg:max-w-xl w-full">
+          <div className="relative  lg:mx-4 lg:max-w-xl w-full">
             <button
               onClick={handleClose}
               className="absolute -top-2 -right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
@@ -133,13 +133,13 @@ export default function WelcomeBanner() {
             >
               ✕
             </button>
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 lg:p-4 shadow-2xl">
-              <div className="relative h-[420px] lg:h-[570px] w-full mb-2 lg:mb-4 px-2">
+            <div className="relative overflow-hidden rounded-md bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 lg:p-4 shadow-2xl py-2">
+              <div className="relative h-[420px] lg:h-[570px] w-full mb-2 lg:mb-4 lg:px-2">
                 <Image
                   src="https://res.cloudinary.com/dzvdh7yez/image/upload/v1750266032/Guildup_6_1_nfu8ku.jpg"
                   alt="Welcome banner"
                   fill
-                  className="object-cover rounded-lg"
+                  className="object-cover rounded-lg  lg:px-2"
                   priority
                 />
               </div>
