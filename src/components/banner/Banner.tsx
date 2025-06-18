@@ -121,7 +121,7 @@ export default function WelcomeBanner() {
             ✕
           </button>
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-sky-400 via-blue-400 to-indigo-300 p-2 lg:p-4 shadow-2xl">
-            <div className="relative h-[500px] w-full mb-2 lg:mb-4">
+            <div className="relative h-[570px] w-full mb-2 lg:mb-4">
               <Image
                 src="https://res.cloudinary.com/dzvdh7yez/image/upload/v1750171742/WhatsApp_Image_2025-06-17_at_20.16.45_400e029e_n4eh1y.jpg"
                 alt="Welcome banner"

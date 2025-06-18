@@ -111,10 +111,9 @@ export function BookingDialog({
       ? communityParam.substring(0, lastHyphenIndex)
       : null;
   const communityIdFromParam =
-    lastHyphenIndex !== -1
+    lastHyphenIndex !== -1 && communityParam.substring(lastHyphenIndex + 1)
       ? communityParam.substring(lastHyphenIndex + 1)
-      : null;
-  // console.log("communityIdFromParam", communityIdFromParam);
+      : "683f18575411ca44bde8f746";
   const cleanedCommunityName =
     communityName ||
     "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
@@ -589,7 +588,7 @@ export function BookingDialog({
 
                 <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
                   {/* Year of Experience */}
-                  {activeCommunityData?.user?.user_years_of_experience && (
+                  {activeCommunityData?.user?.user_year_of_experience && (
                     <div className="flex items-center gap-3 border-b py-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -599,17 +598,17 @@ export function BookingDialog({
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="h-6 w-6 text-violet-500"
+                        className="h-6 w-6 text-amber-500"
                       >
-                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z" />
-                        <path d="M12 6v6l4.5 2.25" />
+                        <circle cx="12" cy="8" r="7" />
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
                       </svg>
                       <div className="flex flex-col">
                         <span className="text-xs text-gray-500">
                           Years of Experience
                         </span>
                         <span className="text-sm font-semibold text-gray-800">
-                          {activeCommunityData?.user?.user_years_of_experience}{" "}
+                          {activeCommunityData?.user?.user_year_of_experience}{" "}
                         </span>
                       </div>
                     </div>
