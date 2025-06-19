@@ -35,7 +35,7 @@ export default function BookingConfirmation() {
     }
 
     axios
-      .get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/booking-by-id/${bookingId}`)
+      .get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${bookingId}`)
       .then((res) => {
         if (res.data?.r === 's') {
           setBooking(res.data.data);
