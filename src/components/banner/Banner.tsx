@@ -99,18 +99,10 @@ export default function WelcomeBanner() {
   };
 
   const handleGoToProfile = () => {
-    if (status === "unauthenticated") {
-      console.log("User not authenticated, triggering signIn");
-      signIn(undefined, {
-        callbackUrl: `${window.location.origin}/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile`,
-      });
-    } else if (isLoading) {
+    if (isLoading) {
       console.log("Offerings are still loading...");
     } else if (offerings.length > 0) {
       console.log("Setting selected offering:", offerings[0]);
-      router.push(
-        "https://www.guildup.club/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile"
-      );
       setSelectedOffering(offerings[0]);
     } else {
       console.log("No offerings available");

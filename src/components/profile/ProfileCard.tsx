@@ -1214,10 +1214,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                       : "cursor-not-allowed opacity-50"
                                   }`}
                                   onClick={() => {
-                                    if (!session) {
-                                      signIn("google");
-                                      return;
-                                    }
+                                    // if (!session) {
+                                      // signIn("google");
+                                      // return;
+                                    // }
+                                    
                                     if (!isOwner) setSelectedOffering(offering);
                                   }}
                                 >
