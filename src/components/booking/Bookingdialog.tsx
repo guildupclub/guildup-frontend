@@ -323,7 +323,7 @@ export function BookingDialog({
           // setBookingDetails(response.data.data);
           // setBookingSuccess(true);
           
-          // toast.success("Booking confirmed successfully!");
+          toast.success("Booking confirmed successfully!");
           // Redirect to booking confirmation page
           router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
           tracking.trackUserAction("free_booking_confirmed", {
@@ -386,9 +386,9 @@ export function BookingDialog({
               // // Store booking details and show success modal
               // setBookingDetails(response.data.data);
               // setBookingSuccess(true);
-              // setTimeout(() => {
-              //   toast.success("Booking confirmed successfully!");
-              // }, 300);
+              setTimeout(() => {
+                toast.success("Booking confirmed successfully!");
+              }, 300);
               router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
               
               console.log("Booking confirmed successfully!");
