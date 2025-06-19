@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -100,6 +101,9 @@ export function BookingDialog({
   const user = useSelector((state: RootState) => state.user.user);
   const name = user?.name || "";
   const email = user?.email || "";
+
+  const router = useRouter();
+  
   const tracking = useTracking();
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [activeCommunityData, setActiveCommunityData] = useState<any>(null);
@@ -315,10 +319,13 @@ export function BookingDialog({
         console.log("Order Created:", response.data.data);
         if (offering.is_free) {
           setIsProcessing(false);
-          // Store booking details and show success modal
-          setBookingDetails(response.data.data);
-          setBookingSuccess(true);
-          toast.success("Booking confirmed successfully!");
+          // // Store booking details and show success modal
+          // setBookingDetails(response.data.data);
+          // setBookingSuccess(true);
+          
+          // toast.success("Booking confirmed successfully!");
+          // Redirect to booking confirmation page
+          router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
           tracking.trackUserAction("free_booking_confirmed", {
             offering_id: offering._id,
             offering_title: offering.title,
@@ -376,12 +383,14 @@ export function BookingDialog({
 
             if (response.data.r === "s") {
               setIsProcessing(false);
-              // Store booking details and show success modal
-              setBookingDetails(response.data.data);
-              setBookingSuccess(true);
-              setTimeout(() => {
-                toast.success("Booking confirmed successfully!");
-              }, 300);
+              // // Store booking details and show success modal
+              // setBookingDetails(response.data.data);
+              // setBookingSuccess(true);
+              // setTimeout(() => {
+              //   toast.success("Booking confirmed successfully!");
+              // }, 300);
+              router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
+              
               console.log("Booking confirmed successfully!");
               tracking.trackUserAction("paid_booking_confirmed", {
                 offering_id: offering._id,
