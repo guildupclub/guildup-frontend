@@ -38,6 +38,7 @@ export default function BookingConfirmation() {
       .get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/${bookingId}`)
       .then((res) => {
         if (res.data?.r === 's') {
+          console.log("Booking API response:", res.data.data);
           setBooking(res.data.data);
         } else {
           setError(true);
@@ -83,12 +84,13 @@ export default function BookingConfirmation() {
         </p>
 
         <div className="bg-gray-50 border rounded-lg p-4 text-left text-sm space-y-3">
-          <div><strong>Service Name:</strong> {booking.offering_id.title}</div>
+          <div><strong>Service Name:</strong> {booking.offering_id?.title || "N/A"}</div>
           <div><strong>Date:</strong> {formattedDate}</div>
           <div><strong>Time:</strong> {formattedTime}</div>
-          <div><strong>Duration:</strong> {booking.offering_id.duration} minutes</div>
-          <div><strong>Price:</strong> {booking.offering_id.price.currency} {booking.offering_id.price.amount}</div>
+          <div><strong>Duration:</strong> {booking.offering_id?.duration || "N/A"} minutes</div>
+          <div><strong>Price:</strong> {booking.offering_id?.price?.currency || "INR"} {booking.offering_id?.price?.amount ?? 0}</div>
         </div>
+
 
         <button
           onClick={() => router.push('/booking')}
