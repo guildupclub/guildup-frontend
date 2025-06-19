@@ -6,17 +6,17 @@ import axios from 'axios';
 
 interface Booking {
   _id: string;
-  offering_id: {
-    title: string;
-    duration: number;
-    price: {
-      amount: number;
-      currency: string;
+  offering_id?: {
+    title?: string;
+    duration?: number;
+    price?: {
+      amount?: number;
+      currency?: string;
     };
-  };
-  start_time: string;
-  provider_id: {
-    name: string;
+  } | string; // in case it's an ID
+  start_time?: string;
+  provider_id?: {
+    name?: string;
   };
 }
 
@@ -62,17 +62,42 @@ export default function BookingConfirmation() {
       </div>
     );
   }
+  const serviceTitle =
+    typeof booking.offering_id === 'object' && booking.offering_id?.title
+      ? booking.offering_id.title
+      : 'N/A';
+  
+  const duration =
+    typeof booking.offering_id === 'object' && booking.offering_id?.duration
+      ? booking.offering_id.duration
+      : 'N/A';
+  
+  const price =
+    typeof booking.offering_id === 'object' && booking.offering_id?.price?.amount
+      ? booking.offering_id.price.amount
+      : 0;
+  
+  const currency =
+    typeof booking.offering_id === 'object' && booking.offering_id?.price?.currency
+      ? booking.offering_id.price.currency
+      : 'INR';
 
-  const dateTime = new Date(booking.start_time);
-  const formattedDate = dateTime.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const formattedTime = dateTime.toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const dateTime = booking?.start_time ? new Date(booking.start_time) : null;
+  
+  const formattedDate = dateTime
+    ? dateTime.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    : 'N/A';
+  
+  const formattedTime = dateTime
+    ? dateTime.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    : 'N/A';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
@@ -84,12 +109,13 @@ export default function BookingConfirmation() {
         </p>
 
         <div className="bg-gray-50 border rounded-lg p-4 text-left text-sm space-y-3">
-          <div><strong>Service Name:</strong> {booking.offering_id?.title || "N/A"}</div>
+          <div><strong>Service Name:</strong> {serviceTitle}</div>
           <div><strong>Date:</strong> {formattedDate}</div>
           <div><strong>Time:</strong> {formattedTime}</div>
-          <div><strong>Duration:</strong> {booking.offering_id?.duration || "N/A"} minutes</div>
-          <div><strong>Price:</strong> {booking.offering_id?.price?.currency || "INR"} {booking.offering_id?.price?.amount ?? 0}</div>
+          <div><strong>Duration:</strong> {duration} minutes</div>
+          <div><strong>Price:</strong> {currency} {price}</div>
         </div>
+
 
 
         <button
