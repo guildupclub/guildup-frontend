@@ -972,15 +972,6 @@ export function BookingDialog({
               >
                 Close
               </Button>
-              <Button
-                onClick={() => {
-                  setBookingSuccess(false);
-                  onClose();
-                  window.location.href = "/booking";
-                }}
-              >
-                Go to Bookings
-              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -988,3 +979,13 @@ export function BookingDialog({
     </Dialog>
   );
 }
+
+{/* <Button
+  onClick={() => {
+    setBookingSuccess(false);
+    onClose();
+    window.location.href = "/booking";
+  }}
+>
+  Go to Bookings
+</Button>; */}
