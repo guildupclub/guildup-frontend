@@ -318,11 +318,13 @@ export function BookingDialog({
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
         if (offering.is_free) {
+          const bookingId = response?.data?.data?._id;
+        
+          if (!bookingId) {
+            toast.error("Booking failed — missing booking ID.");
+            return;
+          }
           setIsProcessing(false);
-          // // Store booking details and show success modal
-          // setBookingDetails(response.data.data);
-          // setBookingSuccess(true);
-          
           toast.success("Booking confirmed successfully!");
           // Redirect to booking confirmation page
           router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
@@ -336,6 +338,9 @@ export function BookingDialog({
             booking_end_time: selectedSlot?.end,
             phone: phoneWithoutFormatting,
           });
+          setTimeout(() => {
+            router.push(`/booking-confirmation?bookingId=${bookingId}`);
+          }, 500);
           return;
         }
         // Track payment initiation
@@ -382,15 +387,15 @@ export function BookingDialog({
             );
 
             if (response.data.r === "s") {
+              const bookingId = response?.data?.data?._id;
+            
+              if (!bookingId) {
+                toast.error("Booking failed — missing booking ID.");
+                return;
+              }
+            
               setIsProcessing(false);
-              // // Store booking details and show success modal
-              // setBookingDetails(response.data.data);
-              // setBookingSuccess(true);
-              setTimeout(() => {
-                toast.success("Booking confirmed successfully!");
-              }, 300);
-              router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
-              
+                          
               console.log("Booking confirmed successfully!");
               tracking.trackUserAction("paid_booking_confirmed", {
                 offering_id: offering._id,
@@ -405,6 +410,12 @@ export function BookingDialog({
                 payment_id: paymentResponse.razorpay_payment_id,
                 order_id: paymentResponse.razorpay_order_id,
               });
+              toast.success("Booking confirmed successfully!");
+
+              // ⏳ Slight delay so toast is visible
+              setTimeout(() => {
+                router.push(`/booking-confirmation?bookingId=${bookingId}`);
+              }, 500);
               // Don't close the dialog here
             } else {
               toast.error("Payment verification failed");
