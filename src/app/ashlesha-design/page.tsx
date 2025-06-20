@@ -85,7 +85,7 @@ export default function AshleshaDesignPage() {
               <div className="mb-4 mt-4">
                 <span className="inline-block bg-blue-50 text-blue-700 font-semibold text-base rounded-full px-4 py-1">SimpliYoga by Ashlesha</span>
               </div>
-              <div className="text-lg font-bold text-gray-900 mb-1 leading-tight">"Helping 500+ people reconnect with their breath and body"</div>
+              <div className="text-lg font-bold text-gray-900 mb-1 leading-tight">&quot;Helping 500+ people reconnect with their breath and body&quot;</div>
               {/* Stats Row */}
               <div className="flex flex-wrap gap-x-6 gap-y-2 items-center mb-1 text-sm">
                 <div className="flex items-center gap-2 text-gray-700"><span className="text-green-500 text-lg">✔️</span> Verified Expert</div>
@@ -106,8 +106,8 @@ export default function AshleshaDesignPage() {
             {/* Bottom: Quote and CTA Button */}
             <div className="flex flex-col gap-2 mt-4 w-full">
               <div className="bg-gray-50 border-l-4 border-purple-300 p-3 rounded-lg text-gray-700 italic flex items-center gap-2 text-sm max-w-xl mb-1">
-                <span className="text-purple-400 text-xl">"</span>
-                <span>Transformation begins with breath — and someone who gets you."</span>
+                <span className="text-purple-400 text-xl">&quot;</span>
+                <span>Transformation begins with breath — and someone who gets you.&quot;</span>
               </div>
               <button className="w-full bg-gradient-to-r from-[#5b6dfa] to-[#a084ee] text-white px-6 py-3 rounded-xl font-bold text-base flex items-center justify-center gap-2 shadow hover:from-blue-700 hover:to-purple-700 transition-colors duration-300">
                 <span className="text-xl">💬</span> Begin Your Journey with Ashlesha <span className="text-xl">→</span>
@@ -123,20 +123,20 @@ export default function AshleshaDesignPage() {
           <button className="px-6 py-2 rounded-full border border-purple-500 text-purple-700 font-semibold bg-white hover:bg-purple-50 transition-colors duration-200 shadow-sm">Discovery</button>
         </div>
 
-        {/* What It's Like to Work With Me */}
+        {/* What It&apos;s Like to Work With Me */}
         <section className="bg-white rounded-2xl shadow-lg px-10 pt-8 pb-10 flex flex-col md:flex-row gap-8 items-center mb-10">
           <div className="flex-1">
-            <div className="text-2xl font-bold mb-2">What It's Like to Work With Me</div>
+            <div className="text-2xl font-bold mb-2">What It&apos;s Like to Work With Me</div>
             <div className="text-gray-700 mb-2 leading-relaxed">
-              I believe healing happens when you feel truly seen and understood. My approach isn't about pushing you toward some perfect version of yourself—it's about meeting you exactly where you are today.<br/><br/>
-              Whether you're carrying stress from a demanding job, navigating life transitions, or simply wanting to reconnect with your body, we'll create a practice that honors your unique needs and rhythm.<br/><br/>
-              My journey from the corporate world to wellness taught me that transformation doesn't require perfection—it requires compassion, especially for yourself.
+              I believe healing happens when you feel truly seen and understood. My approach isn&apos;t about pushing you toward some perfect version of yourself—it&apos;s about meeting you exactly where you are today.<br/><br/>
+              Whether you&apos;re carrying stress from a demanding job, navigating life transitions, or simply wanting to reconnect with your body, we&apos;ll create a practice that honors your unique needs and rhythm.<br/><br/>
+              My journey from the corporate world to wellness taught me that transformation doesn&apos;t require perfection—it requires compassion, especially for yourself.
             </div>
           </div>
           <div className="flex items-center justify-center md:w-1/3">
             <div className="bg-gray-50 rounded-2xl p-8 flex flex-col items-center">
               <span className="text-purple-400 text-4xl mb-2">❝❞</span>
-              <span className="text-gray-700 text-center italic font-medium">"We'll start where you are — not where you think you should be."</span>
+              <span className="text-gray-700 text-center italic font-medium">&quot;We&apos;ll start where you are — not where you think you should be.&quot;</span>
             </div>
           </div>
         </section>
@@ -151,7 +151,7 @@ export default function AshleshaDesignPage() {
             {/* Example testimonials, replace with your dynamic data if needed */}
             <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-3 shadow-sm border border-gray-100">
               <div className="flex gap-1 text-yellow-400 text-lg mb-2">{'★★★★★'}</div>
-              <div className="text-gray-700 italic mb-2">"Ashlesha helped me find calm in the chaos. Her gentle approach made yoga accessible even as a complete beginner."</div>
+              <div className="text-gray-700 italic mb-2">&quot;Ashlesha helped me find calm in the chaos. Her gentle approach made yoga accessible even as a complete beginner.&quot;</div>
               <div className="flex items-center gap-2 mt-2">
                 <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-600">SM</div>
                 <div className="text-gray-800 font-semibold text-sm">Sarah M.</div>
@@ -159,7 +159,7 @@ export default function AshleshaDesignPage() {
             </div>
             <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-3 shadow-sm border border-gray-100">
               <div className="flex gap-1 text-yellow-400 text-lg mb-2">{'★★★★★'}</div>
-              <div className="text-gray-700 italic mb-2">"The breathing techniques I learned have been life-changing. I sleep better and feel more centered throughout the day."</div>
+              <div className="text-gray-700 italic mb-2">&quot;The breathing techniques I learned have been life-changing. I sleep better and feel more centered throughout the day.&quot;</div>
               <div className="flex items-center gap-2 mt-2">
                 <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-600">MK</div>
                 <div className="text-gray-800 font-semibold text-sm">Michael K.</div>
@@ -167,7 +167,7 @@ export default function AshleshaDesignPage() {
             </div>
             <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-3 shadow-sm border border-gray-100">
               <div className="flex gap-1 text-yellow-400 text-lg mb-2">{'★★★★★'}</div>
-              <div className="text-gray-700 italic mb-2">"Such a warm and encouraging teacher. The personalized sessions really made the difference in my practice."</div>
+              <div className="text-gray-700 italic mb-2">&quot;Such a warm and encouraging teacher. The personalized sessions really made the difference in my practice.&quot;</div>
               <div className="flex items-center gap-2 mt-2">
                 <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-600">PR</div>
                 <div className="text-gray-800 font-semibold text-sm">Priya R.</div>
@@ -175,7 +175,7 @@ export default function AshleshaDesignPage() {
             </div>
             <div className="bg-gray-50 rounded-xl p-6 flex flex-col gap-3 shadow-sm border border-gray-100">
               <div className="flex gap-1 text-yellow-400 text-lg mb-2">{'★★★★★'}</div>
-              <div className="text-gray-700 italic mb-2">"I feel more energetic and connected after every session. Highly recommend Ashlesha for anyone seeking clarity and calm."</div>
+              <div className="text-gray-700 italic mb-2">&quot;I feel more energetic and connected after every session. Highly recommend Ashlesha for anyone seeking clarity and calm.&quot;</div>
               <div className="flex items-center gap-2 mt-2">
                 <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-600">AR</div>
                 <div className="text-gray-800 font-semibold text-sm">Anjali R.</div>
@@ -187,7 +187,7 @@ export default function AshleshaDesignPage() {
         {/* Call to Action */}
         <section className="bg-white rounded-2xl shadow-lg px-10 pt-8 pb-10 mb-10 flex flex-col items-center">
           <div className="text-2xl font-bold mb-2">Still Exploring?</div>
-          <div className="text-gray-600 text-center mb-6 max-w-2xl">There's no rush. Healing and growth happen in your own time. Here are some gentle ways to stay connected while you explore what feels right for you.</div>
+          <div className="text-gray-600 text-center mb-6 max-w-2xl">There&apos;s no rush. Healing and growth happen in your own time. Here are some gentle ways to stay connected while you explore what feels right for you.</div>
           <div className="flex flex-wrap gap-3 justify-center">
             <button className="flex items-center gap-2 px-6 py-2 rounded-full border border-purple-400 text-purple-700 font-semibold bg-white hover:bg-purple-50 transition-colors duration-200">
               <span>⭐</span> Follow Ashlesha
