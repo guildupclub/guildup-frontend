@@ -22,7 +22,6 @@ const geistMono = Geist_Mono({
 });
 const guildup_logo_final = "/guildup_logo_final.png";
 
-
 export const metadata: Metadata = {
   title: "GuildUp",
   description:
@@ -76,7 +75,6 @@ export default async function RootLayout({
         <link rel="shortcut icon" href="/guildup_logo_final.png" />
         <link rel="icon" type="image/png" href="/guildup_logo_final.png" />
         <link rel="apple-touch-icon" href="/guildup_logo_final.png" />
-
         {/* PWA Meta Tags */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -84,8 +82,7 @@ export default async function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-
-         {/* Do not remove these script */} {/* Google Analytics */}
+        {/* Do not remove these script */} {/* Google Analytics */}
         <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
@@ -100,7 +97,6 @@ export default async function RootLayout({
             `,
           }}
         />
-
         {/* Service Worker Registration */}
         <script
           dangerouslySetInnerHTML={{
@@ -129,7 +125,7 @@ export default async function RootLayout({
                 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
               })(window, document, "clarity", "script", "rgpxrvmq3a");
-            `
+            `,
           }}
         />
       </head>
@@ -143,7 +139,7 @@ export default async function RootLayout({
               {children}
               <Toaster richColors position="top-center" />
               <CookieConsent />
-              <WelcomeBanner />
+              {/* <WelcomeBanner /> */}
             </Providers>
           </PostHogProviderWrapper>
         </CookieConsentProvider>

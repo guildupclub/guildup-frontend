@@ -177,7 +177,7 @@ export default function Hero() {
             </span>{" "}
             people and connect with
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 pl-1">
-              60+
+              100+
             </span>{" "}
             verified coaches, therapists, nutritionists, and wellness experts
           </motion.p>
