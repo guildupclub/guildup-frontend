@@ -2,24 +2,18 @@
 import HomePage from "@/components/homePageLayout/HomePage";
 import Loader from "@/components/Loader";
 import TopicSelectionModal from "@/components/SelectTopicForm";
-import { setUserFollowedCommunities } from "@/redux/userSlice";
-import axios from "axios";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const { isLoading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const router = useRouter();
-  const dispatch = useDispatch();
 
   const handleTopicSelection = (selectedTopics: string[]) => {
     setIsModalOpen(false); // Close modal after topic selection
   };
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div>
         <Loader />
@@ -28,7 +22,7 @@ export default function Home() {
   }
 
   return (
-    <div className=" min-h-screen pt-16 bg-gradient-to-r from-[#777BEA]/20  text-muted">
+    <div className="min-h-screen pt-16 bg-gradient-to-r from-[#777BEA]/20 text-muted">
       <HomePage />
     </div>
   );

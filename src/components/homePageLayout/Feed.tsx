@@ -1,22 +1,25 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useMemo } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useAuth } from "@/contexts/AuthContext";
+import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
 import Loader from "../Loader";
 import { PostCarde } from "./PostCard";
-import { useInfinitePosts } from "@/hook/queries/useFeedQueries";
 import { StringConstants } from "../common/CommonText";
 import PostFromFeed from "./PostFromFeed";
-import { useSession } from "next-auth/react";
 
 export function Feed() {
-  const userId = useSelector((state: RootState) => state.user.user?._id);
-  const { data: session } = useSession();
+  const { user, isAuthenticated } = useAuth();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfinitePosts(userId);
+  const { 
+    data, 
+    fetchNextPage, 
+    hasNextPage, 
+    isFetchingNextPage, 
+    isLoading,
+    error 
+  } = useInfinitePosts(user?.id);
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -36,7 +39,8 @@ export function Feed() {
     [isFetchingNextPage, hasNextPage, fetchNextPage]
   );
 
-  const posts = data?.flattenedPosts || [];
+  // Get flattened posts from the hook's select function
+  const posts = useMemo(() => data?.flattenedPosts || [], [data?.flattenedPosts]);
 
   if (isLoading && posts.length === 0) {
     return (
@@ -46,10 +50,21 @@ export function Feed() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-center text-red-500">
+          <p>Failed to load posts</p>
+          <p className="text-sm text-gray-500">{(error as Error)?.message}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-4xl mx-auto h-screen overflow-scroll scrollbar-hide">
       <Tabs defaultValue="feed" className="w-full">
-        {session && <PostFromFeed />}
+        {isAuthenticated && <PostFromFeed />}
         <TabsContent value="feed" className="mt-0 p-4">
           {posts.length === 0 ? (
             <div className="text-center text-zinc-400">
@@ -60,8 +75,8 @@ export function Feed() {
               <PostCarde
                 key={post._id}
                 post={post}
-                userID={userId}
-                ref={index === posts.length - 1 ? lastPostElementRef : null}
+                userID={user?.id || ""}
+                cardRef={index === posts.length - 1 ? lastPostElementRef : null}
               />
             ))
           )}

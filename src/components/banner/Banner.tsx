@@ -54,7 +54,7 @@ export default function WelcomeBanner() {
         callbackUrl: `${window.location.origin}?hero=2`,
       });
     } else {
-      router.push("/profile");
+      router.push("/community/648260000000000000000000/profile?offering={offeringId}");
     }
   };
 

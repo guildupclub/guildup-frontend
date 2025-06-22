@@ -1,38 +1,41 @@
 "use client";
+
 import CategoryBar from "@/components/explore/CategoryBar";
 import EnhancedCommunitySection from "@/components/community/enhanced-community-section";
-import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
-import { setUserFollowedCommunities } from "@/redux/userSlice";
-import { useDispatch } from "react-redux";
 import React, {
   useEffect,
   useRef,
   useState,
   Suspense,
   useCallback,
+  useMemo,
 } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 import Hero from "@/components/heroSection/HeroSection";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
-import { toast } from "sonner";
-import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
 import { ArrowRight } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
-import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
-
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
-import { on } from "events";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
+
+// New architecture imports
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigation } from "@/contexts/NavigationContext";
+import { useToast } from "@/contexts/ToastContext";
+import { useCategories } from "@/hooks/api/useExploreQueries";
+import { useUserCommunities } from "@/hooks/api/useCommunityQueries";
+
+// Category URL formatting utilities
+const formatCategoryUrl = (name: string) => name.replace(/\s+/g, "-");
+const parseCategoryUrl = (url: string) => url.replace(/-/g, " ");
 
 interface Category {
   _id: string;
@@ -58,147 +61,138 @@ function SearchParamsProvider({
 }
 
 function Page() {
-  const { data: session, status } = useSession();
-  const [category, setCategory] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>("All Category");
+  const { user, isAuthenticated, login } = useAuth();
+  const { activeTab } = useNavigation();
+  const { showSuccess, showError } = useToast();
+  const tracking = useTracking();
+  const router = useRouter();
+
+  // Fetch categories using the new hook
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  
+  // Fetch user communities if authenticated
+  // Temporarily disabled to prevent infinite re-rendering until backend API is fixed
+  const { 
+    data: userCommunitiesData, 
+    isLoading: communitiesLoading 
+  } = useUserCommunities(
+    user?.id || '', 
+    undefined, 
+    false // Disabled to prevent 404 errors causing infinite re-renders
+  );
+
+  // Local state
+  const [selectedCategory, setSelectedCategory] = useState<string>("All Category");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useDispatch();
-  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const targetRef = useRef<HTMLDivElement | null>(null);
-  const user = useSelector((state: RootState) => state.user);
-  const isCreator = user?.user?.is_creator ? true : false;
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
-  const heroRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
+
+  // Refs
+  const targetRef = useRef<HTMLDivElement | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
-  const userId = session?.user._id;
-  const tracking = useTracking();
+  const { scrollY } = useScroll();
+
+  // Prepare categories data - memoized to prevent recreation
+  const categories = useMemo(() => {
+    return categoriesData ? [
+      { _id: "all", name: "All Category" },
+      ...categoriesData,
+    ] : [];
+  }, [categoriesData]);
+
+  const isCreator = user?.is_creator || false;
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
+  // Track page views and handle authentication - optimized to prevent re-renders
+  const hasTrackedRef = useRef(false);
+  
   useEffect(() => {
-    if (!isMounted || status === "loading") return;
+    if (!isMounted || hasTrackedRef.current) return;
 
-    if (!session) {
+    if (!isAuthenticated) {
       tracking.trackCustomEvent("home_page_viewed_anonymous", {
         is_initial_load: isInitialLoad,
       });
-      router.push("/");
-    } else {
+      hasTrackedRef.current = true;
+    } else if (user) {
       // Track authenticated user viewing home page
       tracking.trackCustomEvent("home_page_viewed_authenticated", {
-        user_id: session.user._id,
-        is_new_user: session.user?.isNewUser,
-        is_creator: session.user?.is_creator,
+        user_id: user.id,
+        is_new_user: user.isNewUser,
+        is_creator: user.is_creator,
         is_initial_load: isInitialLoad,
       });
 
       // Identify user for PostHog
-      tracking.identifyUser(session.user._id, {
-        email: session.user.email,
-        name: session.user.name,
-        is_creator: session.user?.is_creator,
-        signup_date: session.user?.createdAt,
+      tracking.identifyUser(user.id, {
+        email: user.email,
+        name: user.name,
+        is_creator: user.is_creator,
+        signup_date: user.createdAt,
       });
 
-      const fetchCommunities = async () => {
-        try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-            {
-              userId: session?.user._id,
-            }
-          );
-          dispatch(setUserFollowedCommunities(res.data.data));
-
-          // Track communities loaded
-          tracking.trackCustomEvent("user_communities_loaded", {
-            user_id: session.user._id,
-            communities_count: res.data.data?.length || 0,
-          });
-        } catch (error) {
-          console.error(error);
-          tracking.trackError(
-            "api_error",
-            "Failed to fetch user communities",
-            error?.toString()
-          );
-        }
-      };
-      fetchCommunities();
-
-      if (session.user?.isNewUser) {
+      // Show modal for new users
+      if (user.isNewUser && !isModalOpen) {
         tracking.trackCustomEvent("new_user_modal_shown", {
-          user_id: session.user._id,
+          user_id: user.id,
         });
         setIsModalOpen(true);
       }
+      
+      hasTrackedRef.current = true;
     }
 
     // Mark initial load as complete
     if (isInitialLoad) {
       setIsInitialLoad(false);
     }
-  }, [session, status, isMounted, router, isInitialLoad, dispatch]);
+  }, [isAuthenticated, user, isMounted, isInitialLoad, isModalOpen, tracking]);
 
-  const categoryToUrl = (name: string) => {
-    return name.replace(/\s+/g, "-");
-  };
-
-  const urlToCategory = (url: string) => {
-    return url.replace(/-/g, " ");
-  };
-
+  // Handle URL category changes - using ref to prevent loops
+  const isUpdatingUrlRef = useRef(false);
+  
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
-        );
+    if (!categories.length || !isMounted || isInitialLoad || isUpdatingUrlRef.current) return;
 
-        const categories = [
-          { _id: "all", name: "All Category" },
-          ...response.data.data,
-        ];
-        setCategory(categories);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
+    isUpdatingUrlRef.current = true;
+    
+    const updateUrl = async () => {
+      if (selectedCategory === "All Category") {
+        router.replace("/", { scroll: false });
+      } else {
+        router.replace(`?category=${formatCategoryUrl(selectedCategory)}`, {
+          scroll: false,
+        });
       }
+      
+      // Reset flag after a brief delay
+      setTimeout(() => {
+        isUpdatingUrlRef.current = false;
+      }, 100);
     };
-    fetchCategory();
-  }, []);
 
-  useEffect(() => {
-    if (!category.length) return;
+    updateUrl();
+  }, [selectedCategory, router, categories, isMounted, isInitialLoad]);
 
-    if (selectedCategory === "All Category") {
-      router.replace("/", { scroll: false });
-    } else {
-      router.replace(`?category=${categoryToUrl(selectedCategory)}`, {
-        scroll: false,
-      });
-    }
-  }, [selectedCategory, router, category]);
-
-  const handleCreatorButtonClick = () => {
+  const handleCreatorButtonClick = useCallback(() => {
     // Track the creator button click
     tracking.trackClick("creator_signup_button", {
       section: "header",
-      user_signed_in: !!session,
-      user_id: session?.user._id,
+      user_signed_in: !!isAuthenticated,
+      user_id: user?.id,
     });
 
-    if (!session) {
+    if (!isAuthenticated) {
       tracking.trackUserAction("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
@@ -208,22 +202,20 @@ function Page() {
         trigger: "creator_button_prompt",
       });
 
-      signIn(undefined, {
-        callbackUrl: `${window.location.origin}`,
-      });
-
+      // Trigger OAuth login
+      login({ email: "", password: "" });
       return;
     }
 
     tracking.trackUserAction("creator_form_opened", {
       source: "header_button",
-      user_id: session.user._id,
+      user_id: user?.id,
     });
 
     setIsDialogOpen(true);
-  };
+  }, [tracking, isAuthenticated, user?.id, login]);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     tracking.trackClick("explore_communities_button", {
       section: "hero",
       action: "scroll_to_communities",
@@ -232,11 +224,14 @@ function Page() {
     if (targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  };
+  }, [tracking]);
 
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategorySelect = useCallback((categoryId: string) => {
+    // Prevent unnecessary updates if same category is selected
+    if (categoryId === selectedCategoryId) return;
+    
     // Track category selection
-    const selectedCat = category.find(
+    const selectedCat = categories.find(
       (cat: Category) => cat._id === categoryId
     );
 
@@ -244,14 +239,13 @@ function Page() {
       category_id: categoryId,
       category_name: selectedCat?.name || "All Category",
       previous_category: selectedCategory,
-      user_id: session?.user._id,
+      user_id: user?.id,
     });
 
     // Start loading immediately to clear current content
     setIsLoading(true);
 
     // Update category state
-
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -272,8 +266,9 @@ function Page() {
     }
 
     setIsLoading(false);
-  };
+  }, [selectedCategoryId, categories, tracking, selectedCategory, user?.id]);
 
+  // Intersection observer for sticky behavior
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([e]) => {
@@ -293,28 +288,30 @@ function Page() {
 
   const handleCategoryFromUrl = useCallback(
     (categoryFromUrl: string | null) => {
-      if (categoryFromUrl && category.length > 0) {
-        const categoryName = urlToCategory(categoryFromUrl);
-        const categoryObj = category.find(
+      if (categoryFromUrl && categories.length > 0) {
+        const categoryName = parseCategoryUrl(categoryFromUrl);
+        const categoryObj = categories.find(
           (cat: Category) =>
             cat.name.toLowerCase() === categoryName.toLowerCase()
         );
-        if (categoryObj) {
+        if (categoryObj && categoryObj.name !== selectedCategory) {
           setSelectedCategory(categoryObj.name);
           setSelectedCategoryId(categoryObj._id);
         }
       }
     },
-    [category]
+    [categories, selectedCategory]
   );
 
+  // Hero visibility tracking (removed Redux dependency)
   useEffect(() => {
     if (!heroRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         const visiblePercentage = entry.intersectionRatio;
-        dispatch(setHeroVisible(visiblePercentage > 0.2));
+        // Hero visibility can be tracked without Redux if needed
+        // or handled locally for any UI state changes
       },
       {
         threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
@@ -329,7 +326,15 @@ function Page() {
         observer.unobserve(heroRef.current);
       }
     };
-  }, [dispatch, heroRef]);
+  }, [heroRef]);
+
+  if (categoriesLoading) {
+    return (
+      <div className="min-h-[100vh] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <Suspense
@@ -357,18 +362,8 @@ function Page() {
 
           <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
             <DialogTrigger asChild>
-              {/* <Button
-                onClick={handleCreatorButtonClick}
-                className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <span className="relative z-10 font-medium">
-                  Join as Expert{" "}
-                </span>
-                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button> */}
               {!isCreator && (
-                <div className="bg-gradient-to-r from-blue-600 to-blue-400 py-2 w-full h-10 text-white text-sm font-semibold text-center flex items-center justify-center relative z-20 mt-16  mx-auto  ">
+                <div className="bg-gradient-to-r from-blue-600 to-blue-400 py-2 w-full h-10 text-white text-sm font-semibold text-center flex items-center justify-center relative z-20 mt-16 mx-auto">
                   <HiSparkles className="h-6 w-6 text-yellow-300 mx-2" /> Join
                   as Expert
                   <FaArrowRightLong
@@ -446,7 +441,7 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
+                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4 font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                           <span className="relative z-10 font-medium">
@@ -485,7 +480,7 @@ function Page() {
                       <DialogTrigger asChild>
                         <Button
                           onClick={handleCreatorButtonClick}
-                          className="group relative overflow-hidden flex items-center gap-3  hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] px-6"
+                          className="group relative overflow-hidden flex items-center gap-3 hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] px-6"
                         >
                           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                           <span className="relative z-10">Join as Expert</span>
@@ -513,7 +508,7 @@ function Page() {
                       <div className="min-w-max">
                         <div className="flex gap-2">
                           <CategoryBar
-                            categorys={category}
+                            categorys={categories}
                             selectCategory={handleCategorySelect}
                             selectedCategoryId={selectedCategory}
                           />
@@ -558,11 +553,11 @@ function Page() {
         metadata={{
           selected_category: selectedCategory,
           selected_category_id: selectedCategoryId,
-          user_signed_in: !!session,
-          user_id: session?.user._id,
-          is_creator: session?.user?.is_creator,
-          is_new_user: session?.user?.isNewUser,
-          categories_count: category.length,
+          user_signed_in: !!isAuthenticated,
+          user_id: user?.id,
+          is_creator: user?.is_creator,
+          is_new_user: user?.isNewUser,
+          categories_count: categories.length,
           is_loading: isLoading,
         }}
         trackScrollDepth={true}
