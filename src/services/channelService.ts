@@ -22,10 +22,35 @@ export class ChannelService {
       type?: 'chat' | 'post';
     }
   ): Promise<PaginatedResponse<Channel>> {
-    return apiClient.get<PaginatedResponse<Channel>>(
-      `${API_ENDPOINTS.COMMUNITIES}/${communityId}/channels`,
-      params
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${API_ENDPOINTS.CHANNELS}/getChannels`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          communityId,
+          ...params,
+        }),
+      }
     );
+
+    const data = await response.json();
+    if (data.r === 's' && data.data) {
+      return {
+        data: data.data,
+        pagination: {
+          page: params?.page || 1,
+          limit: params?.limit || 20,
+          total: data.data.length,
+          totalPages: Math.ceil(data.data.length / (params?.limit || 20)),
+          hasNextPage: false,
+          hasPrevPage: false,
+        }
+      };
+    }
+    throw new Error(data.message || 'Failed to fetch channels');
   }
 
   // Get channel by ID
@@ -34,8 +59,27 @@ export class ChannelService {
   }
 
   // Create new channel
-  async createChannel(data: CreateChannelRequest): Promise<Channel> {
-    return apiClient.post<Channel>(API_ENDPOINTS.CHANNELS, data);
+  async createChannel(data: CreateChannelRequest & { userId?: string; session?: string }): Promise<Channel> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${API_ENDPOINTS.CHANNELS}/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          communityId: data.community_id,
+          is_locked: data.is_private,
+        }),
+      }
+    );
+
+    const result = await response.json();
+    if (!response.ok || result.r !== 's') {
+      throw new Error(result.message || 'Failed to create channel');
+    }
+    return result.data;
   }
 
   // Update channel
@@ -44,8 +88,22 @@ export class ChannelService {
   }
 
   // Delete channel
-  async deleteChannel(channelId: string): Promise<void> {
-    return apiClient.delete<void>(`${API_ENDPOINTS.CHANNELS}/${channelId}`);
+  async deleteChannel(channelId: string, communityId?: string): Promise<void> {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${API_ENDPOINTS.CHANNELS}/delete`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ channelId, communityId }),
+      }
+    );
+
+    const result = await response.json();
+    if (!response.ok || result.r !== 's') {
+      throw new Error(result.message || 'Failed to delete channel');
+    }
   }
 
   // Archive/unarchive channel

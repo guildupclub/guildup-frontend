@@ -1,25 +1,19 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import type { 
-  User, 
-  UserProfile, 
   UpdateUserRequest,
-  UserStats,
-  UserPreferences,
-  UserNotification
+  UserPreferences
 } from '@/types/auth.types';
-import type { Community } from '@/types/community.types';
-import type { PaginatedResponse } from '@/types/api.types';
 import { userService } from '@/services/userService';
 import { QUERY_KEYS, CACHE_TIME } from '@/utils/constants';
 import { useToast } from '@/contexts/ToastContext';
 
 // PROFILE QUERIES
 
-export function useCurrentUser(enabled = true) {
+export function useCurrentUser(enabled = true, userId?: string) {
   return useQuery({
-    queryKey: [QUERY_KEYS.USER, 'current'],
-    queryFn: () => userService.getCurrentUser(),
-    enabled,
+    queryKey: [QUERY_KEYS.USER, 'current', userId],
+    queryFn: () => userService.getCurrentUser(userId!),
+    enabled: enabled && !!userId,
     staleTime: CACHE_TIME.MEDIUM,
     gcTime: CACHE_TIME.LONG,
   });
@@ -39,6 +33,16 @@ export function useUserProfile(userId: string, enabled = true) {
   return useQuery({
     queryKey: [QUERY_KEYS.USER, userId, 'profile'],
     queryFn: () => userService.getUserProfile(userId),
+    enabled: enabled && !!userId,
+    staleTime: CACHE_TIME.MEDIUM,
+    gcTime: CACHE_TIME.LONG,
+  });
+}
+
+export function useUserProfileById(userId: string, enabled = true) {
+  return useQuery({
+    queryKey: [QUERY_KEYS.USER, 'profile', userId],
+    queryFn: () => userService.getUserProfileById(userId),
     enabled: enabled && !!userId,
     staleTime: CACHE_TIME.MEDIUM,
     gcTime: CACHE_TIME.LONG,
@@ -276,13 +280,54 @@ export function useUpdateProfile() {
 
   return useMutation({
     mutationFn: (data: UpdateUserRequest) => userService.updateProfile(data),
-    onSuccess: (user) => {
+    onSuccess: (updatedUser) => {
+      // Invalidate and refetch user queries
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER] });
-      queryClient.setQueryData([QUERY_KEYS.USER, 'current'], user);
       showSuccess('Profile updated successfully!');
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
+      console.error('Error updating profile:', error);
       showError(error.message || 'Failed to update profile');
+    },
+  });
+}
+
+export function useUpdateProfileById() {
+  const queryClient = useQueryClient();
+  const { showSuccess, showError } = useToast();
+
+  return useMutation({
+    mutationFn: ({ userId, updateData }: { userId: string; updateData: Record<string, any> }) => 
+      userService.updateUserProfileById(userId, updateData),
+    onSuccess: (updatedUser, { userId }) => {
+      // Update the specific user query cache
+      queryClient.setQueryData([QUERY_KEYS.USER, 'profile', userId], updatedUser);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER] });
+      showSuccess('Profile updated successfully!');
+    },
+    onError: (error: any) => {
+      console.error('Error updating profile:', error);
+      showError(error.message || 'Failed to update profile');
+    },
+  });
+}
+
+export function useUpdateUserAvatar() {
+  const queryClient = useQueryClient();
+  const { showSuccess, showError } = useToast();
+
+  return useMutation({
+    mutationFn: ({ userId, file }: { userId: string; file: File }) => 
+      userService.updateUserAvatar(userId, file),
+    onSuccess: ({ user, message }, { userId }) => {
+      // Update the specific user query cache
+      queryClient.setQueryData([QUERY_KEYS.USER, 'profile', userId], user);
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.USER] });
+      showSuccess(message);
+    },
+    onError: (error: any) => {
+      console.error('Error updating avatar:', error);
+      showError(error.message || 'Error uploading profile picture.');
     },
   });
 }

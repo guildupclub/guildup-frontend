@@ -18,6 +18,7 @@ export default function Page() {
     refetch
   } = useCommunity(communityId || "", !!communityId);
 
+  console.log("@community", community);
   // Show loading state
   if (isLoading) {
     return (

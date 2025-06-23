@@ -20,6 +20,19 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   isNewUser?: boolean;
+  // Additional fields from UserProfile
+  followerCount?: number;
+  followingCount?: number;
+  postCount?: number;
+  communityCount?: number;
+  isFollowing?: boolean;
+  isBlocked?: boolean;
+  joinedAt?: string;
+  // User interaction fields
+  save?: string[];
+  share?: string[];
+  upvote?: string[];
+  downvote?: string[];
 }
 
 export interface LoginCredentials {
@@ -57,39 +70,6 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
-}
-
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  image?: string;
-  avatar?: string;
-  cover?: string;
-  about?: string;
-  phone?: string;
-  location?: string;
-  user_interests: string[];
-  year_of_experience?: string;
-  session_conducted?: string;
-  languages?: string[];
-  followerCount: number;
-  followingCount: number;
-  postCount: number;
-  communityCount: number;
-  isFollowing?: boolean;
-  isBlocked?: boolean;
-  joinedAt: string;
-}
-
-export interface UpdateUserRequest {
-  name?: string;
-  about?: string;
-  phone?: string;
-  location?: string;
-  user_interests?: string[];
-  year_of_experience?: string;
-  languages?: string[];
 }
 
 export interface UserStats {
@@ -139,4 +119,14 @@ export interface UserNotification {
   isRead: boolean;
   createdAt: string;
   actionUrl?: string;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  about?: string;
+  phone?: string;
+  location?: string;
+  user_interests?: string[];
+  year_of_experience?: string;
+  languages?: string[];
 } 

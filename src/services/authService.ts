@@ -130,12 +130,6 @@ class AuthService {
     });
   }
 
-  /**
-   * Get user's joined communities
-   */
-  async getUserCommunities(userId: string): Promise<any[]> {
-    return apiClient.post<any[]>('/v1/community/user/follow', { userId });
-  }
 
   /**
    * Update user interests

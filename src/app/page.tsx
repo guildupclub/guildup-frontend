@@ -62,8 +62,6 @@ function SearchParamsProvider({
 
 function Page() {
   const { user, isAuthenticated, login } = useAuth();
-  const { activeTab } = useNavigation();
-  const { showSuccess, showError } = useToast();
   const tracking = useTracking();
   const router = useRouter();
 
@@ -71,16 +69,7 @@ function Page() {
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
   
   // Fetch user communities if authenticated
-  // Temporarily disabled to prevent infinite re-rendering until backend API is fixed
-  const { 
-    data: userCommunitiesData, 
-    isLoading: communitiesLoading 
-  } = useUserCommunities(
-    user?.id || '', 
-    undefined, 
-    false // Disabled to prevent 404 errors causing infinite re-renders
-  );
-
+  // Temporarily disabled to prevent infinite re-rendering until backend API is 
   // Local state
   const [selectedCategory, setSelectedCategory] = useState<string>("All Category");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
@@ -95,9 +84,7 @@ function Page() {
   // Refs
   const targetRef = useRef<HTMLDivElement | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
 
   // Prepare categories data - memoized to prevent recreation
   const categories = useMemo(() => {
@@ -214,17 +201,6 @@ function Page() {
 
     setIsDialogOpen(true);
   }, [tracking, isAuthenticated, user?.id, login]);
-
-  const handleScroll = useCallback(() => {
-    tracking.trackClick("explore_communities_button", {
-      section: "hero",
-      action: "scroll_to_communities",
-    });
-
-    if (targetRef.current) {
-      targetRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [tracking]);
 
   const handleCategorySelect = useCallback((categoryId: string) => {
     // Prevent unnecessary updates if same category is selected

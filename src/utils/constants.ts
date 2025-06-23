@@ -91,7 +91,7 @@ export const API_ENDPOINTS = {
   AUTH: '/v1/auth',
   USERS: '/v1/users',
   COMMUNITIES: '/v1/community',
-  CHANNELS: '/v1/channels',
+  CHANNELS: '/v1/channel',
   POSTS: '/v1/posts',
   MESSAGES: '/v1/messages',
   COMMENTS: '/v1/comments',

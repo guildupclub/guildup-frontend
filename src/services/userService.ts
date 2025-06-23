@@ -15,8 +15,32 @@ export class UserService {
   // PROFILE MANAGEMENT
 
   // Get current user profile
-  async getCurrentUser(): Promise<User> {
-    return apiClient.get<User>(`${API_ENDPOINTS.USERS}/me`);
+  async getCurrentUser(userId: string): Promise<User> {
+    return apiClient.get<User>(`${API_ENDPOINTS.AUTH}/profile`,{userId});
+  }
+
+  // Get user profile with direct endpoint match
+  async getUserProfileById(userId: string): Promise<User> {
+    return apiClient.get<User>(`${API_ENDPOINTS.AUTH}/profile?userId=${userId}`);
+  }
+
+  // Update profile using the edit endpoint
+  async updateUserProfileById(userId: string, updateData: Record<string, any>): Promise<User> {
+   return apiClient.patch<User>(`${API_ENDPOINTS.AUTH}/edit`, {
+      updateData,
+      userId,
+    });
+
+  }
+
+  // Update avatar using direct endpoint
+  async updateUserAvatar(userId: string, file: File): Promise<{ user: User; message: string }> {
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('avatar', file);
+
+    return apiClient.upload<{ user: User; message: string }>(`${API_ENDPOINTS.AUTH}/update-avatar`, formData);
+    
   }
 
   // Get user by ID
@@ -191,18 +215,17 @@ export class UserService {
     }
   ): Promise<PaginatedResponse<Community>> {
     // Use the correct endpoint that exists on the backend
-    const response = await apiClient.post<{ r: string; data: Community[] }>(
-      '/v1/community/user/follow',
-      { userId }
+    const response = await apiClient.get<Community[]>(
+      `${API_ENDPOINTS.COMMUNITIES}/user/follow?userId=${userId}`
     );
     
     // Transform the response to match the expected PaginatedResponse format
     return {
-      data: response.data || [],
+      data: response || [],
       pagination: {
         page: params?.page || 1,
         limit: params?.limit || 20,
-        total: response.data?.length || 0,
+        total: response?.length || 0,
         totalPages: 1,
         hasNextPage: false,
         hasPrevPage: false,

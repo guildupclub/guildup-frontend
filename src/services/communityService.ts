@@ -26,7 +26,7 @@ export class CommunityService {
   // Get community by ID
   async getCommunity(communityId: string): Promise<Community> {
     // Send communityID in the body using POST request
-    return apiClient.post<Community>(`${API_ENDPOINTS.COMMUNITIES}/about`, { communityId });
+    return apiClient.get<Community>(`${API_ENDPOINTS.COMMUNITIES}/about/${communityId}`);
   }
 
   // Create new community
@@ -106,24 +106,58 @@ export class CommunityService {
       role?: 'owner' | 'moderator' | 'member';
     }
   ): Promise<PaginatedResponse<Community>> {
-    // Use the correct endpoint that exists on the backend
-    const response = await apiClient.post<{ r: string; data: Community[] }>(
-      '/v1/community/user/follow',
-      { userId }
-    );
-    
-    // Transform the response to match the expected PaginatedResponse format
-    return {
-      data: response.data || [],
-      pagination: {
-        page: params?.page || 1,
-        limit: params?.limit || 20,
-        total: response.data?.length || 0,
-        totalPages: 1,
-        hasNextPage: false,
-        hasPrevPage: false,
+    try {
+      // Try the follow endpoint first (as it's currently being used)
+      const response = await apiClient.get<Community[]>(
+        `${API_ENDPOINTS.COMMUNITIES}/user/follow?userId=${userId}`,
+      );
+
+      console.log("getUserCommunities response", response);
+      
+      // Handle both array response and object response
+      const communities = Array.isArray(response) ? response : ((response as any)?.data || []);
+      
+      // Transform the response to match the expected PaginatedResponse format
+      const result: PaginatedResponse<Community> = {
+        data: communities,
+        pagination: {
+          page: params?.page || 1,
+          limit: params?.limit || 20,
+          total: communities.length,
+          totalPages: Math.ceil(communities.length / (params?.limit || 20)),
+          hasNextPage: false,
+          hasPrevPage: false,
+        }
+      };
+
+      return result;
+    } catch (error) {
+      console.error("Error fetching user communities:", error);
+      
+      // If the follow endpoint fails, try alternative endpoint
+      try {
+        const response = await apiClient.get<PaginatedResponse<Community>>(
+          `${API_ENDPOINTS.COMMUNITIES}/user/${userId}`,
+          params
+        );
+        return response;
+      } catch (alternativeError) {
+        console.error("Alternative endpoint also failed:", alternativeError);
+        
+        // Return empty result instead of throwing error
+        return {
+          data: [],
+          pagination: {
+            page: params?.page || 1,
+            limit: params?.limit || 20,
+            total: 0,
+            totalPages: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+          }
+        };
       }
-    } as PaginatedResponse<Community>;
+    }
   }
 
   // Search communities

@@ -108,6 +108,8 @@ export interface CreateChannelRequest {
   type: 'chat' | 'post';
   community_id: string;
   is_private: boolean;
+  userId?: string;
+  session?: string;
 }
 
 export interface UpdateChannelRequest {

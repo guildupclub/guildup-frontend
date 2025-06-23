@@ -34,7 +34,7 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-      
+
       if (!response.ok) {
         await this.handleErrorResponse(response);
       }

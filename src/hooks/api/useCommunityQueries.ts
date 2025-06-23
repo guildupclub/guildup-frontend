@@ -110,6 +110,22 @@ export function useUserCommunities(
     queryFn: () => communityService.getUserCommunities(userId, params),
     enabled: enabled && !!userId,
     staleTime: CACHE_TIME.MEDIUM,
+    gcTime: CACHE_TIME.LONG,
+    retry: (failureCount, error) => {
+      // Don't retry on 404 errors (user not found) or 401 (unauthorized)
+      if (error && typeof error === 'object' && 'status' in error) {
+        const status = (error as any).status;
+        if (status === 404 || status === 401) {
+          return false;
+        }
+      }
+      // Retry up to 2 times for other errors
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    refetchOnWindowFocus: false, // Prevent excessive refetching
+    refetchOnMount: true,
+    refetchOnReconnect: true,
   });
 }
 

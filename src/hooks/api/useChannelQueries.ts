@@ -267,12 +267,13 @@ export function useDeleteChannel() {
   const { showSuccess, showError } = useToast();
 
   return useMutation({
-    mutationFn: (channelId: string) => channelService.deleteChannel(channelId),
-    onSuccess: (_, channelId) => {
+    mutationFn: ({ channelId, communityId }: { channelId: string; communityId?: string }) => 
+      channelService.deleteChannel(channelId, communityId),
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.CHANNELS] });
-      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL, channelId] });
-      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL_MESSAGES, channelId] });
-      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL_POSTS, channelId] });
+      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL, variables.channelId] });
+      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL_MESSAGES, variables.channelId] });
+      queryClient.removeQueries({ queryKey: [QUERY_KEYS.CHANNEL_POSTS, variables.channelId] });
       showSuccess('Channel deleted successfully');
     },
     onError: (error: Error) => {

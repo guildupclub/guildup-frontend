@@ -61,13 +61,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const pathname = usePathname();
   const tracking = useTracking();
 
-  // Fetch user's communities using the new hook
-  // Temporarily disabled to prevent infinite re-rendering until backend API is fixed
-  const { data: userCommunitiesData } = useUserCommunities(
+  // Fetch user's communities using the new hook with proper error handling
+  const { 
+    data: userCommunitiesData, 
+    isLoading: communitiesLoading, 
+    error: communitiesError 
+  } = useUserCommunities(
     user?.id || '', 
     undefined, 
-    false // Disabled to prevent 404 errors causing infinite re-renders
+    isAuthenticated && !!user?.id // Only fetch if user is authenticated and has an ID
   );
+  
+  console.log("userCommunitiesData", userCommunitiesData);
+  console.log("communitiesError", communitiesError);
+  
+  // Safely extract communities array with fallback
   const communities = userCommunitiesData?.data || [];
 
   // Local state
@@ -84,25 +92,45 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return communities.find((community: any) => community && community._id);
   };
 
-  // Generate community link with proper formatting
+  // Generate community link with proper formatting and fallback handling
   const getMySpaceLink = () => {
+    // If user is not authenticated, redirect to explore page
+    if (!isAuthenticated) {
+      return "/";
+    }
+
+    // If we have an active community, use it
     if (activeCommunity?.id) {
       const communityParam = createCommunityParam(activeCommunity.name, activeCommunity.id);
       return `${ROUTES.COMMUNITY}/${communityParam}/profile`;
-    } else {
-      const firstCommunity = getFirstValidCommunity();
-      if (firstCommunity) {
-        // Set the first community as active
-        setActiveCommunity({
-          id: firstCommunity._id,
-          name: firstCommunity.name,
-          image: firstCommunity.image || "",
-        });
-        const communityParam = createCommunityParam(firstCommunity.name, firstCommunity._id);
-        return `${ROUTES.COMMUNITY}/${communityParam}/profile`;
-      }
-      return "/no-community";
     }
+
+    // If we're still loading communities, prevent navigation
+    if (communitiesLoading) {
+      return "#"; // Prevent navigation while loading
+    }
+
+    // Try to get the first valid community
+    const firstCommunity = getFirstValidCommunity();
+    console.log("firstCommunity",firstCommunity);
+    if (firstCommunity) {
+      // Set the first community as active
+      setActiveCommunity({
+        id: firstCommunity._id,
+        name: firstCommunity.name,
+        image: firstCommunity.image || "",
+      });
+      const communityParam = createCommunityParam(firstCommunity.name, firstCommunity._id);
+      return `${ROUTES.COMMUNITY}/${communityParam}/profile`;
+    }
+
+    // If there's an error and user is authenticated, show explore instead of no-community
+    if (communitiesError && isAuthenticated) {
+      return "/"; // Redirect to explore to help user find communities
+    }
+
+    // Only redirect to no-community as absolute last resort
+    return "/no-community";
   };
 
   const handleMySpaceClick = (e: React.MouseEvent) => {
@@ -115,6 +143,30 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         },
       });
       return;
+    }
+
+    // If still loading communities, prevent navigation
+    if (communitiesLoading) {
+      e.preventDefault();
+      toast("Loading your communities...", {
+        duration: 1000,
+      });
+      return;
+    }
+
+    // If there's an error loading communities, show error message but allow fallback
+    if (communitiesError) {
+      console.warn("Communities error, but allowing navigation to fallback");
+      // Don't prevent navigation - let it go to explore page as fallback
+      toast("Unable to load your communities, showing explore page instead", {
+        duration: 2000,
+      });
+      // Don't prevent - allow the fallback navigation to happen
+    }
+
+    // If no communities and no error, suggest creating one
+    if (!communitiesLoading && !communitiesError && communities.length === 0) {
+      // Allow navigation to no-community page which has create community options
     }
   };
 
@@ -673,7 +725,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </Dialog>
           </div>
           <div className="space-y-3 pb-16">
-            {communities && communities.length > 0 ? (
+            {communitiesLoading ? (
+              <div className="text-center py-4">
+                <div className="text-sm text-gray-500">Loading communities...</div>
+              </div>
+            ) : communitiesError ? (
+              <div className="text-center py-4">
+                <div className="text-sm text-red-500">Failed to load communities</div>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="text-xs text-blue-500 hover:underline mt-1"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : communities && communities.length > 0 ? (
               communities.map((community: any) => {
                 if (!community) return null;
                 const isActive = activeCommunity?.id === community._id;
