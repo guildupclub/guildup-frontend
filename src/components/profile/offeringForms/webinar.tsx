@@ -102,10 +102,10 @@ const WebinarForm = ({
                 {OFFERING_TYPES.WEBINAR}
             </SelectItem>
             <SelectItem value="package">
-                Package
+                {OFFERING_TYPES.PACKAGE}
             </SelectItem>
             <SelectItem value="class">
-                Class
+                {OFFERING_TYPES.CLASS}
             </SelectItem>
             </SelectContent>
         </Select>
