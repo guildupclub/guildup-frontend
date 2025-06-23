@@ -245,7 +245,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   // };
 
   const handleCreatorButtonClick = () => {
-    // Track the creator button click
     tracking.trackClick("creator_signup_button", {
       section: "header",
       user_signed_in: !!session,
@@ -253,6 +252,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     });
 
     if (!session) {
+      localStorage.setItem("openCreatorModal", "true");
       tracking.trackUserAction("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
@@ -261,14 +261,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       tracking.trackClick("signin_from_redirect", {
         trigger: "creator_button_prompt",
       });
-
       signIn(undefined, {
         callbackUrl: `${window.location.origin}`,
       });
 
       return;
     }
-
     tracking.trackUserAction("creator_form_opened", {
       source: "header_button",
       user_id: session.user._id,
@@ -276,6 +274,22 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
     setIsDialogOpen(true);
   };
+
+  useEffect(() => {
+    if (session && typeof window !== "undefined") {
+      const shouldOpen = localStorage.getItem("openCreatorModal");
+      if (shouldOpen === "true") {
+        localStorage.removeItem("openCreatorModal");
+
+        tracking.trackUserAction("creator_form_opened_post_signin", {
+          user_id: session.user._id,
+          triggered_from: "post_signin",
+        });
+
+        setIsDialogOpen(true);
+      }
+    }
+  }, [session]);
 
   useEffect(() => {
     const checkScreenSize = () => {

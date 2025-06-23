@@ -298,19 +298,12 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
 
   const handleLikeClick = () => {
     if (!user?._id) {
-      toast("Sign in required", {
-        action: {
-          label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: window.location.href,
-            }),
-        },
+      signIn(undefined, {
+        callbackUrl: window.location.href,
       });
+      likeMutation.mutate();
     }
-    likeMutation.mutate();
   };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendComment();

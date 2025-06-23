@@ -48,7 +48,6 @@ interface User {
   languages?: string[];
 }
 
-
 const ProfilePage = () => {
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
@@ -62,6 +61,7 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [newLanguage, setNewLanguage] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<string>("personal");
+  const isCreator = user?.user?.is_creator ? true : false;
 
   React.useEffect(() => {
     const updateUserProfile = async () => {
@@ -325,9 +325,11 @@ const ProfilePage = () => {
             >
               <TabsList className="grid grid-cols-2 mb-6 ">
                 <TabsTrigger value="personal">Personal Info</TabsTrigger>
-                <TabsTrigger value="professional">
-                  Professional Info
-                </TabsTrigger>
+                {isCreator && (
+                  <TabsTrigger value="professional">
+                    Professional Info
+                  </TabsTrigger>
+                )}
               </TabsList>
 
               <TabsContent value="personal" className="space-y-6 ">

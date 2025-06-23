@@ -80,14 +80,29 @@ export function RightSidebar() {
 
     fetchTrendingPosts();
   }, []);
-
   const handleCreatorButtonClick = () => {
     if (!session) {
+      localStorage.setItem("openCreatorModal", "true");
+
       signIn(undefined, {
-        callbackUrl: `${window.location.origin}?hero=1`,
+        callbackUrl: `${window.location.origin}`,
       });
+
+      return;
     }
+
+    setIsDialogOpen(true);
   };
+
+  useEffect(() => {
+    if (session && typeof window !== "undefined") {
+      const shouldOpen = localStorage.getItem("openCreatorModal");
+      if (shouldOpen === "true") {
+        localStorage.removeItem("openCreatorModal");
+        setIsDialogOpen(true);
+      }
+    }
+  }, [session]);
 
   const handlePostClick = (postId: string) => {
     router.push(`/post/${postId}`);
