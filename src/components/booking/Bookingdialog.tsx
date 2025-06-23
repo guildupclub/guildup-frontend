@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import {
   Dialog,
@@ -349,10 +350,18 @@ export function BookingDialog({
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
         if (offering.is_free) {
+          const bookingId = response?.data?.data?._id;
+        
+          if (!bookingId) {
+            toast.error("Booking failed — missing booking ID.");
+            return;
+          }
           setIsProcessing(false);
           setBookingDetails(response.data.data);
           setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
+          // Redirect to booking confirmation page
+          router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
           tracking.trackUserAction("free_booking_confirmed", {
             offering_id: offering._id,
             offering_title: offering.title,
@@ -364,6 +373,9 @@ export function BookingDialog({
             phone: phoneWithoutFormatting,
             is_guest_user: !isLoggedIn,
           });
+          setTimeout(() => {
+            router.push(`/booking-confirmation?bookingId=${bookingId}`);
+          }, 500);
           return;
         }
 
@@ -409,6 +421,13 @@ export function BookingDialog({
             );
 
             if (response.data.r === "s") {
+              const bookingId = response?.data?.data?._id;
+            
+              if (!bookingId) {
+                toast.error("Booking failed — missing booking ID.");
+                return;
+              }
+            
               setIsProcessing(false);
               setBookingDetails(response.data.data);
               setBookingSuccess(true);
