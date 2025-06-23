@@ -23,12 +23,13 @@ interface PackageFormData {
   total_price: number;
   // discounted_price: number;
   number_of_sessions: number;
+  interval_between_sessions: number;
   session_duration: number;
   sessions: { date: string; time: string }[];
   is_private: boolean;
   meeting_link_option: string;
   custom_meeting_link: string;
-  tags: string;
+  // tags: string;
 }
 
 interface PackageFormProps {
@@ -132,12 +133,13 @@ const PackageForm = ({
                 {OFFERING_TYPES.CONSULTATION}
               </SelectItem>
               <SelectItem value="webinar">{OFFERING_TYPES.WEBINAR}</SelectItem>
-              <SelectItem value="package">Package</SelectItem>
+              <SelectItem value="package">{OFFERING_TYPES.PACKAGE}</SelectItem>
+              <SelectItem value="class">{OFFERING_TYPES.CLASS}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label htmlFor="tags">Tags (comma separated)</Label>
           <Input
             id="tags"
@@ -145,7 +147,7 @@ const PackageForm = ({
             onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
             placeholder="coaching, therapy, personal development"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Pricing Section */}
@@ -196,6 +198,7 @@ const PackageForm = ({
         <h3 className="text-lg font-medium">Session Configuration</h3>
 
         <div className="grid grid-cols-2 gap-4">
+          {/* Duration_of_Session */}
           <div className="space-y-2">
             <Label htmlFor="session_duration">
               Duration per Session (minutes)
@@ -215,11 +218,51 @@ const PackageForm = ({
             />
           </div>
 
+          {/* Number_of_Session */}
           <div className="space-y-2">
-            <Label>Number of Sessions: {formData.sessions.length}</Label>
-            <div className="text-sm text-muted-foreground">
+            <Label>
+              Number of Sessions:
+              <span className="text-red-500">*</span>
+            </Label>
+            {/* <div className="text-sm text-muted-foreground">
               Add sessions below to set the count
-            </div>
+            </div> */}
+            <Input
+              id="number_of_sessions"
+              type="number"
+              value={formData.number_of_sessions}
+              defaultValue={1}
+              min={1}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  number_of_sessions: Number(e.target.value),
+                })
+              }
+              required
+            />
+          </div>
+
+          {/* Interval_between_two_sessions */}
+          <div className="space-y-2">
+            <Label htmlFor="interval_between_sessions">
+              Interval Between Sessions (In Days)
+              <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="interval_between_sessions"
+              type="number"
+              value={formData.interval_between_sessions}
+              defaultValue={10}
+              min={0}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  interval_between_sessions: Number(e.target.value),
+                })
+              }
+              required
+            />
           </div>
         </div>
       </div>
@@ -287,7 +330,7 @@ const PackageForm = ({
       </div>
 
       {/* Session Schedule */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">Session Schedule</h3>
           <Button
@@ -353,15 +396,13 @@ const PackageForm = ({
             {formData.session_duration} minutes
           </div>
         )}
-      </div>
+      </div> */}
 
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
           className="bg-primary text-white"
-          disabled={
-            loading || offeringCreated || formData.sessions.length === 0
-          }
+          disabled={loading || offeringCreated}
         >
           {loading
             ? "Creating..."
