@@ -5,18 +5,14 @@ import type { RootState } from "@/redux/store";
 import axios from "axios";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import numbro from "numbro";
-import { motion } from "framer-motion";
 import { StringConstants } from "../common/CommonText";
 import Loader from "../Loader";
 import { setIsBankAdded, setIsCalendarConnected } from "@/redux/userSlice";
 import { ChatSupportButton } from "../chat/ChatSupportButton";
-
-// Components
-import { Avatar } from "@radix-ui/react-avatar";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { AddOfferingDialog } from "./AddOfferingdialog";
@@ -33,26 +29,20 @@ import {
 } from "@/components/ui/tooltip";
 
 // Icons
-import { ArrowRight, Edit, Trash2, Pencil, Share2 } from "lucide-react";
+import { ArrowRight, Edit, Trash2, Pencil } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
-import { RiUserSharedFill, RiVerifiedBadgeFill } from "react-icons/ri";
-import { FaClock, FaEdit, FaShareAlt } from "react-icons/fa";
-import { useNotifications } from "../notifications/NotificationContext";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { FaEdit } from "react-icons/fa";
 import { ref, push, update } from "firebase/database";
 import database from "../../../firebase";
 import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
-import {
-  HiOutlineUserGroup,
-  HiOutlineVideoCamera,
-  HiOutlineArchive,
-  HiOutlineBookOpen,
-} from "react-icons/hi";
+import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
 
 interface CommunityProfile {
   user: {
@@ -195,6 +185,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   );
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingBackground, setIsUploadingBackground] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const backgroundInputRef = useRef<HTMLInputElement>(null);
 
   const activeCommunityId = communityId || community?.communityId;
 
@@ -477,6 +471,148 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     },
   });
 
+  // Handle avatar image upload
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+
+      // Add the new image file
+      formData.append("image", file);
+
+      // Add all existing profile data
+      formData.append("communityId", activeCommunityId || "");
+      formData.append("userId", user._id);
+      formData.append("name", profile?.community?.name || "");
+      formData.append("description", profile?.community?.description || "");
+      formData.append("tags", JSON.stringify(profile?.community?.tags || []));
+      formData.append(
+        "is_locked",
+        String(profile?.community?.is_locked || false)
+      );
+      formData.append(
+        "instagram_followers",
+        String(profile?.community?.instagram_followers || "")
+      );
+      formData.append(
+        "youtube_followers",
+        String(profile?.community?.youtube_followers || "")
+      );
+      formData.append(
+        "linkedin_followers",
+        String(profile?.community?.linkedin_followers || "")
+      );
+
+      // Keep existing background image
+      if (profile?.community?.background_image) {
+        formData.append(
+          "background_image_url",
+          profile.community.background_image
+        );
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/edit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.r === "s") {
+        setAvatarImgUrl(
+          response.data.data.image || response.data.data.community?.image
+        );
+        toast.success("Profile image updated successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["communityProfile", activeCommunityId],
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error("Failed to update profile image");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  // Handle background image upload
+  const handleBackgroundUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingBackground(true);
+    try {
+      const formData = new FormData();
+
+      // Add the new background image file
+      formData.append("background_image", file);
+
+      // Add all existing profile data
+      formData.append("communityId", activeCommunityId || "");
+      formData.append("userId", user._id);
+      formData.append("name", profile?.community?.name || "");
+      formData.append("description", profile?.community?.description || "");
+      formData.append("tags", JSON.stringify(profile?.community?.tags || []));
+      formData.append(
+        "is_locked",
+        String(profile?.community?.is_locked || false)
+      );
+      formData.append(
+        "instagram_followers",
+        String(profile?.community?.instagram_followers || "")
+      );
+      formData.append(
+        "youtube_followers",
+        String(profile?.community?.youtube_followers || "")
+      );
+      formData.append(
+        "linkedin_followers",
+        String(profile?.community?.linkedin_followers || "")
+      );
+
+      // Keep existing profile image
+      if (profile?.community?.image) {
+        formData.append("image_url", profile.community.image);
+      }
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/edit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.r === "s") {
+        setBgImgUrl(
+          response.data.data.background_image ||
+            response.data.data.community?.background_image
+        );
+        toast.success("Background image updated successfully!");
+        queryClient.invalidateQueries({
+          queryKey: ["communityProfile", activeCommunityId],
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading background:", error);
+      toast.error("Failed to update background image");
+    } finally {
+      setIsUploadingBackground(false);
+    }
+  };
+
   // Event handlers
   const handleLeaveCommunity = () => {
     if (!user?._id || !activeCommunityId) return;
@@ -645,6 +781,20 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 className="h-full w-full object-cover opacity-90 transition-transform duration-500 hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+              {isOwner && (
+                <button
+                  onClick={() => backgroundInputRef.current?.click()}
+                  disabled={isUploadingBackground}
+                  className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70 disabled:opacity-50"
+                  title="Change background image"
+                >
+                  {isUploadingBackground ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  ) : (
+                    <Pencil className="h-4 w-4" />
+                  )}
+                </button>
+              )}
             </div>
           </div>
 
@@ -653,14 +803,30 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             <div className="w-full md:w-1/3 px-2 lg:px-6 pt-0 pb-6 relative">
               {/* Profile Avatar - Half on background, half below */}
               <div className="absolute -top-20 left-4 lg:left-10">
-                <Image
-                  src={profile?.community?.image || avatarImgUrl}
-                  alt={profile?.community?.name || "Community Avatar"}
-                  width={200}
-                  height={200}
-                  className="h-44 lg:h-60 w-44 lg:w-56 rounded-xl border-4 border-background bg-primary/5 object-cover transition-transform duration-300 hover:scale-105 shadow-lg"
-                  unoptimized
-                />
+                <div className="relative">
+                  <Image
+                    src={profile?.community?.image || avatarImgUrl}
+                    alt={profile?.community?.name || "Community Avatar"}
+                    width={200}
+                    height={200}
+                    className="h-44 lg:h-60 w-44 lg:w-56 rounded-xl border-4 border-background bg-primary/5 object-cover transition-transform duration-300 hover:scale-105 shadow-lg"
+                    unoptimized
+                  />
+                  {isOwner && (
+                    <button
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="absolute bottom-2 right-2 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70 disabled:opacity-50"
+                      title="Change profile image"
+                    >
+                      {isUploadingAvatar ? (
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      ) : (
+                        <Pencil className="h-3 w-3" />
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="mt-20 hidden md:block">
                 <div className="flex flex-col gap-2 pt-8 lg:pt-24 w-56 lg:ml-4">
@@ -1306,6 +1472,21 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           )}
         </div>
       </div>
+      {/* Hidden file inputs */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarUpload}
+        className="hidden"
+      />
+      <input
+        ref={backgroundInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleBackgroundUpload}
+        className="hidden"
+      />
     </div>
   );
 }
