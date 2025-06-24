@@ -351,7 +351,7 @@ export function BookingDialog({
         console.log("Order Created:", response.data.data);
         if (offering.is_free) {
           const bookingId = response?.data?.data?._id;
-        
+
           if (!bookingId) {
             toast.error("Booking failed — missing booking ID.");
             return;
@@ -361,7 +361,9 @@ export function BookingDialog({
           setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
           // Redirect to booking confirmation page
-          router.push(`/booking-confirmation?bookingId=${response.data.data._id}`);
+          router.push(
+            `/booking-confirmation?bookingId=${response.data.data._id}`
+          );
           tracking.trackUserAction("free_booking_confirmed", {
             offering_id: offering._id,
             offering_title: offering.title,
@@ -422,12 +424,12 @@ export function BookingDialog({
 
             if (response.data.r === "s") {
               const bookingId = response?.data?.data?._id;
-            
+
               if (!bookingId) {
                 toast.error("Booking failed — missing booking ID.");
                 return;
               }
-            
+
               setIsProcessing(false);
               setBookingDetails(response.data.data);
               setBookingSuccess(true);
@@ -629,7 +631,7 @@ export function BookingDialog({
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
-                  {activeCommunityData?.user?.user_year_of_experience && (
+                  {activeCommunityData?.user?.user_year_of_experience > 0 ? (
                     <div className="flex items-center gap-3 border-b py-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -653,9 +655,9 @@ export function BookingDialog({
                         </span>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
-                  {activeCommunityData?.user?.user_session_conducted && (
+                  {activeCommunityData?.user?.user_session_conducted > 0 ? (
                     <div className="flex items-center gap-3 border-b py-2">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -686,7 +688,7 @@ export function BookingDialog({
                         </span>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   <div className="flex items-center justify-center">
                     <Clock className="w-6 h-6 text-blue-500 mx-2" />
@@ -999,7 +1001,8 @@ export function BookingDialog({
   );
 }
 
-{/* <Button
+{
+  /* <Button
   onClick={() => {
     setBookingSuccess(false);
     onClose();
@@ -1007,4 +1010,5 @@ export function BookingDialog({
   }}
 >
   Go to Bookings
-</Button>; */}
+</Button>; */
+}

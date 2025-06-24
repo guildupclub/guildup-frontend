@@ -1030,233 +1030,240 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               </div>
             ) : (
               <div className="flex flex-col gap-5">
-                {offerings.map((offering, index) => (
-                  <div
-                    key={offering._id || `${offering.title}-${index}`}
-                    className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
-                  >
-                    {/* Top gradient accent */}
-                    <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
+                {offerings.map(
+                  (offering, index) =>
+                    // Show the card only if it's not a webinar with a past date
+                    offering.type !== "webinar" ||
+                    (offering.when && new Date(offering.when) > new Date()) ? (
+                      <div
+                        key={offering._id || `${offering.title}-${index}`}
+                        className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
+                      >
+                        {/* Top gradient accent */}
+                        <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
 
-                    <div className="flex gap-4 items-start">
-                      {/* Icon and Meet badge */}
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="rounded-lg border border-blue-100 bg-blue-50 p-2.5 transition-colors group-hover:bg-blue-100">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            x="0px"
-                            y="0px"
-                            width="36"
-                            height="36"
-                            viewBox="0 0 48 48"
-                          >
-                            <rect
-                              width="10"
-                              height="10"
-                              x="12"
-                              y="16"
-                              fill="#fff"
-                              transform="rotate(-90 20 24)"
-                            ></rect>
-                            <polygon
-                              fill="#1e88e5"
-                              points="3,17 3,31 8,32 13,31 13,17 8,16"
-                            ></polygon>
-                            <path
-                              fill="#4caf50"
-                              d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
-                            ></path>
-                            <path
-                              fill="#fbc02d"
-                              d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
-                            ></path>
-                            <path
-                              fill="#1565c0"
-                              d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z"
-                            ></path>
-                            <polygon
-                              fill="#e53935"
-                              points="13,7 13,17 3,17"
-                            ></polygon>
-                            <polygon
-                              fill="#2e7d32"
-                              points="38,24 37,32.45 27,24 37,15.55"
-                            ></polygon>
-                            <path
-                              fill="#4caf50"
-                              d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
-                            ></path>
-                          </svg>
-                        </div>
-                      </div>
-
-                      {/* Title, Price, Description */}
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
-                            {offering.title}
-                          </h3>
-
-                          {offering.is_free ||
-                          Number(offering.price?.amount) === 0 ? (
-                            <Badge
-                              variant="outline"
-                              className="border-green-200 bg-green-50 text-green-700"
-                            >
-                              Free
-                            </Badge>
-                          ) : (
-                            <span className="font-semibold text-gray-900">
-                              ₹{offering.price?.amount}
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-gray-600">
-                          {offering.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
-                      <div className="flex items-center gap-2">
-                        <FcClock
-                          size={28}
-                          className="text-primary-foreground"
-                        />
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                          <span className="text-base  font-semibold text-gray-700">
-                            Duration:
-                          </span>
-                          <span className="text-base text-gray-600">
-                            {offering.duration} min
-                          </span>
-                        </div>
-                      </div>
-                      <div>
-                        {offering?.type && typeToIcon[offering.type] && (
-                          <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-                            {typeToIcon[offering.type].icon}
-                            <span>{typeToIcon[offering.type].label}</span>
+                        <div className="flex gap-4 items-start">
+                          {/* Icon and Meet badge */}
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="rounded-lg border border-blue-100 bg-blue-50 p-2.5 transition-colors group-hover:bg-blue-100">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                x="0px"
+                                y="0px"
+                                width="36"
+                                height="36"
+                                viewBox="0 0 48 48"
+                              >
+                                <rect
+                                  width="10"
+                                  height="10"
+                                  x="12"
+                                  y="16"
+                                  fill="#fff"
+                                  transform="rotate(-90 20 24)"
+                                ></rect>
+                                <polygon
+                                  fill="#1e88e5"
+                                  points="3,17 3,31 8,32 13,31 13,17 8,16"
+                                ></polygon>
+                                <path
+                                  fill="#4caf50"
+                                  d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
+                                ></path>
+                                <path
+                                  fill="#fbc02d"
+                                  d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
+                                ></path>
+                                <path
+                                  fill="#1565c0"
+                                  d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z"
+                                ></path>
+                                <polygon
+                                  fill="#e53935"
+                                  points="13,7 13,17 3,17"
+                                ></polygon>
+                                <polygon
+                                  fill="#2e7d32"
+                                  points="38,24 37,32.45 27,24 37,15.55"
+                                ></polygon>
+                                <path
+                                  fill="#4caf50"
+                                  d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
+                                ></path>
+                              </svg>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </div>
 
-                    {offering.type === "webinar" && (
-                      <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
-                        {/* Date */}
-                        <div className="flex items-center gap-2 text-sm text-gray-700">
-                          <BsCalendarCheck className="h-5 w-5 text-blue-500" />
-                          <span>
-                            {offering.when
-                              ? new Date(offering.when).toLocaleDateString(
+                          {/* Title, Price, Description */}
+                          <div className="flex-1">
+                            <div className="flex items-start justify-between">
+                              <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
+                                {offering.title}
+                              </h3>
+
+                              {offering.is_free ||
+                              Number(offering.price?.amount) === 0 ? (
+                                <Badge
+                                  variant="outline"
+                                  className="border-green-200 bg-green-50 text-green-700"
+                                >
+                                  Free
+                                </Badge>
+                              ) : (
+                                <span className="font-semibold text-gray-900">
+                                  ₹{offering.price?.amount}
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-gray-600">
+                              {offering.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
+                          <div className="flex items-center gap-2">
+                            <FcClock
+                              size={28}
+                              className="text-primary-foreground"
+                            />
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                              <span className="text-base font-semibold text-gray-700">
+                                Duration:
+                              </span>
+                              <span className="text-base text-gray-600">
+                                {offering.duration} min
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            {offering?.type && typeToIcon[offering.type] && (
+                              <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
+                                {typeToIcon[offering.type].icon}
+                                <span>{typeToIcon[offering.type].label}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {offering.type === "webinar" &&
+                          offering.when &&
+                          new Date(offering.when) > new Date() && (
+                            <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
+                              {/* Date */}
+                              <div className="flex items-center gap-2 text-sm text-gray-700">
+                                <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                                <span>
+                                  {new Date(offering.when).toLocaleDateString(
+                                    "en-US",
+                                    {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                    }
+                                  )}
+                                </span>
+                              </div>
+
+                              {/* Time */}
+                              <div className="text-sm text-gray-700">
+                                {new Date(offering.when).toLocaleTimeString(
                                   "en-US",
                                   {
-                                    year: "numeric",
-                                    month: "long",
-                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
                                   }
-                                )
-                              : "No date set"}
-                          </span>
-                        </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
 
-                        {/* Time */}
-                        <div className="text-sm text-gray-700">
-                          {offering.when
-                            ? new Date(offering.when).toLocaleTimeString(
-                                "en-US",
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
+                        {/* Buttons */}
+                        <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                          {isOwner ? (
+                            <div className="mr-auto flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                                onClick={() => handleEditClick(offering)}
+                              >
+                                <Edit className="h-3.5 w-3.5" />
+                                <span>{StringConstants.EDIT}</span>
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                onClick={() =>
+                                  handleDeleteOffering(offering._id)
                                 }
-                              )
-                            : ""}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                <span>{StringConstants.DELETE}</span>
+                              </Button>
+                            </div>
+                          ) : (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <div className="w-full">
+                                    <Button
+                                      disabled={
+                                        !offering.is_free &&
+                                        !isBankConnected &&
+                                        !isCalendarConnected
+                                      }
+                                      className={`flex items-center w-full gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
+                                        !isOwner
+                                          ? "cursor-pointer"
+                                          : "cursor-not-allowed opacity-50"
+                                      }`}
+                                      onClick={() => {
+                                        if (!isOwner)
+                                          setSelectedOffering(offering);
+                                      }}
+                                    >
+                                      <span>Book Now</span>
+                                      <ArrowRight className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </TooltipTrigger>
+                                {!offering.is_free && !isBankConnected && (
+                                  <TooltipContent className="flex items-center gap-2 rounded border border-gray-200 bg-white px-3 py-2 text-black shadow-lg">
+                                    <svg
+                                      className="h-4 w-4 text-blue-500"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      strokeWidth={2}
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <circle
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        fill="white"
+                                      />
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M12 16v-4m0-4h.01"
+                                      />
+                                    </svg>
+                                    <span>
+                                      The expert is not accepting bookings at
+                                      the moment
+                                    </span>
+                                  </TooltipContent>
+                                )}
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                         </div>
                       </div>
-                    )}
+                    ) : null // Hide the entire card if it's a webinar with a past date
+                )}
 
-                    {/* Buttons */}
-                    <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
-                      {isOwner ? (
-                        <div className="mr-auto flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
-                            onClick={() => handleEditClick(offering)}
-                          >
-                            <Edit className="h-3.5 w-3.5" />
-                            <span>{StringConstants.EDIT}</span>
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => handleDeleteOffering(offering._id)}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            <span>{StringConstants.DELETE}</span>
-                          </Button>
-                        </div>
-                      ) : (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="w-full">
-                                <Button
-                                  disabled={
-                                    !offering.is_free && !isBankConnected
-                                  }
-                                  className={`flex items-center w-full  gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
-                                    !isOwner
-                                      ? "cursor-pointer"
-                                      : "cursor-not-allowed opacity-50"
-                                  }`}
-                                  onClick={() => {
-                                    // if (!session) {
-                                      // signIn("google");
-                                      // return;
-                                    // }
-                                    
-                                    if (!isOwner) setSelectedOffering(offering);
-                                  }}
-                                >
-                                  <span>Book Now</span>
-                                  <ArrowRight className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TooltipTrigger>
-                            {!offering.is_free && !isBankConnected && (
-                              <TooltipContent className="flex items-center gap-2 rounded border border-gray-200 bg-white px-3 py-2 text-black shadow-lg">
-                                <svg
-                                  className="h-4 w-4 text-blue-500"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  viewBox="0 0 24 24"
-                                >
-                                  <circle cx="12" cy="12" r="10" fill="white" />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 16v-4m0-4h.01"
-                                  />
-                                </svg>
-                                <span>
-                                  The expert is not accepting bookings at the
-                                  moment
-                                </span>
-                              </TooltipContent>
-                            )}
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Booking dialog */}
                 {selectedOffering && (
                   <BookingDialog
                     offering={{
