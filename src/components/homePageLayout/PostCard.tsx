@@ -301,9 +301,12 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
       signIn(undefined, {
         callbackUrl: window.location.href,
       });
-      likeMutation.mutate();
+      return; 
     }
+
+    likeMutation.mutate();
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSendComment();
