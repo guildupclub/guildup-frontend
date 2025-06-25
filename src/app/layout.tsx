@@ -97,20 +97,20 @@ export default async function RootLayout({
         <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
         {/* Do not remove these script */} {/* Google Analytics */}
-        <script
+        {/* <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
-        ></script>
+        ></script> 
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-B3B9W8GRQP');
-            `,
+       window.dataLayer = window.dataLayer || [];
+       function gtag(){window.dataLayer.push(arguments);}
+       gtag('js', new Date());
+       gtag('config', 'G-B3B9W8GRQP');
+     `,
           }}
-        />
+        />*/}
         {/* Service Worker Registration */}
         <script
           dangerouslySetInnerHTML={{
