@@ -85,6 +85,24 @@ export default async function RootLayout({
         <meta name="msapplication-config" content="/browserconfig.xml" />
         {/* Do not remove these script */} {/* Google Analytics */}
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+           j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+           })(window,document,'script','dataLayer','GTM-5ZKZDMMK');
+         `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+   window.dataLayer = window.dataLayer || [];
+ `,
+          }}
+        />
+        <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
         ></script>
@@ -129,24 +147,6 @@ export default async function RootLayout({
             `,
           }}
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-5ZKZDMMK');
-            `,
-          }}
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-      window.dataLayer = window.dataLayer || [];
-    `,
-          }}
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -163,7 +163,7 @@ export default async function RootLayout({
           <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
-               <RouteChangeTracker />
+              <RouteChangeTracker />
               {children}
               <Toaster richColors position="top-center" />
               <CookieConsent />
