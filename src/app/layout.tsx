@@ -96,13 +96,6 @@ export default async function RootLayout({
           }}
         />
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-   window.dataLayer = window.dataLayer || [];
- `,
-          }}
-        />
-        <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
         ></script>
