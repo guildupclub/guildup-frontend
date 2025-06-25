@@ -8,7 +8,7 @@ import AuthHandler from "@/components/AuthHandler";
 import { NotificationProvider } from "@/components/notifications/NotificationContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { GoogleMeetProvider } from "@/contexts/GoogleMeetContext";
-import RouteChangeTracker from "@/components/RouteChangeTracker.tsxRouteChangeTracker";
+import RouteChangeTracker from "@/components/RouteChangeTracker";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(() => new QueryClient()); // ✅ Ensures a stable QueryClient instance
@@ -21,7 +21,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
             <ChatProvider>
               <GoogleMeetProvider>
                 <AuthHandler />
-                <RouteChangeTracker/>
+                <RouteChangeTracker />
                 {children}
               </GoogleMeetProvider>
             </ChatProvider>

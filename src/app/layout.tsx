@@ -10,7 +10,7 @@ import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
-import RouteChangeTracker from "@/components/RouteChangeTracker.tsxRouteChangeTracker";
+import RouteChangeTracker from "@/components/RouteChangeTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
