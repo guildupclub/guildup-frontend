@@ -10,6 +10,7 @@ import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
+import RouteChangeTracker from "@/components/RouteChangeTracker.tsxRouteChangeTracker";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -162,6 +163,7 @@ export default async function RootLayout({
           <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
+               <RouteChangeTracker />
               {children}
               <Toaster richColors position="top-center" />
               <CookieConsent />
