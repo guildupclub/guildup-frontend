@@ -1,18 +1,53 @@
-export interface Community {
+export interface Community<TCategory=string> {
   _id: string;
-  name: string;
-  description: string;
+  user_id: string; // Owner/creator of the community
+  category_id?: TCategory;
+  icon_id?: string;
   image?: string;
   background_image?: string;
-  category: string;
-  category_id: string;
-  owner_id: string;
-  member_count: number;
-  is_public: boolean;
+  name: string;
+  description: string;
+  rules?: string; // Changed from string[] to string to match schema
+  owner_name?: string;
+  post_count: number;
+  post_reply_count: number;
   created_at: string;
-  updated_at: string;
-  tags: string[];
-  rules?: string[];
+  banned: boolean;
+  restricted_to_mods: boolean;
+  content_warning: boolean;
+  low_quality: boolean;
+  show_home: boolean;
+  show_popular: boolean;
+  subscription: boolean;
+  subscription_price: number;
+  moderation_level: 'none' | 'light' | 'heavy';
+  additional_tags: string[];
+  is_active: boolean;
+  edited_at: string | null;
+  nsfw: boolean;
+  reports?: string[];
+  banned_member?: string[];
+  num_member: number;
+  is_locked: boolean;
+  total_subs: number;
+  score: number;
+  youtube_followers: number;
+  instagram_followers: number;
+  linkedin_followers: number;
+  last_active: string;
+  iscalendarConnected: boolean;
+  calendar_oauth_access_token?: string | null;
+  calendar_oauth_refresh_token?: string | null;
+  calendar_oauth_token_expiry?: string | null;
+  testimonials: string[];
+  
+  // Legacy fields for backward compatibility
+  category?: string;
+  owner_id?: string;
+  member_count?: number;
+  is_public?: boolean;
+  updated_at?: string;
+  tags?: string[];
 }
 
 export interface CommunityMember {
@@ -44,23 +79,73 @@ export interface CommunityPermissions {
 export interface CreateCommunityData {
   name: string;
   description: string;
-  category_id: string;
-  is_public: boolean;
+  category_id?: string;
+  icon_id?: string;
   image?: File;
   background_image?: File;
-  tags: string[];
-  rules?: string[];
+  rules?: string;
+  owner_name?: string;
+  banned?: boolean;
+  restricted_to_mods?: boolean;
+  content_warning?: boolean;
+  low_quality?: boolean;
+  show_home?: boolean;
+  show_popular?: boolean;
+  subscription?: boolean;
+  subscription_price?: number;
+  moderation_level?: 'none' | 'light' | 'heavy';
+  additional_tags?: string[];
+  is_active?: boolean;
+  nsfw?: boolean;
+  is_locked?: boolean;
+  youtube_followers?: number;
+  instagram_followers?: number;
+  linkedin_followers?: number;
+  iscalendarConnected?: boolean;
+  calendar_oauth_access_token?: string;
+  calendar_oauth_refresh_token?: string;
+  calendar_oauth_token_expiry?: string;
+  testimonials?: string[];
+  
+  // Legacy fields for backward compatibility
+  is_public?: boolean;
+  tags?: string[];
 }
 
 export interface UpdateCommunityData {
   name?: string;
   description?: string;
   category_id?: string;
-  is_public?: boolean;
+  icon_id?: string;
   image?: File;
   background_image?: string;
+  rules?: string;
+  owner_name?: string;
+  banned?: boolean;
+  restricted_to_mods?: boolean;
+  content_warning?: boolean;
+  low_quality?: boolean;
+  show_home?: boolean;
+  show_popular?: boolean;
+  subscription?: boolean;
+  subscription_price?: number;
+  moderation_level?: 'none' | 'light' | 'heavy';
+  additional_tags?: string[];
+  is_active?: boolean;
+  nsfw?: boolean;
+  is_locked?: boolean;
+  youtube_followers?: number;
+  instagram_followers?: number;
+  linkedin_followers?: number;
+  iscalendarConnected?: boolean;
+  calendar_oauth_access_token?: string;
+  calendar_oauth_refresh_token?: string;
+  calendar_oauth_token_expiry?: string;
+  testimonials?: string[];
+  
+  // Legacy fields for backward compatibility
+  is_public?: boolean;
   tags?: string[];
-  rules?: string[];
 }
 
 export interface CommunityStats {
@@ -75,27 +160,78 @@ export interface CommunityStats {
 export interface CreateCommunityRequest {
   name: string;
   description: string;
-  category_id: string;
-  is_public: boolean;
+  category_id?: string;
+  icon_id?: string;
   image?: string;
   background_image?: string;
-  tags: string[];
-  rules?: string[];
+  rules?: string;
+  owner_name?: string;
+  banned?: boolean;
+  restricted_to_mods?: boolean;
+  content_warning?: boolean;
+  low_quality?: boolean;
+  show_home?: boolean;
+  show_popular?: boolean;
+  subscription?: boolean;
+  subscription_price?: number;
+  moderation_level?: 'none' | 'light' | 'heavy';
+  additional_tags?: string[];
+  is_active?: boolean;
+  nsfw?: boolean;
+  is_locked?: boolean;
+  youtube_followers?: number;
+  instagram_followers?: number;
+  linkedin_followers?: number;
+  iscalendarConnected?: boolean;
+  calendar_oauth_access_token?: string;
+  calendar_oauth_refresh_token?: string;
+  calendar_oauth_token_expiry?: string;
+  testimonials?: string[];
+  
+  // Legacy fields for backward compatibility
+  is_public?: boolean;
+  tags?: string[];
 }
 
 export interface UpdateCommunityRequest {
   name?: string;
   description?: string;
   category_id?: string;
-  is_public?: boolean;
+  icon_id?: string;
   image?: string;
   background_image?: string;
+  rules?: string;
+  owner_name?: string;
+  banned?: boolean;
+  restricted_to_mods?: boolean;
+  content_warning?: boolean;
+  low_quality?: boolean;
+  show_home?: boolean;
+  show_popular?: boolean;
+  subscription?: boolean;
+  subscription_price?: number;
+  moderation_level?: 'none' | 'light' | 'heavy';
+  additional_tags?: string[];
+  is_active?: boolean;
+  nsfw?: boolean;
+  is_locked?: boolean;
+  youtube_followers?: number;
+  instagram_followers?: number;
+  linkedin_followers?: number;
+  iscalendarConnected?: boolean;
+  calendar_oauth_access_token?: string;
+  calendar_oauth_refresh_token?: string;
+  calendar_oauth_token_expiry?: string;
+  testimonials?: string[];
+  
+  // Legacy fields for backward compatibility
+  is_public?: boolean;
   tags?: string[];
-  rules?: string[];
 }
 
 export interface JoinCommunityRequest {
   communityId: string;
+  userId: string;
   inviteCode?: string;
 }
 

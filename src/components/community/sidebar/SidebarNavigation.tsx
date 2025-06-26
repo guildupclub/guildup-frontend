@@ -71,7 +71,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           <FaUser />
           {StringConstants.MEMBER}
         </Button>
-      )}
+      )}-
 
       {isAdmin && (
         <Button

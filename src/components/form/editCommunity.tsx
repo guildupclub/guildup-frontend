@@ -36,10 +36,37 @@ interface ProfileData {
   youtube_followers: string | number;
 }
 
+interface CommunityProfile {
+  user: {
+    user_name: string;
+    user_email: string;
+    user_avatar: string;
+    about: string;
+    user_isBankDetailsAdded: boolean;
+    user_iscalendarConnected: boolean;
+    user_year_of_experience: number;
+    user_session_conducted: number;
+    user_languages: string[];
+  };
+  community: {
+    name: string;
+    num_member: number;
+    post_count: number;
+    description: string;
+    is_locked: boolean;
+    tags: string[];
+    image: string;
+    background_image: string;
+    youtube_followers: number;
+    instagram_followers: number;
+    linkedin_followers: number;
+    category: string;
+  };
+}
 interface EditCommunityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  profile?: ProfileData;
+  profile?: CommunityProfile;
 }
 
 export function EditCommunityModal({
@@ -53,10 +80,9 @@ export function EditCommunityModal({
     name: profile?.community?.name || "",
     description: profile?.community?.description || "",
     category: profile?.community?.category || "",
-    rules: profile?.community?.rules || "",
     tags: profile?.community?.tags || [],
     image: profile?.community?.image || "",
-    bgImage: profile?.community?.bgImage || "",
+    bgImage: profile?.community?.background_image || "",
     instagram_followers: profile?.community?.instagram_followers || "",
     youtube_followers: profile?.community?.youtube_followers || "",
     linkedin_followers: profile?.community?.linkedin_followers || "",
@@ -87,10 +113,9 @@ export function EditCommunityModal({
         name: profile?.community?.name || community?.community?.name || "",
         description: profile?.community?.description || "",
         category: profile?.community?.category || "",
-        rules: profile?.community?.rules || "",
         tags: profile?.community?.tags || communityData?.additional_tags || [],
         image: profile?.community?.image || communityData?.image || "",
-        bgImage: profile?.community?.bgImage || communityData?.bgImage || "",
+        bgImage: profile?.community?.background_image || communityData?.bgImage || "",
         instagram_followers:
           profile?.community?.instagram_followers ||
           communityData?.instagram_followers ||

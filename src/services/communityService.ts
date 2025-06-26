@@ -26,7 +26,7 @@ export class CommunityService {
   // Get community by ID
   async getCommunity(communityId: string): Promise<Community> {
     // Send communityID in the body using POST request
-    return apiClient.get<Community>(`${API_ENDPOINTS.COMMUNITIES}/about/${communityId}`);
+    return apiClient.get<Community>(`${API_ENDPOINTS.COMMUNITIES}/view?communityId=${communityId}`);
   }
 
   // Create new community
@@ -46,7 +46,7 @@ export class CommunityService {
 
   // Join community
   async joinCommunity(data: JoinCommunityRequest): Promise<void> {
-    return apiClient.post<void>(`${API_ENDPOINTS.COMMUNITIES}/${data.communityId}/join`, data);
+    return apiClient.post<void>(`${API_ENDPOINTS.COMMUNITIES}/join`, data);
   }
 
   // Leave community
@@ -71,8 +71,8 @@ export class CommunityService {
   }
 
   // Get specific member
-  async getCommunityMember(communityId: string, userId: string): Promise<CommunityMember> {
-    return apiClient.get<CommunityMember>(`${API_ENDPOINTS.COMMUNITIES}/${communityId}/members/${userId}`);
+  async getCommunityMember(communityId: string): Promise<CommunityMember> {
+    return apiClient.get<CommunityMember>(`${API_ENDPOINTS.COMMUNITIES}/members?communityId=${communityId}`);
   }
 
   // Update member role
@@ -227,6 +227,36 @@ export class CommunityService {
   // Join by invite code
   async joinByInviteCode(code: string): Promise<Community> {
     return apiClient.post<Community>(`${API_ENDPOINTS.COMMUNITIES}/invite/${code}/join`);
+  }
+
+  // Get community profile/about data
+  async getCommunityProfile(communityId: string): Promise<{
+    user: {
+      user_name: string;
+      user_email: string;
+      user_avatar: string;
+      about: string;
+      user_isBankDetailsAdded: boolean;
+      user_iscalendarConnected: boolean;
+      user_year_of_experience: number;
+      user_session_conducted: number;
+      user_languages: string[];
+    };
+    community: {
+      name: string;
+      num_member: number;
+      post_count: number;
+      description: string;
+      is_locked: boolean;
+      tags: string[];
+      image: string;
+      background_image: string;
+      youtube_followers: number;
+      instagram_followers: number;
+      linkedin_followers: number;
+    };
+  }> {
+    return apiClient.get(`${API_ENDPOINTS.COMMUNITIES}/about?communityId=${communityId}`);
   }
 }
 

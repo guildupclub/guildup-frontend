@@ -18,16 +18,12 @@ import { useToast } from '@/contexts/ToastContext';
 
 export function useChannels(
   communityId: string,
-  params?: {
-    page?: number;
-    limit?: number;
-    type?: 'chat' | 'post';
-  },
+  userId: string,
   enabled = true
 ) {
   return useQuery({
-    queryKey: [QUERY_KEYS.CHANNELS, communityId, params],
-    queryFn: () => channelService.getChannels(communityId, params),
+    queryKey: [QUERY_KEYS.CHANNELS, communityId, userId],
+    queryFn: () => channelService.getChannels(communityId, userId),
     enabled: enabled && !!communityId,
     staleTime: CACHE_TIME.MEDIUM,
     gcTime: CACHE_TIME.LONG,

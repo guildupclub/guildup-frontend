@@ -16,41 +16,11 @@ export class ChannelService {
   // Get all channels for a community
   async getChannels(
     communityId: string,
-    params?: {
-      page?: number;
-      limit?: number;
-      type?: 'chat' | 'post';
-    }
+    userId: string,
   ): Promise<PaginatedResponse<Channel>> {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}${API_ENDPOINTS.CHANNELS}/getChannels`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          communityId,
-          ...params,
-        }),
-      }
+    return apiClient.get<PaginatedResponse<Channel>>(
+      `${API_ENDPOINTS.CHANNELS}/getChannels?communityId=${communityId}&userId=${userId}`
     );
-
-    const data = await response.json();
-    if (data.r === 's' && data.data) {
-      return {
-        data: data.data,
-        pagination: {
-          page: params?.page || 1,
-          limit: params?.limit || 20,
-          total: data.data.length,
-          totalPages: Math.ceil(data.data.length / (params?.limit || 20)),
-          hasNextPage: false,
-          hasPrevPage: false,
-        }
-      };
-    }
-    throw new Error(data.message || 'Failed to fetch channels');
   }
 
   // Get channel by ID

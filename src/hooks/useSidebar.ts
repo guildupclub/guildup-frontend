@@ -45,7 +45,7 @@ export function useSidebar() {
   });
 
   // Computed values
-  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator;
+  const isAdmin = memberDetails?.is_owner || memberDetails?.is_moderator || false;
   const communityParam = communityName && communityId ? `${communityName}-${communityId}` : '';
   
   // Navigation paths
@@ -67,12 +67,12 @@ export function useSidebar() {
     data: channelsData,
     isLoading: isLoadingChannels,
     error: channelsError,
-  } = useChannels(communityId || '', undefined, !!communityId);
+  } = useChannels(communityId || '',userId);
 
   const {
     data: memberData,
     isLoading: isLoadingMember,
-  } = useCommunityMember(communityId || '', userId || '', !!communityId && !!userId);
+  } = useCommunityMember(communityId || '',!!communityId && !!userId);
 
   // Mutations
   const createChannelMutation = useCreateChannel();
@@ -137,7 +137,7 @@ export function useSidebar() {
         community_id: communityId,
         is_private: formData.is_locked,
         userId,
-        session: sessionId,
+        session: sessionId ?? undefined,
       });
 
       // Reset form and close dialog

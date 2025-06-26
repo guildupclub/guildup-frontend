@@ -62,7 +62,7 @@ export function Sidebar() {
             <h2 className="text-lg text-red-500">Error loading community</h2>
           ) : (
             <h2 className="text-lg text-muted-foreground font-semibold">
-              {communityDetails?.community?.name || communityDetails?.name}
+              {communityDetails?.name}
             </h2>
           )}
         </div>

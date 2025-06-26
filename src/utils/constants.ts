@@ -99,6 +99,7 @@ export const API_ENDPOINTS = {
   FEED: '/v1/feed',
   EXPLORE: '/v1/explore',
   UPLOAD: '/v1/upload',
+  OFFERINGS: '/v1/offering',
 } as const;
 
 // Query Keys
@@ -123,6 +124,7 @@ export const QUERY_KEYS = {
   NOTIFICATIONS: ['notifications'],
   SEARCH: ['search'],
   POPULAR: ['popular'],
+  OFFERINGS: ['offering']
 } as const;
 
 // Local Storage Keys

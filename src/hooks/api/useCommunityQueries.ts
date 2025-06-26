@@ -78,11 +78,11 @@ export function useCommunityMembers(
   });
 }
 
-export function useCommunityMember(communityId: string, userId: string, enabled = true) {
+export function useCommunityMember(communityId: string, enabled = true) {
   return useQuery({
-    queryKey: [QUERY_KEYS.COMMUNITY_MEMBERS, communityId, userId],
-    queryFn: () => communityService.getCommunityMember(communityId, userId),
-    enabled: enabled && !!communityId && !!userId,
+    queryKey: [QUERY_KEYS.COMMUNITY_MEMBERS, communityId],
+    queryFn: () => communityService.getCommunityMember(communityId),
+    enabled: enabled && !!communityId,
     staleTime: CACHE_TIME.SHORT,
   });
 }
@@ -170,6 +170,16 @@ export function useCategories() {
     queryFn: () => communityService.getCategories(),
     staleTime: CACHE_TIME.VERY_LONG,
     gcTime: CACHE_TIME.VERY_LONG,
+  });
+}
+
+export function useCommunityProfile(communityId: string, enabled = true) {
+  return useQuery({
+    queryKey: [QUERY_KEYS.COMMUNITY, communityId, 'profile'],
+    queryFn: () => communityService.getCommunityProfile(communityId),
+    enabled: enabled && !!communityId,
+    staleTime: CACHE_TIME.MEDIUM,
+    gcTime: CACHE_TIME.LONG,
   });
 }
 
