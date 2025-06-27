@@ -105,8 +105,7 @@ export default function WelcomeBanner() {
       console.log("Setting selected offering:", offerings[0]);
       setSelectedOffering(offerings[0]);
     } else {
-      console.log("No offerings available");
-      alert("No offerings available at the moment. Please try again later.");
+      router.push("/community/648260000000000000000000/profile?offering={offeringId}");
     }
   };
 

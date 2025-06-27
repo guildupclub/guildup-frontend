@@ -53,7 +53,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
     useOfferingFilters(communities);
 
   const fetchCommunities = useCallback(
-    async (pageNum: number, isLoadMore = false) => {
+    async (pageNum: number, isLoadMore = false, categoryId?: string) => {
       try {
         if (isLoadMore) {
           setLoadingMore(true);
@@ -62,8 +62,9 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           setCommunities([]);
         }
 
+        const currentCategory = categoryId || activeCategory;
         let response;
-        if (activeCategory === "all") {
+        if (currentCategory === "all") {
           response = await axios.get(
             `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE}`
           );
@@ -71,7 +72,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           response = await axios.post(
             `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
             {
-              categoryId: activeCategory,
+              categoryId: currentCategory,
               page: pageNum,
               limit: COMMUNITIES_PER_PAGE,
             }
@@ -114,14 +115,14 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
         setLoadingMore(false);
       }
     },
-    [activeCategory]
+    [] // Remove activeCategory dependency to prevent re-creation
   );
 
   useEffect(() => {
     if (activeCategory) {
       setPage(0);
       setHasMore(true);
-      fetchCommunities(0, false);
+      fetchCommunities(0, false, activeCategory);
     }
   }, [activeCategory, fetchCommunities]);
 
@@ -129,9 +130,9 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
     if (!loadingMore && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
-      fetchCommunities(nextPage, true);
+      fetchCommunities(nextPage, true, activeCategory);
     }
-  }, [page, loadingMore, hasMore, fetchCommunities]);
+  }, [page, loadingMore, hasMore, fetchCommunities, activeCategory]);
 
   const handleClickCommunity = useCallback(
     (community: Community) => {

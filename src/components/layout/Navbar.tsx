@@ -24,235 +24,192 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
 import Guildup_logo_mobile from "./../../../public/GuildUp_logo_mobile.svg";
-import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 import { StringConstants } from "../common/CommonText";
-import { setActiveCommunity } from "@/redux/channelSlice";
-import { setCommunityData } from "@/redux/communitySlice";
 import type React from "react";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
-import axios from "axios";
-import { setUserFollowedCommunities } from "@/redux/userSlice";
-import { toast } from "sonner";
-import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
 import { useChatContext } from "@/contexts/ChatContext";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { useTracking } from "@/hooks/useTracking";
+import { toast } from "sonner";
+
+// New architecture imports
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigation } from "@/contexts/NavigationContext";
+import { useToast } from "@/contexts/ToastContext";
+import { useUserCommunities } from "@/hooks/api/useCommunityQueries";
+import { getInitials, createCommunityParam } from "@/utils/helpers";
+import { ROUTES } from "@/utils/constants";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
-  const COMMUNITY_FEED_PATH = "/feed";
-  const COMMUNITY_PATH = "/community";
-  const FEED_PATH = "/feed";
-  const PROFILE_PATH = "/profile";
-  const NO_COMMUNITIES_AVAILABLE = "/no-community";
-  const { data: session } = useSession();
+  const { user, isAuthenticated, login, logout } = useAuth();
+  const { 
+    activeTab, 
+    activeCommunity, 
+    navigateToFeed, 
+    navigateToExplore, 
+    navigateToCommunity, 
+    navigateToProfile,
+    setActiveCommunity 
+  } = useNavigation();
+  const { showSuccess, showError } = useToast();
+  const { unreadCount } = useChatContext();
   const router = useRouter();
   const pathname = usePathname();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.user);
-  const { unreadCount } = useChatContext();
-  const [isUser, setIsUser] = useState(true);
+  const tracking = useTracking();
+
+  // Fetch user's communities using the new hook with proper error handling
+  const { 
+    data: userCommunitiesData, 
+    isLoading: communitiesLoading, 
+    error: communitiesError 
+  } = useUserCommunities(
+    user?.id || '', 
+    undefined, 
+    isAuthenticated && !!user?.id // Only fetch if user is authenticated and has an ID
+  );
+  
+  console.log("userCommunitiesData", userCommunitiesData);
+  console.log("communitiesError", communitiesError);
+  
+  // Safely extract communities array with fallback
+  const communities = userCommunitiesData?.data || [];
+
+  // Local state
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showEditCommunity, setShowEditCommunity] = useState(false);
-  const [showCommunityList, setShowCommunityList] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedCommunity, setSelectedCommunity] = useState<{
-    _id: string;
-    name: string;
-  } | null>(null);
-  const [searchType, setSearchType] = useState("post");
-  const userId = user?._id;
-  const { heroVisible } = useSelector((state: RootState) => state.ui);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  // State to store fetchCommunities API response
-  const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
-  const isCreator = user?.user?.is_creator ? true : false;
-  console.log(isCreator);
-  const tracking = useTracking();
 
-  useEffect(() => {
-    async function fetchCommunities() {
-      try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-          {
-            userId: userId,
-          }
-        );
-        // Store the API response in state
-        setFetchedCommunities(res.data.data);
-        dispatch(setUserFollowedCommunities(res.data.data));
-      } catch (error) {
-        console.error("Error fetching communities:", error);
-      }
-    }
-    if (userId) {
-      fetchCommunities();
-    }
-  }, [userId, dispatch]);
+  const isCreator = user?.is_creator || false;
 
-  const activeCommunity = useSelector(
-    (state: any) => state.channel.activeCommunity
-  );
-  const activeCommunityId = activeCommunity?.id;
-  const activeCommunityName = activeCommunity?.name;
-
-  const communities = useSelector(
-    (state: RootState) => state?.user?.userFollowedCommunities
-  );
-
-  // Function to get the first non-null community
+  // Get the first valid community for fallback
   const getFirstValidCommunity = () => {
-    return fetchedCommunities.find((community) => community && community._id);
+    return communities.find((community: any) => community && community._id);
   };
 
-  const cleanedCommunityName = activeCommunityName
-    ? activeCommunityName
-        .replace(/\s+/g, "-")
-        .replace(/\|/g, "-")
-        .replace(/-+/g, "-")
-    : "";
-  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-  const communityParams = `${encodedCommunityName}-${activeCommunityId}`;
+  // Generate community link with proper formatting and fallback handling
   const getMySpaceLink = () => {
-    if (activeCommunityId) {
-      return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
-    } else {
-      const firstCommunity = getFirstValidCommunity();
-      if (firstCommunity) {
-        // Set the first community as active
-        dispatch(
-          setActiveCommunity({
-            id: firstCommunity._id,
-            name: firstCommunity.name,
-            image: firstCommunity.image || "",
-            background_image: firstCommunity.background_image || "",
-            user_isBankDetailsAdded: false,
-            user_iscalendarConnected: false,
-          })
-        );
-        if (user?._id) {
-          dispatch(
-            setCommunityData({
-              communityId: firstCommunity._id,
-              userId: user._id,
-            })
-          );
-        }
-        return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
-      }
-      return NO_COMMUNITIES_AVAILABLE;
+    // If user is not authenticated, redirect to explore page
+    if (!isAuthenticated) {
+      return "/";
     }
+
+    // If we have an active community, use it
+    if (activeCommunity?.id) {
+      const communityParam = createCommunityParam(activeCommunity.name, activeCommunity.id);
+      return `${ROUTES.COMMUNITY}/${communityParam}/profile`;
+    }
+
+    // If we're still loading communities, prevent navigation
+    if (communitiesLoading) {
+      return "#"; // Prevent navigation while loading
+    }
+
+    // Try to get the first valid community
+    const firstCommunity = getFirstValidCommunity();
+    console.log("firstCommunity",firstCommunity);
+    if (firstCommunity) {
+      // Set the first community as active
+      setActiveCommunity({
+        id: firstCommunity._id,
+        name: firstCommunity.name,
+        image: firstCommunity.image || "",
+      });
+      const communityParam = createCommunityParam(firstCommunity.name, firstCommunity._id);
+      return `${ROUTES.COMMUNITY}/${communityParam}/profile`;
+    }
+
+    // If there's an error and user is authenticated, show explore instead of no-community
+    if (communitiesError && isAuthenticated) {
+      return "/"; // Redirect to explore to help user find communities
+    }
+
+    // Only redirect to no-community as absolute last resort
+    return "/no-community";
   };
 
   const handleMySpaceClick = (e: React.MouseEvent) => {
-    if (!session) {
+    if (!isAuthenticated) {
       e.preventDefault();
       toast("Sign in required to view your guild", {
         action: {
           label: "Sign In",
-          onClick: () =>
-            signIn(undefined, {
-              callbackUrl: `${window.location.origin}`,
-            }),
+          onClick: () => login({ email: "", password: "" }), // This will trigger OAuth flow
         },
       });
       return;
     }
-    // If signed in, let the normal navigation happen
-  };
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    // If still loading communities, prevent navigation
+    if (communitiesLoading) {
+      e.preventDefault();
+      toast("Loading your communities...", {
+        duration: 1000,
+      });
+      return;
+    }
+
+    // If there's an error loading communities, show error message but allow fallback
+    if (communitiesError) {
+      console.warn("Communities error, but allowing navigation to fallback");
+      // Don't prevent navigation - let it go to explore page as fallback
+      toast("Unable to load your communities, showing explore page instead", {
+        duration: 2000,
+      });
+      // Don't prevent - allow the fallback navigation to happen
+    }
+
+    // If no communities and no error, suggest creating one
+    if (!communitiesLoading && !communitiesError && communities.length === 0) {
+      // Allow navigation to no-community page which has create community options
+    }
   };
 
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
-    router.push(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
   };
 
-  const handleSignOut = () => {
-    localStorage.clear();
-    signOut();
-  };
-
-  const handleEditClick = () => {
-    setShowCommunityList(true);
-  };
-
-  const handleCommunitySelect = (community: { _id: string; name: string }) => {
-    setSelectedCommunity(community);
-    setShowCommunityList(false);
-    setShowEditCommunity(true);
-  };
-
-  function handleSelectCommunity(community: any) {
-    dispatch(
-      setActiveCommunity({
-        id: community._id,
-        name: community.name,
-        image: community.image || "",
-        background_image: community.background_image || "",
-        user_isBankDetailsAdded: false,
-        user_iscalendarConnected: false,
-      })
-    );
-
-    if (user?._id) {
-      dispatch(
-        setCommunityData({
-          communityId: community._id,
-          userId: user._id,
-        })
-      );
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      showSuccess("Successfully signed out!");
+    } catch (error) {
+      showError("Failed to sign out");
     }
-    const cleanedName = community.name
-      .replace(/\s+/g, "-")
-      .replace(/\|/g, "-")
-      .replace(/-+/g, "-");
+  };
 
-    const encodedName = encodeURIComponent(cleanedName);
-
-    router.push(`/community/${encodedName}-${community._id}/profile`);
+  const handleSelectCommunity = (community: any) => {
+    navigateToCommunity(community._id, community.name);
     setIsSidebarOpen(false);
-  }
+  };
 
   const isActive = (path: string) => {
-    if (path === "/" && pathname === "/") {
-      return true;
+    if (path === "/") {
+      return pathname === "/" || pathname === "/explore";
     }
-    return path !== "/" && pathname?.startsWith(path);
+    if (path === "/feeds") {
+      return pathname === "/feeds" || pathname === "/feed";
+    }
+    if (path === "/community") {
+      return pathname.startsWith("/community");
+    }
+    return pathname.startsWith(path);
   };
 
-  // const handleCreatorButtonClick = () => {
-  //   if (!session) {
-  //     signIn(undefined, {
-  //       callbackUrl: `${window.location.origin}?hero=1`,
-  //     });
-  //   }
-  // };
-
   const handleCreatorButtonClick = () => {
-    // Track the creator button click
-    tracking.trackClick("creator_signup_button", {
+    tracking.trackClick("creator_button_clicked", {
       section: "header",
-      user_signed_in: !!session,
-      user_id: session?.user._id,
+      user_signed_in: !!isAuthenticated,
+      user_id: user?.id,
     });
 
-    if (!session) {
+    if (!isAuthenticated) {
       tracking.trackUserAction("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
@@ -262,21 +219,20 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         trigger: "creator_button_prompt",
       });
 
-      signIn(undefined, {
-        callbackUrl: `${window.location.origin}`,
-      });
-
+      // Trigger OAuth login
+      login({ email: "", password: "" });
       return;
     }
 
     tracking.trackUserAction("creator_form_opened", {
       source: "header_button",
-      user_id: session.user._id,
+      user_id: user?.id,
     });
 
     setIsDialogOpen(true);
   };
 
+  // Handle screen size changes
   useEffect(() => {
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 640);
@@ -286,6 +242,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
+  // Handle sidebar body scroll lock
   useEffect(() => {
     if (typeof window !== "undefined") {
       document.body.style.overflow = isSidebarOpen ? "hidden" : "auto";
@@ -350,18 +307,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </button>
                 </div>
               </div>
-              <div
-                className="
-            md:hidden"
-              >
-                {" "}
-                {user?._id && <NotificationDropdown />}
+              <div className="md:hidden">
+                {user?.id && <NotificationDropdown />}
               </div>
             </div>
+
             <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
               <div className="hidden md:flex items-center">
                 <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                     <Link href="/" className="flex flex-col items-center">
                       <Compass
                         className={`h-5 w-5 ${
@@ -378,7 +332,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <MdOutlineRssFeed
                         className={`h-5 w-5 ${
@@ -395,7 +349,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
+                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                     <Link
                       href={getMySpaceLink()}
                       className="flex flex-col items-center"
@@ -428,7 +382,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           isActive("/chat") ? "text-primary" : ""
                         }`}
                       />
-                      {user?._id && unreadCount > 0 && (
+                      {user?.id && unreadCount > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                           {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
@@ -443,7 +397,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  {user?._id && (
+                  {user?.id && (
                     <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                       <NotificationDropdown />
                     </li>
@@ -452,20 +406,20 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </div>
 
               <div className="hidden md:block ml-2 lg:ml-4 xl:ml-6">
-                {user?._id ? (
+                {user?.id ? (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
                           <Avatar className="h-10 w-10">
-                            {session?.user?.image ? (
+                            {user?.image ? (
                               <AvatarImage
-                                src={session?.user?.image || "/placeholder.svg"}
+                                src={user.image || "/placeholder.svg"}
                                 alt="User"
                               />
                             ) : (
                               <AvatarFallback>
-                                {session?.user?.name?.charAt(0)}
+                                {getInitials(user.name)}
                               </AvatarFallback>
                             )}
                           </Avatar>
@@ -491,7 +445,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                             className="flex items-center justify-between"
                           >
                             <span>Chat</span>
-                            {user?._id && unreadCount > 0 && (
+                            {user?.id && unreadCount > 0 && (
                               <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                 {unreadCount > 9 ? "9+" : unreadCount}
                               </span>
@@ -510,14 +464,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         >
                           <Link href="/booking">Bookings</Link>
                         </DropdownMenuItem>
-                        {isUser && (
-                          <DropdownMenuItem
-                            asChild
-                            className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
-                          >
-                            <Link href="/payments">Payments</Link>
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem
+                          asChild
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        >
+                          <Link href="/payments">Payments</Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
                           onClick={handleSignOut}
@@ -530,11 +482,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Button
-                      onClick={() =>
-                        signIn(undefined, {
-                          callbackUrl: `${window.location.href}?hero=2`,
-                        })
-                      }
+                      onClick={() => login({ email: "", password: "" })}
                       className="px-6 border border-blue-500 transition-all duration-200"
                       variant="outline"
                     >
@@ -543,18 +491,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </div>
                 )}
               </div>
+
               {!isCreator && (
                 <Dialog
-                  open={session ? isDialogOpen : false}
+                  open={isAuthenticated ? isDialogOpen : false}
                   onOpenChange={setIsDialogOpen}
                 >
                   <Button
-                    className="border border-gray-300 "
+                    className="border border-gray-300"
                     onClick={handleCreatorButtonClick}
                   >
                     Join as Expert
                   </Button>
-                  {session && (
+                  {isAuthenticated && (
                     <CreatorForm onClose={() => setIsDialogOpen(false)} />
                   )}
                 </Dialog>
@@ -564,6 +513,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </nav>
 
+      {/* Mobile Bottom Navigation */}
       <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
         <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
           <Link
@@ -610,7 +560,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <MessageCircle
                 className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : ""}`}
               />
-              {user?._id && unreadCount > 0 && (
+              {user?.id && unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
@@ -646,18 +596,18 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </span>
           </Link>
 
-          {user?._id ? (
+          {user?.id ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex flex-col items-center justify-center gap-1">
                   <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
                     <Avatar className="h-4 w-4">
                       <AvatarImage
-                        src={session?.user?.image || ""}
+                        src={user?.image || ""}
                         alt="User"
                       />
                       <AvatarFallback>
-                        {session?.user?.name?.charAt(0)}
+                        {getInitials(user.name)}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -685,7 +635,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     className="flex items-center justify-between"
                   >
                     <span>Chat</span>
-                    {user?._id && unreadCount > 0 && (
+                    {user?.id && unreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                         {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
@@ -704,14 +654,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 >
                   <Link href="/booking">Bookings</Link>
                 </DropdownMenuItem>
-                {isUser && (
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:bg-primary-gradient border-b border-zinc-300"
-                  >
-                    <Link href="/payments">Payments</Link>
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem
+                  asChild
+                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                >
+                  <Link href="/payments">Payments</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="hover:bg-primary-gradient"
                   onClick={handleSignOut}
@@ -723,11 +671,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           ) : (
             <button
               className="flex flex-col items-center justify-center gap-1"
-              onClick={() =>
-                signIn(undefined, {
-                  callbackUrl: `${window.location.origin}?hero=2`,
-                })
-              }
+              onClick={() => login({ email: "", password: "" })}
             >
               <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
                 <Avatar className="h-4 w-4">
@@ -743,6 +687,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </div>
 
+      {/* Mobile Sidebar */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black bg-opacity-40 transition-opacity duration-300"
@@ -780,10 +725,24 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </Dialog>
           </div>
           <div className="space-y-3 pb-16">
-            {communities && communities.length > 0 ? (
+            {communitiesLoading ? (
+              <div className="text-center py-4">
+                <div className="text-sm text-gray-500">Loading communities...</div>
+              </div>
+            ) : communitiesError ? (
+              <div className="text-center py-4">
+                <div className="text-sm text-red-500">Failed to load communities</div>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="text-xs text-blue-500 hover:underline mt-1"
+                >
+                  Retry
+                </button>
+              </div>
+            ) : communities && communities.length > 0 ? (
               communities.map((community: any) => {
                 if (!community) return null;
-                const isActive = activeCommunityId === community._id;
+                const isActive = activeCommunity?.id === community._id;
                 return (
                   <button
                     key={community._id}
@@ -828,7 +787,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             ) : (
               <div className="">
                 {StringConstants.NO_COMMUNITIES_AVAILABLE}
-                {!session && (
+                {!isAuthenticated && (
                   <p className="mt-2">Sign in to create or join communities</p>
                 )}
               </div>

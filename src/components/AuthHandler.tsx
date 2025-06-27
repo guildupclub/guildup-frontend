@@ -42,13 +42,12 @@ const AuthHandler = () => {
     const fetchUserProfile = async (userId: string) => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`,
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile?userId=${userId}`,
           {
-            method: "POST",
+            method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ userId }),
           }
         );
 

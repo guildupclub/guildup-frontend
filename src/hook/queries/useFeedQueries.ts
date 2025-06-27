@@ -10,12 +10,16 @@ interface Post {
   reply_count: number;
   post_type: string;
   slug: string;
-  community_id: string;
-  upvote_userId: any;
-  media?: {
-    publicUrl: string;
-    fileType: string;
+  community_id: {
+    name: string;
+    image: string;
+    background_image: string;
+    _id: string;
   };
+  upvote_userId: any;
+  replies?: any;
+  media?: any;
+  user_id: any;
 }
 
 interface FetchPostsParams {
@@ -68,5 +72,9 @@ export const useInfinitePosts = (userId: string | undefined) => {
         flattenedPosts: uniquePosts,
       };
     },
+    enabled: !!userId, // Only run query if userId is available
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
