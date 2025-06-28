@@ -94,8 +94,10 @@ const ConsultationForm = ({
               {OFFERING_TYPES.CONSULTATION}
             </SelectItem>
             <SelectItem value="webinar">{OFFERING_TYPES.WEBINAR}</SelectItem>
-            <SelectItem value="package">Package</SelectItem>
-            <SelectItem value="class">Class</SelectItem>
+            <SelectItem value="package">{
+                OFFERING_TYPES.PACKAGE
+              }</SelectItem>
+            <SelectItem value="class">{OFFERING_TYPES.CLASS}</SelectItem>
           </SelectContent>
         </Select>
       </div>

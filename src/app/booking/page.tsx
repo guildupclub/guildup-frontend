@@ -46,6 +46,7 @@ const BookingPage = () => {
   const [completedBookings, setCompletedBookings] = useState<Booking[]>([]);
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
+  const isCreator = user?.is_creator ? true : false;
 
   const fetchBookings = async () => {
     try {
@@ -114,16 +115,18 @@ const BookingPage = () => {
           >
             Completed
           </button>
-          <button
-            className={`pb-2 ${
-              activeTab === "availability"
-                ? "text-blue-600 border-blue-600 border-b-2"
-                : "text-gray-500"
-            }`}
-            onClick={() => setActiveTab("availability")}
-          >
-            Set Availability
-          </button>
+          {isCreator && (
+            <button
+              className={`pb-2 ${
+                activeTab === "availability"
+                  ? "text-blue-600 border-blue-600 border-b-2"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setActiveTab("availability")}
+            >
+              Availability
+            </button>
+          )}
         </div>
 
         <div className="space-y-4">

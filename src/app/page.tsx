@@ -27,14 +27,12 @@ import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 
-
 import BenefitCards from "@/components/heroSection/BenefitCards";
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 import { on } from "events";
 import { FaArrowRightLong } from "react-icons/fa6";
 import { HiSparkles } from "react-icons/hi2";
-
 
 interface Category {
   _id: string;
@@ -192,8 +190,24 @@ function Page() {
     }
   }, [selectedCategory, router, category]);
 
+  useEffect(() => {
+    if (session && typeof window !== "undefined") {
+      const shouldOpen = localStorage.getItem("openCreatorModal");
+
+      if (shouldOpen === "true") {
+        localStorage.removeItem("openCreatorModal");
+
+        tracking.trackUserAction("creator_form_opened_post_signin", {
+          user_id: session.user._id,
+          triggered_from: "post_signin",
+        });
+
+        setIsCreatorFormOpen(true);
+      }
+    }
+  }, [session]);
+
   const handleCreatorButtonClick = () => {
-    // Track the creator button click
     tracking.trackClick("creator_signup_button", {
       section: "header",
       user_signed_in: !!session,
@@ -201,6 +215,9 @@ function Page() {
     });
 
     if (!session) {
+      // Store intent to open modal after sign-in
+      localStorage.setItem("openCreatorModal", "true");
+
       tracking.trackUserAction("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
@@ -222,7 +239,7 @@ function Page() {
       user_id: session.user._id,
     });
 
-    setIsDialogOpen(true);
+    setIsCreatorFormOpen(true);
   };
 
   const handleScroll = () => {
@@ -414,7 +431,7 @@ function Page() {
                   transforms your growth journey
                 </motion.p>
               </div>
-              <VideoPlaceholder className="mb-16" />
+              {/* <VideoPlaceholder className="mb-16" /> */}
             </div>
 
             <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
