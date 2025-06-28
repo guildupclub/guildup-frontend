@@ -11,7 +11,8 @@ import WelcomeBanner from "@/components/banner/Banner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
 import RouteChangeTracker from "@/components/RouteChangeTracker";
-import dynamic from "next/dynamic";
+import dynamic from "next/dynamic";import GoogleOneTap from "@/components/GoogleOneTap";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -186,6 +187,7 @@ export default async function RootLayout({
               <NavbarClient />
               <RouteChangeTracker />
               {children}
+              <GoogleOneTap />
               <Toaster richColors position="top-center" />
               <CookieConsent />
               {/* <WelcomeBanner /> */}
