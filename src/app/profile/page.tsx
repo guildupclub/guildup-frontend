@@ -61,7 +61,7 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [newLanguage, setNewLanguage] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<string>("personal");
-  const isCreator = user?.user?.is_creator ? true : false;
+  const isCreator = user?.is_creator ? true : false;
 
   React.useEffect(() => {
     const updateUserProfile = async () => {
