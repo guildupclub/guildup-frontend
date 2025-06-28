@@ -1,6 +1,6 @@
 "use client";
-import { useRouter } from "next/navigation";
 
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -11,12 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 declare global {
   interface Window {
     Razorpay: any;
   }
 }
-import { CalendarIcon, Clock, ChevronLeft, Check } from "lucide-react";
+
+import { CalendarIcon, Clock, ChevronLeft } from "lucide-react";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -69,6 +71,7 @@ export function BookingDialog({
   isOpen,
   onClose,
 }: BookingDialogProps) {
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
@@ -97,6 +100,7 @@ export function BookingDialog({
   const tracking = useTracking();
   const [avatarImgUrl, setAvatarImgUrl] = useState("");
   const [activeCommunityData, setActiveCommunityData] = useState<any>(null);
+
   const params = useParams();
   const communityParam = params?.["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
@@ -108,6 +112,7 @@ export function BookingDialog({
     lastHyphenIndex !== -1 && communityParam.substring(lastHyphenIndex + 1)
       ? communityParam.substring(lastHyphenIndex + 1)
       : "683f18575411ca44bde8f746";
+
   const cleanedCommunityName =
     communityName ||
     "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
@@ -133,7 +138,6 @@ export function BookingDialog({
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
           );
         }
-
         return response.data.data;
       }
       throw new Error("Failed to fetch community profile");
@@ -203,7 +207,6 @@ export function BookingDialog({
         selected_date: date.toISOString(),
         user_id: currentUserId,
       });
-
       fetchAvailableSlots(date);
       setBookingStep("time");
     }
@@ -224,7 +227,6 @@ export function BookingDialog({
       selected_slot_end: slot.end,
       user_id: currentUserId,
     });
-
     setSelectedSlot(slot);
     setShowConfirmation(true);
     setBookingStep("confirmation");
@@ -245,7 +247,6 @@ export function BookingDialog({
           email: guestEmail,
         }
       );
-
       if (response.data.r === "s") {
         const registeredUserId = response.data.data.user._id;
         setCurrentUserId(registeredUserId);
@@ -279,6 +280,7 @@ export function BookingDialog({
     });
 
     setIsProcessing(true);
+
     if (!selectedDate || !selectedSlot) {
       setIsProcessing(false);
       return;
@@ -349,21 +351,34 @@ export function BookingDialog({
 
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
+
         if (offering.is_free) {
           const bookingId = response?.data?.data?._id;
-
           if (!bookingId) {
             toast.error("Booking failed — missing booking ID.");
             return;
           }
+
           setIsProcessing(false);
-          setBookingDetails(response.data.data);
-          setBookingSuccess(true);
           toast.success("Booking confirmed successfully!");
-          // Redirect to booking confirmation page
-          router.push(
-            `/booking-confirmation?bookingId=${response.data.data._id}`
-          );
+
+          // Close dialog and redirect to booking confirmation page
+          onClose();
+          const offeringParams = new URLSearchParams({
+            bookingId: bookingId,
+            title: offering.title,
+            duration: offering.duration.toString(),
+            price: offering.price.amount.toString(),
+            currency: offering.price.currency,
+            type: offering.type,
+            isFree: offering.is_free.toString(),
+            providerName:
+              activeCommunityData?.community?.name || "Service Provider",
+            selectedDate: selectedDate?.toISOString() || "",
+            selectedTime: selectedSlot?.start || "",
+          });
+          router.push(`/booking-confirmation?${offeringParams.toString()}`);
+
           tracking.trackUserAction("free_booking_confirmed", {
             offering_id: offering._id,
             offering_title: offering.title,
@@ -375,9 +390,7 @@ export function BookingDialog({
             phone: phoneWithoutFormatting,
             is_guest_user: !isLoggedIn,
           });
-          setTimeout(() => {
-            router.push(`/booking-confirmation?bookingId=${bookingId}`);
-          }, 500);
+
           return;
         }
 
@@ -404,13 +417,14 @@ export function BookingDialog({
           order_id: response.data.data.id,
           handler: async (paymentResponse: any) => {
             console.log("Payment Success:", paymentResponse);
+
             const dateObject = new Date(selectedSlot.start);
             dateObject.setMinutes(
               dateObject.getMinutes() - dateObject.getTimezoneOffset()
             );
             const startTime = dateObject.toISOString().slice(0, 19);
 
-            const response = await axios.post(
+            const verifyResponse = await axios.post(
               `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
               {
                 razorpay_order_id: paymentResponse.razorpay_order_id,
@@ -422,27 +436,39 @@ export function BookingDialog({
               }
             );
 
-            if (response.data.r === "s") {
-              const bookingId = response?.data?.data?._id;
-
+            if (verifyResponse.data.r === "s") {
+              const bookingId = verifyResponse?.data?.data?._id;
               if (!bookingId) {
                 toast.error("Booking failed — missing booking ID.");
                 return;
               }
 
               setIsProcessing(false);
-              setBookingDetails(response.data.data);
-              setBookingSuccess(true);
-              setTimeout(() => {
-                toast.success("Booking confirmed successfully!");
-              }, 300);
-              console.log("Booking confirmed successfully!");
+              toast.success("Booking confirmed successfully!");
+
+              // Close dialog and redirect to booking confirmation page
+              onClose();
+              const offeringParams = new URLSearchParams({
+                bookingId: bookingId,
+                title: offering.title,
+                duration: offering.duration.toString(),
+                price: offering.price.amount.toString(),
+                currency: offering.price.currency,
+                type: offering.type,
+                isFree: offering.is_free.toString(),
+                providerName:
+                  activeCommunityData?.community?.name || "Service Provider",
+                selectedDate: selectedDate?.toISOString() || "",
+                selectedTime: selectedSlot?.start || "",
+              });
+              router.push(`/booking-confirmation?${offeringParams.toString()}`);
+
               tracking.trackUserAction("paid_booking_confirmed", {
                 offering_id: offering._id,
                 offering_title: offering.title,
                 offering_type: offering.type,
-                amount: response.data.data.amount,
-                currency: response.data.data.currency || "INR",
+                amount: verifyResponse.data.data.amount,
+                currency: verifyResponse.data.data.currency || "INR",
                 user_id: bookingUserId,
                 booking_date: selectedDate?.toISOString(),
                 booking_start_time: selectedSlot?.start,
@@ -520,6 +546,7 @@ export function BookingDialog({
   const handlePaymentVerification = async (paymentResponse: any) => {
     try {
       console.log("Payment response:", paymentResponse);
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/v1/payment/verify-payment`,
         {
@@ -533,11 +560,27 @@ export function BookingDialog({
       );
 
       if (response.data.booking) {
+        const bookingId = response.data.booking._id;
         setIsProcessing(false);
-        setBookingDetails(response.data.booking);
-        setBookingSuccess(true);
         toast.success("Booking confirmed successfully!");
-        console.log("Booking confirmed successfully!");
+
+        // Close dialog and redirect to booking confirmation page
+        onClose();
+        const offeringParams = new URLSearchParams({
+          bookingId: bookingId,
+          title: offering.title,
+          duration: offering.duration.toString(),
+          price: offering.price.amount.toString(),
+          currency: offering.price.currency,
+          type: offering.type,
+          isFree: offering.is_free.toString(),
+          providerName:
+            activeCommunityData?.community?.name || "Service Provider",
+          selectedDate: selectedDate?.toISOString() || "",
+          selectedTime: selectedSlot?.start || "",
+        });
+        router.push(`/booking-confirmation?${offeringParams.toString()}`);
+
         tracking.trackUserAction("paid_booking_confirmed_v2", {
           offering_id: offering._id,
           offering_title: offering.title,
@@ -576,6 +619,7 @@ export function BookingDialog({
                     {offering.title}
                   </span>
                 </h1>
+
                 {offering.type === "webinar" && (
                   <div className="flex justify-between items-center mt-4 w-full bg-blue-100 font-bold px-4 py-2 rounded-md shadow-sm">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
@@ -610,6 +654,8 @@ export function BookingDialog({
                     src={
                       avatarImgUrl ||
                       "https://api.dicebear.com/7.x/avataaars/svg?seed=adarsh" ||
+                      "/placeholder.svg" ||
+                      "/placeholder.svg" ||
                       "/placeholder.svg"
                     }
                     alt="User"
@@ -781,7 +827,7 @@ export function BookingDialog({
                           <Button
                             key={index}
                             variant="outline"
-                            className="text-sm transition-all duration-200 hover:scale-105 hover:bg-primary/10"
+                            className="text-sm transition-all duration-200 hover:scale-105 hover:bg-primary/10 bg-transparent"
                             onClick={() => handleSlotSelect(slot)}
                           >
                             {formatTime(slot.start)} - {formatTime(slot.end)}
@@ -817,7 +863,6 @@ export function BookingDialog({
                                 required
                               />
                             </div>
-
                             <div className="space-y-2">
                               <Label htmlFor="guest-email">
                                 Email <span className="text-red-500">*</span>
@@ -833,7 +878,6 @@ export function BookingDialog({
                             </div>
                           </>
                         )}
-
                         {isLoggedIn && (
                           <>
                             <div className="space-y-2">
@@ -847,7 +891,6 @@ export function BookingDialog({
                                 disabled
                               />
                             </div>
-
                             <div className="space-y-2">
                               <Label htmlFor="email">Email</Label>
                               <Input
@@ -861,7 +904,6 @@ export function BookingDialog({
                             </div>
                           </>
                         )}
-
                         <div className="space-y-2">
                           <Label htmlFor="phone">
                             Phone Number <span className="text-red-500">*</span>
@@ -912,103 +954,6 @@ export function BookingDialog({
           </div>
         </DialogContent>
       </div>
-
-      {bookingSuccess && (
-        <Dialog
-          open={bookingSuccess}
-          onOpenChange={() => {
-            setBookingSuccess(false);
-            onClose();
-          }}
-        >
-          <DialogContent className="sm:max-w-sm md:max-w-xl p-6 bg-card rounded-xl shadow-xl border border-border/50">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="w-8 h-8 text-green-600" />
-              </div>
-              <DialogTitle className="text-2xl font-bold text-foreground">
-                Booking Confirmed!
-              </DialogTitle>
-              <p className="text-muted-foreground mt-2">
-                Your booking has been successfully confirmed.
-                {!isLoggedIn &&
-                  " You have been registered and can now access your bookings."}
-              </p>
-            </div>
-
-            <div className="space-y-4 mb-6">
-              <div className="bg-background p-4 rounded-lg">
-                <h2 className="text-center font-semibold">Booking Details</h2>
-
-                <div>
-                  <p className="text-muted-foreground">Service Name</p>
-                  <p className="font-medium">{offering.title}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Date</p>
-                    <p className="font-medium">
-                      {selectedDate ? format(selectedDate, "PPP") : "N/A"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-muted-foreground">Time</p>
-                    <p className="font-medium">
-                      {selectedSlot
-                        ? `${formatTime(selectedSlot.start)} - ${formatTime(
-                            selectedSlot.end
-                          )}`
-                        : "N/A"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-muted-foreground">Duration</p>
-                    <p className="font-medium">{offering.duration} minutes</p>
-                  </div>
-
-                  <div>
-                    <p className="text-muted-foreground">Price</p>
-                    <p className="font-medium">
-                      {offering.price.currency}{" "}
-                      {offering.discounted_price !== null &&
-                      offering.discounted_price !== undefined
-                        ? offering.discounted_price
-                        : offering.price.amount}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-center">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setBookingSuccess(false);
-                  onClose();
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </Dialog>
   );
-}
-
-{
-  /* <Button
-  onClick={() => {
-    setBookingSuccess(false);
-    onClose();
-    window.location.href = "/booking";
-  }}
->
-  Go to Bookings
-</Button>; */
 }
