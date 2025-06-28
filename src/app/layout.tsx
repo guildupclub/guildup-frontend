@@ -12,6 +12,8 @@ import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
 import GoogleOneTap from "@/components/GoogleOneTap";
 
+import RouteChangeTracker from "@/components/RouteChangeTracker";
+import dynamic from "next/dynamic";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -65,6 +67,36 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <Script
+          id="gtm"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer','GTM-5ZKZDMMK');
+    `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?                         
+              n.callMethod.apply(n,arguments):n.queue.push   
+              (arguments)}; if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!
+              0;n.version='2.0';n.queue=[];t=b.createElement(e);
+              t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,
+              'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              fbq('init', '661403980198126');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
@@ -84,20 +116,20 @@ export default async function RootLayout({
         <meta name="msapplication-TileColor" content="#0A0A0A" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
         {/* Do not remove these script */} {/* Google Analytics */}
-        <script
+        {/* <script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-B3B9W8GRQP"
-        ></script>
+        ></script> 
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){window.dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-B3B9W8GRQP');
-            `,
+       window.dataLayer = window.dataLayer || [];
+       function gtag(){window.dataLayer.push(arguments);}
+       gtag('js', new Date());
+       gtag('config', 'G-B3B9W8GRQP');
+     `,
           }}
-        />
+        />*/}
         {/* Service Worker Registration */}
         <script
           dangerouslySetInnerHTML={{
@@ -133,10 +165,28 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-5ZKZDMMK"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=661403980198126&ev=
+            PageView&noscript=1"
+          />
+        </noscript>
         <CookieConsentProvider>
           <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
+              <RouteChangeTracker />
               {children}
               <GoogleOneTap />
               <Toaster richColors position="top-center" />
