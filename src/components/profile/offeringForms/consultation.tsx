@@ -13,6 +13,10 @@ import {
   OFFERING_TYPES,
   StringConstants,
 } from "@/components/common/CommonText";
+import { Info } from "lucide-react";
+
+const PLATFORM_COMMISSION_RATE = 0.118;
+const EXPERT_PAYOUT_RATE = 1 - PLATFORM_COMMISSION_RATE;
 
 const INITIAL_FORM_STATE = {
   title: "",
@@ -22,7 +26,6 @@ const INITIAL_FORM_STATE = {
     amount: 0,
     currency: "INR",
   },
-  //   discounted_price: 0,
   duration: 60,
   is_free: true,
   tags: "",
@@ -36,6 +39,14 @@ interface OfferingFormProps {
   handleOfferingSubmit: (e: React.FormEvent) => void;
   loading: boolean;
   offeringCreated: boolean;
+}
+
+function calculateExpertPayout(priceInclGst: number): string {
+  const expertAmount = priceInclGst * EXPERT_PAYOUT_RATE;
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(expertAmount);
 }
 
 const ConsultationForm = ({
@@ -94,23 +105,26 @@ const ConsultationForm = ({
               {OFFERING_TYPES.CONSULTATION}
             </SelectItem>
             <SelectItem value="webinar">{OFFERING_TYPES.WEBINAR}</SelectItem>
-            <SelectItem value="package">{
-                OFFERING_TYPES.PACKAGE
-              }</SelectItem>
+            <SelectItem value="package">{OFFERING_TYPES.PACKAGE}</SelectItem>
             <SelectItem value="class">{OFFERING_TYPES.CLASS}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 items-start">
         <div className="space-y-2">
           <Label htmlFor="price">
             {StringConstants.PRICE} ({StringConstants.INR})
             <span className="text-red-500">*</span>
           </Label>
+          <div className="flex items-start text-xs text-muted-foreground mb-1 gap-1">
+            <Info className="h-4 w-4 mt-0.5" />
+            <span>10% platform fee + taxes, no hidden charges.</span>
+          </div>
           <Input
             id="price"
             type="number"
+            min={0}
             value={formData.price.amount}
             onChange={(e) => {
               const value = e.target.value;
@@ -125,55 +139,41 @@ const ConsultationForm = ({
             }}
             required
           />
-        </div>
-
-        <div className="space-y-2">
-          {/* <Label htmlFor="discounted_price">
-            {StringConstants.DISCOUNTED_PRICE} (
-            {StringConstants.INR})
-            <span className="text-red-500">*</span>
-            </Label>
-            <Input
-            id="discounted_price"
-            type="number"
-            value={
-                formData.discounted_price
-            }
-            onChange={(e) => {
-                const value = e.target.value;
-                setFormData({
-                ...formData,
-                discounted_price: Number(value),
-                is_free: Number(value) === 0,
-                });
-            }}
-            required
-            /> */}
-
-          <div className="space-y-2">
-            <Label htmlFor="duration">
-              {StringConstants.DURATION} (Mins)
-              <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="duration"
-              type="number"
-              value={formData.duration}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  duration: Number(e.target.value),
-                })
-              }
-              required
-            />
+          <div className="h-[48px] transition-all duration-200 ease-in-out">
+            {formData.price.amount > 0 && (
+              <div className="rounded-md border p-3 bg-gray-50">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-700">
+                    You will receive
+                  </span>
+                  <span className="text-sm font-semibold text-green-600">
+                    {calculateExpertPayout(formData.price.amount)}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* <div className="grid grid-cols-2 gap-4">
-        
-      </div> */}
+        <div className="space-y-2 pt-[28px]">
+          <Label htmlFor="duration">
+            {StringConstants.DURATION} (Mins)
+            <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="duration"
+            type="number"
+            value={formData.duration}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                duration: Number(e.target.value),
+              })
+            }
+            required
+          />
+        </div>
+      </div>
 
       <div className="flex justify-end pt-4">
         <Button
