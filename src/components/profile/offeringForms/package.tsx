@@ -284,7 +284,7 @@ const PackageForm: React.FC<PackageFormProps> = ({
             }
           />
           <Label htmlFor="is_private">
-            Private Package (Custom offer - won't appear on public profile)
+            Private Package (Custom offer - won&apos;t appear on public profile)
           </Label>
         </div>
       </div>
