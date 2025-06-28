@@ -147,7 +147,7 @@ export default function BookingConfirmation() {
               Booking Not Found
             </h2>
             <p className="text-gray-600 mb-4 text-sm">
-              We couldn't find your booking details.
+              We couldn&apos;t find your booking details.
             </p>
             <Button
               onClick={() => router.push("/booking")}
@@ -308,7 +308,7 @@ export default function BookingConfirmation() {
           {/* Next Steps */}
           <div className="mt-4 pt-4 border-t">
             <h3 className="text-sm font-semibold text-gray-900 mb-2">
-              What's Next?
+              What&apos;s Next?
             </h3>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex items-center gap-2">
