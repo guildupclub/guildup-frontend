@@ -17,8 +17,8 @@ export class ChannelService {
   async getChannels(
     communityId: string,
     userId: string,
-  ): Promise<PaginatedResponse<Channel>> {
-    return apiClient.get<PaginatedResponse<Channel>>(
+  ): Promise<Channel[]> {
+    return apiClient.get<Channel[]>(
       `${API_ENDPOINTS.CHANNELS}/getChannels?communityId=${communityId}&userId=${userId}`
     );
   }

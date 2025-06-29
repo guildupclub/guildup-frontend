@@ -104,7 +104,10 @@ export function useSidebar() {
   }, [memberData, communityId, dispatch]);
 
   // Format channels data
-  const channels = channelsData?.data?.map((channel: any) => ({
+
+  console.log("channelsData", channelsData);
+
+  const channels = channelsData?.map((channel: any) => ({
     id: channel._id,
     name: channel.name,
     locked: channel.is_locked,

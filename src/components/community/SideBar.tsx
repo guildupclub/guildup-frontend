@@ -51,6 +51,8 @@ export function Sidebar() {
     isDeletingChannel,
   } = useSidebar();
 
+  console.log("channels", channels);
+
   return (
     <>
       {/* Desktop Sidebar */}

@@ -50,8 +50,8 @@ export class CommunityService {
   }
 
   // Leave community
-  async leaveCommunity(communityId: string): Promise<void> {
-    return apiClient.post<void>(`${API_ENDPOINTS.COMMUNITIES}/${communityId}/leave`);
+  async leaveCommunity(communityId: string, userId: string): Promise<void> {
+    return apiClient.post<void>(`${API_ENDPOINTS.COMMUNITIES}/leave`, { communityId, userId });
   }
 
   // Get community members

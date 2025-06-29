@@ -248,9 +248,7 @@ export function ProfileCard({
     activeCommunityId || '',
       !!(activeCommunityId && (user?._id || reduxUser?._id))
   );
-  
-  const joinCommunityMutation = useJoinCommunity();
-  const leaveCommunityMutation = useLeaveCommunity();
+
 
   const isOwner =
     memberDetails &&
@@ -358,7 +356,7 @@ export function ProfileCard({
 
   // Use existing join/leave community hooks
   const joinCommunityMutation2 = useJoinCommunity();
-  const leaveCommunityMutation2 = useLeaveCommunity();
+  const leaveCommunityMutation2 = useLeaveCommunity(user?._id || '');
 
 // ctiveCommunityId, user, reduxUser, joinCommunityMutation, onRefetch]);
 
@@ -438,7 +436,6 @@ export function ProfileCard({
   const postCount = communityDetails?.post_count ?? profile?.community?.post_count ?? 0;
 
   const isLoading = isMembershipLoading || isLoadingCommunity || isProfileLoading;
-  const isMutating = joinCommunityMutation.isPending || leaveCommunityMutation.isPending
 
   // Loading state
   if (isLoading) {

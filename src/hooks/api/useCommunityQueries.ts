@@ -247,7 +247,9 @@ export function useJoinCommunity() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITY, variables.communityId] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITY_MEMBERS, variables.communityId] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITIES] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITIES, 'infinite'] });
       showSuccess('Successfully joined community!');
+
     },
     onError: (error: Error) => {
       showError(error.message || 'Failed to join community');
@@ -255,16 +257,17 @@ export function useJoinCommunity() {
   });
 }
 
-export function useLeaveCommunity() {
+export function useLeaveCommunity(userId: string) {
   const queryClient = useQueryClient();
   const { showSuccess, showError } = useToast();
 
   return useMutation({
-    mutationFn: (communityId: string) => communityService.leaveCommunity(communityId),
+    mutationFn: (communityId: string) => communityService.leaveCommunity(communityId, userId),
     onSuccess: (_, communityId) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITY, communityId] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITY_MEMBERS, communityId] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITIES] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COMMUNITIES, 'infinite'] });
       showSuccess('Successfully left community');
     },
     onError: (error: Error) => {
