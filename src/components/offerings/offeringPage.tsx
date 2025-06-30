@@ -154,13 +154,13 @@ export default function OfferingDetails({
               <li>
                 <strong>🧠 Personal Assessment</strong>
                 <br />
-                We’ll explore your specific anxiety triggers and current coping
+                We&quot;ll explore your specific anxiety triggers and current coping
                 mechanisms
               </li>
               <li>
                 <strong>🛠️ Practical Techniques</strong>
                 <br />
-                Learn 3–5 evidence-based tools you can use immediately
+                Learn 3 to 5 evidence-based tools you can use immediately
               </li>
               <li>
                 <strong>🧭 Personalized Action Plan</strong>
@@ -196,9 +196,9 @@ export default function OfferingDetails({
           {testimonials.length > 0 && (
             <div className="mt-6 border-t pt-4">
               <p className="text-sm italic text-gray-700 max-w-lg">
-                "Dr. {fullName.split(" ")[1]} helped me understand my anxiety
+                &quot;Dr. {fullName.split(" ")[1]} helped me understand my anxiety
                 patterns and gave me practical tools that actually work. The
-                session was incredibly valuable and I felt heard throughout."
+                session was incredibly valuable and I felt heard throughout.&quot;
               </p>
               <p className="text-xs text-gray-500 mt-1">
                 Verified client · 2 weeks ago
