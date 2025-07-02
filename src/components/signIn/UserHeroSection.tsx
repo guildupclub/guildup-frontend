@@ -18,7 +18,7 @@ const Poppins = PoppinsFont({
 
 export const UserHeroSection: React.FC = () => {
   return (
-    <div className="w-full bg-white border border-background flex flex-col p-4  h-screen overflow-hidden" >
+    <div className="w-full bg-white border border-background flex flex-col p-5  h-screen overflow-hidden" >
      <div className="relative h-full w-full rounded-xl bg-blue-50" >
 
           <div className="h-48 lg:h-64 w-48 lg:w-64 absolute top-0 right-0">
@@ -31,13 +31,13 @@ export const UserHeroSection: React.FC = () => {
               alt="GuildUp Logo"
               className="w-20 h-16 "
             />
-            <h1 className={`font-semibold text-4xl ${Poppins.className}`}>GuildUp</h1>
+            <h1 className={`font-semibold text-4xl font-poppins`}>GuildUp</h1>
           </div>
           <div className=" absolute bottom-6 flex flex-col gap-3 lg:gap-4 xl:gap-5 px-5">
             
                    <h1 className={`font-semibold text-[#334BFF] text-2xl ${Poppins.className}`}>Work 1:1 with</h1>
-                   <p className={`font-extrabold text-4xl lg:text-5xl ${Poppins.className}`}>Trusted Coaches, Therapists, Nutritionists & more</p>
-                   <p className={`font-normal text-base text-gray-500 ${Poppins.className}`}>Join a growing community of over 2.5 lakh people and connect with 100+ verified coaches, therapists, nutritionists, and wellness experts</p>
+                   <p className={`font-bold text-4xl lg:text-5xl font-poppins`}>Trusted Coaches, Therapists, Nutritionists & more</p>
+                   <p className={`font-normal text-base text-gray-500 font-poppins`}>Join a growing community of over 2.5 lakh people and connect with 100+ verified coaches, therapists, nutritionists, and wellness experts</p>
           </div>
           
      </div>

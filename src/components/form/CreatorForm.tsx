@@ -234,7 +234,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             category_id: categoryId,
             instagram_followers: formData.instaFollowers,
             youtube_followers: formData.youtubeSubscribers,
-            phone_number: `${formData.countryCode}${formData.phoneNumber}`, // Include country code
+            phone_number: `${formData.countryCode}${formData.phoneNumber}`, 
             is_locked: false,
           }),
         }

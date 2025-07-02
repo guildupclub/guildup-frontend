@@ -93,7 +93,10 @@ export default {
           '0%, 100%': { transform: 'translateX(0)' },
           '50%': { transform: 'translateX(4px)' },
         },
-  		}
+  		},
+  		fontFamily: {
+  			poppins: ['var(--font-poppins)', 'sans-serif'],
+  		},
   	}
   },
   plugins: [
