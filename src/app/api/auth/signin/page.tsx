@@ -32,7 +32,7 @@ function SignInContent() {
   };
 
   return (
-    <div className="flex md:flex-row h-screen md:overflow-hidden">
+    <div className="flex md:flex-row h-screen md:overflow-hidden container max-w-[96rem] mx-auto">
       <div className="hidden md:block w-1/2">
         {getHeroVersion() === 1 ? (
           session ? (
