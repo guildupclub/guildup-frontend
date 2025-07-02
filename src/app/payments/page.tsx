@@ -5,11 +5,34 @@ import { FaArrowLeft } from "react-icons/fa";
 import Card from "@/components/payments/Card";
 import RecentTransactions from "@/components/payments/RecentTransactions";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import type { RootState } from "@/redux/store";
 
 function Payments() {
   const user = useSelector((state: RootState) => state.user);
   const isCreator = user?.user?.is_creator ? true : false;
+  React.useEffect(() => {
+    const handleVisibilityChange = (e: Event) => {
+      e.stopPropagation();
+    };
+
+    const handleFocusChange = (e: Event) => {
+      e.stopPropagation();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange, true);
+    window.addEventListener("blur", handleFocusChange, true);
+    window.addEventListener("focus", handleFocusChange, true);
+
+    return () => {
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange,
+        true
+      );
+      window.removeEventListener("blur", handleFocusChange, true);
+      window.removeEventListener("focus", handleFocusChange, true);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col bg-[#F2F2F2] min-h-screen">
       {/* Header with responsive padding */}
@@ -21,10 +44,7 @@ function Payments() {
           </h1>
         </div>
       </div>
-
-      {/* Main content with proper spacing */}
       <div className="flex flex-col gap-8 md:gap-16 px-4 md:px-20 mt-20 md:mt-24 pb-16">
-        {/* Card and Transactions container */}
         <div className="flex flex-col gap-6 md:gap-10">
           {isCreator && <Card />}
           <RecentTransactions />
