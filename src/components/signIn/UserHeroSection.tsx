@@ -3,77 +3,43 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import guildup_logo from "./../../../public/svg/GuildUp_Logo_Light.svg";
+import guilduplogo from "./../../../public/guilduplogo.webp";
+import bgleft from "./../../../public/bgleft.webp";
+
+
 import Login_laptop from "./../../../public/Login_laptop.png";
+import { Poppins as PoppinsFont } from "next/font/google";
+
+const Poppins = PoppinsFont({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["600"],
+});
 
 export const UserHeroSection: React.FC = () => {
   return (
-    <div className="w-full bg-white border border-background flex flex-col h-full max-h-screen overflow-hidden">
-      <div className="w-full flex justify-center p-6 py-10">
-        <Image
-          src={guildup_logo || "/placeholder.svg"}
-          alt="GuildUp"
-          width={160}
-          height={48}
-          className="h-12 w-auto"
-        />
-      </div>
+    <div className="w-full bg-white border border-background flex flex-col p-4  h-screen overflow-hidden" >
+     <div className="relative h-full w-full rounded-xl bg-blue-50" >
 
-      <div className="flex-1 flex flex-col justify-between px-8 pb-6 overflow-y-auto">
-        <div className="flex flex-col items-center max-w-2xl mx-auto w-full">
-          <div className="w-full mb-8">
-            <h1 className="font-bold text-2xl md:text-3xl text-center mb-8">
-              Discover Expertise and Communities <br /> like never before
-            </h1>
-
-            <div className="space-y-2  mx-20">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 text-primary">
-                  <Check className="w-5 h-5" />
-                </div>
-                <p className="text-lg md:text-xl">
-                  Find experts who actually help.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 text-primary">
-                  <Check className="w-5 h-5" />
-                </div>
-                <p className="text-lg md:text-xl">Book sessions instantly.</p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 text-primary">
-                  <Check className="w-5 h-5" />
-                </div>
-                <p className="text-lg md:text-xl">No more endless searching.</p>
-              </div>
-            </div>
+          <div className="h-48 lg:h-64 w-48 lg:w-64 absolute top-0 right-0">
+             <Image src={bgleft} alt={"bg"}/>
           </div>
+          <div className="relative top-7 left-6 z-10 flex gap-5 items-center justify-start">
 
-          <div className="w-full flex justify-center my-2">
-            <div className="relative w-full max-w-md h-[240px] ">
-              <Image
-                src={Login_laptop || "/placeholder.svg"}
-                alt="GuildUp Platform"
-                className="object-contain"
-                width={600}
-                height={300}
-              />
-            </div>
+            <Image
+              src={guilduplogo}
+              alt="GuildUp Logo"
+              className="w-24 h-14 "
+            />
+            <h1 className={`font-semibold text-4xl ${Poppins.className}`}>GuildUp</h1>
           </div>
-        </div>
-
-        {/* <div className="text-center mt-4 pt-4 border-t border-background">
-          <p className="text-muted-foreground mb-2 text-sm">
-            Are you an expert looking to create a page?
-          </p>
-          <Button variant="outline" asChild className="font-medium">
-            <Link href="#">Become a Creator</Link>
-          </Button>
-        </div> */}
-      </div>
+          <div className=" absolute bottom-6 flex flex-col gap-3 lg:gap-4 xl:gap-5 px-5">
+                   <h1 className={`font-semibold text-[#334BFF] text-2xl ${Poppins.className}`}>Work 1:1 with</h1>
+                   <p className={`font-extrabold text-4xl lg:text-5xl ${Poppins.className}`}>Trusted Coaches, Therapists, Nutritionists & more</p>
+                   <p className={`font-normal text-base text-gray-500 ${Poppins.className}`}>Join a growing community of over 2.5 lakh people and connect with 100+ verified coaches, therapists, nutritionists, and wellness experts</p>
+          </div>
+          
+     </div>
     </div>
   );
 };

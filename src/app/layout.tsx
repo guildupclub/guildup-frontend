@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Poppins as PoppinsFont } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
@@ -22,6 +22,11 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+const Poppins = PoppinsFont({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400","600","700","800"],
 });
 const guildup_logo_final = "/guildup_logo_final.png";
 
