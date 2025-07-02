@@ -29,7 +29,7 @@ export const UserHeroSection: React.FC = () => {
             <Image
               src={guilduplogo}
               alt="GuildUp Logo"
-              className="w-24 h-14 "
+              className="w-20 h-16 "
             />
             <h1 className={`font-semibold text-4xl ${Poppins.className}`}>GuildUp</h1>
           </div>
