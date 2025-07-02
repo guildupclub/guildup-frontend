@@ -34,6 +34,7 @@ export const UserHeroSection: React.FC = () => {
             <h1 className={`font-semibold text-4xl ${Poppins.className}`}>GuildUp</h1>
           </div>
           <div className=" absolute bottom-6 flex flex-col gap-3 lg:gap-4 xl:gap-5 px-5">
+            
                    <h1 className={`font-semibold text-[#334BFF] text-2xl ${Poppins.className}`}>Work 1:1 with</h1>
                    <p className={`font-extrabold text-4xl lg:text-5xl ${Poppins.className}`}>Trusted Coaches, Therapists, Nutritionists & more</p>
                    <p className={`font-normal text-base text-gray-500 ${Poppins.className}`}>Join a growing community of over 2.5 lakh people and connect with 100+ verified coaches, therapists, nutritionists, and wellness experts</p>
