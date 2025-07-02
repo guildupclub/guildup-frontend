@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/tooltip";
 
 // Icons
-import { ArrowRight, Edit, Trash2, Pencil } from "lucide-react";
+import { ArrowRight, Edit, Trash2, Pencil, Share } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
 import { GrInstagram, GrYoga } from "react-icons/gr";
 import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
@@ -649,13 +649,50 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   };
 
   const handleShareClick = async () => {
-    const shareUrl = `${window.location.origin}/community/${communityParams}/profile`;
-
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.info("Profile link copied to clipboard!");
+      const shareUrl = `${window.location.origin}/community/${communityParams}/profile`;
+
+      const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
+      console.log("baseLink", baseLink);
+      const response = await axios.post(
+        `${baseLink}/shorten`,
+        { longUrl: shareUrl }
+      );
+      if (response.data.r === "s") {
+        const shortenedUrl = response.data.shortUrl;
+        await navigator.clipboard.writeText(shortenedUrl);
+        toast.success("Link copied to clipboard!");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
     } catch (error) {
-      console.log("Error copying to clipboard:", error);
+      console.error("Error shortening URL:", error);
+      toast.error("Failed to copy link. Please try again.");
+    }
+  };
+
+  const handleOfferingShareClick = async (offeringID: string) => {
+    try {
+      const shareUrl = `${window.location.origin}/offering/` + offeringID;
+
+      const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
+      const response = await axios.post(
+        `${baseLink}/shorten`,
+        { longUrl: shareUrl }
+      );
+
+      if (response.data.r === "s") {
+        console.log("response.data.shortUrl", response.data.shortUrl);
+        const shortenedUrl = response.data.shortUrl;
+        await navigator.clipboard.writeText(shortenedUrl);
+        toast.success("Link copied to clipboard!");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error shortening URL:", error);
       toast.error("Failed to copy link. Please try again.");
     }
   };
@@ -1347,26 +1384,38 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         {/* Buttons */}
                         <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
                           {isOwner ? (
-                            <div className="mr-auto flex gap-2">
+                            <div className="mr-auto flex justify-between w-full gap-2">
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                                  onClick={() => handleEditClick(offering)}
+                                >
+                                  <Edit className="h-3.5 w-3.5" />
+                                  <span>{StringConstants.EDIT}</span>
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                  onClick={() =>
+                                    handleDeleteOffering(offering._id)
+                                  }
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  <span>{StringConstants.DELETE}</span>
+                                </Button>
+                              </div>
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
-                                onClick={() => handleEditClick(offering)}
+                                className="flex items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                                onClick={() => handleOfferingShareClick(offering._id)}
+                                title="Share Offering"
                               >
-                                <Edit className="h-3.5 w-3.5" />
-                                <span>{StringConstants.EDIT}</span>
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
-                                onClick={() =>
-                                  handleDeleteOffering(offering._id)
-                                }
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                <span>{StringConstants.DELETE}</span>
+                                <Share className="h-3.5 w-3.5" />
+                                <span>{StringConstants.SHARE}</span>
                               </Button>
                             </div>
                           ) : (
@@ -1449,6 +1498,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
+            {/* @ts-ignore */}
               <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
