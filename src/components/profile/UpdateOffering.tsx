@@ -4,7 +4,6 @@ import { useState } from "react";
 import axios from "axios";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -36,46 +35,73 @@ const EditOfferingModal = ({
   });
   const [loading, setLoading] = useState(false);
 
+  const hasBookings = (offering.bookings || 0) > 0;
+
+  const canEditField = (fieldName: string) => {
+    const type = formData.type;
+
+    if (type === "consultation") return true;
+    if (type === "webinar") {
+      if (!hasBookings) return true;
+      return !["price", "duration", "when", "meeting_link"].includes(fieldName);
+    }
+    if (type === "package") return true;
+    if (type === "class") {
+      if (!hasBookings) return true;
+      return ![
+        "price",
+        "duration",
+        "when",
+        "meeting_link",
+        "days",
+        "batch_type",
+        "class_time",
+      ].includes(fieldName);
+    }
+    return false;
+  };
+
   const handleEditOffering = async (e: any) => {
     e.preventDefault();
-
-    // if (offering.creatorId !== userId) {
-    //   alert("You are not authorized to edit this offering.");
-    //   return;
-    // }
-    // if (formData.discounted_price > formData.price.amount) {
-    //   toast.error(
-    //     "Discounted price cannot be greater than the original price."
-    //   );
-    //   return;
-    // }
-    // if (formData.discounted_price < 0) {
-    //   toast.error("Discounted price cannot be negative.");
-    //   return;
-    // }
     if (formData.price.amount < 0) {
       toast.error("Price cannot be negative.");
       return;
+    }
+
+    const payload = { ...formData };
+
+if (formData.type === "webinar" && hasBookings) {
+      delete payload.price;
+      delete payload.duration;
+      delete payload.when;
+      delete payload.meeting_link;
+    }
+    if (formData.type === "class" && hasBookings) {
+      delete payload.price;
+      delete payload.duration;
+      delete payload.when;
+      delete payload.meeting_link;
+      delete payload.days;
+      delete payload.batch_type;
+      delete payload.class_time;
     }
 
     setLoading(true);
     try {
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/edit/${offering._id}`,
-        formData
+        payload
       );
       if (response.data.r === "s") {
         toast.success("Offering updated successfully");
         onUpdate();
         onClose();
-      } else if (response.data.r === "e") {
-        toast.error("Offering updated successfully");
-        onUpdate();
-        onClose();
+      } else {
+        toast.error("Failed to update offering");
       }
     } catch (error) {
       console.error("Error updating offering:", error);
-      alert("Failed to update offering");
+      toast.error("Failed to update offering");
     }
     setLoading(false);
   };
@@ -116,6 +142,7 @@ const EditOfferingModal = ({
               onValueChange={(value) =>
                 setFormData({ ...formData, type: value })
               }
+              disabled
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select type" />
@@ -123,6 +150,8 @@ const EditOfferingModal = ({
               <SelectContent>
                 <SelectItem value="consultation">Consultation</SelectItem>
                 <SelectItem value="webinar">Webinar</SelectItem>
+                <SelectItem value="package">Package</SelectItem>
+                <SelectItem value="class">Class</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -146,6 +175,7 @@ const EditOfferingModal = ({
                 }
                 min="0"
                 required
+                disabled={!canEditField("price")}
               />
             </div>
 
@@ -159,39 +189,48 @@ const EditOfferingModal = ({
                   setFormData({ ...formData, duration: Number(e.target.value) })
                 }
                 required
+                disabled={!canEditField("duration")}
               />
             </div>
-            {/* <div className="space-y-2">
-              <label htmlFor="discounted_price">
-                {StringConstants.DISCOUNTED_PRICE} ({StringConstants.INR})
-              </label>
-              <Input
-                id="discoounted_price"
-                type="number"
-                value={formData.discounted_price}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    discounted_price: Number(e.target.value),
-                    is_free: Number(e.target.value) === 0,
-                  })
-                }
-                min="0"
-                required
-              />
-            </div> */}
           </div>
-          {/* <div className="space-y-2">
-            <label htmlFor="tags">Tags (comma-separated)</label>
-            <Input
-              id="tags"
-              value={formData.tags}
-              onChange={(e) =>
-                setFormData({ ...formData, tags: e.target.value })
-              }
-              placeholder="e.g., Design, Technology, Business"
-            />
-          </div> */}
+
+          {formData.type === "webinar" && (
+            <>
+              <div className="space-y-2">
+                <label htmlFor="meeting_link">Meeting Link</label>
+                <Input
+                  id="meeting_link"
+                  value={formData.meeting_link || ""}
+                  onChange={(e) =>
+                    setFormData({ ...formData, meeting_link: e.target.value })
+                  }
+                  disabled={!canEditField("meeting_link")}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="when">Start Date & Time</label>
+                <Input
+                  id="when"
+                  type="datetime-local"
+                  value={
+                    formData.when
+                      ? new Date(formData.when).toISOString().slice(0, 16)
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      when: new Date(e.target.value).toISOString(),
+                    })
+                  }
+                  disabled={!canEditField("when")}
+                />
+              </div>
+            </>
+          )}
+
+          {/* Add class/package-specific fields here using similar checks */}
+
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onClose}>
               Cancel
