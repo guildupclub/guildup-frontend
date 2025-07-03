@@ -8,7 +8,7 @@ export default function Page() {
   let { "offering-id": offeringId } = useParams();
   offeringId = String(offeringId);
   return (
-    <div className="min-h-screen bg-background pt-10 pb-4 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background pt-10 pb-10 px-4 sm:px-6 lg:px-8">
       <OfferingPage offeringId={offeringId} />
     </div>
   );

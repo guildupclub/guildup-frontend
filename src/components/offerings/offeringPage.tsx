@@ -9,6 +9,25 @@ import {
   BookOpenCheckIcon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BookingDialog } from "../booking/Bookingdialog";
+
+interface Offering {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  price: {
+    amount: number;
+    currency: string;
+  };
+  discounted_price: string;
+  when: Date;
+  duration: number;
+  is_free: boolean;
+  tags: string[];
+  rating: number;
+  total_ratings: number;
+}
 
 export default function OfferingDetails({
   offeringId,
@@ -17,6 +36,10 @@ export default function OfferingDetails({
 }>) {
   const [userId, setUserId] = useState<string | null>(null);
   const [communityId, setCommunityId] = useState<string | null>(null);
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
+  
 
   const { data: offeringData, isLoading: loadingOffering } = useQuery({
     queryKey: ["offering-data", offeringId],
@@ -246,12 +269,30 @@ export default function OfferingDetails({
             <div className="mt-2 text-sm text-gray-600">
               Next available: Tomorrow 11:00 AM
             </div>
-            <Button className="mt-4 md:mt-0 w-full md:w-auto">
+            <Button
+              onClick={() => {
+                setSelectedOffering(offering);
+              }}
+              className="mt-4 md:mt-0 w-full md:w-auto"
+            >
               Book Your Session
             </Button>
           </div>
         </div>
       </div>
+
+      {selectedOffering && (
+        <BookingDialog
+          offering={{
+            ...selectedOffering,
+            discounted_price: selectedOffering.discounted_price
+              ? Number(selectedOffering.discounted_price)
+              : 0,
+          }}
+          isOpen={!!selectedOffering}
+          onClose={() => setSelectedOffering(null)}
+        />
+      )}
 
       <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 justify-center">
         <span>✅ 100% Refund Policy</span>
