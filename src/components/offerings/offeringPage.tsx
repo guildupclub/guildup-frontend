@@ -298,6 +298,7 @@ export default function OfferingDetails({
           }}
           isOpen={!!selectedOffering}
           onClose={() => setSelectedOffering(null)}
+          communityId={communityId}
         />
       )}
 
