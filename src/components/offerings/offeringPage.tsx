@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "../booking/Bookingdialog";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
 
 interface Offering {
   _id: string;
@@ -39,7 +40,6 @@ export default function OfferingDetails({
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
-  
 
   const { data: offeringData, isLoading: loadingOffering } = useQuery({
     queryKey: ["offering-data", offeringId],
@@ -96,6 +96,7 @@ export default function OfferingDetails({
   const languageList = user?.languages || [];
   const experience = user?.year_of_experience || 0;
   const sessionConduct = user?.session_conducted || 0;
+  const isBankAdded = user?.isBankDetailsAdded;
   const sessionsTaken = user?.session_conducted || 0;
   const avatar = user?.image;
   const education = user?.education || "";
@@ -104,13 +105,19 @@ export default function OfferingDetails({
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-6">
       <div className="bg-white rounded-3xl shadow-xl grid md:grid-cols-3 overflow-hidden">
-        <div className="bg-gray-50 p-6 flex flex-col items-center text-center border-r">
-          <img
-            src={avatar || "/avatar-placeholder.png"}
-            alt={fullName}
-            className="w-28 h-28 rounded-full object-cover"
-          />
-          <h3 className="text-xl font-semibold mt-4">{fullName}</h3>
+        <div className="bg-gray-50 p-6 lg:py-10 flex flex-col items-center text-center border-r">
+          <div className="relative inline-block">
+            <img
+              src={avatar || "/avatar-placeholder.png"}
+              alt={fullName}
+              className="w-32 h-32 rounded-full object-cover"
+            />
+            {isBankAdded && (
+              <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-10 w-10 text-primary drop-shadow-md bg-white rounded-full" />
+            )}
+          </div>
+
+          <h3 className="text-2xl font-semibold mt-4">{fullName}</h3>
           {/* <p className="text-sm text-gray-600 mt-1">
             Clinical Psychologist & Mindfulness Expert
           </p> */}
@@ -266,9 +273,9 @@ export default function OfferingDetails({
               ₹{price?.toLocaleString("en-IN")}{" "}
               <span className="text-sm font-normal">per session</span>
             </div>
-            <div className="mt-2 text-sm text-gray-600">
+            {/* <div className="mt-2 text-sm text-gray-600">
               Next available: Tomorrow 11:00 AM
-            </div>
+            </div> */}
             <Button
               onClick={() => {
                 setSelectedOffering(offering);
