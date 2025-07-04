@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import GoogleSignIn from "../common/GoogleSignIn";
 import { Input } from "../ui/input";
 import { FiUser, FiPhone } from "react-icons/fi";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/userSlice";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useRequestOtp, useVerifyOtp } from "@/hooks/queries/useAuth";
 
 const countryCodes = [
   { code: "+91", label: "India" },
@@ -18,6 +24,24 @@ export const LoginContainer: React.FC = () => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(59);
   const [resendActive, setResendActive] = useState(false);
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [error, setError] = useState("");
+  const [otpPhone, setOtpPhone] = useState("");
+  const [otpName, setOtpName] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
+  const {
+    mutate: requestOtp,
+    status: requestOtpStatus,
+  } = useRequestOtp();
+  const {
+    mutate: verifyOtp,
+    status: verifyOtpStatus,
+  } = useVerifyOtp();
+  const isRequestingOtp = requestOtpStatus === "pending";
+  const isVerifyingOtp = verifyOtpStatus === "pending";
+  const loading = isRequestingOtp || isVerifyingOtp;
 
   React.useEffect(() => {
     if (step === 'otp' && timer > 0) {
@@ -28,20 +52,177 @@ export const LoginContainer: React.FC = () => {
     }
   }, [step, timer]);
 
+  React.useEffect(() => {
+    if (cooldown > 0) {
+      const interval = setInterval(() => setCooldown((c) => c - 1), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [cooldown]);
+
+ 
+  const saveSignupData = (name: string, phone: string) => {
+    localStorage.setItem('signup_name', name);
+    localStorage.setItem('signup_phone', phone);
+  };
+  const saveLoginData = (phone: string) => {
+    localStorage.setItem('login_phone', phone);
+  };
+  const removeSignupData = () => {
+    localStorage.removeItem('signup_name');
+    localStorage.removeItem('signup_phone');
+  };
+  const removeLoginData = () => {
+    localStorage.removeItem('login_phone');
+  };
+  const getSignupData = () => ({
+    name: localStorage.getItem('signup_name') || '',
+    phone: localStorage.getItem('signup_phone') || '',
+  });
+  const getLoginData = () => ({
+    phone: localStorage.getItem('login_phone') || '',
+  });
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setPrevStep('login');
-    setStep('otp');
-    setTimer(59);
-    setResendActive(false);
+    setError("");
+    const phoneVal = countryCode.replace("+", "") + phone;
+    saveLoginData(phoneVal);
+    requestOtp(
+      { phone: phoneVal },
+      {
+        onSuccess: (res: any) => {
+          if (res.data.r === "e") {
+            setError(res.data.e || "Failed to send OTP");
+            toast.error(res.data.e || "Failed to send OTP");
+            if (res.data.e === "Please wait a few minutes before requesting another OTP.") {
+              setCooldown(120);
+            }
+          } else {
+            setOtpPhone(phoneVal);
+            setOtpName("");
+            setStep('otp');
+            setTimer(59);
+            setResendActive(false);
+            toast.success(res.data.data?.message || "OTP sent successfully");
+          }
+        },
+        onError: (error: any) => {
+          const apiError = error?.response?.data?.e;
+          setError(apiError || "Network error");
+          toast.error(apiError || "Network error");
+        },
+      }
+    );
   };
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     setPrevStep('signup');
-    setStep('otp');
-    setTimer(59);
-    setResendActive(false);
+    setError("");
+    const phoneVal = countryCode.replace("+", "") + phone;
+    saveSignupData(fullName, phoneVal);
+    requestOtp(
+      { phone: phoneVal, name: fullName },
+      {
+        onSuccess: (res: any) => {
+          if (res.data.r === "e") {
+            setError(res.data.e || "Failed to send OTP");
+            toast.error(res.data.e || "Failed to send OTP");
+            if (res.data.e === "Please wait a few minutes before requesting another OTP.") {
+              setCooldown(120);
+            }
+          } else {
+            setOtpPhone(phoneVal);
+            setOtpName(fullName);
+            setStep('otp');
+            setTimer(59);
+            setResendActive(false);
+            toast.success(res.data.data?.message || "OTP sent successfully");
+          }
+        },
+        onError: (error: any) => {
+          const apiError = error?.response?.data?.e;
+          setError(apiError || "Network error");
+          toast.error(apiError || "Network error");
+        },
+      }
+    );
+  };
+
+  const handleVerifyOtp = () => {
+    setError("");
+    const otpValue = otp.join("");
+    if (otpValue.length !== 6) {
+      setError("Please enter a valid 6-digit OTP");
+      return;
+    }
+    let payload: any = {
+      phone: otpPhone,
+      otp: otpValue,
+    };
+    if (prevStep === 'signup') payload.name = otpName;
+    verifyOtp(payload, {
+      onSuccess: (res: any) => {
+        if (res.data.r === "e") {
+          setError(res.data.e || "OTP verification failed");
+          toast.error(res.data.e || "OTP verification failed");
+        } else {
+          const user = res.data.data.user;
+          const token = res.data.data.token;
+          dispatch(setUser({
+            _id: user._id,
+            name: user.name || "",
+            email: user.email || "",
+            image: user.avatar,
+            accessToken: token,
+            phone: user.phone,
+          }));
+          toast.success(res.data.data.message || "Signed in successfully!");
+          removeSignupData();
+          removeLoginData();
+          router.push("/");
+          router.refresh();
+        }
+      },
+      onError: (error: any) => {
+        const apiError = error?.response?.data?.e;
+        setError(apiError || "Network error");
+        toast.error(apiError || "Network error");
+      },
+    });
+  };
+
+  const handleResendOtp = () => {
+    setError("");
+    let payload: any = {};
+    if (prevStep === 'signup') {
+      const { name, phone } = getSignupData();
+      payload = { phone, name };
+    } else {
+      const { phone } = getLoginData();
+      payload = { phone };
+    }
+    requestOtp(payload, {
+      onSuccess: (res: any) => {
+        if (res.data.r === "e") {
+          setError(res.data.e || "Failed to resend OTP");
+          toast.error(res.data.e || "Failed to resend OTP");
+          if (res.data.e === "Please wait a few minutes before requesting another OTP.") {
+            setCooldown(120);
+          }
+        } else {
+          setTimer(59);
+          setResendActive(false);
+          toast.success(res.data.data?.message || "OTP resent successfully");
+        }
+      },
+      onError: (error: any) => {
+        const apiError = error?.response?.data?.e;
+        setError(apiError || "Network error");
+        toast.error(apiError || "Network error");
+      },
+    });
   };
 
   const handleOtpChange = (idx: number, value: string) => {
@@ -63,6 +244,7 @@ export const LoginContainer: React.FC = () => {
           <>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Login Now</h1>
             <p className="font-normal text-center text-sm lg:text-base text-gray-500 font-poppins">Enter your mobile number below to login to your account</p>
+            {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
             <form className="space-y-4" onSubmit={handleLogin}>
               <div className="relative group flex items-center border border-gray-200 rounded-xl bg-white px-2 lg:px-3 py-1 lg:py-1 focus-within:ring-2 focus-within:ring-blue-400">
                 <select
@@ -93,8 +275,9 @@ export const LoginContainer: React.FC = () => {
               <button
                 type="submit"
                 className="w-full bg-[#334BFF] text-white font-bold font-poppins py-2 lg:py-3 rounded-xl hover:bg-blue-700 transition text-lg shadow-md"
+                disabled={loading || cooldown > 0}
               >
-                Login
+                {isRequestingOtp ? "Sending OTP..." : cooldown > 0 ? `Wait ${cooldown}s` : "Login"}
               </button>
             </form>
             <div className="text-center mt-3 lg:mt-4 text-sm lg:text-base font-poppins">
@@ -112,6 +295,7 @@ export const LoginContainer: React.FC = () => {
           <>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Sign Up Now</h1>
             <p className="font-normal text-center text-sm lg:text-base text-gray-500 font-poppins">Enter your mobile number below to create your account</p>
+            {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
             <form className="space-y-3 lg:space-y-4" onSubmit={handleSignup}>
               <div className="relative group flex items-center border border-gray-200 rounded-xl bg-white px-3 py-1 lg:py-1 focus-within:ring-2 focus-within:ring-blue-400">
                 <span className="absolute left-4 text-gray-400 text-xl flex items-center h-full">
@@ -156,8 +340,9 @@ export const LoginContainer: React.FC = () => {
               <button
                 type="submit"
                 className="w-full bg-[#334BFF] text-white font-bold font-poppins py-2  rounded-xl hover:bg-blue-700 transition text-base lg:text-lg shadow-md"
+                disabled={loading || cooldown > 0}
               >
-                Sign Up
+                {isRequestingOtp ? "Sending OTP..." : cooldown > 0 ? `Wait ${cooldown}s` : "Sign Up"}
               </button>
             </form>
             <div className="text-center mt-2 lg:mt-4 text-base font-poppins">
@@ -175,6 +360,7 @@ export const LoginContainer: React.FC = () => {
           <>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Verify Phone number</h1>
             <p className="text-center text-gray-500 mb-3 lg:mb-6 font-poppins">OTP has been shared to {countryCode}-{phone}</p>
+            {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
             <div className="flex justify-center gap-2 mb-4">
               {otp.map((digit, idx) => (
                 <input
@@ -192,18 +378,19 @@ export const LoginContainer: React.FC = () => {
             <div className="flex gap-2 mb-4">
               <button
                 className="flex-1 border border-[#334BFF] text-[#334BFF] py-1 lg:py-2 rounded-md hover:bg-blue-50 font-poppins"
-                onClick={() => { setStep(prevStep); setOtp(["", "", "", "", "", ""]); }}
+                onClick={() => { setStep(prevStep); setOtp(["", "", "", "", "", ""]); setError(""); }}
+                disabled={loading}
               >Back</button>
               <button
                 className="flex-1 bg-[#334BFF] text-white py-1 lg:py-2 rounded-md hover:bg-blue-700 font-poppins"
-               
-              >Verify</button>
+                onClick={handleVerifyOtp}
+                disabled={loading}
+              >{isVerifyingOtp ? "Verifying..." : "Verify"}</button>
             </div>
             <div className="flex justify-between text-xs font-poppins">
               <span>OTP expired in <span className="text-red-600 font-semibold">00:{timer.toString().padStart(2, '0')}</span></span>
-              <span className={resendActive ? "text-[#334BFF] cursor-pointer" : "text-gray-400"} onClick={() => resendActive && setTimer(59)}>
-               
-                Resend Code
+              <span className={resendActive && cooldown === 0 ? "text-[#334BFF] cursor-pointer" : "text-gray-400"} onClick={() => resendActive && cooldown === 0 && handleResendOtp()}>
+                {isRequestingOtp ? "Resending..." : cooldown > 0 ? `Wait ${cooldown}s` : "Resend Code"}
               </span>
             </div>
           </>
