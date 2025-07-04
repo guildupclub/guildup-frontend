@@ -32,8 +32,8 @@ function SignInContent() {
   };
 
   return (
-    <div className="flex md:flex-row h-screen md:overflow-hidden container max-w-[96rem] mx-auto">
-      <div className="hidden md:block w-1/2">
+    <div className="flex flex-col gap-12 lg:gap-0  lg:flex-row h-screen lg:overflow-hidden container max-w-[96rem] mx-auto">
+      <div className="max-w-full lg:w-1/2">
         {getHeroVersion() === 1 ? (
           session ? (
             <CreatorHeroSection2 />
@@ -44,14 +44,8 @@ function SignInContent() {
           <UserHeroSection />
         )}
       </div>
-      <div className="block w-full md:hidden">
-        {getHeroVersion() === 1 ? (
-          <CreatorMobileHeroSection1 />
-        ) : (
-          <UserMobileHeroSection />
-        )}
-      </div>
-      <div className="hidden md:block md:w-1/2">
+     
+      <div className="w-full lg:w-1/2">
         <RightSection />
       </div>
     </div>

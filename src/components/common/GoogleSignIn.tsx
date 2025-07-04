@@ -39,7 +39,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
     return null;
   }
   return (
-    <div className="flex items-center justify-center bg-background w-full h-full rounded-lg">
+    <div className="flex items-center justify-center bg-background w-full  rounded-lg">
     
        
 
