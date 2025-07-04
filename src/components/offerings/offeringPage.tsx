@@ -9,6 +9,26 @@ import {
   BookOpenCheckIcon,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BookingDialog } from "../booking/Bookingdialog";
+import { RiVerifiedBadgeFill } from "react-icons/ri";
+
+interface Offering {
+  _id: string;
+  title: string;
+  description: string;
+  type: string;
+  price: {
+    amount: number;
+    currency: string;
+  };
+  discounted_price: string;
+  when: Date;
+  duration: number;
+  is_free: boolean;
+  tags: string[];
+  rating: number;
+  total_ratings: number;
+}
 
 export default function OfferingDetails({
   offeringId,
@@ -17,6 +37,9 @@ export default function OfferingDetails({
 }>) {
   const [userId, setUserId] = useState<string | null>(null);
   const [communityId, setCommunityId] = useState<string | null>(null);
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
+    null
+  );
 
   const { data: offeringData, isLoading: loadingOffering } = useQuery({
     queryKey: ["offering-data", offeringId],
@@ -72,39 +95,77 @@ export default function OfferingDetails({
   const tags = offering?.tags || [];
   const languageList = user?.languages || [];
   const experience = user?.year_of_experience || 0;
+  const sessionConduct = user?.session_conducted || 0;
+  const isBankAdded = user?.isBankDetailsAdded;
   const sessionsTaken = user?.session_conducted || 0;
   const avatar = user?.image;
   const education = user?.education || "";
   const testimonials = community?.testimonials || [];
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-8">
+    <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-6">
       <div className="bg-white rounded-3xl shadow-xl grid md:grid-cols-3 overflow-hidden">
-        <div className="bg-gray-50 p-6 flex flex-col items-center text-center border-r">
-          <img
-            src={avatar || "/avatar-placeholder.png"}
-            alt={fullName}
-            className="w-28 h-28 rounded-full object-cover"
-          />
-          <h3 className="text-xl font-semibold mt-4">{fullName}</h3>
-          <p className="text-sm text-gray-600 mt-1">
+        <div className="bg-gray-50 p-6 lg:py-10 flex flex-col items-center text-center border-r">
+          <div className="relative inline-block">
+            <img
+              src={avatar || "/avatar-placeholder.png"}
+              alt={fullName}
+              className="w-32 h-32 rounded-full object-cover"
+            />
+            {isBankAdded && (
+              <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-10 w-10 text-primary drop-shadow-md bg-white rounded-full" />
+            )}
+          </div>
+
+          <h3 className="text-2xl font-semibold mt-4">{fullName}</h3>
+          {/* <p className="text-sm text-gray-600 mt-1">
             Clinical Psychologist & Mindfulness Expert
-          </p>
+          </p> */}
           <div className="mt-4 space-y-2 text-sm text-gray-700 text-left">
-            <p>🎓 {education}</p>
-            <p>🕒 {experience}+ years experience</p>
-            <p>👥 {sessionsTaken}+ clients helped</p>
+            <p>🎓 {experience}+ Years Experience</p>
+            <p>👥 {sessionsTaken}+ Clients helped</p>
             <p>🌐 {languageList.join(", ")}</p>
           </div>
           <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {tags.map((tag: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined, i: React.Key | null | undefined) => (
-              <span
-                key={i}
-                className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
+            {tags.map(
+              (
+                tag:
+                  | string
+                  | number
+                  | bigint
+                  | boolean
+                  | React.ReactElement<
+                      unknown,
+                      string | React.JSXElementConstructor<any>
+                    >
+                  | Iterable<React.ReactNode>
+                  | React.ReactPortal
+                  | Promise<
+                      | string
+                      | number
+                      | bigint
+                      | boolean
+                      | React.ReactPortal
+                      | React.ReactElement<
+                          unknown,
+                          string | React.JSXElementConstructor<any>
+                        >
+                      | Iterable<React.ReactNode>
+                      | null
+                      | undefined
+                    >
+                  | null
+                  | undefined,
+                i: React.Key | null | undefined
+              ) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
+                >
+                  {tag}
+                </span>
+              )
+            )}
           </div>
         </div>
 
@@ -148,78 +209,98 @@ export default function OfferingDetails({
 
           <div className="bg-gray-50 p-4 rounded-xl mt-6">
             <h4 className="font-medium text-sm text-gray-800 mb-2">
-              What to Expect
+              ✅ What to Expect
             </h4>
             <ul className="text-sm space-y-2 text-gray-700">
               <li>
-                <strong>🧠 Personal Assessment</strong>
-                <br />
-                We&quot;ll explore your specific anxiety triggers and current coping
-                mechanisms
+                Tailored guidance designed around your unique goals and
+                challenges
               </li>
               <li>
-                <strong>🛠️ Practical Techniques</strong>
-                <br />
-                Learn 3 to 5 evidence-based tools you can use immediately
+                Proven tools & expert techniques to help you make lasting
+                progress
               </li>
               <li>
-                <strong>🧭 Personalized Action Plan</strong>
-                <br />
-                Receive a custom roadmap for your continued growth
+                A safe and supportive space to grow with clarity, compassion,
+                and accountability
               </li>
             </ul>
+
+            <h4 className="font-medium text-sm text-gray-800  mt-5">
+              🎯 How It Works
+            </h4>
           </div>
 
-          <div className="mt-6 grid md:grid-cols-3 gap-4">
+          <div className=" grid md:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl bg-gray-50 text-center">
-              <p className="font-medium text-sm mb-1">📅 Choose Your Slot</p>
-              <p className="text-xs text-gray-600">
-                Pick a time that works for you from available slots
+              <p className="font-medium text-sm mb-1">
+                📅 Choose a Time That Suits You
               </p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50 text-center">
-              <p className="font-medium text-sm mb-1">💻 Join Your Session</p>
               <p className="text-xs text-gray-600">
-                Connect via secure video call at your scheduled time
+                Browse flexible slots and book a session that fits your schedule
               </p>
             </div>
             <div className="p-4 rounded-xl bg-gray-50 text-center">
               <p className="font-medium text-sm mb-1">
-                🚀 Continue Your Journey
+                🎥 Join Securely on Google Meet
               </p>
               <p className="text-xs text-gray-600">
-                Apply your new tools and book follow-ups as needed
+                You&apos;ll receive a private, secure link — no setup or app
+                needed
+              </p>
+            </div>
+            <div className="p-4 rounded-xl bg-gray-50 text-center">
+              <p className="font-medium text-sm mb-1">
+                🔄 Reflect, Apply, Grow
+              </p>
+              <p className="text-xs text-gray-600">
+                Take your learnings into real life. Reflect on the shifts,
+                celebrate the small wins.
               </p>
             </div>
           </div>
 
-          {testimonials.length > 0 && (
+          {/* {testimonials.length > 0 && (
             <div className="mt-6 border-t pt-4">
               <p className="text-sm italic text-gray-700 max-w-lg">
-                &quot;Dr. {fullName.split(" ")[1]} helped me understand my anxiety
-                patterns and gave me practical tools that actually work. The
-                session was incredibly valuable and I felt heard throughout.&quot;
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Verified client · 2 weeks ago
+                &quot;Transformation isn&apos;t a one-time event — it&apos;s a journey
+                we&apos;ll walk together, at your pace.&quot;
               </p>
             </div>
-          )}
+          )} */}
+          <div className="p-6 bg-white rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="text-xl font-semibold">
+              ₹{price?.toLocaleString("en-IN")}{" "}
+              <span className="text-sm font-normal">per session</span>
+            </div>
+            {/* <div className="mt-2 text-sm text-gray-600">
+              Next available: Tomorrow 11:00 AM
+            </div> */}
+            <Button
+              onClick={() => {
+                setSelectedOffering(offering);
+              }}
+              className="mt-4 md:mt-0 w-full md:w-auto"
+            >
+              Book Your Session
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="p-6 bg-white rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between">
-        <div className="text-xl font-semibold">
-          ₹{price?.toLocaleString("en-IN")}{" "}
-          <span className="text-sm font-normal">per session</span>
-        </div>
-        <div className="mt-2 text-sm text-gray-600">
-          Next available: Tomorrow 11:00 AM
-        </div>
-        <Button className="mt-4 md:mt-0 w-full md:w-auto">
-          Book Your Session
-        </Button>
-      </div>
+      {selectedOffering && (
+        <BookingDialog
+          offering={{
+            ...selectedOffering,
+            discounted_price: selectedOffering.discounted_price
+              ? Number(selectedOffering.discounted_price)
+              : 0,
+          }}
+          isOpen={!!selectedOffering}
+          onClose={() => setSelectedOffering(null)}
+          communityId={communityId}
+        />
+      )}
 
       <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 justify-center">
         <span>✅ 100% Refund Policy</span>
