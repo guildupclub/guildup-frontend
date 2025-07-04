@@ -10,7 +10,8 @@ const countryCodes = [
 ];
 
 export const LoginContainer: React.FC = () => {
-  const [step, setStep] = useState<'login' | 'otp'>('login');
+  const [step, setStep] = useState<'login' | 'otp' | 'signup'>('login');
+  const [prevStep, setPrevStep] = useState<'login' | 'signup'>('login');
   const [countryCode, setCountryCode] = useState(countryCodes[0].code);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -18,7 +19,6 @@ export const LoginContainer: React.FC = () => {
   const [timer, setTimer] = useState(59);
   const [resendActive, setResendActive] = useState(false);
 
-  
   React.useEffect(() => {
     if (step === 'otp' && timer > 0) {
       const interval = setInterval(() => setTimer(t => t - 1), 1000);
@@ -30,6 +30,15 @@ export const LoginContainer: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setPrevStep('login');
+    setStep('otp');
+    setTimer(59);
+    setResendActive(false);
+  };
+
+  const handleSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPrevStep('signup');
     setStep('otp');
     setTimer(59);
     setResendActive(false);
@@ -48,50 +57,37 @@ export const LoginContainer: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4 py-8">
-      <div className="max-w-md w-full space-y-4">
+    <div className="min-h-screen relative flex flex-col items-center justify-center bg-white  px-2 py-6 sm:px-4 sm:py-8">
+      <div className="w-full max-w-md space-y-4  p-4 sm:p-8">
         {step === 'login' && (
           <>
-            <h1 className="font-extrabold text-3xl lg:text-4xl text-center mb-2 font-poppins">Login Now</h1>
+            <h1 className="font-extrabold text-2xl sm:text-3xl lg:text-4xl text-center mb-2 font-poppins">Login Now</h1>
             <p className="font-normal text-center text-base text-gray-500 font-poppins">Enter your mobile number below to login to your account</p>
             <form className="space-y-4" onSubmit={handleLogin}>
-              <div className="relative flex items-center">
-                <span className="absolute left-4 text-gray-400 text-xl flex items-center h-full">
-                  <FiUser />
-                </span>
-                <Input
-                  type="text"
-                  placeholder="Enter full name"
-                  value={fullName}
-                  onChange={e => setFullName(e.target.value)}
+              <div className="relative group flex items-center border border-gray-200 rounded-xl bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                <select
+                  value={countryCode}
+                  onChange={e => setCountryCode(e.target.value)}
                   required
-                  className="pl-12 font-poppins h-14 text-base border border-gray-200 focus:border-blue-500 focus:ring-0 rounded-xl bg-white"
-                />
-              </div>
-              <div className="flex items-center relative">
-                <div className="flex items-center h-14 px-4 font-poppins font-bold text-[#334BFF] text-base">
-                  <select
-                    className="appearance-none bg-transparent border-none outline-none font-poppins font-bold text-[#334BFF] text-base pr-4 cursor-pointer"
-                    value={countryCode}
-                    onChange={e => setCountryCode(e.target.value)}
-                    required
-                    style={{ minWidth: '3.5rem' }}
-                  >
-                    {countryCodes.map(c => (
-                      <option key={c.code} value={c.code}>{c.code}</option>
-                    ))}
-                  </select>
-                  <svg className="w-4 h-4 ml-[-1.2rem] text-[#334BFF] pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                </div>
-                <div className="h-8 w-px bg-gray-200 mx-2" />
-                <Input
+                  className="appearance-none bg-transparent border-none outline-none font-poppins font-bold text-gray-700 text-base pr-2 cursor-pointer focus:ring-0 focus:outline-none"
+                  style={{ minWidth: '3.5rem' }}
+                >
+                  {countryCodes.map(c => (
+                    <option key={c.code} value={c.code}>{c.code}</option>
+                  ))}
+                </select>
+                {/* Dropdown arrow */}
+                <span className="pointer-events-none absolute left-12 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </span>
+                <input
                   type="tel"
                   placeholder="Mobile number"
                   value={phone}
                   onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
                   maxLength={10}
                   required
-                  className="font-poppins h-14 text-base border border-gray-200 focus:border-blue-500 focus:ring-0 rounded-xl bg-white flex-1 pl-2"
+                  className="flex-1 font-poppins h-10 sm:h-12 text-base font-medium text-[#898989] border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
                 />
               </div>
               <button
@@ -102,7 +98,7 @@ export const LoginContainer: React.FC = () => {
               </button>
             </form>
             <div className="text-center mt-4 text-base font-poppins">
-              Don't have an account? <span className="text-[#334BFF] cursor-pointer font-semibold">Sign Up now</span>
+              Don't have an account? <span className="text-[#334BFF] cursor-pointer font-semibold" onClick={() => { setStep('signup'); setFullName(''); }}>Sign Up now</span>
             </div>
             <div className="flex items-center my-4">
               <div className="flex-grow h-px bg-gray-200" />
@@ -112,9 +108,72 @@ export const LoginContainer: React.FC = () => {
             <GoogleSignIn />
           </>
         )}
+        {step === 'signup' && (
+          <>
+            <h1 className="font-extrabold text-2xl sm:text-3xl lg:text-4xl text-center mb-2 font-poppins">Sign Up Now</h1>
+            <p className="font-normal text-center text-base text-gray-500 font-poppins">Enter your mobile number below to create your account</p>
+            <form className="space-y-4" onSubmit={handleSignup}>
+              <div className="relative group flex items-center border border-gray-200 rounded-xl bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                <span className="absolute left-4 text-gray-400 text-xl flex items-center h-full">
+                  <FiUser />
+                </span>
+                <input
+                  type="text"
+                  placeholder="Enter full name"
+                  value={fullName}
+                  onChange={e => setFullName(e.target.value)}
+                  required
+                  className="pl-10 font-poppins h-10 sm:h-12 text-base font-medium text-[#898989] border-none outline-none bg-transparent flex-1 focus:ring-0 focus:outline-none"
+                  style={{ minWidth: '0' }}
+                />
+              </div>
+              <div className="relative group flex items-center border border-gray-200 rounded-xl bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-blue-400">
+                <select
+                  value={countryCode}
+                  onChange={e => setCountryCode(e.target.value)}
+                  required
+                  className="appearance-none bg-transparent border-none outline-none font-poppins font-bold text-gray-700 text-base pr-2 cursor-pointer focus:ring-0 focus:outline-none"
+                  style={{ minWidth: '3.5rem' }}
+                >
+                  {countryCodes.map(c => (
+                    <option key={c.code} value={c.code}>{c.code}</option>
+                  ))}
+                </select>
+                {/* Dropdown arrow */}
+                <span className="pointer-events-none absolute left-12 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                </span>
+                <input
+                  type="tel"
+                  placeholder="Mobile number"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
+                  maxLength={10}
+                  required
+                  className="flex-1 font-poppins  h-10 sm:h-12 text-base font-medium text-[#898989] border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-[#334BFF] text-white font-bold font-poppins py-3 rounded-xl hover:bg-blue-700 transition text-lg shadow-md"
+              >
+                Sign Up
+              </button>
+            </form>
+            <div className="text-center mt-4 text-base font-poppins">
+              Already have an account? <span className="text-[#334BFF] cursor-pointer font-semibold" onClick={() => { setStep('login'); setFullName(''); }}>Login now</span>
+            </div>
+            <div className="flex items-center my-4">
+              <div className="flex-grow h-px bg-gray-200" />
+              <span className="mx-2 text-gray-400 text-xs font-poppins">or sign up with</span>
+              <div className="flex-grow h-px bg-gray-200" />
+            </div>
+            <GoogleSignIn />
+          </>
+        )}
         {step === 'otp' && (
           <>
-            <h1 className="font-extrabold text-3xl text-center mb-2 font-poppins">Verify Phone number</h1>
+            <h1 className="font-extrabold text-2xl sm:text-3xl text-center mb-2 font-poppins">Verify Phone number</h1>
             <p className="text-center text-gray-500 mb-6 font-poppins">OTP has been shared to {countryCode}-{phone}</p>
             <div className="flex justify-center gap-2 mb-4">
               {otp.map((digit, idx) => (
@@ -124,7 +183,7 @@ export const LoginContainer: React.FC = () => {
                   type="text"
                   inputMode="numeric"
                   maxLength={1}
-                  className="w-12 h-12 text-center border rounded-md text-xl focus:ring-2 focus:ring-blue-400 font-poppins"
+                  className="w-10 sm:w-12 h-10 sm:h-12 text-center border border-gray-200 rounded-xl text-xl font-poppins text-gray-900 bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400 outline-none transition"
                   value={digit}
                   onChange={e => handleOtpChange(idx, e.target.value)}
                 />
@@ -133,11 +192,11 @@ export const LoginContainer: React.FC = () => {
             <div className="flex gap-2 mb-4">
               <button
                 className="flex-1 border border-[#334BFF] text-[#334BFF] py-2 rounded-md hover:bg-blue-50 font-poppins"
-                onClick={() => setStep('login')}
+                onClick={() => { setStep(prevStep); setOtp(["", "", "", "", "", ""]); }}
               >Back</button>
               <button
                 className="flex-1 bg-[#334BFF] text-white py-2 rounded-md hover:bg-blue-700 font-poppins"
-                // onClick={...} // No real OTP logic
+               
               >Verify</button>
             </div>
             <div className="flex justify-between text-xs font-poppins">
@@ -148,14 +207,15 @@ export const LoginContainer: React.FC = () => {
             </div>
           </>
         )}
-        <div className="mt-8 text-center text-xs text-gray-400 font-poppins">
+      
+      </div>
+        <div className=" absolute bottom-8  text-center text-sm text-gray-400 font-poppins">
           © 2025 <span className="text-[#334BFF] font-bold">GuildUp</span>. All Rights Reserved.<br />
           <span className="inline-block mt-2">
             <a href="/privacy-policy" className="hover:underline">Privacy & Policy</a> |
             <a href="/terms-conditions" className="hover:underline ml-1">Terms & Condition</a>
           </span>
         </div>
-      </div>
     </div>
   );
 };
