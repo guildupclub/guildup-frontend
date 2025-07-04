@@ -202,6 +202,7 @@ export const LoginContainer: React.FC = () => {
             <div className="flex justify-between text-xs font-poppins">
               <span>OTP expired in <span className="text-red-600 font-semibold">00:{timer.toString().padStart(2, '0')}</span></span>
               <span className={resendActive ? "text-[#334BFF] cursor-pointer" : "text-gray-400"} onClick={() => resendActive && setTimer(59)}>
+               
                 Resend Code
               </span>
             </div>
