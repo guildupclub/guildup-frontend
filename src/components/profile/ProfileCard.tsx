@@ -43,6 +43,7 @@ import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
 import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
+import TestimonialsSection from "../clientSays/ClientSays";
 
 interface CommunityProfile {
   user: {
@@ -654,10 +655,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
       const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
       console.log("baseLink", baseLink);
-      const response = await axios.post(
-        `${baseLink}/shorten`,
-        { longUrl: shareUrl }
-      );
+      const response = await axios.post(`${baseLink}/shorten`, {
+        longUrl: shareUrl,
+      });
       if (response.data.r === "s") {
         const shortenedUrl = response.data.shortUrl;
         await navigator.clipboard.writeText(shortenedUrl);
@@ -677,10 +677,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       const shareUrl = `${window.location.origin}/offering/` + offeringID;
 
       const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
-      const response = await axios.post(
-        `${baseLink}/shorten`,
-        { longUrl: shareUrl }
-      );
+      const response = await axios.post(`${baseLink}/shorten`, {
+        longUrl: shareUrl,
+      });
 
       if (response.data.r === "s") {
         console.log("response.data.shortUrl", response.data.shortUrl);
@@ -1411,7 +1410,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                 size="sm"
                                 variant="outline"
                                 className="flex items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
-                                onClick={() => handleOfferingShareClick(offering._id)}
+                                onClick={() =>
+                                  handleOfferingShareClick(offering._id)
+                                }
                                 title="Share Offering"
                               >
                                 <Share className="h-3.5 w-3.5" />
@@ -1498,7 +1499,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
-            {/* @ts-ignore */}
+              <TestimonialsSection />
+            </div>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="col-span-1 mt-8 lg:col-span-2">
+            <div className="rounded-xl shadow-sm">
+              {/* @ts-ignore */}
               <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
