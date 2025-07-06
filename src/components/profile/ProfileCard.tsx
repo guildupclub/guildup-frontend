@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import type { RootState } from "@/redux/store";
 import axios from "axios";
 import Image from "next/image";
@@ -44,6 +44,7 @@ import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
 import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
 import TestimonialsSection from "../clientSays/ClientSays";
+import { WebinarOfferBanner } from "../webinarHolding/WebinarHoldingSection";
 
 interface CommunityProfile {
   user: {
@@ -190,6 +191,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [isUploadingBackground, setIsUploadingBackground] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
+  const [BookingCount, setBookingCount] = useState(0);
 
   const activeCommunityId = communityId || community?.communityId;
 
@@ -329,6 +331,25 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
     }
   }, [profile?.community]);
+
+  useEffect(() => {
+    const fetchBookingCount = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/bookings-count?communityId=${communityIdFromParam}`
+        );
+        const data = await res.json();
+        setBookingCount(data.data.bookingsCount);
+        console.log("Fetched data:", data.data.bookingsCount);
+      } catch (err) {
+        console.error("Error fetching booking count:", err);
+      }
+    };
+
+    if (communityIdFromParam) {
+      fetchBookingCount();
+    }
+  }, [communityIdFromParam]);
 
   // Update Redux state with user bank and calendar status
   useEffect(() => {
@@ -1180,6 +1201,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             </div>
           </div>
         </div>
+
+        <div className="my-3">
+          <WebinarOfferBanner
+            isBankAdded={isBankConnected}
+            isCalendarConnected={isCalendarConnected}
+            offerings={offerings}
+            totalBookings={BookingCount}
+          />
+        </div>
         {/* Main Content Grid */}
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* About Section */}
@@ -1499,7 +1529,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
-              <TestimonialsSection />
+              <TestimonialsSection communityId={communityIdFromParam} />
             </div>
           </div>
 

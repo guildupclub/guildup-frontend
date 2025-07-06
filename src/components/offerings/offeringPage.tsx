@@ -47,7 +47,7 @@ export default function OfferingDetails({
     queryKey: ["offering-data", offeringId],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:8000/v1/offering/${offeringId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/${offeringId}`
       );
       const providerId = res.data?.data?.provider_id?._id;
       const community = res.data?.data?.community_id;
@@ -61,7 +61,7 @@ export default function OfferingDetails({
   const { data: userData, isLoading: loadingUser } = useQuery({
     queryKey: ["user-profile", userId],
     queryFn: async () => {
-      const res = await axios.post("http://localhost:8000/v1/auth/profile", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`, {
         userId,
       });
       return res.data;
@@ -72,7 +72,7 @@ export default function OfferingDetails({
   const { data: communityData, isLoading: loadingCommunity } = useQuery({
     queryKey: ["community-details", communityId],
     queryFn: async () => {
-      const res = await axios.post("http://localhost:8000/v1/community/view", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/view`, {
         communityId,
       });
       return res.data;
