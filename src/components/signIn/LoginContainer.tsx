@@ -1,3 +1,4 @@
+"use client"
 import React, { useState } from "react";
 import GoogleSignIn from "../common/GoogleSignIn";
 import { Input } from "../ui/input";
@@ -8,6 +9,8 @@ import { setUser } from "@/redux/userSlice";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useRequestOtp, useVerifyOtp } from "@/hooks/queries/useAuth";
+import guilduplogo from "../../../public/guilduplogo.webp";
+import Image from "next/image";
 
 const countryCodes = [
   { code: "+91", label: "India" },
@@ -238,10 +241,20 @@ export const LoginContainer: React.FC = () => {
   };
 
   return (
-    <div className="h-full relative flex flex-col items-center justify-center bg-white  px-2 py-6 sm:px-4 sm:py-8">
-      <div className="w-full max-w-xl space-y-3 lg:space-y-4  p-4 sm:p-8">
+    <div className="max-h-screen min-h-screen lg:h-full relative flex flex-col items-center justify-center bg-white  px-2 py-6 sm:px-4 sm:py-8">
+       
+      <div className="w-full max-w-xl space-y-3 lg:space-y-4  p-4 sm:p-8 justify-center items-center">
         {step === 'login' && (
           <>
+         <div className=" z-10 flex lg:hidden gap-3 md:gap-4 lg:gap-5 items-center justify-start mb-20 mt-6">
+         
+                     <Image
+                       src={guilduplogo}
+                       alt="GuildUp Logo"
+                       className="w-10 md:w-14 lg:w-20 h-8 md:h-12 lg:h-16 "
+                     />
+                     <h1 className={`font-semibold text-2xl md:text-3xl lg:text-4xl font-poppins`}>GuildUp</h1>
+                   </div>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Login Now</h1>
             <p className="font-normal text-center text-sm lg:text-base text-gray-500 font-poppins">Enter your mobile number below to login to your account</p>
             {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
@@ -269,7 +282,7 @@ export const LoginContainer: React.FC = () => {
                   onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
                   maxLength={10}
                   required
-                  className="flex-1 font-poppins h-8 sm:h-10 text-base font-medium text-[#898989] border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
+                  className="flex-1 font-poppins  h-8 sm:h-10 text-base font-medium text-gray-800  border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
                 />
               </div>
               <button
@@ -293,6 +306,15 @@ export const LoginContainer: React.FC = () => {
         )}
         {step === 'signup' && (
           <>
+            <div className=" z-10 flex lg:hidden gap-3 md:gap-4 lg:gap-5 items-center justify-start mb-16 mt-8">
+         
+                     <Image
+                       src={guilduplogo}
+                       alt="GuildUp Logo"
+                       className="w-10 md:w-14 lg:w-20 h-8 md:h-12 lg:h-16 "
+                     />
+                     <h1 className={`font-semibold text-2xl md:text-3xl lg:text-4xl font-poppins`}>GuildUp</h1>
+                   </div>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Sign Up Now</h1>
             <p className="font-normal text-center text-sm lg:text-base text-gray-500 font-poppins">Enter your mobile number below to create your account</p>
             {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
@@ -307,7 +329,7 @@ export const LoginContainer: React.FC = () => {
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   required
-                  className="pl-10 font-poppins h-8 sm:h-10 text-base font-medium text-[#898989] border-none outline-none bg-transparent flex-1 focus:ring-0 focus:outline-none"
+                  className="pl-10 font-poppins h-8 sm:h-10 text-base font-medium text-gray-800 border-none outline-none bg-transparent flex-1 focus:ring-0 focus:outline-none"
                   style={{ minWidth: '0' }}
                 />
               </div>
@@ -334,7 +356,7 @@ export const LoginContainer: React.FC = () => {
                   onChange={e => setPhone(e.target.value.replace(/\D/g, ''))}
                   maxLength={10}
                   required
-                  className="flex-1 font-poppins  h-8 sm:h-10 text-base font-medium text-[#898989] border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
+                  className="flex-1 font-poppins  h-8 sm:h-10 text-base font-medium text-gray-800 border-none outline-none bg-transparent pl-2 focus:ring-0 focus:outline-none"
                 />
               </div>
               <button
@@ -358,6 +380,15 @@ export const LoginContainer: React.FC = () => {
         )}
         {step === 'otp' && (
           <>
+           <div className=" z-10 flex lg:hidden gap-3 md:gap-4 lg:gap-5 items-center justify-start mb-16 mt-8">
+         
+                     <Image
+                       src={guilduplogo}
+                       alt="GuildUp Logo"
+                       className="w-10 md:w-14 lg:w-20 h-8 md:h-12 lg:h-16 "
+                     />
+                     <h1 className={`font-semibold text-2xl md:text-3xl lg:text-4xl font-poppins`}>GuildUp</h1>
+                   </div>
             <h1 className="font-extrabold text-xl sm:text-2xl lg:text-4xl text-center mb-2 font-poppins">Verify Phone number</h1>
             <p className="text-center text-gray-500 mb-3 lg:mb-6 font-poppins">OTP has been shared to {countryCode}-{phone}</p>
             {error && <div className="text-red-500 text-center font-bold mb-2">{error}</div>}
@@ -397,7 +428,7 @@ export const LoginContainer: React.FC = () => {
         )}
       
       </div>
-        <div className="text-center text-sm text-gray-400 font-poppins my-10 lg:my-0 lg:absolute lg:bottom-2 xl:bottom-7 w-full">
+        <div className="text-center  text-sm text-gray-400 font-poppins   lg:my-0 absolute -bottom-2 lg:bottom-2 xl:bottom-7 w-full">
     © 2025 <span className="text-[#334BFF] font-bold">GuildUp</span>. All Rights Reserved.<br />
     <span className="inline-block mt-2">
       <a href="/privacy-policy" className="hover:underline">Privacy & Policy</a> |
