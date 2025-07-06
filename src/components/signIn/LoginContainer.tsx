@@ -184,6 +184,7 @@ export const LoginContainer: React.FC = () => {
           toast.success(res.data.data.message || "Signed in successfully!");
           removeSignupData();
           removeLoginData();
+          localStorage.setItem("accessToken", token);
           router.push("/");
           router.refresh();
         }

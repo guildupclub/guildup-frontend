@@ -84,7 +84,7 @@ export default function SignIn() {
         setError(result.data.data);
       } else {
         toast.success("Signed in successfully!");
-        router.push("/explore");
+        router.push("/");
         router.refresh();
       }
     } catch (error) {
