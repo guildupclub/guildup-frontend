@@ -59,6 +59,7 @@ interface BookingDialogProps {
   };
   isOpen: boolean;
   onClose: () => void;
+  communityId?: string;
 }
 
 interface TimeSlot {
@@ -70,6 +71,7 @@ export function BookingDialog({
   offering,
   isOpen,
   onClose,
+  communityId,
 }: BookingDialogProps) {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
@@ -113,6 +115,7 @@ export function BookingDialog({
       ? communityParam.substring(lastHyphenIndex + 1)
       : "683f18575411ca44bde8f746";
 
+  const effectiveCommunityId = communityId || communityIdFromParam;
   const cleanedCommunityName =
     communityName ||
     "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
@@ -125,7 +128,7 @@ export function BookingDialog({
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
         {
-          communityId: communityIdFromParam,
+          communityId: effectiveCommunityId,
         }
       );
       setActiveCommunityData(response.data.data);

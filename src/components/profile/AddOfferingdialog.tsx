@@ -155,6 +155,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
     setLoading(true);
     try {
+      bankDetails.accountHolderName = bankDetails.accountHolderName.trim();
+      bankDetails.accountNumber = bankDetails.accountNumber.trim();
+      bankDetails.ifscCode = bankDetails.ifscCode.trim();
       // Send bank details to verification endpoint
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,

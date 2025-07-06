@@ -8,8 +8,8 @@ export default function CommunityLayout({ children }: { children: ReactNode }) {
     <div className="h-screen bg-background text-muted md:pe-[100px] pb-16 overflow-scroll ">
       <LeftmostSidebar />
       <div className="flex flex-col md:ml-20 ">
-        <Sidebar  />
-        <div className="flex md:ml-80">{children}</div>
+        <Sidebar />
+        <div className="flex md:ml-80 lg:w-[79%]">{children}</div>
       </div>
     </div>
   );
