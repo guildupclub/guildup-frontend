@@ -11,6 +11,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
+import { signIn, useSession } from "next-auth/react";
 
 interface Offering {
   _id: string;
@@ -40,12 +41,13 @@ export default function OfferingDetails({
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
+  const session = useSession();
 
   const { data: offeringData, isLoading: loadingOffering } = useQuery({
     queryKey: ["offering-data", offeringId],
     queryFn: async () => {
       const res = await axios.get(
-        `http://localhost:8000/v1/offering/${offeringId}`
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/${offeringId}`
       );
       const providerId = res.data?.data?.provider_id?._id;
       const community = res.data?.data?.community_id;
@@ -59,7 +61,7 @@ export default function OfferingDetails({
   const { data: userData, isLoading: loadingUser } = useQuery({
     queryKey: ["user-profile", userId],
     queryFn: async () => {
-      const res = await axios.post("http://localhost:8000/v1/auth/profile", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`, {
         userId,
       });
       return res.data;
@@ -70,7 +72,7 @@ export default function OfferingDetails({
   const { data: communityData, isLoading: loadingCommunity } = useQuery({
     queryKey: ["community-details", communityId],
     queryFn: async () => {
-      const res = await axios.post("http://localhost:8000/v1/community/view", {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/view`, {
         communityId,
       });
       return res.data;
@@ -101,6 +103,16 @@ export default function OfferingDetails({
   const avatar = user?.image;
   const education = user?.education || "";
   const testimonials = community?.testimonials || [];
+
+  const handleBookNow = async () => {
+    if (!session?.data?.user) {
+      signIn(undefined, {
+        callbackUrl: window.location.href,
+      });
+      return;
+    }
+    setSelectedOffering(offering);
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-6">
@@ -277,9 +289,7 @@ export default function OfferingDetails({
               Next available: Tomorrow 11:00 AM
             </div> */}
             <Button
-              onClick={() => {
-                setSelectedOffering(offering);
-              }}
+              onClick={handleBookNow}
               className="mt-4 md:mt-0 w-full md:w-auto"
             >
               Book Your Session

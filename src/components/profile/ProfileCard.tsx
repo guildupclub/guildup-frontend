@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import type { RootState } from "@/redux/store";
 import axios from "axios";
 import Image from "next/image";
@@ -43,6 +43,8 @@ import { removeSpecialCharacters } from "../utils/StringUtils";
 import { FcClock } from "react-icons/fc";
 import { useParams } from "next/navigation";
 import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
+import TestimonialsSection from "../clientSays/ClientSays";
+import { WebinarOfferBanner } from "../webinarHolding/WebinarHoldingSection";
 
 interface CommunityProfile {
   user: {
@@ -189,6 +191,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [isUploadingBackground, setIsUploadingBackground] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
+  const [BookingCount, setBookingCount] = useState(0);
 
   const activeCommunityId = communityId || community?.communityId;
 
@@ -328,6 +331,25 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
     }
   }, [profile?.community]);
+
+  useEffect(() => {
+    const fetchBookingCount = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/bookings-count?communityId=${communityIdFromParam}`
+        );
+        const data = await res.json();
+        setBookingCount(data.data.bookingsCount);
+        console.log("Fetched data:", data.data.bookingsCount);
+      } catch (err) {
+        console.error("Error fetching booking count:", err);
+      }
+    };
+
+    if (communityIdFromParam) {
+      fetchBookingCount();
+    }
+  }, [communityIdFromParam]);
 
   // Update Redux state with user bank and calendar status
   useEffect(() => {
@@ -654,10 +676,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
       const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
       console.log("baseLink", baseLink);
-      const response = await axios.post(
-        `${baseLink}/shorten`,
-        { longUrl: shareUrl }
-      );
+      const response = await axios.post(`${baseLink}/shorten`, {
+        longUrl: shareUrl,
+      });
       if (response.data.r === "s") {
         const shortenedUrl = response.data.shortUrl;
         await navigator.clipboard.writeText(shortenedUrl);
@@ -677,10 +698,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       const shareUrl = `${window.location.origin}/offering/` + offeringID;
 
       const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
-      const response = await axios.post(
-        `${baseLink}/shorten`,
-        { longUrl: shareUrl }
-      );
+      const response = await axios.post(`${baseLink}/shorten`, {
+        longUrl: shareUrl,
+      });
 
       if (response.data.r === "s") {
         console.log("response.data.shortUrl", response.data.shortUrl);
@@ -1181,6 +1201,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             </div>
           </div>
         </div>
+
+        <div className="my-3">
+          <WebinarOfferBanner
+            isBankAdded={isBankConnected}
+            isCalendarConnected={isCalendarConnected}
+            offerings={offerings}
+            totalBookings={BookingCount}
+          />
+        </div>
         {/* Main Content Grid */}
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* About Section */}
@@ -1411,7 +1440,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                 size="sm"
                                 variant="outline"
                                 className="flex items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
-                                onClick={() => handleOfferingShareClick(offering._id)}
+                                onClick={() =>
+                                  handleOfferingShareClick(offering._id)
+                                }
                                 title="Share Offering"
                               >
                                 <Share className="h-3.5 w-3.5" />
@@ -1498,7 +1529,14 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
             <div className="rounded-xl shadow-sm">
-            {/* @ts-ignore */}
+              <TestimonialsSection communityId={communityIdFromParam} />
+            </div>
+          </div>
+
+          {/* Testimonials Section */}
+          <div className="col-span-1 mt-8 lg:col-span-2">
+            <div className="rounded-xl shadow-sm">
+              {/* @ts-ignore */}
               <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
