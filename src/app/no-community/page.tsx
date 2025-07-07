@@ -9,8 +9,11 @@ import { Dialog } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { StringConstants } from "@/components/common/CommonText";
 import CreatorForm from "@/components/form/CreatorForm";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const NoCommunitySelected = () => {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -36,7 +39,8 @@ const NoCommunitySelected = () => {
         },
       });
     } else {
-      setIsDialogOpen(true);
+      setIsDialogOpen(false);
+      router.push("/onboarding");
     }
   };
 
@@ -66,7 +70,7 @@ const NoCommunitySelected = () => {
             {StringConstants.CREATE_A_PAGE}
           </Button>
 
-          {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+          
         </Dialog>
       </div>
     </div>

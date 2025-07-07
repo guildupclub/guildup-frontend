@@ -351,10 +351,7 @@ function Page() {
 
         <div className="min-h-screen bg-white relative">
 
-          {/* Creator Form Dialog */}
-          <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
-            <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
-          </Dialog>
+          
 
           <div className="relative z-10">
             <div ref={heroRef}>

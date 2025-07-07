@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useRequestOtp, useVerifyOtp } from "@/hooks/queries/useAuth";
 import guilduplogo from "../../../public/guilduplogo.webp";
 import Image from "next/image";
+import Link from "next/link";
 
 const countryCodes = [
   { code: "+91", label: "India" },
@@ -295,7 +296,7 @@ export const LoginContainer: React.FC = () => {
               </button>
             </form>
             <div className="text-center mt-3 lg:mt-4 text-sm lg:text-base font-poppins">
-              Don't have an account? <span className="text-[#334BFF] cursor-pointer font-semibold" onClick={() => { setStep('signup'); setFullName(''); }}>Sign Up now</span>
+              Don&apos;t have an account? <span className="text-[#334BFF] cursor-pointer font-semibold" onClick={() => { setStep('signup'); setFullName(''); }}>Sign Up now</span>
             </div>
             <div className="flex items-center my-4">
               <div className="flex-grow h-px bg-gray-200" />
@@ -432,8 +433,8 @@ export const LoginContainer: React.FC = () => {
         <div className="text-center  text-sm text-gray-400 font-poppins   lg:my-0 absolute -bottom-8 lg:bottom-2 xl:bottom-7 w-full">
     © 2025 <span className="text-[#334BFF] font-bold">GuildUp</span>. All Rights Reserved.<br />
     <span className="inline-block mt-2">
-      <a href="/privacy-policy" className="hover:underline">Privacy & Policy</a> |
-      <a href="/terms-conditions" className="hover:underline ml-1">Terms & Condition</a>
+      <Link href="/privacy-policy" className="hover:underline">Privacy & Policy</Link> |
+      <Link href="/terms-conditions" className="hover:underline ml-1">Terms & Condition</Link>
     </span>
   </div>
     </div>

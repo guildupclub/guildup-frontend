@@ -11,15 +11,16 @@ const NavbarClient = () => {
   // Log pathname for debugging
   console.log("Current pathname:", pathname);
 
-  // Check if we're on an authentication page, checking for both signin and callback query parameters
+  // Check if we're on an authentication page or onboarding page
   const isAuthPage =
     pathname?.includes("/api/auth/signin") ||
     pathname?.includes("/api/auth/signup") ||
-    pathname?.includes("/api/auth/callback");
+    pathname?.includes("/api/auth/callback") ||
+    pathname?.startsWith("/onboarding");
 
   // Conditionally render the Navbar
   if (isAuthPage) {
-    return null; // Don't render the Navbar on authentication pages
+    return null; // Don't render the Navbar on authentication or onboarding pages
   }
 
   return <Navbar />;

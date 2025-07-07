@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import debounce from "lodash/debounce";
+import Image from "next/image";
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -132,7 +133,7 @@ function Stepper({ currentStep, totalSteps }: { currentStep: number; totalSteps:
   );
 }
 
-export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+export default function CreatorForm({ onClose }: CreatorFormProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -455,7 +456,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     switch (currentStep) {
       case 1:
         return (
-          <div className="w-full max-w-3xl mx-auto flex flex-col gap-6 p-2 sm:p-6">
+          <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 p-2 sm:p-6">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Guild Name */}
@@ -575,7 +576,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
                 <span className="text-xs text-muted-foreground mb-1">Choose the profile picture</span>
                 <label className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-primary flex items-center justify-center cursor-pointer bg-gray-50">
                   {formData.profilePicture ? (
-                    <img src={typeof formData.profilePicture === 'string' ? formData.profilePicture : URL.createObjectURL(formData.profilePicture)} alt="Profile" className="object-cover w-full h-full" />
+                    <Image src={typeof formData.profilePicture === 'string' ? formData.profilePicture : URL.createObjectURL(formData.profilePicture)} alt="Profile" width={96} height={96} className="object-cover w-full h-full" />
                   ) : (
                     <Camera className="w-8 h-8 text-gray-400" />
                   )}
@@ -893,7 +894,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
                 {formData.certificates.map((cert, idx) => (
                   <div key={idx} className="border rounded-lg p-3 flex flex-col gap-2 bg-white min-w-[180px] items-center">
                     {cert.file ? (
-                      <img src={typeof cert.file === 'string' ? cert.file : URL.createObjectURL(cert.file)} alt="Certificate" className="w-24 h-16 object-cover rounded mb-2" />
+                      <Image src={typeof cert.file === 'string' ? cert.file : URL.createObjectURL(cert.file)} alt="Certificate" width={96} height={64} className="w-24 h-16 object-cover rounded mb-2" />
                     ) : (
                       <span className="w-24 h-16 flex items-center justify-center bg-gray-100 rounded mb-2 text-xs text-gray-400">No file</span>
                     )}
@@ -978,9 +979,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { key: 'google', label: 'Google Calendar', desc: 'Google Calendar, Google', icon: <img src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google" className="w-8 h-8" /> },
-                { key: 'office', label: 'Office 365', desc: 'Microsoft', icon: <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_Office_2013_logo.svg" alt="Office" className="w-8 h-8" /> },
-                { key: 'outlook', label: 'Outlook Calendar', desc: 'Outlook', icon: <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Office_Outlook_%282018–present%29.svg" alt="Outlook" className="w-8 h-8" /> },
+                { key: 'google', label: 'Google Calendar', desc: 'Google Calendar, Google', icon: <Image src="https://www.gstatic.com/images/branding/product/1x/calendar_2020q4_48dp.png" alt="Google" width={32} height={32} className="w-8 h-8" /> },
+                { key: 'office', label: 'Office 365', desc: 'Microsoft', icon: <Image src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_Office_2013_logo.svg" alt="Office" width={32} height={32} className="w-8 h-8" /> },
+                { key: 'outlook', label: 'Outlook Calendar', desc: 'Outlook', icon: <Image src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Office_Outlook_%282018–present%29.svg" alt="Outlook" width={32} height={32} className="w-8 h-8" /> },
               ].map(provider => (
                 <div key={provider.key} className={`border rounded-lg p-5 flex flex-col items-center gap-2 bg-white shadow-sm ${formData.calendar === provider.key ? 'border-primary ring-2 ring-primary' : 'border-gray-200'}`}>
                   {provider.icon}
@@ -1140,29 +1141,26 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
   return (
     session && (
-      <DialogContent className="w-full max-w-4xl lg:max-w-5xl rounded-2xl shadow-2xl border-none flex flex-col items-center justify-center 
-        h-[85vh] lg:h-[80vh] min-h-[400px]  mx-auto">
+      <div className="w-full max-w-3xl rounded-2xl shadow-none flex flex-col items-center justify-center min-h-[70vh] bg-white mx-auto px-2 sm:px-8 py-8 sm:py-12">
         <div className="w-full flex flex-col items-center justify-center">
-           <div className="w-full flex justify-between items-center px-6 pb-2">
+           <div className="w-full flex justify-between items-center px-0 sm:px-6 pb-2">
             <h2 className="text-2xl sm:text-3xl font-bold font-serif text-black">{stepTitles[currentStep - 1]}</h2>
             <span className="text-primary font-semibold text-sm min-w-fit">Step {currentStep}/{totalSteps}</span>
           </div>
           <Stepper currentStep={currentStep} totalSteps={totalSteps} />
-       
-        
         </div>
         {/* Step content - fixed height, scrollable if overflow */}
-        <div className="flex-1 w-full flex flex-col items-center justify-center px-2 sm:px-8">
-          <div className="w-full h-full max-h-[calc(80vh-180px)] lg:max-h-[calc(70vh-180px)] overflow-y-auto custom-scrollbar flex flex-col justify-center bg-white rounded-xl shadow-none">
+        <div className="flex-1 w-full flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col justify-center rounded-xl shadow-none">
             {renderStepContent()}
           </div>
         </div>
         {/* Navigation buttons */}
-        <div className="w-full flex flex-row justify-between gap-4 pt-4 border-t border-gray-100 flex-shrink-0 px-6 pb-6 bg-white">
+        <div className="w-full flex flex-row flex-wrap justify-between gap-4 pt-4 border-t border-gray-100 flex-shrink-0 px-0 sm:px-6 pb-0 sm:pb-6 bg-white">
           <Button
             variant="outline"
             onClick={currentStep === 1 ? onClose : prevStep}
-            className="flex-1 text-muted bg-transparent border-gray-300 hover:bg-gray-50 h-12 text-base font-semibold"
+            className="flex-1 min-w-[120px] text-muted bg-transparent border-gray-300 hover:bg-gray-50 h-12 text-base font-semibold"
           >
             {currentStep === 1 ? (
               StringConstants.CANCEL
@@ -1176,7 +1174,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           <Button
             onClick={currentStep === totalSteps ? handleSubmit : nextStep}
             disabled={!isStepValid(currentStep)}
-            className="flex-1 text-white bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
+            className="flex-1 min-w-[120px] text-white bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
           >
             {currentStep === totalSteps ? "Setup Profile" : (
               <>
@@ -1188,12 +1186,12 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
           <Button
             variant="ghost"
             onClick={skipStep}
-            className="flex-1 text-muted-foreground bg-transparent border-none h-12 text-base font-semibold"
+            className="flex-1 min-w-[120px] text-muted-foreground bg-transparent border-none h-12 text-base font-semibold"
           >
             Skip for now
           </Button>
         </div>
-      </DialogContent>
+      </div>
     )
   );
 }
