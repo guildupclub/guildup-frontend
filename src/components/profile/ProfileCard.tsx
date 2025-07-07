@@ -1202,14 +1202,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
         </div>
 
-        <div className="my-3">
-          <WebinarOfferBanner
-            isBankAdded={isBankConnected}
-            isCalendarConnected={isCalendarConnected}
-            offerings={offerings}
-            totalBookings={BookingCount}
-          />
-        </div>
+        {isOwner && (
+          <div className="my-3">
+            <WebinarOfferBanner
+              isBankAdded={isBankConnected}
+              isCalendarConnected={isCalendarConnected}
+              offerings={offerings}
+              totalBookings={BookingCount}
+            />
+          </div>
+        )}
         {/* Main Content Grid */}
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* About Section */}
