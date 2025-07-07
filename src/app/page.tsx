@@ -242,17 +242,6 @@ function Page() {
     setIsCreatorFormOpen(true);
   };
 
-  const handleScroll = () => {
-    tracking.trackClick("explore_communities_button", {
-      section: "hero",
-      action: "scroll_to_communities",
-    });
-
-    if (targetRef.current) {
-      targetRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const handleCategorySelect = (categoryId: string) => {
     // Track category selection
     const selectedCat = category.find(

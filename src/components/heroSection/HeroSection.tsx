@@ -398,7 +398,7 @@ export default function Hero() {
                         onClick={handleCreatorButtonClick}
                         className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
                       >
-                        <span className="relative z-10">Check If You're Eligible</span>
+                        <span className="relative z-10">Check If You&apos;re Eligible</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
                       </Button>
                       {session && (
@@ -410,33 +410,6 @@ export default function Hero() {
               </div>
             </motion.div>
           )}
-
-          {/* PWA Install with Blue Theme */}
-          {/* {!isInstalled && (
-            <motion.div
-              className="mt-16 flex justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.6 }}
-            >
-              <div className="bg-white/90 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-6 shadow-lg max-w-md">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
-                    <span className="text-2xl">📱</span>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">Get the GuildUp App</h4>
-                    <p className="text-sm text-gray-600">Access experts on-the-go</p>
-                  </div>
-                  <PWAInstallPrompt
-                    showOnLoad={true}
-                    mode="full"
-                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )} */}
 
         </div>
       </div>
