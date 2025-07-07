@@ -14,6 +14,7 @@ import {
   StringConstants,
 } from "@/components/common/CommonText";
 import { Info } from "lucide-react";
+import React from "react";
 
 const PLATFORM_COMMISSION_RATE = 0.118;
 const EXPERT_PAYOUT_RATE = 1 - PLATFORM_COMMISSION_RATE;
@@ -26,8 +27,7 @@ const INITIAL_FORM_STATE = {
     amount: 0,
     currency: "INR",
   },
-  discounted_price: 0,
-  duration: 60,
+  duration: 30,
   is_free: true,
   tags: "",
   start_time: "",
@@ -50,13 +50,32 @@ function calculateExpertPayout(priceInclGst: number): string {
   }).format(expertAmount);
 }
 
-const WebinarForm = ({
+const DiscoveryCallForm = ({
   formData,
   setFormData,
   handleOfferingSubmit,
   loading,
   offeringCreated,
 }: OfferingFormProps) => {
+    const [priceError, setPriceError] = React.useState<string | null>(null);
+    const [durationError, setDurationError] = React.useState<string | null>(
+      null
+    );
+
+    React.useEffect(() => {
+      if(formData.duration > 30) {
+        setFormData({ ...formData, duration: 30 });
+      }
+    }, []);
+    // the initial time duration must be set to 30 minutes
+    React.useEffect(() => {
+      if (formData.duration > 30) {
+        setDurationError("Duration must not exceed 30 minutes.");
+      } else {
+        setDurationError(null);
+      }
+    }, [formData.duration]);
+
   return (
     <form onSubmit={handleOfferingSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -67,7 +86,7 @@ const WebinarForm = ({
           id="title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Webinar Title"
+          placeholder="Discovery Call"
           required
         />
       </div>
@@ -116,54 +135,65 @@ const WebinarForm = ({
       </div>
 
       <div className="grid grid-cols-2 gap-4 items-start">
-        <div className="space-y-2 w-full">
+        <div className="space-y-2">
           <Label htmlFor="price">
             {StringConstants.PRICE} ({StringConstants.INR})
             <span className="text-red-500">*</span>
           </Label>
-
           <div className="flex items-start text-xs text-muted-foreground mb-1 gap-1">
             <Info className="h-4 w-4 mt-0.5" />
             <span>10% platform fee + taxes, no hidden charges.</span>
           </div>
-
           <Input
             id="price"
             type="number"
             min={0}
+            max={200}
             value={formData.price.amount}
             onChange={(e) => {
-              const value = e.target.value;
+              const value = Number(e.target.value);
+              if (value < 0 || value > 200) {
+                setPriceError("Price must be between ₹0 and ₹200.");
+              } else {
+                setPriceError(null);
+              }
               setFormData({
                 ...formData,
                 price: {
                   ...formData.price,
-                  amount: Number(value),
+                  amount: value,
                 },
-                is_free: Number(value) === 0,
+                is_free: value === 0,
               });
             }}
             required
           />
 
-          {/* Persistent payout block with animated height */}
-          <div
-            className={`transition-all duration-300 overflow-hidden ${
-              formData.price.amount > 0 ? "max-h-[56px] mt-2" : "max-h-0 mt-0"
-            }`}
-          >
-            <div className="rounded-md border p-3 bg-gray-50">
-              <div className="flex justify-between">
-                <span className="text-sm text-gray-700">You will receive</span>
-                <span className="text-sm font-semibold text-green-600">
-                  {calculateExpertPayout(formData.price.amount)}
-                </span>
+          {/* 👇 This block handles both error and payout info */}
+          <div className="relative min-h-[48px] mt-1">
+            {formData.price.amount > 0 &&
+            formData.price.amount <= 200 &&
+            !priceError ? (
+              <div className="rounded-md border p-3 bg-gray-50">
+                <div className="flex justify-between">
+                  <span className="text-sm text-gray-700">
+                    You will receive
+                  </span>
+                  <span className="text-sm font-semibold text-green-600">
+                    {calculateExpertPayout(formData.price.amount)}
+                  </span>
+                </div>
               </div>
-            </div>
+            ) : priceError ? (
+              <p className="text-sm text-red-600">{priceError}</p>
+            ) : (
+              // Placeholder to preserve height and avoid layout jump
+              <div className="h-[48px]" />
+            )}
           </div>
         </div>
 
-        <div className="space-y-2 w-full">
+        <div className="space-y-2 pt-[28px]">
           <Label htmlFor="duration">
             {StringConstants.DURATION} (Mins)
             <span className="text-red-500">*</span>
@@ -172,44 +202,23 @@ const WebinarForm = ({
             id="duration"
             type="number"
             value={formData.duration}
-            onChange={(e) =>
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value > 30) {
+                setDurationError("Duration must not exceed 30 minutes.");
+              } else {
+                setDurationError(null);
+              }
               setFormData({
                 ...formData,
-                duration: Number(e.target.value),
-              })
-            }
+                duration: value,
+              });
+            }}
             required
           />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="start_time">
-            Start Time<span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="start_time"
-            type="datetime-local"
-            value={formData.start_time}
-            onChange={(e) =>
-              setFormData({ ...formData, start_time: e.target.value })
-            }
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="link">
-            Link<span className="text-red-500">*</span>
-          </Label>
-          <Input
-            id="link"
-            type="url"
-            placeholder="https://zoom.us/..."
-            value={formData.link}
-            onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-          />
+          {durationError && (
+            <p className="text-sm text-red-600">{durationError}</p>
+          )}
         </div>
       </div>
 
@@ -230,4 +239,4 @@ const WebinarForm = ({
   );
 };
 
-export default WebinarForm;
+export default DiscoveryCallForm;

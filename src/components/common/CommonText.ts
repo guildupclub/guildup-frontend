@@ -137,4 +137,5 @@ export const OFFERING_TYPES = {
   WEBINAR: "Webinar",
   PACKAGE: "Package",
   CLASS: "Class",
+  DISCOVERY_CALL: "Discovery Call",
 };
