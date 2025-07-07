@@ -66,7 +66,7 @@ const ConsultationForm = ({
           id="title"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Discovery Call"
+          placeholder="Consultation Title"
           required
         />
       </div>
@@ -101,6 +101,9 @@ const ConsultationForm = ({
             <SelectValue placeholder="Select your offering type" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="discovery-call">
+              {OFFERING_TYPES.DISCOVERY_CALL}
+            </SelectItem>
             <SelectItem value="consultation">
               {OFFERING_TYPES.CONSULTATION}
             </SelectItem>
