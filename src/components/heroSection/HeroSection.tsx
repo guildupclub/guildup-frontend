@@ -2,14 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { TrendingUp, Users, Target, Sparkles } from "lucide-react";
+import { Rocket, ArrowRight, Star, Shield, Zap, Check, Sparkles } from "lucide-react";
 import SearchBar from "../SearchBar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
 import { useSession, signIn } from "next-auth/react";
 import { useSelector } from "react-redux";
-import { toast } from "sonner";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
@@ -23,17 +22,65 @@ export default function Hero() {
   const router = useRouter();
   const { isInstalled } = usePWAInstall();
 
-  const suggestionButtons = [
-    "Mental Health",
-    "Anxiety",
-    "Diet and Nutrition",
-    "Relationship Issues",
-    "Stress Management",
-    "Self-Awareness",
-    "Mindfulness",
-    "Confidence",
-    "Therapy",
-    "Weight Management",
+  // Rotating success stories for confidence building
+  const successStories = [
+    "I finally got my sleep schedule right ✨",
+    "I discovered what food actually suits my body 🥗",
+    "I achieved my dream weight in just 3 months 💪",
+    "I learned to manage my time like a pro ⏰",
+    "I overcame my anxiety with the right guidance 🧠",
+    "I built the confidence I always wanted 🌟",
+    "I created healthy habits that actually stick 🎯",
+    "I found peace through mindfulness practice 🧘"
+  ];
+
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStoryIndex((prev) => (prev + 1) % successStories.length);
+    }, 5000); // Change every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [successStories.length]);
+
+
+  // Premium expert showcase with original blue theme
+  const featuredExperts = [
+    {
+      name: "Dr. Sarah Chen",
+      specialty: "Anxiety & Stress Management",
+      credentials: "PhD Psychology, 15+ years",
+      rating: 4.9,
+      sessions: 500,
+      price: "$120/session",
+      avatar: "/api/placeholder/60/60",
+      verified: true,
+      available: true
+    },
+    {
+      name: "Michael Rodriguez",
+      specialty: "Nutrition & Wellness",
+      credentials: "MS Nutrition, Certified Coach",
+      rating: 4.8,
+      sessions: 350,
+      price: "$95/session",
+      avatar: "/api/placeholder/60/60",
+      verified: true,
+      available: true
+    },
+    {
+      name: "Dr. Priya Sharma",
+      specialty: "Relationship Therapy",
+      credentials: "MD Psychiatry, 12+ years",
+      rating: 5.0,
+      sessions: 280,
+      price: "$150/session",
+      avatar: "/api/placeholder/60/60",
+      verified: true,
+      available: false
+    }
   ];
 
   const handleCreatorButtonClick = () => {
@@ -43,407 +90,354 @@ export default function Hero() {
         callbackUrl: `${window.location.origin}?hero=1`,
       });
       return;
-      setIsDialogOpen(true);
     }
+    setIsDialogOpen(true);
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     router.push(`/api/search?q=${encodeURIComponent(suggestion)}`);
   };
 
-  return (
-    <div className="min-h-[90vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Background elements - restored original for desktop */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Simplified animated geometric shapes */}
-        <motion.div
-          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-blue-100/20 to-indigo-100/15 rounded-full blur-3xl will-change-transform"
-          animate={{
-            scale: [1, 1.1, 1],
-            x: [0, 20, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-violet-100/15 to-purple-100/10 rounded-full blur-2xl will-change-transform"
-          animate={{
-            scale: [1, 1.2, 1],
-            y: [0, -30, 0],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 5,
-          }}
-        />
+  const handleStartJourneyClick = () => {
+    // Scroll to the categories/experts section
+    const categoriesSection = document.getElementById('scroll-target-border');
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
 
-        {/* Grid pattern */}
+  return (
+    <div className="relative h-[calc(100vh-80px)] w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
+      {/* Sophisticated Background Elements with Original Blue Theme */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Enhanced gradient meshes with blue theme */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-blue-100/40 to-indigo-100/30 rounded-full blur-3xl opacity-60"></div>
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-br from-purple-100/30 to-pink-100/20 rounded-full blur-3xl opacity-50"></div>
+        </div>
+
+        {/* Premium grid pattern */}
         <div
-          className="absolute inset-0 opacity-[0.25] animate-pulse"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
             backgroundImage: `
-              radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.4) 2px, transparent 0)
+              linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px)
             `,
-            backgroundSize: "40px 40px",
-            animation: "gridMove 20s ease-in-out infinite",
+            backgroundSize: '32px 32px'
           }}
         />
 
-        {/* Floating particles */}
-        {[...Array(4)].map((_, i) => (
-          <motion.div
-            key={i}
-            className={`absolute w-2 h-2 rounded-full will-change-transform ${
-              i % 2 === 0 ? "bg-blue-300/30" : "bg-indigo-300/30"
-            }`}
-            style={{
-              left: `${20 + i * 20}%`,
-              top: `${30 + i * 15}%`,
-            }}
-            animate={{
-              y: [0, -15, 0],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 6 + i * 1,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.5,
-            }}
-          />
-        ))}
-
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/2 to-white/5" />
+        {/* Subtle blue-tinted texture */}
+        <div className="absolute inset-0 opacity-[0.02] mix-blend-multiply">
+          <div className="w-full h-full bg-gradient-to-br from-blue-900 to-indigo-700" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E")`,
+          }}></div>
+        </div>
       </div>
 
-      {/* Content - Mobile optimized, desktop preserved */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20 pb-16">
-        <div className="text-center max-w-5xl mx-auto">
-          {/* Badge - Enhanced for mobile only */}
+      {/* Main Content */}
+      <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="pt-16 pb-16 min-w-full">
+          {/* Campaign Banner - Show to all non-creators */}
+          {!isCreator && (
+            <motion.div
+              className="mb-6 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 px-4 sm:px-6 text-white text-sm font-medium text-center shadow-lg">
+                {/* Mobile Layout */}
+                <div className="flex md:hidden items-center justify-center gap-2">
+                  <span className="text-lg">🔥</span>
+                  <span className="font-semibold text-xs">Spotlight Campaign - Only 25 Experts!</span>
+                  <svg
+                    onClick={handleCreatorButtonClick}
+                    className="h-3 w-3 ml-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+
+                {/* Desktop Layout */}
+                <div className="hidden md:flex items-center justify-center gap-2 w-full">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🔥</span>
+                    <span className="font-semibold">GuildUp Spotlight Campaign Launching Soon — Only 25 Experts Will Be Featured!</span>
+                  </div>
+                  <div className="ml-4 flex items-center gap-2 text-xs bg-white/20 px-3 py-1 rounded-full">
+                    <span>🎯</span>
+                    <span>0% Commission, Homepage Spotlight & Access to 20,000+ Users</span>
+                  </div>
+                  <svg
+                    onClick={handleCreatorButtonClick}
+                    className="h-4 w-4 ml-3 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Trust Badge */}
           <motion.div
-            className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-gray-200/50 md:border-gray-200/50 text-gray-700 md:text-gray-700 px-4 py-2 md:px-6 md:py-3 rounded-full text-sm font-medium mb-6 md:mb-8 shadow"
+            className="flex justify-center mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8 }}
           >
-            <Sparkles className="h-4 w-4 text-blue-600" />
-            Real experts, real guidance
-          </motion.div>
-
-          {/* Heading - Mobile optimized spacing */}
-          <motion.h1
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-          >
-            {/* Book Experts{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              Buy Services
-            </span> */}
-            <span> Work 1:1 with trusted </span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              coaches,
-            </span>{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              therapists,
-            </span>{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              nutritionists
-            </span>
-            <span> & more</span>
-          </motion.h1>
-
-          {/* Subtitle - Mobile optimized */}
-          <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600 mb-8 md:mb-12 max-w-2xl md:max-w-3xl mx-auto leading-relaxed px-2 md:px-0"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            {/* Connect with expert coaches and mentors who&apos;ll guide your
-            <span className="hidden md:inline"> personal and professional</span>
-            <span className="md:hidden font-semibold text-gray-700">
-              {" "}
-              personal
-            </span>{" "}
-            growth journey */}
-            Join a growing community of over{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-              2.5 lakh
-            </span>{" "}
-            people and connect with
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 pl-1">
-              100+
-            </span>{" "}
-            verified coaches, therapists, nutritionists, and wellness experts
-          </motion.p>
-
-          {/* Benefits - Mobile cards, desktop original */}
-          <motion.div
-            className="mb-8 md:mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            {/* Mobile version - Card layout */}
-            <div className="md:hidden grid grid-cols-3 gap-2 max-w-sm mx-auto">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-green-100 text-center">
-                <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                  🌱
-                </div>
-                <span className="text-xs font-semibold text-gray-800 leading-[1.2] block w-[80px]">
-                  Personalized Coaching
-                </span>
-              </div>
-
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-blue-100 text-center">
-                <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                  🎯
-                </div>
-                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
-                  Clear Roadmaps
-                </span>
-              </div>
-
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 shadow-sm border border-purple-100 text-center">
-                <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-1">
-                  💬
-                </div>
-                <span className="text-xs font-semibold text-gray-800  leading-[1.2] block w-[80px]">
-                  Real Conversations
-                </span>
-              </div>
-            </div>
-
-            {/* Desktop version - Original layout */}
-            <div className="hidden md:flex flex-wrap justify-center gap-6 md:gap-8">
-              <div className="flex items-center gap-2 text-gray-700">
-                🌱 Personalized Coaching
-              </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                🎯 Clear Roadmaps
-              </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                 💬 Real Conversations
-              </div>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm border border-blue-200/60 rounded-full shadow-sm">
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">95% see results in 4 weeks</span>
             </div>
           </motion.div>
 
-          {/* Search bar */}
-          <motion.div
-            className="mb-6 md:mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-          >
-            <SearchBar />
-          </motion.div>
+          {/* Bifurcated Hero Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
 
-          {/* Suggestion buttons - Mobile optimized, desktop original */}
-          <motion.div
-            className="mb-8 md:mb-0"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-          >
-            {/* Mobile version */}
-            <div className="md:hidden">
-              <div className="text-center mb-4">
-                <p className="text-sm text-gray-500 font-medium">
-                  Popular searches:
+            {/* Left Side - CTA Content */}
+            <motion.div
+              className="flex flex-col justify-center space-y-8"
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              {/* Main Headline and Description */}
+              <div className="space-y-6">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-gray-900 leading-tight">
+                  Expert guidance for
+                  <span className="block font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    meaningful growth
+                  </span>
+                </h1>
+
+                <p className="text-lg text-gray-600 leading-relaxed max-w-lg">
+                  Connect with verified professionals who deliver real results.
                 </p>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-2 max-w-sm mx-auto">
-                {suggestionButtons.slice(0, 6).map((suggestion, index) => {
-                  const colors = [
-                    "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100",
-                    "bg-green-50 border-green-200 text-green-700 hover:bg-green-100",
-                    "bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100",
-                    "bg-pink-50 border-pink-200 text-pink-700 hover:bg-pink-100",
-                    "bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100",
-                    "bg-teal-50 border-teal-200 text-teal-700 hover:bg-teal-100",
-                  ];
-
-                  return (
-                    <button
-                      key={suggestion}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className={`px-3 py-1.5 ${colors[index]} rounded-full border transition-all duration-200 text-xs font-medium shadow-sm hover:shadow-md hover:scale-105`}
-                    >
-                      {suggestion === "Diet and Nutrition"
-                        ? "Diet & Nutrition"
-                        : suggestion === "Relationship Issues"
-                        ? "Relationships"
-                        : suggestion === "Stress Management"
-                        ? "Stress Relief"
-                        : suggestion === "Self-Awareness"
-                        ? "Self-Growth"
-                        : suggestion}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Desktop version - Original */}
-            <div className="hidden md:flex flex-wrap justify-center gap-3 max-w-4xl mx-auto">
-              {suggestionButtons.map((suggestion, index) => {
-                const styles = [
-                  "bg-white/80 hover:bg-white text-gray-700 hover:text-gray-900 border border-gray-200/60 hover:border-gray-300",
-                  "bg-gradient-to-r from-gray-50 to-slate-100 hover:from-gray-100 hover:to-slate-200 text-gray-700 border border-gray-200/60",
-                  "bg-white/70 hover:bg-white/90 text-gray-700 hover:text-gray-800 border border-emerald-200/60 hover:border-emerald-300/80",
-                  "bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 text-gray-700 border border-rose-200/60",
-                  "bg-gradient-to-r from-blue-50 to-cyan-50 hover:from-blue-100 hover:to-cyan-100 text-gray-700 border border-blue-200/60",
-                  "bg-white/80 hover:bg-white text-gray-700 hover:text-indigo-800 border border-indigo-200/60 hover:border-indigo-300",
-                  "bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-gray-700 border border-teal-200/60",
-                  "bg-gradient-to-r from-amber-50 to-yellow-50 hover:from-amber-100 hover:to-yellow-100 text-gray-700 border border-amber-200/60",
-                  "bg-gradient-to-r from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100 text-gray-700 border border-purple-200/60",
-                  "bg-white/80 hover:bg-white text-gray-700 hover:text-emerald-800 border border-emerald-200/60 hover:border-emerald-300",
-                ];
-
-                return (
-                  <button
-                    key={suggestion}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className={`px-6 py-3 ${styles[index]} rounded-full transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md backdrop-blur-sm hover:scale-105`}
+              {/* Rotating Success Stories */}
+              <motion.div
+                className="relative h-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                {successStories.map((story, index) => (
+                  <motion.p
+                    key={index}
+                    className="absolute inset-0 text-base font-medium text-gray-700 flex items-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{
+                      opacity: index === currentStoryIndex ? 1 : 0,
+                      y: index === currentStoryIndex ? 0 : -10
+                    }}
+                    transition={{ duration: 0.5 }}
                   >
-                    {suggestion}
-                  </button>
-                );
-              })}
-            </div>
-          </motion.div>
+                    "{story}"
+                  </motion.p>
+                ))}
+              </motion.div>
 
-          {/* PWA Install Section */}
-          {!isInstalled && (
-            <motion.div
-              className="mb-8 md:mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0 }}
-            >
-              <div className="flex justify-center pt-5">
-                {/* Mobile version */}
-                <div className="md:hidden bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-blue-100 max-w-sm w-full mx-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
-                      <span className="text-lg">📱</span>
-                    </div>
-                    <div className="text-left flex-1">
-                      <p className="text-sm font-semibold text-gray-900">
-                        Get the GuildUp App
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        Access coaching on-the-go
-                      </p>
-                    </div>
-                  </div>
-                  <PWAInstallPrompt
-                    showOnLoad={true}
-                    mode="full"
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                  />
-                </div>
-
-                {/* Desktop version */}
-                <div className="hidden md:flex items-center gap-4 bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-blue-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
-                      <span className="text-xl">📱</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">
-                        Get the GuildUp App
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        Native app experience with offline support
-                      </p>
-                    </div>
-                  </div>
-                  <PWAInstallPrompt
-                    showOnLoad={true}
-                    mode="full"
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 rounded-xl px-6 py-2.5 font-semibold shadow-md hover:shadow-lg transition-all duration-200"
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Mobile CTA - Enhanced for mobile only */}
-          {!isCreator && (
-            <motion.div
-              className="md:hidden mt-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.3 }}
-            >
-              <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-lg border border-blue-100 max-w-sm mx-auto text-center">
-                <div className="mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <span className="text-2xl">🚀</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    Join as Expert
-                  </h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    Ready to share your expertise and make an impact?
-                  </p>
-                </div>
-
-                <Dialog
-                  open={session ? isDialogOpen : false}
-                  onOpenChange={setIsDialogOpen}
+              {/* CTA Actions */}
+              <div className="space-y-6">
+                {/* Main CTA Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.6 }}
                 >
                   <Button
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                    onClick={handleCreatorButtonClick}
+                    onClick={handleStartJourneyClick}
+                    size="lg"
+                    className="h-14 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group"
                   >
-                    Start Your Journey
+                    <span className="flex items-center gap-3">
+                      <Rocket className="h-5 w-5" />
+                      Start your journey
+                      <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    </span>
                   </Button>
-                  {session && (
-                    <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                  )}
-                </Dialog>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Right Side - Featured Experts */}
+            <motion.div
+              className="space-y-6"
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              <div className="text-center lg:text-left mb-8">
+                <h2 className="text-2xl font-light text-gray-900 mb-2">
+                  Meet our <span className="font-semibold text-blue-600">top experts</span>
+                </h2>
+                <p className="text-gray-600">Vetted professionals with proven results</p>
+              </div>
+
+              <div className="space-y-4">
+                {featuredExperts.slice(0, 3).map((expert, index) => (
+                  <motion.div
+                    key={expert.name}
+                    className="flex items-center gap-4 p-4 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:bg-white hover:border-blue-200/50 transition-all duration-300 group"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
+                  >
+                    <div className="relative">
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
+                        <span className="text-sm font-semibold text-blue-700">
+                          {expert.name.split(' ').map(n => n[0]).join('')}
+                        </span>
+                      </div>
+                      {expert.verified && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5 text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 text-sm">{expert.name}</h3>
+                      <p className="text-xs text-gray-600 mb-1">{expert.specialty}</p>
+                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                          <span>{expert.rating}</span>
+                        </div>
+                        <span>{expert.sessions}+ sessions</span>
+                        <div className={`flex items-center gap-1 ${expert.available ? 'text-emerald-600' : 'text-orange-600'}`}>
+                          <div className={`w-1.5 h-1.5 rounded-full ${expert.available ? 'bg-emerald-500' : 'bg-orange-500'}`} />
+                          <span>{expert.available ? 'Available' : 'Busy'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs px-3 py-1 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200"
+                      >
+                        View Profile
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+          </div>
+
+
+
+          {/* Spotlight Campaign - Only show to creators */}
+          {isCreator && (
+            <motion.div
+              className="mt-8 text-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1.4 }}
+            >
+              <div className="max-w-3xl mx-auto">
+                {/* Clean, minimal container with subtle accent */}
+                <div className="bg-white border border-blue-200/40 rounded-xl p-6 shadow-sm relative overflow-hidden">
+                  {/* Subtle accent line */}
+                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+
+                  <div className="space-y-4">
+                    {/* Compact Header */}
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full mb-3">
+                        <span>💡</span>
+                        <span>Early Access</span>
+                      </div>
+
+                      <h3 className="text-xl font-medium text-gray-900 mb-2">
+                        Join our <span className="text-blue-600">Spotlight Campaign</span>
+                      </h3>
+
+                      <p className="text-sm text-gray-600 max-w-xl mx-auto">
+                        Get full earnings, paid promotion, and discovery call bookings — all powered by GuildUp.
+                      </p>
+                    </div>
+
+                    {/* Compact Benefits Row */}
+                    <div className="flex flex-wrap justify-center gap-3 py-3">
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                        <span>⚡</span>
+                        <span>Limited to 25</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full">
+                        <span>💰</span>
+                        <span>0% Commission</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-full">
+                        <span>🌟</span>
+                        <span>Homepage Feature</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-700 text-xs font-medium rounded-full">
+                        <span>👥</span>
+                        <span>20,000+ Users</span>
+                      </div>
+                    </div>
+
+                    {/* Elegant CTA */}
+                    <Dialog open={session ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
+                      <Button
+                        onClick={handleCreatorButtonClick}
+                        className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
+                      >
+                        <span className="relative z-10">Check If You're Eligible</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+                      </Button>
+                      {session && (
+                        <CreatorForm onClose={() => setIsDialogOpen(false)} />
+                      )}
+                    </Dialog>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
 
-          {/* Desktop CTA - Original */}
-          {!isCreator && (
+          {/* PWA Install with Blue Theme */}
+          {/* {!isInstalled && (
             <motion.div
-              className="hidden md:block mt-16"
+              className="mt-16 flex justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              transition={{ duration: 0.8, delay: 1.6 }}
             >
-              <h2 className="font-medium px-4 leading-tight text-gray-700 mb-4">
-                Are you a coach or expert ready to make an impact?
-              </h2>
-              <Dialog
-                open={session ? isDialogOpen : false}
-                onOpenChange={setIsDialogOpen}
-              >
-                <Button
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full font-semibold shadow-lg"
-                  onClick={handleCreatorButtonClick}
-                >
-                  🚀 Join as Expert
-                </Button>
-                {session && (
-                  <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                )}
-              </Dialog>
+              <div className="bg-white/90 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-6 shadow-lg max-w-md">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">📱</span>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-gray-900 mb-1">Get the GuildUp App</h4>
+                    <p className="text-sm text-gray-600">Access experts on-the-go</p>
+                  </div>
+                  <PWAInstallPrompt
+                    showOnLoad={true}
+                    mode="full"
+                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+                  />
+                </div>
+              </div>
             </motion.div>
-          )}
+          )} */}
+
         </div>
       </div>
     </div>
