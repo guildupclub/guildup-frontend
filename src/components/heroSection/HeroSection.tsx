@@ -142,51 +142,49 @@ export default function Hero() {
       {/* Main Content */}
       <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <div className="pt-16 pb-16 min-w-full">
-          {/* Campaign Banner - Show to all non-creators */}
-          {!isCreator && (
-            <motion.div
-              className="mb-6 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 px-4 sm:px-6 text-white text-sm font-medium text-center shadow-lg">
-                {/* Mobile Layout */}
-                <div className="flex md:hidden items-center justify-center gap-2">
-                  <span className="text-lg">🔥</span>
-                  <span className="font-semibold text-xs">Spotlight Campaign - Only 25 Experts!</span>
-                  <svg
-                    onClick={handleCreatorButtonClick}
-                    className="h-3 w-3 ml-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-
-                {/* Desktop Layout */}
-                <div className="hidden md:flex items-center justify-center gap-2 w-full">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">🔥</span>
-                    <span className="font-semibold">GuildUp Spotlight Campaign Launching Soon — Only 25 Experts Will Be Featured!</span>
-                  </div>
-                  <div className="ml-4 flex items-center gap-2 text-xs bg-white/20 px-3 py-1 rounded-full">
-                    <span>🎯</span>
-                    <span>0% Commission, Homepage Spotlight & Access to 20,000+ Users</span>
-                  </div>
-                  <svg
-                    onClick={handleCreatorButtonClick}
-                    className="h-4 w-4 ml-3 hover:scale-105 transition-transform duration-200 cursor-pointer"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
+          {/* Campaign Banner - Show to all users */}
+          <motion.div
+            className="mb-6 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 px-4 sm:px-6 text-white text-sm font-medium text-center shadow-lg">
+              {/* Mobile Layout */}
+              <div className="flex md:hidden items-center justify-center gap-2">
+                <span className="text-lg">🔥</span>
+                <span className="font-semibold text-xs">Spotlight Campaign - Only 25 Experts!</span>
+                <svg
+                  onClick={handleCreatorButtonClick}
+                  className="h-3 w-3 ml-2 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
               </div>
-            </motion.div>
-          )}
+
+              {/* Desktop Layout */}
+              <div className="hidden md:flex items-center justify-center gap-2 w-full">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🔥</span>
+                  <span className="font-semibold">GuildUp Spotlight Campaign Launching Soon — Only 25 Experts Will Be Featured!</span>
+                </div>
+                <div className="ml-4 flex items-center gap-2 text-xs bg-white/20 px-3 py-1 rounded-full">
+                  <span>🎯</span>
+                  <span>0% Commission, Homepage Spotlight & Access to 20,000+ Users</span>
+                </div>
+                <svg
+                  onClick={handleCreatorButtonClick}
+                  className="h-4 w-4 ml-3 hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Trust Badge */}
           <motion.div
@@ -243,7 +241,7 @@ export default function Hero() {
                     }}
                     transition={{ duration: 0.5 }}
                   >
-                    &quot;{story}&quot;
+{story}
                   </motion.p>
                 ))}
               </motion.div>
@@ -339,75 +337,7 @@ export default function Hero() {
 
           </div>
 
-          {/* Spotlight Campaign - Only show to creators */}
-          {isCreator && (
-            <motion.div
-              className="mt-8 text-center"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1.4 }}
-            >
-              <div className="max-w-3xl mx-auto">
-                {/* Clean, minimal container with subtle accent */}
-                <div className="bg-white border border-blue-200/40 rounded-xl p-6 shadow-sm relative overflow-hidden">
-                  {/* Subtle accent line */}
-                  <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
 
-                  <div className="space-y-4">
-                    {/* Compact Header */}
-                    <div>
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full mb-3">
-                        <span>💡</span>
-                        <span>Early Access</span>
-                      </div>
-
-                      <h3 className="text-xl font-medium text-gray-900 mb-2">
-                        Join our <span className="text-blue-600">Spotlight Campaign</span>
-                      </h3>
-
-                      <p className="text-sm text-gray-600 max-w-xl mx-auto">
-                        Get full earnings, paid promotion, and discovery call bookings — all powered by GuildUp.
-                      </p>
-                    </div>
-
-                    {/* Compact Benefits Row */}
-                    <div className="flex flex-wrap justify-center gap-3 py-3">
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
-                        <span>⚡</span>
-                        <span>Limited to 25</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full">
-                        <span>💰</span>
-                        <span>0% Commission</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-full">
-                        <span>🌟</span>
-                        <span>Homepage Feature</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-700 text-xs font-medium rounded-full">
-                        <span>👥</span>
-                        <span>20,000+ Users</span>
-                      </div>
-                    </div>
-
-                    {/* Elegant CTA */}
-                    <Dialog open={session ? isDialogOpen : false} onOpenChange={setIsDialogOpen}>
-                      <Button
-                        onClick={handleCreatorButtonClick}
-                        className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
-                      >
-                        <span className="relative z-10">Check If You are Eligible</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
-                      </Button>
-                      {session && (
-                        <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                      )}
-                    </Dialog>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
 
         </div>
       </div>
