@@ -34,6 +34,7 @@ import ConsultationForm from "./offeringForms/consultation";
 import WebinarForm from "./offeringForms/webinar";
 import PackageForm from "./offeringForms/package";
 import ClassForm from "./offeringForms/class";
+import DiscoveryCallForm from "./offeringForms/discovery-call";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -304,6 +305,27 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
   const handleOfferingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if(formData.type === "discovery-call") {
+      e.preventDefault();
+
+      const isPriceValid =
+        formData.price.amount >= 0 && formData.price.amount <= 200;
+      const isDurationValid = formData.duration <= 30;
+
+      if (!isPriceValid) {
+        toast.error("Price must be between ₹0 and ₹200.");
+        return;
+      }
+      if (!isDurationValid) {
+        toast.error("Duration must not exceed 30 minutes.");
+        return;
+      }
+
+      if (!isPriceValid || !isDurationValid) {
+        return;
+      }
+    }
     const originalPrice =
       formData.type === "class" || formData.type === "package"
         ? formData.total_price
@@ -1099,6 +1121,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "discovery-call" ? (
+                  <DiscoveryCallForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1153,6 +1183,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "discovery-call" ? (
+                  <DiscoveryCallForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1161,7 +1199,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
-                )}
+                ) 
+                
+                }
               </div>
             </div>
           </>

@@ -145,6 +145,9 @@ const ClassForm = ({
               <SelectItem value="consultation">
                 {OFFERING_TYPES.CONSULTATION}
               </SelectItem>
+              <SelectItem value="discovery-call">
+                {OFFERING_TYPES.DISCOVERY_CALL}
+              </SelectItem>
               <SelectItem value="webinar">{OFFERING_TYPES.WEBINAR}</SelectItem>
               <SelectItem value="package">{OFFERING_TYPES.PACKAGE}</SelectItem>
               <SelectItem value="class">{OFFERING_TYPES.CLASS}</SelectItem>
