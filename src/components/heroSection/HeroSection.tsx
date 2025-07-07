@@ -243,7 +243,7 @@ export default function Hero() {
                     }}
                     transition={{ duration: 0.5 }}
                   >
-                    "{story}"
+                    &quot;{story}&quot;
                   </motion.p>
                 ))}
               </motion.div>
@@ -339,8 +339,6 @@ export default function Hero() {
 
           </div>
 
-
-
           {/* Spotlight Campaign - Only show to creators */}
           {isCreator && (
             <motion.div
@@ -398,7 +396,7 @@ export default function Hero() {
                         onClick={handleCreatorButtonClick}
                         className="h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 relative overflow-hidden group"
                       >
-                        <span className="relative z-10">Check If You&apos;re Eligible</span>
+                        <span className="relative z-10">Check If You are Eligible</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
                       </Button>
                       {session && (
