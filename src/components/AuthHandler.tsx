@@ -1,15 +1,36 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
+import { usePathname } from "next/navigation";
 import { setUser, setSessionId } from "../redux/userSlice";
 
 const AuthHandler = () => {
   const { data: session } = useSession();
   const dispatch = useDispatch();
+  const pathname = usePathname();
+
+  // Define public pages that don't need any authentication
+  const isPublicPage = pathname?.startsWith('/blogs') || 
+                      pathname === '/' || 
+                      pathname?.startsWith('/auth') ||
+                      pathname?.startsWith('/privacy-policy') ||
+                      pathname?.startsWith('/terms-conditions') ||
+                      pathname?.startsWith('/contact-us');
 
   useEffect(() => {
+    // Skip all authentication for blog pages
+    if (pathname?.startsWith('/blogs')) {
+      return;
+    }
+
     const fetchSessionId = async (userId: string) => {
       try {
+        // Only fetch sessionId if backend URL is configured
+        if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+          console.warn("Backend URL not configured, skipping session fetch");
+          return;
+        }
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/getSession`,
           {
@@ -20,27 +41,34 @@ const AuthHandler = () => {
             body: JSON.stringify({ userId }),
           }
         );
+        
         if (!response.ok) {
-          console.error("Failed to fetch sessionId:", response.statusText);
+          // Only log error for non-404 responses to avoid spam
+          if (response.status !== 404) {
+            console.warn("Failed to fetch sessionId:", response.status, response.statusText);
+          }
           return;
         }
 
         const data = await response.json();
-        console.log("API Response:", data);
         if (data.data) {
           const sessionId = data.data;
-          console.log("Session ID:", sessionId);
           dispatch(setSessionId(sessionId));
-        } else {
-          console.error("Session ID not found in the response:", data);
         }
       } catch (error) {
-        console.error("Error fetching session ID:", error);
+        // Silently handle network errors to avoid blocking page functionality
+        console.warn("Session fetch failed:", error instanceof Error ? error.message : 'Unknown error');
       }
     };
 
     const fetchUserProfile = async (userId: string) => {
       try {
+        // Only fetch profile if backend URL is configured
+        if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+          console.warn("Backend URL not configured, skipping profile fetch");
+          return;
+        }
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`,
           {
@@ -53,12 +81,14 @@ const AuthHandler = () => {
         );
 
         if (!response.ok) {
-          console.error("Failed to fetch user profile:", response.statusText);
+          // Only log error for non-404 responses to avoid spam
+          if (response.status !== 404) {
+            console.warn("Failed to fetch user profile:", response.status, response.statusText);
+          }
           return;
         }
 
         const data = await response.json();
-        console.log("User Profile Response:", data);
         
         if (data.r === "s" && data.data) {
           // Merge the profile data with the existing session user data
@@ -69,27 +99,25 @@ const AuthHandler = () => {
             ...profileData,
             _id: session?.user._id || profileData._id,
           }));
-        } else {
-          console.error("User profile data not found in the response:", data);
         }
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        // Silently handle network errors to avoid blocking page functionality
+        console.warn("Profile fetch failed:", error instanceof Error ? error.message : 'Unknown error');
       }
     };
 
-    console.log("@session", session);
     if (session?.user) {
       dispatch(setUser(session.user));
 
       const userId = session.user._id;
-      console.log("User ID:", userId);
       
-      if (userId) {
+      // Only fetch additional auth data for authenticated pages or when user explicitly logs in
+      if (userId && (!isPublicPage || session.user.email)) {
         fetchSessionId(userId);
         fetchUserProfile(userId);
       }
     }
-  }, [session, dispatch]);
+  }, [session, dispatch, pathname, isPublicPage]);
 
   return null; // This component doesn't render anything
 };

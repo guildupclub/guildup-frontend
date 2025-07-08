@@ -2,8 +2,31 @@
 User-agent: *
 Allow: /
 
-# Host
-Host: https://www.guildup.club
+# Disallow admin and private routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /no-community/
 
-# Sitemaps
-Sitemap: https://www.guildup.club/sitemap.xml
+# Allow specific API routes that are public
+Allow: /api/search
+Allow: /api/sitemap
+
+# Sitemap location
+Sitemap: https://guildup.com/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
