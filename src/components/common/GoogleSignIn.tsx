@@ -79,11 +79,11 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
         <p>
           By creating an account, you agree to our{" "}
           <span className="text-[#334BFF]">
-            <a href="/terms-conditions">Terms of use</a>
+            <Link href="/terms-conditions">Terms of use</Link>
           </span>{" "}
           and{" "}
           <span className="text-[#334BFF]">
-            <a href="/privacy-policy">Privacy policy</a>
+            <Link href="/privacy-policy">Privacy policy</Link>
           </span>
         </p>
       </div>

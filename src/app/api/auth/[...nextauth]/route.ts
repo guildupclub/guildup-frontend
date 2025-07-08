@@ -23,7 +23,7 @@ const handler = NextAuth({
           // const usersCollection = db.collection("users");
 
            const existingUser = await client
-            .db("test")
+            .db(process.env.MONGO_DB_NAME )
             .collection("users")
             .findOne({ email: user.email });
           if (existingUser) {
@@ -48,7 +48,7 @@ const handler = NextAuth({
 
       if (user) {
         try {
-          const db = client.db("test");
+          const db = client.db(process.env.MONGO_DB_NAME );
           const usersCollection = db.collection("users");
 
           const userExists = await usersCollection.findOne({
@@ -140,7 +140,7 @@ const handler = NextAuth({
             throw new Error("Email not verified or not available");
           }
 
-          const db = client.db("test");
+          const db = client.db(process.env.MONGO_DB_NAME );
           const usersCollection = db.collection("users");
 
           // Check if user already exists
