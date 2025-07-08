@@ -105,6 +105,9 @@ const PackageForm: React.FC<PackageFormProps> = ({
               <SelectValue placeholder="Select your offering type" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="discovery-call">
+                {OFFERING_TYPES.DISCOVERY_CALL}
+              </SelectItem>
               <SelectItem value="consultation">
                 {OFFERING_TYPES.CONSULTATION}
               </SelectItem>

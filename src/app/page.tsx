@@ -27,11 +27,11 @@ import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 
-import BenefitCards from "@/components/heroSection/BenefitCards";
+
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 import { on } from "events";
-import { FaArrowRightLong } from "react-icons/fa6";
+
 import { HiSparkles } from "react-icons/hi2";
 
 interface Category {
@@ -242,17 +242,6 @@ function Page() {
     setIsCreatorFormOpen(true);
   };
 
-  const handleScroll = () => {
-    tracking.trackClick("explore_communities_button", {
-      section: "hero",
-      action: "scroll_to_communities",
-    });
-
-    if (targetRef.current) {
-      targetRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const handleCategorySelect = (categoryId: string) => {
     // Track category selection
     const selectedCat = category.find(
@@ -359,44 +348,11 @@ function Page() {
       }
     >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
-        <div className="min-h-screen bg-white relative">
-          {/* Grid pattern background for entire page */}
-          <div className="fixed inset-0 pointer-events-none z-0">
-            <div
-              className="absolute inset-0 opacity-[0.35] animate-pulse"
-              style={{
-                backgroundImage: `
-                  radial-gradient(circle at 2px 2px, rgba(148, 163, 184, 0.6) 2px, transparent 0)
-                `,
-                backgroundSize: "40px 40px",
-                animation: "gridMove 20s ease-in-out infinite",
-              }}
-            />
-          </div>
 
+        <div className="min-h-screen bg-white relative">
+
+          {/* Creator Form Dialog */}
           <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
-            <DialogTrigger asChild>
-              {/* <Button
-                onClick={handleCreatorButtonClick}
-                className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                <span className="relative z-10 font-medium">
-                  Join as Expert{" "}
-                </span>
-                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button> */}
-              {!isCreator && (
-                <div className="bg-gradient-to-r from-blue-600 to-blue-400 py-2 w-full h-10 text-white text-sm font-semibold text-center flex items-center justify-center relative z-20 mt-16  mx-auto  ">
-                  <HiSparkles className="h-6 w-6 text-yellow-300 mx-2" /> Join
-                  as Expert
-                  <FaArrowRightLong
-                    onClick={handleCreatorButtonClick}
-                    className="h-5 w-5 ml-4 animate-arrow-bounce hover:scale-x-150 transition-transform duration-300 cursor-pointer"
-                  />
-                </div>
-              )}
-            </DialogTrigger>
             <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
           </Dialog>
 
@@ -405,138 +361,23 @@ function Page() {
               <Hero />
             </div>
 
-            {/* Video Showcase Section */}
-            <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-              <div className="text-center mb-8 sm:mb-12">
-                <motion.h2
-                  className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                >
-                  See GuildUp in{" "}
-                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    Action
-                  </span>
-                </motion.h2>
-                <motion.p
-                  className="text-gray-600 text-lg max-w-2xl mx-auto"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  Watch how our platform connects you with expert coaches and
-                  transforms your growth journey
-                </motion.p>
-              </div>
-              {/* <VideoPlaceholder className="mb-16" /> */}
-            </div>
-
-            <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 relative bg-white">
-              <div className="py-6 sm:py-10 border-b border-gray-100 bg-gradient-to-b from-white to-gray-50/30">
-                <div className="flex flex-col gap-6 sm:gap-8">
-                  {/* Mobile Layout */}
-                  <div className="sm:hidden space-y-6">
-                    <div className="text-center space-y-4">
-                      <div className="space-y-2">
-                        <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-tight">
-                          Real Experts.
-                          <br />
-                          <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                            Real Solutions.
-                          </span>
-                        </h1>
-                        <div className="w-16 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full mx-auto shadow-sm"></div>
-                      </div>
-                      <p className="text-gray-600 text-sm max-w-xs mx-auto">
-                        GuildUp brings real experts together in one easy
-                        place—so you can get support without the stress.
-                      </p>
-                    </div>
-
-                    <BenefitCards />
-
-                    <Dialog
-                      open={isCreatorFormOpen}
-                      onOpenChange={setIsCreatorFormOpen}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          onClick={handleCreatorButtonClick}
-                          className="group w-full relative overflow-hidden flex items-center justify-center gap-2 px-6 py-4  font-semibold rounded-xl hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl active:scale-[0.98]"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10 font-medium">
-                            Join as Expert{" "}
-                          </span>
-                          <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                        </Button>
-                      </DialogTrigger>
-                      <CreatorForm
-                        onClose={() => setIsCreatorFormOpen(false)}
-                      />
-                    </Dialog>
-                  </div>
-
-                  {/* Desktop Layout */}
-                  <div className="hidden sm:flex items-center justify-between">
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <h1 className="text-3xl sm:text-2xl lg:text-4xl font-black text-gray-900 tracking-tight">
-                          Real Experts.{" "}
-                          <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                            Real Solutions.
-                          </span>
-                        </h1>
-                        <div className="w-20 h-1.5 bg-gradient-to-r from-primary to-primary/70 rounded-full shadow-sm"></div>
-                      </div>
-                      <p className="text-gray-600 text-md font-medium max-w-lg">
-                        GuildUp brings real experts together in one easy
-                        place—so you can get support without the stress.
-                      </p>
-                    </div>
-                    <Dialog
-                      open={isCreatorFormOpen}
-                      onOpenChange={setIsCreatorFormOpen}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          onClick={handleCreatorButtonClick}
-                          className="group relative overflow-hidden flex items-center gap-3  hover:bg-primary/90 transition-all duration-300 shadow-xl hover:shadow-2xl active:scale-[0.98] px-6"
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                          <span className="relative z-10">Join as Expert</span>
-                          <ArrowRight className="relative z-10 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                        </Button>
-                      </DialogTrigger>
-                      <CreatorForm
-                        onClose={() => setIsCreatorFormOpen(false)}
-                      />
-                    </Dialog>
-                  </div>
-                </div>
-              </div>
-
-              <div className="sticky top-16 z-50 bg-white border-b py-1">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-lg font-semibold text-gray-800 md:hidden">
-                    Categories
-                  </h2>
-                  <h2 className="hidden md:block text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700">
-                    Browse Categories
-                  </h2>
-                  <div className="p-2 sm:p-4 rounded-xl sm:rounded-2xl bg-white">
-                    <div className="overflow-x-auto -mx-3 sm:-mx-6 px-3 sm:px-6 scrollbar-hide">
+            <div className="w-full max-w-[1920px] mx-auto">
+              <div className="sticky top-16 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100/30 py-6">
+                <div className="px-4 sm:px-6 lg:px-8">
+                  <div className="flex flex-col gap-6">
+                    <h2 className="text-xl font-medium text-gray-800 md:hidden">
+                      Browse by Category
+                    </h2>
+                    <h2 className="hidden md:block text-3xl lg:text-4xl font-light text-gray-900 tracking-tight">
+                      Browse <span className="font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Categories</span>
+                    </h2>
+                    <div className="overflow-x-auto scrollbar-hide">
                       <div className="min-w-max">
-                        <div className="flex gap-2">
-                          <CategoryBar
-                            categorys={category}
-                            selectCategory={handleCategorySelect}
-                            selectedCategoryId={selectedCategory}
-                          />
-                        </div>
+                        <CategoryBar
+                          categorys={category}
+                          selectCategory={handleCategorySelect}
+                          selectedCategoryId={selectedCategory}
+                        />
                       </div>
                     </div>
                   </div>
@@ -544,7 +385,7 @@ function Page() {
               </div>
 
               {/* Main Content with Enhanced Filtering */}
-              <div className="pt-3 sm:pt-6">
+              <div className="pt-3 sm:pt-6 px-4 sm:px-6 lg:px-8">
                 <div className="flex-1 min-w-0" ref={targetRef}>
                   <div className="rounded-xl sm:rounded-2xl">
                     <div
