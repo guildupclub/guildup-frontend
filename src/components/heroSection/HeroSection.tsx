@@ -12,6 +12,7 @@ import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import { usePWAInstall } from "@/hooks/usePWAInstall";
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function Hero() {
   const { data: session } = useSession();
@@ -52,7 +53,7 @@ export default function Hero() {
       specialty: "Weight training, Nutrition, Fat-Loss, Strength",
       rating: 4.9,
       sessions: 250,
-      avatar: "/api/placeholder/60/60",
+      avatar: "/experts/amit.jpg",
       verified: true,
       available: true,
       url: "https://www.guildup.club/community/GetfitwithAmit-682dabd74264957c9ad90a64/profile"
@@ -62,7 +63,7 @@ export default function Hero() {
       specialty: "Life Coach, Emotional Healing, Relationship Coaching, Therapy",
       rating: 4.8,
       sessions: 100,
-      avatar: "/api/placeholder/60/60",
+      avatar: "/experts/nikhar.jpg",
       verified: true,
       available: true,
       url: "https://www.guildup.club/community/Bettermind-with-Nikhar-6821cae798627fbe232cc209/profile"
@@ -72,7 +73,7 @@ export default function Hero() {
       specialty: "Yoga, Pranayam, PCOD, Pregnancy yoga, Fitness",
       rating: 5.0,
       sessions: 580,
-      avatar: "/api/placeholder/60/60",
+      avatar: "/experts/ashlesha.jpg",
       verified: true,
       available: true,
       url: "https://www.guildup.club/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile"
@@ -281,10 +282,14 @@ export default function Hero() {
                     transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
                   >
                     <div className="relative">
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs lg:text-sm font-semibold text-blue-700">
-                          {expert.name.split(' ').map(n => n[0]).join('')}
-                        </span>
+                      <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full overflow-hidden">
+                        <Image
+                          src={expert.avatar}
+                          alt={expert.name}
+                          width={48}
+                          height={48}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       {expert.verified && (
                         <div className="absolute -top-1 -right-1 w-3 h-3 lg:w-4 lg:h-4 bg-blue-600 rounded-full flex items-center justify-center">
