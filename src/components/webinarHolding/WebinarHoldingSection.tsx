@@ -274,9 +274,9 @@ export function WebinarOfferBanner({
               )}
             </div>
             <div
-              className={`font-semibold text-xs whitespace-nowrap   ${
+              className={`font-semibold text-xs lg:whitespace-nowrap   ${
                 step2Complete
-                  ? "text-blue-800 py-3"
+                  ? "text-blue-800 lg:py-2"
                   : !step1Complete
                   ? "text-gray-500"
                   : "text-blue-800"
@@ -313,7 +313,7 @@ export function WebinarOfferBanner({
             </div>
 
             <div
-              className={`font-semibold text-xs whitespace-nowrap ${
+              className={`font-semibold text-xs whitespace-nowrap sm:mt-2 md:mt-1 ${
                 step3Complete
                   ? "text-blue-800"
                   : !step2Complete
@@ -343,14 +343,15 @@ export function WebinarOfferBanner({
                 title="Share Offering"
               >
                 Share Profile
-                <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+                <FaRegShareFromSquare className="ml-2 h-5 w-5 hidden lg:block" />
               </Button>
             )}
           </div>
         </div>
 
         <div className="text-center text-blue-600 text-sm mb-4">
-          Share your GuildUp link to get booked and earn 100%.
+          Share your GuildUp link to get booked <br className="lg:hidden" /> and
+          earn 100%.
         </div>
       </CardContent>
     </Card>
