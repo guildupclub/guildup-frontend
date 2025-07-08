@@ -24,4 +24,4 @@ Disallow: /dashboard/private/
 # Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://www.guildup.club/manifest.xml 
+Sitemap: https://www.guildup.club/sitemap.xml 
