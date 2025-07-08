@@ -159,9 +159,33 @@ export default function TestimonialsSection({
                         <h4 className="font-semibold text-gray-900">
                           Anonymous User
                         </h4>
-                        <p className="text-sm text-gray-500">
-                          Rating: {feedback.rating}/5
-                        </p>
+                        <div className="flex gap-1">
+                          {[...Array(5)].map((_, index) => (
+                            <svg
+                              key={index}
+                              xmlns="http://www.w3.org/2000/svg"
+                              className={`h-4 w-4 ${
+                                index < feedback.rating
+                                  ? "text-yellow-400"
+                                  : "text-gray-300"
+                              }`}
+                              fill={
+                                index < feedback.rating
+                                  ? "currentColor"
+                                  : "none"
+                              }
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={index < feedback.rating ? 0 : 2}
+                                d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.016 6.183h6.508c.969 0 1.371 1.24.588 1.81l-5.27 3.827 2.015 6.184c.3.92-.755 1.688-1.54 1.118l-5.271-3.826-5.27 3.826c-.786.57-1.841-.197-1.541-1.118l2.016-6.184-5.27-3.827c-.783-.57-.38-1.81.588-1.81h6.508l2.016-6.183z"
+                              />
+                            </svg>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </CardContent>

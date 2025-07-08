@@ -555,12 +555,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         <DialogTrigger asChild>
           <Button
             variant="default"
-            className={`${
+            className={` ${
               isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
             }`}
             disabled={!isAdmin}
           >
-            {StringConstants.ADD_OFFERING}
+            Add <span className="hidden lg:block">Offering</span>
           </Button>
         </DialogTrigger>
       )}
