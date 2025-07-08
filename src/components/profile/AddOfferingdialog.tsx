@@ -34,6 +34,7 @@ import ConsultationForm from "./offeringForms/consultation";
 import WebinarForm from "./offeringForms/webinar";
 import PackageForm from "./offeringForms/package";
 import ClassForm from "./offeringForms/class";
+import DiscoveryCallForm from "./offeringForms/discovery-call";
 
 interface AddOfferingDialogProps {
   onOfferingAdded: () => void;
@@ -155,6 +156,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
     setLoading(true);
     try {
+      bankDetails.accountHolderName = bankDetails.accountHolderName.trim();
+      bankDetails.accountNumber = bankDetails.accountNumber.trim();
+      bankDetails.ifscCode = bankDetails.ifscCode.trim();
       // Send bank details to verification endpoint
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/bank-details`,
@@ -301,6 +305,27 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
 
   const handleOfferingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if(formData.type === "discovery-call") {
+      e.preventDefault();
+
+      const isPriceValid =
+        formData.price.amount >= 0 && formData.price.amount <= 200;
+      const isDurationValid = formData.duration <= 30;
+
+      if (!isPriceValid) {
+        toast.error("Price must be between ₹0 and ₹200.");
+        return;
+      }
+      if (!isDurationValid) {
+        toast.error("Duration must not exceed 30 minutes.");
+        return;
+      }
+
+      if (!isPriceValid || !isDurationValid) {
+        return;
+      }
+    }
     const originalPrice =
       formData.type === "class" || formData.type === "package"
         ? formData.total_price
@@ -530,12 +555,12 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
         <DialogTrigger asChild>
           <Button
             variant="default"
-            className={`${
+            className={` ${
               isAdmin ? "" : "bg-blue-300 cursor-not-allowed hover:bg-blue-300"
             }`}
             disabled={!isAdmin}
           >
-            {StringConstants.ADD_OFFERING}
+            Add <span className="hidden lg:block">Offering</span>
           </Button>
         </DialogTrigger>
       )}
@@ -1096,6 +1121,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "discovery-call" ? (
+                  <DiscoveryCallForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1150,6 +1183,14 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
+                ) : formData.type === "discovery-call" ? (
+                  <DiscoveryCallForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    handleOfferingSubmit={handleOfferingSubmit}
+                    loading={loading}
+                    offeringCreated={offeringCreated}
+                  />
                 ) : (
                   <WebinarForm
                     formData={formData}
@@ -1158,7 +1199,9 @@ export function AddOfferingDialog({ onOfferingAdded }: AddOfferingDialogProps) {
                     loading={loading}
                     offeringCreated={offeringCreated}
                   />
-                )}
+                ) 
+                
+                }
               </div>
             </div>
           </>

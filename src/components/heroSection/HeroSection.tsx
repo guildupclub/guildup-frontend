@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Rocket, ArrowRight, Star, Shield, Zap, Check, Sparkles } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { Rocket, ArrowRight, Star, Shield, Zap, Check, Sparkles } from "lucide-react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
 import { useSession, signIn } from "next-auth/react";
