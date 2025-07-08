@@ -12,6 +12,7 @@ import {
   Target,
   Zap,
   Plus,
+  Share2,
 } from "lucide-react";
 import { AddOfferingDialog } from "../profile/AddOfferingdialog";
 import { useCallback, useState } from "react";
@@ -19,6 +20,10 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { Share } from "next/font/google";
+import { StringConstants } from "../common/CommonText";
+import { toast } from "sonner";
+import { FaRegShareFromSquare } from "react-icons/fa6";
 
 interface WebinarOfferBannerProps {
   isBankAdded: boolean;
@@ -81,6 +86,20 @@ export function WebinarOfferBanner({
     memberDetails.is_owner === true &&
     memberDetails.community_id === activeCommunityId;
 
+  const communityName =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(0, lastHyphenIndex)
+      : null;
+  const communityIdFromParam =
+    lastHyphenIndex !== -1
+      ? communityParam.substring(lastHyphenIndex + 1)
+      : null;
+  const cleanedCommunityName =
+    communityName ||
+    "".replace(/\s+/g, "-").replace(/\|/g, "-").replace(/-+/g, "-");
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParams = `${encodedCommunityName}-${communityIdFromParam}`;
+
   const fetchOfferings = useCallback(async () => {
     if (!activeCommunityId) return;
 
@@ -131,7 +150,28 @@ export function WebinarOfferBanner({
       </Card>
     );
   }
+  const handleShareClick = async () => {
+    try {
+      const shareUrl = `${window.location.origin}/community/${communityParams}/profile`;
 
+      const baseLink = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING;
+      console.log("baseLink", baseLink);
+      const response = await axios.post(`${baseLink}/shorten`, {
+        longUrl: shareUrl,
+      });
+      if (response.data.r === "s") {
+        const shortenedUrl = response.data.shortUrl;
+        await navigator.clipboard.writeText(shortenedUrl);
+        toast.success("Link copied to clipboard!");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success("Link copied to clipboard!");
+      }
+    } catch (error) {
+      console.error("Error shortening URL:", error);
+      toast.error("Failed to copy link. Please try again.");
+    }
+  };
   return (
     <Card className={`border-gray-200 bg-white shadow-sm ${className}`}>
       <CardContent className="p-4">
@@ -234,9 +274,9 @@ export function WebinarOfferBanner({
               )}
             </div>
             <div
-              className={`font-semibold text-xs whitespace-nowrap ${
+              className={`font-semibold text-xs whitespace-nowrap   ${
                 step2Complete
-                  ? "text-blue-800"
+                  ? "text-blue-800 py-3"
                   : !step1Complete
                   ? "text-gray-500"
                   : "text-blue-800"
@@ -271,6 +311,7 @@ export function WebinarOfferBanner({
                 />
               )}
             </div>
+
             <div
               className={`font-semibold text-xs whitespace-nowrap ${
                 step3Complete
@@ -280,13 +321,31 @@ export function WebinarOfferBanner({
                   : "text-gray-600"
               }`}
             >
-              Get 3 Bookings
+              Get 3 Bookings -{" "}
+              <span className="font-bold">
+                {" "}
+                {totalBookings >= 3
+                  ? `${totalBookings}/3 ✓`
+                  : `${totalBookings}/3`}
+              </span>
             </div>
-            <div className="text-[10px] text-gray-500">
+            {/* <div className="text-[10px] text-gray-500">
               {totalBookings >= 3
                 ? `${totalBookings}/3 ✓`
                 : `${totalBookings}/3`}
-            </div>
+            </div> */}
+            {step1Complete && step2Complete && !step3Complete && isOwner && (
+              <Button
+                size="sm"
+                variant="default"
+                className="flex items-center rounded-lg border-blue-200 px-3  text-white"
+                onClick={handleShareClick}
+                title="Share Offering"
+              >
+                Share Profile
+                <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+              </Button>
+            )}
           </div>
         </div>
 
