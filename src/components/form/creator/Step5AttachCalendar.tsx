@@ -125,7 +125,7 @@ export default function Step5AttachCalendar({ formData, setFormData }: Step5Atta
            
             <button
               type="button"
-              className={`w-full border-2 rounded-md py-1 text-sm font-semibold transition-all duration-200 ${formData.calendar === provider.key ? 'border-primary text-primary ' : 'border-primary text-primary bg-white '}`}
+              className={`w-full border rounded-md py-1 text-sm font-medium transition-all duration-200 ${formData.calendar === provider.key ? 'border-primary text-primary ' : 'border-primary text-primary bg-white '}`}
               onClick={() => setFormData({ ...formData, calendar: provider.key })}
             >
               Connect Calendar

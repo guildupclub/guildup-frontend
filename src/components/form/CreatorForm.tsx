@@ -36,6 +36,8 @@ import Step2ProfessionalProfile from "@/components/form/creator/Step2Professiona
 import Step3AboutMe from "@/components/form/creator/Step3AboutMe";
 import Step4ReviewsAchievements from "@/components/form/creator/Step4ReviewsAchievements";
 import Step5AttachCalendar from "@/components/form/creator/Step5AttachCalendar";
+import Step6CreateOffering from "@/components/form/creator/Step6CreateOffering";
+import Step7LinkBankAccount from "@/components/form/creator/Step7LinkBankAccount";
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -464,8 +466,8 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
 
   return (
     session && (
-      <div className="w-full min-h-screen max-w-4xl rounded-2xl shadow-none flex flex-col items-center justify-center bg-white mx-auto px-2 sm:px-4 md:px-8 py-4 sm:py-7 md:py-9">
-        <div className="w-full flex flex-col items-center justify-center sticky top-0 z-10 bg-white pt-2 pb-2 sm:pb-4">
+      <div className="w-full min-h-screen max-w-4xl rounded-2xl shadow-none flex flex-col items-center justify-center bg-white mx-auto px-2 sm:px-4 md:px-8 py-3 sm:py-5 md:py-6">
+        <div className="w-full flex flex-col items-center justify-center sticky top-0 z-10 bg-white pt-1 pb-2 sm:pb-2">
           <div className="w-full flex flex-row justify-between items-center px-2 sm:px-4 md:px-6 pb-2 ">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-poppins text-black text-center sm:text-left w-auto sm:w-auto">{stepTitles[currentStep - 1]}</h2>
             <span className="text-primary font-semibold text-xs sm:text-sm min-w-fit">Step {currentStep}/{totalSteps}</span>
@@ -474,7 +476,7 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
         </div>
         {/* Step content - fixed height, scrollable if overflow */}
         <div className="flex-1 w-full flex flex-col items-center justify-center">
-          <div className="w-full h-full flex flex-col justify-center rounded-xl shadow-none font-poppins">
+          <div className="w-full h-full flex flex-col justify-center rounded-xl shadow-none font-poppins pb-12 md:pb-0">
             {currentStep === 1 && (
               <Step1GuildDetails
                 formData={formData}
@@ -514,44 +516,66 @@ export default function CreatorForm({ onClose }: CreatorFormProps) {
                 setFormData={setFormData}
               />
             )}
-            {/* Future: Add other steps here as <Step6CreateOffering ... /> etc. */}
+            {currentStep === 6 && (
+              <Step6CreateOffering
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+            {currentStep === 7 && (
+              <Step7LinkBankAccount
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
           </div>
         </div>
         {/* Navigation buttons */}
-        <div className="w-full flex flex-col sm:flex-row flex-wrap justify-between gap-2 sm:gap-4 pt-4 border-t border-gray-100 flex-shrink-0 px-0 sm:px-4 md:px-6 pb-0 sm:pb-6 bg-white">
-          <Button
-            variant="outline"
-            onClick={currentStep === 1 ? onClose : prevStep}
-            className="flex-1 min-w-[100px] sm:min-w-[120px] text-muted bg-transparent border-gray-300 hover:bg-gray-50 h-12 text-base font-semibold"
-          >
-            {currentStep === 1 ? (
-              StringConstants.CANCEL
-            ) : (
-              <>
-                <ChevronLeft size={18} className="mr-1" />
-                Back
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={currentStep === totalSteps ? handleSubmit : nextStep}
-            // disabled={!isStepValid(currentStep)}
-            className="flex-1 min-w-[100px] sm:min-w-[120px] text-white bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
-          >
-            {currentStep === totalSteps ? "Setup Profile" : (
-              <>
-                Next
-                <ChevronRight size={18} className="ml-1" />
-              </>
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={skipStep}
-            className="flex-1 min-w-[100px] sm:min-w-[120px] text-muted-foreground bg-transparent border-none h-12 text-base font-semibold"
-          >
-            Skip for now
-          </Button>
+        <div
+          className="w-full bg-white   flex items-center justify-between px-2 sm:px-4 md:px-8"
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            zIndex: 20,
+          }}
+        >
+          <div className="flex-1 text-left py-6">
+            <button
+              type="button"
+              onClick={skipStep}
+              className="text-xs sm:text-sm md:text-base text-gray-500 font-medium px-0 py-2 bg-transparent border-none outline-none hover:underline"
+              style={{ minWidth: 0 }}
+            >
+              Skip for now
+            </button>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4 justify-end">
+            <Button
+              variant="outline"
+              onClick={currentStep === 1 ? onClose : prevStep}
+              className="h-6 sm:h-8 md:h-10 px-3 sm:px-5 md:px-6 text-xs sm:text-sm md:text-base font-semibold min-w-[70px] sm:min-w-[100px] md:min-w-[120px] border-gray-300"
+            >
+              {currentStep === 1 ? (
+                StringConstants.CANCEL
+              ) : (
+                <>
+                  <ChevronLeft size={16} className="mr-1" />
+                  Back
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={currentStep === totalSteps ? handleSubmit : nextStep}
+              className="h-6 sm:h-8 md:h-10 px-3 sm:px-5 md:px-6 text-xs sm:text-sm md:text-base font-semibold min-w-[70px] sm:min-w-[100px] md:min-w-[120px] bg-primary hover:bg-primary/90"
+            >
+              {currentStep === totalSteps ? "Setup Profile" : (
+                <>
+                  Next
+                  <ChevronRight size={16} className="ml-1" />
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     )
