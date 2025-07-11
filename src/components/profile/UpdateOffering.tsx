@@ -41,16 +41,6 @@ const EditOfferingModal = ({
     const type = formData.type;
     const bookingCount = formData.bookings || 0;
     const hasBookings = bookingCount > 0;
-
-    console.log(
-      "Checking edit permissions for field:",
-      fieldName,
-      "Type:",
-      type,
-      ", hasBookings:",
-      hasBookings
-    );
-
     return helper(type, fieldName, hasBookings);
   };
 
@@ -76,13 +66,27 @@ const EditOfferingModal = ({
     }
     return false;
   };
-  
 
   const handleEditOffering = async (e: any) => {
     e.preventDefault();
-    if (formData.price.amount < 0) {
+
+    const price = formData.price.amount;
+    const duration = formData.duration;
+
+    if (price < 0) {
       toast.error("Price cannot be negative.");
       return;
+    }
+
+    if (formData.type === "discovery-call") {
+      if (price > 200) {
+        toast.error("Discovery call price cannot exceed ₹200.");
+        return;
+      }
+      if (duration > 30) {
+        toast.error("Discovery call duration cannot exceed 30 minutes.");
+        return;
+      }
     }
 
     const payload = { ...formData };
@@ -169,6 +173,7 @@ const EditOfferingModal = ({
                 <SelectItem value="webinar">Webinar</SelectItem>
                 <SelectItem value="package">Package</SelectItem>
                 <SelectItem value="class">Class</SelectItem>
+                <SelectItem value="discovery-call">Discovery Call</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -185,12 +190,13 @@ const EditOfferingModal = ({
                     ...formData,
                     price: {
                       ...formData.price,
-                      amount: Number(e.target.value),
+                      amount: Math.min(200, Number(e.target.value)),
                     },
                     is_free: Number(e.target.value) === 0,
                   })
                 }
                 min="0"
+                max={formData.type === "discovery-call" ? 200 : undefined}
                 required
                 disabled={!canEditField("price")}
                 className={
@@ -206,8 +212,13 @@ const EditOfferingModal = ({
                 type="number"
                 value={formData.duration}
                 onChange={(e) =>
-                  setFormData({ ...formData, duration: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    duration: Math.min(30, Number(e.target.value)),
+                  })
                 }
+                min="1"
+                max={formData.type === "discovery-call" ? 30 : undefined}
                 required
                 disabled={!canEditField("duration")}
                 className={
