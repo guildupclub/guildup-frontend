@@ -39,12 +39,28 @@ const EditOfferingModal = ({
 
   const canEditField = (fieldName: string) => {
     const type = formData.type;
+    const bookingCount = formData.bookings || 0;
+    const hasBookings = bookingCount > 0;
 
+    console.log(
+      "Checking edit permissions for field:",
+      fieldName,
+      "Type:",
+      type,
+      ", hasBookings:",
+      hasBookings
+    );
+
+    return helper(type, fieldName, hasBookings);
+  };
+
+  const helper = (type: any, fieldName: any, hasBookings: boolean) => {
     if (type === "consultation") return true;
     if (type === "webinar") {
       if (!hasBookings) return true;
       return !["price", "duration", "when", "meeting_link"].includes(fieldName);
     }
+    if (type === "discovery-call") return true;
     if (type === "package") return true;
     if (type === "class") {
       if (!hasBookings) return true;
@@ -60,6 +76,7 @@ const EditOfferingModal = ({
     }
     return false;
   };
+  
 
   const handleEditOffering = async (e: any) => {
     e.preventDefault();
@@ -70,21 +87,11 @@ const EditOfferingModal = ({
 
     const payload = { ...formData };
 
-if (formData.type === "webinar" && hasBookings) {
-      delete payload.price;
-      delete payload.duration;
-      delete payload.when;
-      delete payload.meeting_link;
-    }
-    if (formData.type === "class" && hasBookings) {
-      delete payload.price;
-      delete payload.duration;
-      delete payload.when;
-      delete payload.meeting_link;
-      delete payload.days;
-      delete payload.batch_type;
-      delete payload.class_time;
-    }
+    Object.keys(payload).forEach((key) => {
+      if (!canEditField(key)) {
+        delete payload[key];
+      }
+    });
 
     setLoading(true);
     try {
@@ -122,6 +129,10 @@ if (formData.type === "webinar" && hasBookings) {
                 setFormData({ ...formData, title: e.target.value })
               }
               required
+              disabled={!canEditField("title")}
+              className={
+                !canEditField("title") ? "opacity-50 cursor-not-allowed" : ""
+              }
             />
           </div>
           <div className="space-y-2">
@@ -133,6 +144,12 @@ if (formData.type === "webinar" && hasBookings) {
                 setFormData({ ...formData, description: e.target.value })
               }
               required
+              disabled={!canEditField("description")}
+              className={
+                !canEditField("description")
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }
             />
           </div>
           <div className="space-y-2">
@@ -176,6 +193,9 @@ if (formData.type === "webinar" && hasBookings) {
                 min="0"
                 required
                 disabled={!canEditField("price")}
+                className={
+                  !canEditField("price") ? "opacity-50 cursor-not-allowed" : ""
+                }
               />
             </div>
 
@@ -190,6 +210,11 @@ if (formData.type === "webinar" && hasBookings) {
                 }
                 required
                 disabled={!canEditField("duration")}
+                className={
+                  !canEditField("duration")
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
               />
             </div>
           </div>
@@ -205,6 +230,11 @@ if (formData.type === "webinar" && hasBookings) {
                     setFormData({ ...formData, meeting_link: e.target.value })
                   }
                   disabled={!canEditField("meeting_link")}
+                  className={
+                    !canEditField("meeting_link")
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -224,12 +254,13 @@ if (formData.type === "webinar" && hasBookings) {
                     })
                   }
                   disabled={!canEditField("when")}
+                  className={
+                    !canEditField("when") ? "opacity-50 cursor-not-allowed" : ""
+                  }
                 />
               </div>
             </>
           )}
-
-          {/* Add class/package-specific fields here using similar checks */}
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onClose}>
