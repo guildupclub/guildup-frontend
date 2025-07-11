@@ -39,12 +39,18 @@ const EditOfferingModal = ({
 
   const canEditField = (fieldName: string) => {
     const type = formData.type;
+    const bookingCount = formData.bookings || 0;
+    const hasBookings = bookingCount > 0;
+    return helper(type, fieldName, hasBookings);
+  };
 
+  const helper = (type: any, fieldName: any, hasBookings: boolean) => {
     if (type === "consultation") return true;
     if (type === "webinar") {
       if (!hasBookings) return true;
       return !["price", "duration", "when", "meeting_link"].includes(fieldName);
     }
+    if (type === "discovery-call") return true;
     if (type === "package") return true;
     if (type === "class") {
       if (!hasBookings) return true;
@@ -63,28 +69,33 @@ const EditOfferingModal = ({
 
   const handleEditOffering = async (e: any) => {
     e.preventDefault();
-    if (formData.price.amount < 0) {
+
+    const price = formData.price.amount;
+    const duration = formData.duration;
+
+    if (price < 0) {
       toast.error("Price cannot be negative.");
       return;
     }
 
+    if (formData.type === "discovery-call") {
+      if (price > 200) {
+        toast.error("Discovery call price cannot exceed ₹200.");
+        return;
+      }
+      if (duration > 30) {
+        toast.error("Discovery call duration cannot exceed 30 minutes.");
+        return;
+      }
+    }
+
     const payload = { ...formData };
 
-if (formData.type === "webinar" && hasBookings) {
-      delete payload.price;
-      delete payload.duration;
-      delete payload.when;
-      delete payload.meeting_link;
-    }
-    if (formData.type === "class" && hasBookings) {
-      delete payload.price;
-      delete payload.duration;
-      delete payload.when;
-      delete payload.meeting_link;
-      delete payload.days;
-      delete payload.batch_type;
-      delete payload.class_time;
-    }
+    Object.keys(payload).forEach((key) => {
+      if (!canEditField(key)) {
+        delete payload[key];
+      }
+    });
 
     setLoading(true);
     try {
@@ -122,6 +133,10 @@ if (formData.type === "webinar" && hasBookings) {
                 setFormData({ ...formData, title: e.target.value })
               }
               required
+              disabled={!canEditField("title")}
+              className={
+                !canEditField("title") ? "opacity-50 cursor-not-allowed" : ""
+              }
             />
           </div>
           <div className="space-y-2">
@@ -133,6 +148,12 @@ if (formData.type === "webinar" && hasBookings) {
                 setFormData({ ...formData, description: e.target.value })
               }
               required
+              disabled={!canEditField("description")}
+              className={
+                !canEditField("description")
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }
             />
           </div>
           <div className="space-y-2">
@@ -152,6 +173,7 @@ if (formData.type === "webinar" && hasBookings) {
                 <SelectItem value="webinar">Webinar</SelectItem>
                 <SelectItem value="package">Package</SelectItem>
                 <SelectItem value="class">Class</SelectItem>
+                <SelectItem value="discovery-call">Discovery Call</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -168,14 +190,18 @@ if (formData.type === "webinar" && hasBookings) {
                     ...formData,
                     price: {
                       ...formData.price,
-                      amount: Number(e.target.value),
+                      amount: Math.min(200, Number(e.target.value)),
                     },
                     is_free: Number(e.target.value) === 0,
                   })
                 }
                 min="0"
+                max={formData.type === "discovery-call" ? 200 : undefined}
                 required
                 disabled={!canEditField("price")}
+                className={
+                  !canEditField("price") ? "opacity-50 cursor-not-allowed" : ""
+                }
               />
             </div>
 
@@ -186,10 +212,20 @@ if (formData.type === "webinar" && hasBookings) {
                 type="number"
                 value={formData.duration}
                 onChange={(e) =>
-                  setFormData({ ...formData, duration: Number(e.target.value) })
+                  setFormData({
+                    ...formData,
+                    duration: Math.min(30, Number(e.target.value)),
+                  })
                 }
+                min="1"
+                max={formData.type === "discovery-call" ? 30 : undefined}
                 required
                 disabled={!canEditField("duration")}
+                className={
+                  !canEditField("duration")
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
               />
             </div>
           </div>
@@ -205,6 +241,11 @@ if (formData.type === "webinar" && hasBookings) {
                     setFormData({ ...formData, meeting_link: e.target.value })
                   }
                   disabled={!canEditField("meeting_link")}
+                  className={
+                    !canEditField("meeting_link")
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -224,12 +265,13 @@ if (formData.type === "webinar" && hasBookings) {
                     })
                   }
                   disabled={!canEditField("when")}
+                  className={
+                    !canEditField("when") ? "opacity-50 cursor-not-allowed" : ""
+                  }
                 />
               </div>
             </>
           )}
-
-          {/* Add class/package-specific fields here using similar checks */}
 
           <div className="flex justify-end gap-4">
             <Button variant="outline" onClick={onClose}>
