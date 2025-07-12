@@ -14,7 +14,7 @@ import {
   StringConstants,
 } from "@/components/common/CommonText";
 import { Switch } from "@/components/ui/switch";
-import { Calendar, Clock, Info } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import React from "react";
 
 interface ClassFormData {
@@ -51,17 +51,6 @@ const daysOfWeek = [
   { value: "saturday", label: "Sat" },
   { value: "sunday", label: "Sun" },
 ];
-
-const PLATFORM_COMMISSION_RATE = 0.118;
-const EXPERT_PAYOUT_RATE = 1 - PLATFORM_COMMISSION_RATE;
-
-function calculateExpertPayout(priceInclGst: number): string {
-  const expertAmount = priceInclGst * EXPERT_PAYOUT_RATE;
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-  }).format(expertAmount);
-}
 
 const ClassForm = ({
   formData,
@@ -145,9 +134,6 @@ const ClassForm = ({
               <SelectItem value="consultation">
                 {OFFERING_TYPES.CONSULTATION}
               </SelectItem>
-              <SelectItem value="discovery-call">
-                {OFFERING_TYPES.DISCOVERY_CALL}
-              </SelectItem>
               <SelectItem value="webinar">{OFFERING_TYPES.WEBINAR}</SelectItem>
               <SelectItem value="package">{OFFERING_TYPES.PACKAGE}</SelectItem>
               <SelectItem value="class">{OFFERING_TYPES.CLASS}</SelectItem>
@@ -155,60 +141,37 @@ const ClassForm = ({
           </Select>
         </div>
       </div>
+
       {/* Pricing Section */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Pricing</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-4 md:items-start">
-          <div className="flex flex-col justify-start w-full">
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
             <Label htmlFor="total_price">
               Monthly Price ({StringConstants.INR})
               <span className="text-red-500">*</span>
             </Label>
-            <div className="flex items-start text-xs text-muted-foreground mb-1 gap-1">
-              <Info className="h-4 w-4 mt-0.5" />
-              <span>10% platform fee + taxes, no hidden charges.</span>
-            </div>
             <Input
               id="total_price"
               type="number"
-              min={0}
               value={formData.total_price}
-              onChange={(e) => {
-                const value = e.target.value;
+              onChange={(e) =>
                 setFormData({
                   ...formData,
-                  total_price: Number(value),
-                });
-              }}
+                  total_price: Number(e.target.value),
+                })
+              }
               required
             />
-            <div
-              className={`transition-all duration-300 overflow-hidden ${
-                formData.total_price > 0 ? "max-h-[56px] mt-2" : "max-h-0 mt-0"
-              }`}
-            >
-              <div className="rounded-md border p-3 bg-gray-50">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-700">
-                    You will receive
-                  </span>
-                  <span className="text-sm font-semibold text-green-600">
-                    {calculateExpertPayout(formData.total_price)}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="flex flex-col justify-start w-full ">
-            <Label htmlFor="max_attendees" className="mt-2">
-              Max Attendees
-            </Label>
+          <div className="space-y-2">
+            <Label htmlFor="max_attendees">Max Attendees</Label>
             <Input
               id="max_attendees"
               type="number"
               value={formData.max_attendees}
-              className="mt-3"
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -239,64 +202,107 @@ const ClassForm = ({
           </SelectContent>
         </Select>
       </div>
+
       {/* Schedule Configuration */}
       <div className="space-y-4">
-        <h3 className="text-lg font-medium">Pricing</h3>
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4 items-start md:items-start">
-          <div className="space-y-2 w-full">
-            <Label htmlFor="total_price">
-              Monthly Price ({StringConstants.INR})
+        <h3 className="text-lg font-medium">Schedule Configuration</h3>
+
+        <div className="grid grid-cols-2 gap-4">
+          {batchType === "new" && (
+            <div className="space-y-2">
+              <Label htmlFor="start_date">
+                <Calendar className="w-4 h-4 inline mr-1" />
+                Start Date<span className="text-red-500">*</span>
+              </Label>
+              {
+                <Input
+                  id="start_date"
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      start_date: e.target.value,
+                    })
+                  }
+                  required={batchType === "new"}
+                />
+              }
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="duration_per_session">
+              <Clock className="w-4 h-4 inline mr-1" />
+              Duration per Session (minutes)
               <span className="text-red-500">*</span>
             </Label>
-            <div className="flex items-start text-xs text-muted-foreground mb-1 gap-1">
-              <Info className="h-4 w-4 mt-0.5" />
-              <span>10% platform fee + taxes, no hidden charges.</span>
-            </div>
             <Input
-              id="total_price"
+              id="duration_per_session"
               type="number"
-              min={0}
-              value={formData.total_price}
-              onChange={(e) => {
-                const value = e.target.value;
-                setFormData({
-                  ...formData,
-                  total_price: Number(value),
-                });
-              }}
-              required
-            />
-            {formData.total_price > 0 && (
-              <div className="rounded-md border p-3 bg-gray-50 mt-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-gray-700">
-                    You will receive
-                  </span>
-                  <span className="text-sm font-semibold text-green-600">
-                    {calculateExpertPayout(formData.total_price)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-2 w-full">
-            <Label htmlFor="max_attendees">Max Attendees</Label>
-            <Input
-              id="max_attendees"
-              type="number"
-              value={formData.max_attendees}
+              value={formData.duration_per_session}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  max_attendees: Number(e.target.value),
+                  duration_per_session: Number(e.target.value),
                 })
               }
-              placeholder="50"
+              placeholder="60"
+              required
             />
           </div>
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="schedule_time">
+            Class Time<span className="text-red-500">*</span>
+          </Label>
+          <Input
+            id="schedule_time"
+            type="time"
+            value={formData.schedule?.time || ""}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                schedule: {
+                  ...formData.schedule,
+                  time: e.target.value,
+                },
+              })
+            }
+            required
+          />
+        </div>
+
+        <div className="space-y-3">
+          <Label>
+            Days of Week<span className="text-red-500">*</span>
+          </Label>
+          <div className="grid grid-cols-4 gap-2">
+            {daysOfWeek.map((day) => (
+              <Button
+                key={day.value}
+                type="button"
+                variant={
+                  formData.schedule?.days_of_week?.includes(day.value)
+                    ? "default"
+                    : "outline"
+                }
+                className="h-10 text-sm"
+                onClick={() => handleDayToggle(day.value)}
+              >
+                {day.label}
+              </Button>
+            ))}
+          </div>
+          {formData.schedule?.days_of_week?.length > 0 && (
+            <div className="text-sm text-muted-foreground">
+              Selected: {formData.schedule.days_of_week.join(", ")}
+            </div>
+          )}
+        </div>
       </div>
+
       {/* Meeting Configuration */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Meeting Configuration</h3>
@@ -362,6 +368,7 @@ const ClassForm = ({
           </Label>
         </div>
       </div>
+
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
