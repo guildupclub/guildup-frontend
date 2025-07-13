@@ -6,7 +6,7 @@ import axios from "axios";
 
 export default function RedirectPage({
   params,
-}: {
+}: { 
   params: { shortId: string };
 }) {
   const router = useRouter();
