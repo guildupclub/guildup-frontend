@@ -1,7 +1,7 @@
 import { usePostHog } from '@/contexts/PostHogProvider';
 import { useCallback } from 'react';
 
-export const useTracking = () => {
+export const useTracking = () => { 
   const { 
     trackEvent, 
     trackButtonClick, 
