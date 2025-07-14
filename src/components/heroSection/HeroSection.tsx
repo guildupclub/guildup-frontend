@@ -77,6 +77,26 @@ export default function Hero() {
       verified: true,
       available: true,
       url: "https://www.guildup.club/community/SimpliYoga-with-Ashlesha-683f18575411ca44bde8f746/profile"
+    },
+    {
+      name: "Khushi Tayal",
+      specialty: "Anxiety, Trauma, Stress, Relationship Issues",
+      rating: 5,
+      sessions: 100,
+      avatar: "https://storage.googleapis.com/v0-bucket/communities/685bcf2d76aa736a1c6853fe/profile/a1fff12e-dda3-4bf1-9b16-4038dc63201a.jpg",
+      verified: true,
+      available: true,
+      url: "https://www.guildup.club/community/Khushi-Tayal-685bcf2d76aa736a1c6853fe/profile"
+    },
+    {
+      name: "Anand Shinde",
+      specialty: "Ashtanga flow, yoga, reiki, healing",
+      rating: 4.8,
+      sessions: 1000,
+      avatar: "https://storage.googleapis.com/v0-bucket/communities/685c0e9d76aa736a1c687af9/profile/00104767-c45b-4b50-ab09-dc8ac9ff2efc.jpg",
+      verified: true,
+      available: true,
+      url: "https://www.guildup.club/community/Anand-Shinde-685c0e9d76aa736a1c687af9/profile"
     }
   ];
 
@@ -272,63 +292,71 @@ export default function Hero() {
                 <p className="text-sm lg:text-base text-gray-600">Vetted professionals with proven results</p>
               </div>
 
-              <div className="space-y-3 lg:space-y-4">
-                {featuredExperts.slice(0, 3).map((expert, index) => (
-                  <motion.div
-                    key={expert.name}
-                    className="flex items-center gap-3 lg:gap-4 p-3 lg:p-4 bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-xl hover:bg-white hover:border-blue-200/50 transition-all duration-300 group"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                  >
-                    <div className="relative">
-                      <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-full overflow-hidden">
-                        <Image
-                          src={expert.avatar}
-                          alt={expert.name}
-                          width={48}
-                          height={48}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {expert.verified && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 lg:w-4 lg:h-4 bg-blue-600 rounded-full flex items-center justify-center">
-                          <Check className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-white" />
+              {/* GuildUp Featured Experts Carousel */}
+              <div className="relative w-full max-w-[90vw] xl:max-w-[1600px] mx-auto overflow-hidden group py-6">
+                <div
+                  className="carousel-track flex items-stretch gap-6 group-hover:[animation-play-state:paused]"
+                  style={{
+                    animation: 'carousel-marquee 16s linear infinite',
+                  }}
+                >
+                  {featuredExperts.concat(featuredExperts).map((expert, idx) => (
+                    <div
+                      key={expert.name + idx}
+                      className="flex flex-col items-center justify-between bg-white/80 bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-xl border border-blue-100 p-5 w-[90vw] max-w-xs sm:min-w-[250px] sm:w-[260px] sm:h-[320px] mx-1 transition-all duration-300 hover:shadow-2xl hover:scale-105"
+                    >
+                      <div className="flex flex-col items-center w-full flex-grow">
+                        <div className="mb-2 w-full flex flex-col items-center justify-center">
+                          <div className="w-20 h-20 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-white shadow mx-auto bg-gray-50 flex items-center justify-center">
+                            <Image
+                              src={expert.avatar}
+                              alt={expert.name}
+                              width={144}
+                              height={144}
+                              className="w-full h-full object-cover rounded-full"
+                            />
+                          </div>
+                          <h3 className="font-bold text-lg text-gray-900 mt-2 mb-1 text-center w-full truncate" title={expert.name}>{expert.name}</h3>
+                          <div className="text-blue-700 text-xs font-medium mb-1 text-center flex flex-wrap justify-center gap-1 w-full max-w-full overflow-hidden" style={{ minHeight: '40px', maxHeight: '40px' }}>
+                            {expert.specialty.split(',').slice(0,3).map((spec, i) => (
+                              <span key={i} className="inline-block px-2 py-0.5 bg-blue-50 rounded-lg text-xs font-semibold max-w-[90px] truncate align-middle whitespace-nowrap overflow-hidden text-ellipsis" title={spec.trim()}>{spec.trim()}</span>
+                            ))}
+                          </div>
                         </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm lg:text-sm truncate">{expert.name}</h3>
-                      <p className="text-xs text-gray-600 mb-1 line-clamp-2 lg:line-clamp-1">{expert.specialty}</p>
-                      <div className="flex items-center gap-2 lg:gap-3 text-xs text-gray-500">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                        <div className="flex items-center gap-1 text-sm text-gray-700 mb-1 mt-auto">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
                           <span>{expert.rating}</span>
+                          <span className="text-gray-400">· {expert.sessions}+ sessions</span>
                         </div>
-                        <span className="hidden sm:inline">{expert.sessions}+ sessions</span>
-                        <span className="sm:hidden">{expert.sessions}+ sessions</span>
-                        {/* <div className={`flex items-center gap-1 ${expert.available ? 'text-emerald-600' : 'text-orange-600'}`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${expert.available ? 'bg-emerald-500' : 'bg-orange-500'}`} />
-                          <span className="hidden sm:inline">{expert.available ? 'Available' : 'Busy'}</span>
-                          <span className="sm:hidden">{expert.available ? 'Online' : 'Busy'}</span>
-                        </div> */}
                       </div>
-                    </div>
-
-                    <div className="flex-shrink-0">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-xs px-2 lg:px-3 py-1 border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 transition-all duration-200"
+                      <button
+                        className="mt-1 px-4 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold shadow hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 text-xs w-full"
                         onClick={() => window.open(expert.url, '_blank', 'noopener,noreferrer')}
+                        style={{ marginTop: 'auto' }}
                       >
-                        <span className="hidden sm:inline">View Profile</span>
-                        <span className="sm:hidden">View</span>
-                      </Button>
+                        View Profile
+                      </button>
                     </div>
-                  </motion.div>
-                ))}
+                  ))}
+                </div>
+                <style jsx>{`
+                  .carousel-track {
+                    width: max-content;
+                  }
+                  @keyframes carousel-marquee {
+                    0% { transform: translateX(-50%); }
+                    100% { transform: translateX(0); }
+                  }
+                  @media (max-width: 1024px) {
+                    .carousel-track {
+                      gap: 1rem;
+                    }
+                  }
+                `}</style>
+                {/* Dedicated visible area overlay to always show 2-3 cards */}
+                <div className="pointer-events-none absolute inset-0 z-10" style={{
+                  background: 'linear-gradient(to right, #f8fafc 0%, rgba(248,250,252,0.7) 10%, rgba(248,250,252,0) 25%, rgba(248,250,252,0) 75%, rgba(248,250,252,0.7) 90%, #f8fafc 100%)'
+                }} />
               </div>
             </motion.div>
 
