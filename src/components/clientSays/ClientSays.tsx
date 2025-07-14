@@ -40,7 +40,7 @@ export default function TestimonialsSection({
     const fetchTestimonials = async () => {
       try {
         const response = await fetch(
-          `https://guildup-be-dev-new-569548341732.us-central1.run.app/v1/feedback?community_id=${communityId}`
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/feedback?community_id=${communityId}`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch testimonials");

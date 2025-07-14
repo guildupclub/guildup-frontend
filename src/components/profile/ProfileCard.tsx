@@ -31,7 +31,7 @@ import {
 // Icons
 import { ArrowRight, Edit, Trash2, Pencil, Share } from "lucide-react";
 import { HiMiniUserGroup } from "react-icons/hi2";
-import { GrInstagram, GrYoga } from "react-icons/gr";
+import { GrInstagram, GrUserManager, GrYoga } from "react-icons/gr";
 import { BsCalendarCheck, BsYoutube } from "react-icons/bs";
 import { MdOutlineClass, MdOutlineRssFeed, MdPeopleAlt } from "react-icons/md";
 import { FaLinkedinIn, FaRegShareFromSquare } from "react-icons/fa6";
@@ -780,6 +780,10 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     class: {
       icon: <GrYoga className="text-green-600 w-6 h-6" />,
       label: "Class",
+    },
+    "discovery-call": {
+      icon: <GrUserManager className="text-green-600 w-6 h-6" />,
+      label: "Discovery Call",
     },
   };
   return (

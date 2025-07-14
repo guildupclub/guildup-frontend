@@ -60,7 +60,7 @@ export function WebinarOfferBanner({
   const step1Complete = isBankAdded && isCalendarConnected;
   const step2Complete =
     step1Complete &&
-    offerings.some((o) => o?.type?.toLowerCase() === "consultation");
+    offerings.some((o) => o?.type?.toLowerCase() === "discovery-call");
   const step3Complete = step2Complete && totalBookings >= 3;
 
   const completedSteps = [step1Complete, step2Complete, step3Complete].filter(
