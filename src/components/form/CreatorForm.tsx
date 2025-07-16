@@ -20,7 +20,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { useRouter } from "next/navigation";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { setCommunityData } from "@/redux/communitySlice";
-import { ChevronLeft, ChevronRight, X, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Check, Camera, Video, Facebook, Instagram, Youtube } from "lucide-react";
 import { setLoading } from "@/redux/memberSlice";
 import {
   Select,
@@ -30,6 +30,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import debounce from "lodash/debounce";
+import Image from "next/image";
+import Step1GuildDetails from "@/components/form/creator/Step1GuildDetails";
+import Step2ProfessionalProfile from "@/components/form/creator/Step2ProfessionalProfile";
+import Step3AboutMe from "@/components/form/creator/Step3AboutMe";
+import Step4ReviewsAchievements from "@/components/form/creator/Step4ReviewsAchievements";
+import Step5AttachCalendar from "@/components/form/creator/Step5AttachCalendar";
+import Step6CreateOffering from "@/components/form/creator/Step6CreateOffering";
+import Step7LinkBankAccount from "@/components/form/creator/Step7LinkBankAccount";
 
 interface CreatorFormProps {
   onClose: () => void;
@@ -39,6 +47,44 @@ interface CreatorFormProps {
 interface Category {
   _id: string;
   name: string;
+}
+
+interface EducationType { school: string; duration: string; degree: string; }
+interface WorkExperienceType { title: string; duration: string; }
+interface CertificateType { file: File | string | null; }
+interface AwardType { title: string; }
+interface FormDataType {
+  name: string;
+  description: string;
+  experience: string;
+  sessionsConducted: string;
+  languages: string[];
+  expertise: string;
+  profilePicture: File | string | null;
+  title: string;
+  quote: string;
+  introVideo: File | string | null;
+  socialLinks: { facebook: string; instagram: string; tiktok: string; other: string };
+  tags: string[];
+  bio: string;
+  faqs: { question: string; answer: string }[];
+  education: EducationType[];
+  workExperience: WorkExperienceType[];
+  certificates: CertificateType[];
+  awards: AwardType[];
+  calendar: string;
+  offeringTitle: string;
+  offeringType: string;
+  offeringDescription: string;
+  offeringPrice: string;
+  offeringDuration: string;
+  accountHolder: string;
+  accountNumber: string;
+  ifsc: string;
+  instaFollowers: string;
+  youtubeSubscribers: string;
+  phoneNumber: string;
+  countryCode: string;
 }
 
 // Add country codes data
@@ -55,7 +101,46 @@ const countryCodes = [
   { code: "+34", country: "Spain" },
 ];
 
-export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
+const languageOptions = [
+  "English", "Hindi", "Spanish", "French", "German", "Chinese", "Japanese"
+];
+const experienceOptions = [
+  "<1 Year", "1-2 Years", "3-5 Years", "6-10 Years", "10+ Years"
+];
+
+const stepTitles = [
+  "Guild details",
+  "Professional Profile",
+  "About me",
+  "Reviews & Achievements",
+  "Attach Calendar",
+  "Create first offering",
+  "Link bank account"
+];
+
+function Stepper({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) {
+  return (
+    <div className="flex items-center justify-center w-full py-2">
+      {[...Array(totalSteps)].map((_, idx) => (
+        <div key={idx} className="flex items-center">
+          <div
+            className={`w-4 md:w-6 h-4 md:h-6 rounded-full flex items-center justify-center border-2 transition-colors duration-300 text-[12px] sm:text-sm  md:text-base font-bold z-10
+              ${idx + 1 <= currentStep ? 'bg-primary border-primary text-white' : 'bg-white border-gray-300 text-gray-400'}`}
+          >
+            {idx + 1}
+          </div>
+          {idx < totalSteps - 1 && (
+            <div className="w-6 sm:w-8 md:w-20 h-0 border-t-2 border-dashed mx-1 sm:mx-2 transition-colors duration-300"
+              style={{ borderColor: idx + 1 < currentStep ? '#2563eb' : '#d1d5db' }}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function CreatorForm({ onClose }: CreatorFormProps) {
   const router = useRouter();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -63,14 +148,39 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   const { data: session } = useSession();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const totalSteps = 7;
+  const [formData, setFormData] = useState<FormDataType>({
     name: "",
     description: "",
-    tags: [] as string[],
+    experience: "",
+    sessionsConducted: "",
+    languages: [],
+    expertise: "",
+    profilePicture: null,
+    title: "",
+    quote: "",
+    introVideo: null,
+    socialLinks: { facebook: "", instagram: "", tiktok: "", other: "" },
+    tags: [],
+    bio: "",
+    faqs: [{ question: "", answer: "" }],
+    education: [{ school: '', duration: '', degree: '' }],
+    workExperience: [{ title: '', duration: '' }],
+    certificates: [{ file: null }],
+    awards: [{ title: '' }],
+    calendar: "",
+    offeringTitle: "",
+    offeringType: "",
+    offeringDescription: "",
+    offeringPrice: "",
+    offeringDuration: "",
+    accountHolder: "",
+    accountNumber: "",
+    ifsc: "",
     instaFollowers: "",
     youtubeSubscribers: "",
     phoneNumber: "",
-    countryCode: "+91", // Default to India
+    countryCode: "+91",
   });
   const [categoryId, setCategoryId] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -93,7 +203,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     },
   });
 
-  // Add name availability check query
+
   const { refetch: checkNameAvailability } = useQuery({
     queryKey: ["checkGuildName", formData.name],
     queryFn: async () => {
@@ -105,7 +215,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       const data = await response.json();
       return data.data.available;
     },
-    enabled: false, // Don't run automatically
+    enabled: false, 
   });
 
   // Debounced name check
@@ -189,15 +299,25 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   const isStepValid = (step: number) => {
     switch (step) {
       case 1:
-        return formData.name.trim() !== "" && isNameAvailable === true;
+        return (
+          formData.name.trim() !== "" &&
+          formData.experience.trim() !== "" &&
+          formData.sessionsConducted.trim() !== "" &&
+          formData.languages.length > 0 &&
+          categoryId !== ""
+        );
       case 2:
-        return categoryId !== "";
+        return formData.title.trim() !== "";
       case 3:
         return formData.tags.length > 0;
       case 4:
-        return true; // Description is now optional
+        return true; // Education/experience/certificates/awards optional for now
       case 5:
-        return formData.phoneNumber.trim() !== "" && /^[0-9]{10}$/.test(formData.phoneNumber);
+        return true; // Calendar optional for now
+      case 6:
+        return formData.offeringTitle.trim() !== "" && formData.offeringType.trim() !== "";
+      case 7:
+        return formData.accountHolder.trim() !== "" && formData.accountNumber.trim() !== "" && formData.ifsc.trim() !== "";
       default:
         return false;
     }
@@ -205,9 +325,9 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
   // Navigation functions
   const nextStep = () => {
-    if (currentStep < 5 && isStepValid(currentStep)) {
+    if (currentStep < totalSteps && isStepValid(currentStep)) {
       setCurrentStep(currentStep + 1);
-    } else if (currentStep < 5) {
+    } else if (currentStep < totalSteps) {
       toast.error("Please complete this step before continuing.");
     }
   };
@@ -215,6 +335,12 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const skipStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -234,7 +360,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
             category_id: categoryId,
             instagram_followers: formData.instaFollowers,
             youtube_followers: formData.youtubeSubscribers,
-            phone_number: `${formData.countryCode}${formData.phoneNumber}`, // Include country code
+            phone_number: `${formData.countryCode}${formData.phoneNumber}`, 
             is_locked: false,
           }),
         }
@@ -284,11 +410,35 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
       setFormData({
         name: "",
         description: "",
+        experience: "",
+        sessionsConducted: "",
+        languages: [],
+        expertise: "",
+        profilePicture: null,
+        title: "",
+        quote: "",
+        introVideo: null,
+        socialLinks: { facebook: "", instagram: "", tiktok: "", other: "" },
         tags: [],
+        bio: "",
+        faqs: [{ question: "", answer: "" }],
+        education: [{ school: '', duration: '', degree: '' }],
+        workExperience: [{ title: '', duration: '' }],
+        certificates: [{ file: null }],
+        awards: [{ title: '' }],
+        calendar: "",
+        offeringTitle: "",
+        offeringType: "",
+        offeringDescription: "",
+        offeringPrice: "",
+        offeringDuration: "",
+        accountHolder: "",
+        accountNumber: "",
+        ifsc: "",
         instaFollowers: "",
         youtubeSubscribers: "",
         phoneNumber: "",
-        countryCode: "+91", // Reset to default
+        countryCode: "+91",
       });
       setCategoryId("");
       
@@ -305,7 +455,7 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
 
   // Handle submit action
   const handleSubmit = () => {
-    if (!isStepValid(5)) {
+    if (!isStepValid(7)) {
       toast.error("Please complete all required fields.");
       return;
     }    
@@ -314,292 +464,120 @@ export default function CreatorForm({ onClose, onSuccess }: CreatorFormProps) {
     setCurrentStep(1);
   };
 
-  // Step content renderer
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="h-full flex flex-col space-y-3 p-3 sm:p-2">
-            <div className="text-center">
-              <div className="text-xs text-primary mb-1 font-medium">Step 1 of 5</div>
-              <h3 className="text-base font-semibold mb-1">What&apos;s your Guild name?</h3>
-              <p className="text-xs text-muted-foreground px-2 opacity-75">
-                Choose a name that represents your expertise and community
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label className="text-sm">
-                Guild Name&nbsp;<span className="text-red-500">*</span>
-              </Label>
-              <div className="relative">
-                <Input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Mindfulness with Shivani"
-                  className={`bg-white border-lg text-base h-9 sm:h-10 pr-8 ${
-                    isNameAvailable === false ? "border-red-500" : 
-                    isNameAvailable === true ? "border-green-500" : ""
-                  }`}
-                />
-                {formData.name.trim() && (
-                  <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                    {isCheckingName ? (
-                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    ) : isNameAvailable === true ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : isNameAvailable === false ? (
-                      <X className="w-4 h-4 text-red-500" />
-                    ) : null}
-                  </div>
-                )}
-              </div>
-              {formData.name.trim() && (
-                <p className={`text-xs ${
-                  isNameAvailable === true ? "text-green-500" :
-                  isNameAvailable === false ? "text-red-500" :
-                  "text-muted-foreground"
-                }`}>
-                  {isCheckingName ? "Checking availability..." :
-                   isNameAvailable === true ? "This name is available!" :
-                   isNameAvailable === false ? "This name is already taken" :
-                   "Enter a name to check availability"}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="h-full flex flex-col p-3 sm:p-2">
-            <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 2 of 5</div>
-              <h3 className="text-base font-semibold mb-1">Select your expertise</h3>
-              <p className="text-xs text-muted-foreground px-2 opacity-75">
-                Choose the category that best describes your Guild
-              </p>
-            </div>
-            <div className="flex-1 overflow-y-scroll scrollbar-hide">
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 pr-1">
-                {categories.map((category: Category) => (
-                  <button
-                    key={category._id}
-                    onClick={() => handleCategorySelect(category)}
-                    className={`w-full p-2 h-auto text-left rounded-md border transition-all duration-200 min-h-[40px] touch-manipulation ${
-                      categoryId === category._id
-                        ? "bg-primary text-white border-primary shadow-sm"
-                        : "bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700 active:bg-gray-100"
-                    }`}
-                  >
-                    <span className="text-xs font-medium leading-tight block">
-                      {category.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="h-full flex flex-col p-3 sm:p-2">
-            <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 3 of 5</div>
-              <h3 className="text-base font-semibold mb-1">Add keywords</h3>
-              <p className="text-xs text-muted-foreground px-2 opacity-75">
-                Type keywords and press Enter to help users find your Guild
-              </p>
-            </div>
-            <div className="flex-1 flex flex-col space-y-2 min-h-0">
-              <div className="flex-shrink-0">
-                <Label className="text-sm block mb-1">
-                  Keywords&nbsp;<span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  value={tagInput}
-                  onChange={handleTagInputChange}
-                  onKeyDown={handleTagInputKeyDown}
-                  placeholder="Type a keyword and press Enter"
-                  className="bg-white border-gray-200 focus:border-primary h-9 sm:h-10"
-                />
-              </div>
-              <div className="flex-1 min-h-[120px] overflow-y-auto">
-                {formData.tags.length > 0 ? (
-                  <>
-                    <Label className="block mb-2 text-sm">Selected Keywords:</Label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {formData.tags.map((tag, index) => (
-                        <span
-                          key={index}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full text-xs border border-primary/20"
-                        >
-                          {tag}
-                          <button
-                            onClick={() => removeTag(tag)}
-                            className="hover:text-primary/70 transition-colors"
-                          >
-                            <X size={12} />
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-center h-full text-xs text-gray-400">
-                    Added keywords will appear here
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="h-full flex flex-col p-3 sm:p-2">
-            <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 4 of 5</div>
-              <h3 className="text-base font-semibold mb-1">Describe your Guild</h3>
-              <p className="text-xs text-muted-foreground px-2 opacity-75">
-                Tell people what they can expect from your Guild (optional)
-              </p>
-            </div>
-            <div className="flex-1 flex flex-col space-y-2 min-h-0">
-              <Label className="flex-shrink-0 text-sm">
-                About your Guild
-              </Label>
-              <Textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="e.g., Weekly mindfulness tips & guided meditations to reduce stress."
-                className="bg-white border-gray-200 focus:border-primary flex-1 resize-none text-sm min-h-[80px] sm:min-h-[100px]"
-              />
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="h-full flex flex-col p-3 sm:p-2">
-            <div className="text-center flex-shrink-0 mb-2">
-              <div className="text-xs text-primary mb-1 font-medium">Step 5 of 5</div>
-              <h3 className="text-base font-semibold mb-1">Add your phone number</h3>
-              <p className="text-xs text-muted-foreground px-2 opacity-75">
-                We&apos;ll use this to send you updates about bookings and important notifications
-              </p>
-            </div>
-            <div className="flex-1 flex flex-col space-y-2 min-h-0">
-              <div className="space-y-2">
-                <Label className="text-sm">
-                  Phone Number&nbsp;<span className="text-red-500">*</span>
-                </Label>
-                <div className="flex gap-2">
-                  <Select
-                    value={formData.countryCode}
-                    onValueChange={(value) => setFormData({ ...formData, countryCode: value })}
-                  >
-                    <SelectTrigger className="w-[100px] bg-white border-lg text-base h-9 sm:h-10">
-                      <SelectValue placeholder="Code" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {countryCodes.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          {country.code} ({country.country})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    placeholder="Enter your 10-digit phone number"
-                    type="tel"
-                    pattern="[0-9]{10}"
-                    maxLength={10}
-                    className="flex-1 bg-white border-lg text-base h-9 sm:h-10"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  This number will be used for:
-                  <ul className="list-disc pl-4 mt-1 space-y-1">
-                    <li>Booking notifications</li>
-                    <li>Important updates about your Guild</li>
-                    <li>Direct communication with clients</li>
-                  </ul>
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
-
   return (
     session && (
-      <DialogContent className="w-[95vw] max-w-[450px] h-[600px] bg-card text-muted border-none flex flex-col">
-        <DialogHeader className="flex items-center justify-between py-2 flex-shrink-0">
-          <DialogTitle className="text-lg sm:text-xl font-semibold font-serif">
-            Let&apos;s Build your Guild!
-          </DialogTitle>
-        </DialogHeader>
-
-        {/* Progress indicator */}
-        <div className="flex space-x-2 mb-1 flex-shrink-0 px-1">
-          {[1, 2, 3, 4, 5].map((step) => (
-            <div
-              key={step}
-              className={`flex-1 h-2 rounded-full transition-colors duration-300 ${
-                step <= currentStep ? "bg-primary" : "bg-gray-200"
-              }`}
-            />
-          ))}
+      <div className="w-full min-h-screen max-w-4xl rounded-2xl shadow-none flex flex-col items-center justify-center bg-white mx-auto px-2 sm:px-4 md:px-8 py-3 sm:py-5 md:py-6">
+        <div className="w-full flex flex-col items-center justify-center sticky top-0 z-10 bg-white pt-1 pb-2 sm:pb-2">
+          <div className="w-full flex flex-row justify-between items-center px-2 sm:px-4 md:px-6 pb-2 ">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-poppins text-black text-center sm:text-left w-auto sm:w-auto">{stepTitles[currentStep - 1]}</h2>
+            <span className="text-primary font-semibold text-xs sm:text-sm min-w-fit">Step {currentStep}/{totalSteps}</span>
+          </div>
+          <Stepper currentStep={currentStep} totalSteps={totalSteps} />
         </div>
-
-        {/* Step content - Responsive height container */}
-        <div className="flex-1 overflow-hidden min-h-0">
-          {renderStepContent()}
+        {/* Step content - fixed height, scrollable if overflow */}
+        <div className="flex-1 w-full flex flex-col items-center justify-center">
+          <div className="w-full h-full flex flex-col justify-center rounded-xl shadow-none font-poppins pb-12 md:pb-0">
+            {currentStep === 1 && (
+              <Step1GuildDetails
+                formData={formData}
+                setFormData={setFormData}
+                categoryId={categoryId}
+                setCategoryId={setCategoryId}
+                categories={categories}
+                isCategoriesLoading={isCategoriesLoading}
+              />
+            )}
+            {currentStep === 2 && (
+              <Step2ProfessionalProfile
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+            {currentStep === 3 && (
+              <Step3AboutMe
+                formData={formData}
+                setFormData={setFormData}
+                tagInput={tagInput}
+                setTagInput={setTagInput}
+                removeTag={removeTag}
+                handleTagInputChange={handleTagInputChange}
+                handleTagInputKeyDown={handleTagInputKeyDown}
+              />
+            )}
+            {currentStep === 4 && (
+              <Step4ReviewsAchievements
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+            {currentStep === 5 && (
+              <Step5AttachCalendar
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+            {currentStep === 6 && (
+              <Step6CreateOffering
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+            {currentStep === 7 && (
+              <Step7LinkBankAccount
+                formData={formData}
+                setFormData={setFormData}
+              />
+            )}
+          </div>
         </div>
-
         {/* Navigation buttons */}
-        <div className="flex flex-row justify-between gap-2 pt-2 border-t border-gray-100 flex-shrink-0">
-          <Button
-            variant="outline"
-            onClick={currentStep === 1 ? onClose : prevStep}
-            className="flex-1 text-muted bg-transparent border-gray-300 hover:bg-gray-50 h-7 text-sm"
-          >
-            {currentStep === 1 ? (
-              StringConstants.CANCEL
-            ) : (
-              <>
-                <ChevronLeft size={12} className="mr-1" />
-                Back
-              </>
-            )}
-          </Button>
-
-          <Button
-            onClick={currentStep === 5 ? handleSubmit : nextStep}
-            disabled={!isStepValid(currentStep) || createCommunity.isPending}
-            className="flex-1 text-white bg-primary hover:bg-primary/90 h-7 text-sm"
-          >
-            {currentStep === 5 ? (
-              createCommunity.isPending ? "Creating..." : "Join as Expert"
-            ) : (
-              <>
-                Next
-                <ChevronRight size={12} className="ml-1" />
-              </>
-            )}
-          </Button>
+        <div
+          className="w-full bg-white   flex items-center justify-between px-2 sm:px-4 md:px-8"
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            zIndex: 20,
+          }}
+        >
+          <div className="flex-1 text-left py-6">
+            <button
+              type="button"
+              onClick={skipStep}
+              className="text-xs sm:text-sm md:text-base text-gray-500 font-medium px-0 py-2 bg-transparent border-none outline-none hover:underline"
+              style={{ minWidth: 0 }}
+            >
+              Skip for now
+            </button>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4 justify-end">
+            <Button
+              variant="outline"
+              onClick={currentStep === 1 ? onClose : prevStep}
+              className="h-6 sm:h-8 md:h-10 px-3 sm:px-5 md:px-6 text-xs sm:text-sm md:text-base font-semibold min-w-[70px] sm:min-w-[100px] md:min-w-[120px] border-gray-300"
+            >
+              {currentStep === 1 ? (
+                StringConstants.CANCEL
+              ) : (
+                <>
+                  <ChevronLeft size={16} className="mr-1" />
+                  Back
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={currentStep === totalSteps ? handleSubmit : nextStep}
+              className="h-6 sm:h-8 md:h-10 px-3 sm:px-5 md:px-6 text-xs sm:text-sm md:text-base font-semibold min-w-[70px] sm:min-w-[100px] md:min-w-[120px] bg-primary hover:bg-primary/90"
+            >
+              {currentStep === totalSteps ? "Setup Profile" : (
+                <>
+                  Next
+                  <ChevronRight size={16} className="ml-1" />
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-      </DialogContent>
+      </div>
     )
   );
 }

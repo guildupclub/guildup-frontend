@@ -127,7 +127,7 @@ export function RightSidebar() {
               Join as Expert
             </Button>
 
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
+           
           </Dialog>
         </div>
       )}

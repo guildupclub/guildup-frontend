@@ -25,7 +25,7 @@ import Image from "next/image";
 import guildup_logo from "../../../public/svg/GuildUp_Logo_Light.svg";
 import Guildup_logo_mobile from "./../../../public/GuildUp_logo_mobile.svg";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname,  } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { StringConstants } from "../common/CommonText";
@@ -272,7 +272,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       user_id: session.user._id,
     });
 
-    setIsDialogOpen(true);
+    // Redirect to onboarding page
+    router.push("/onboarding");
   };
 
   useEffect(() => {
@@ -562,9 +563,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   >
                     Join as Expert
                   </Button>
-                  {session && (
-                    <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                  )}
+                  
                 </Dialog>
               )}
             </div>
@@ -778,7 +777,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <Plus className="h-6 w-6" />
                 </Button>
               </DialogTrigger>
-              <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
+              
             </Dialog>
           </div>
           <div className="space-y-3 pb-16">

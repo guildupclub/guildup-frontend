@@ -102,13 +102,15 @@ export default function Hero() {
 
   const handleCreatorButtonClick = () => {
     if (!session) {
-      localStorage.setItem("openCreatorModal", "true");
+      // localStorage.setItem("openCreatorModal", "true");
       signIn(undefined, {
         callbackUrl: `${window.location.origin}?hero=1`,
       });
       return;
     }
-    setIsDialogOpen(true);
+    setIsDialogOpen(false);
+     router.push("/onboarding");
+
   };
 
   const handleBannerClick = () => {

@@ -32,26 +32,14 @@ function SignInContent() {
   };
 
   return (
-    <div className="flex md:flex-row h-screen md:overflow-hidden">
-      <div className="hidden md:block w-1/2">
-        {getHeroVersion() === 1 ? (
-          session ? (
-            <CreatorHeroSection2 />
-          ) : (
-            <CreatorHeroSection1 />
-          )
-        ) : (
+    <div className="flex flex-col gap-12 lg:gap-0  lg:flex-row h-screen lg:overflow-hidden ">
+      <div className="max-w-full hidden lg:flex lg:w-1/2">
+        
           <UserHeroSection />
-        )}
+        
       </div>
-      <div className="block w-full md:hidden">
-        {getHeroVersion() === 1 ? (
-          <CreatorMobileHeroSection1 />
-        ) : (
-          <UserMobileHeroSection />
-        )}
-      </div>
-      <div className="hidden md:block md:w-1/2">
+     
+      <div className="w-full lg:w-1/2">
         <RightSection />
       </div>
     </div>
@@ -96,7 +84,7 @@ export default function SignIn() {
         setError(result.data.data);
       } else {
         toast.success("Signed in successfully!");
-        router.push("/explore");
+        router.push("/");
         router.refresh();
       }
     } catch (error) {

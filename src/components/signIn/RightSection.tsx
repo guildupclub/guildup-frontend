@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import CreatorForm from "./CreatorForm";
 import { LoginContainer } from "./LoginContainer";
 
+         
+
 export const RightSection: React.FC = () => {
   const { data: session } = useSession();
   const [isFormOpen, setIsFormOpen] = useState(true);
@@ -14,11 +16,11 @@ export const RightSection: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-gradient-to-br from-[#9900FA] to-[#334BFF]  lg:p-8">
+    <div className="w-full max-h-screen h-[70vh] lg:h-screen flex items-center justify-center bg-white p-5">
       {session && isFormOpen ? (
-        <CreatorForm onSuccess={handleSuccess} /> // when logged in show creator form
+        <CreatorForm onSuccess={handleSuccess} /> 
       ) : (
-        <LoginContainer /> // when logged out show login form
+        <LoginContainer /> 
       )}
     </div>
   );
