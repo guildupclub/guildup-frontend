@@ -1479,6 +1479,18 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                                       <span>Book Now</span>
                                       <ArrowRight className="h-4 w-4" />
                                     </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="flex w-full my-2 items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                                      onClick={() =>
+                                        handleOfferingShareClick(offering._id)
+                                      }
+                                      title="Share Offering"
+                                    >
+                                      <Share className="h-3.5 w-3.5" />
+                                      <span>{StringConstants.SHARE}</span>
+                                    </Button>
                                   </div>
                                 </TooltipTrigger>
                                 {!offering.is_free && !isBankConnected && (
