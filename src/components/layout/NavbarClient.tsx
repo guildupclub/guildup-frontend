@@ -1,7 +1,7 @@
 "use client"; // Ensure this component is client-side
 
 import { useRouter } from "next/navigation"; // Import from next/navigation for App Router
-import { Navbar } from "@/components/layout/Navbar";
+import { NewNavbar } from "@/components/layout/NewNavbar";
 import { usePathname } from "next/navigation"; // Import usePathname
 
 const NavbarClient = () => {
@@ -22,7 +22,7 @@ const NavbarClient = () => {
     return null; // Don't render the Navbar on authentication pages
   }
 
-  return <Navbar />;
+  return <NewNavbar />;
 };
 
 export default NavbarClient;

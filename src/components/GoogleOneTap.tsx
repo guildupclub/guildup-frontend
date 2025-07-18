@@ -37,11 +37,11 @@ export default function GoogleOneTap() {
       });
   }, []);
   const initializeOneTap = useCallback(() => {
-    if (window.google && !session) {
+    if (window.google && !session && process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
       console.log("Initializing One Tap");
       try {
         window.google.accounts.id.initialize({
-          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+          client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
           callback: handleCredentialResponse,
           auto_select: false,
           context: "signin",
@@ -78,6 +78,12 @@ export default function GoogleOneTap() {
       window.google?.accounts.id.cancel();
     }
   }, [session]);
+  // Only render if Google Client ID is configured
+  if (!process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) {
+    console.warn("Google One Tap: NEXT_PUBLIC_GOOGLE_CLIENT_ID not configured");
+    return null;
+  }
+
   return (
     <Script
       src="https://accounts.google.com/gsi/client"
