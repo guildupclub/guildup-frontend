@@ -334,7 +334,8 @@ export default function OfferingDetails({
                 🎥 Join Securely on Google Meet
               </p>
               <p className="text-xs text-gray-600">
-                You'll receive a private, secure link — no setup or app needed
+                You&apos;ll receive a private, secure link — no setup or app
+                needed
               </p>
             </div>
             <div className="p-4 rounded-xl bg-gray-50 text-center">
