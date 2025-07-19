@@ -12,6 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookingDialog } from "../booking/Bookingdialog";
 import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { signIn, useSession } from "next-auth/react";
+import { FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa6";
+import numbro from "numbro";
 
 interface Offering {
   _id: string;
@@ -38,11 +40,15 @@ export default function OfferingDetails({
 }>) {
   const [userId, setUserId] = useState<string | null>(null);
   const [communityId, setCommunityId] = useState<string | null>(null);
+  const [avatarImgUrl, setAvatarImgUrl] = useState("");
+  const [bgImgUrl, setBgImgUrl] = useState("");
+  const [communityDetails, setCommunityDetails] = useState<any>(null);
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
   const session = useSession();
 
+  // Fetch offering data
   const { data: offeringData, isLoading: loadingOffering } = useQuery({
     queryKey: ["offering-data", offeringId],
     queryFn: async () => {
@@ -58,29 +64,74 @@ export default function OfferingDetails({
     enabled: !!offeringId,
   });
 
+  // Fetch user profile data
   const { data: userData, isLoading: loadingUser } = useQuery({
     queryKey: ["user-profile", userId],
     queryFn: async () => {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`, {
-        userId,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/profile`,
+        {
+          userId,
+        }
+      );
       return res.data;
     },
     enabled: !!userId,
   });
 
+  // Fetch community details
   const { data: communityData, isLoading: loadingCommunity } = useQuery({
     queryKey: ["community-details", communityId],
     queryFn: async () => {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/view`, {
-        communityId,
-      });
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/view`,
+        {
+          communityId,
+        }
+      );
       return res.data;
     },
     enabled: !!communityId,
   });
 
-  if (loadingOffering || loadingUser || loadingCommunity) {
+  // Fetch community profile (moved above the early return)
+  const { data: profile, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["communityProfile", communityId],
+    queryFn: async () => {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        {
+          communityId: communityId,
+        }
+      );
+
+      if (response.data.r) {
+        setCommunityDetails(response.data.data.community);
+        if (response?.data?.data?.community?.image) {
+          setAvatarImgUrl(response.data.data.community.image);
+        } else {
+          setAvatarImgUrl(
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+          );
+        }
+
+        if (response.data.data.community.background_image) {
+          setBgImgUrl(response.data.data.community.background_image);
+        } else {
+          setBgImgUrl(
+            "https://random-image-pepebigotes.vercel.app/api/random-image"
+          );
+        }
+
+        return response.data.data;
+      }
+      throw new Error("Failed to fetch community profile");
+    },
+    enabled: !!communityId,
+  });
+
+  // Early return for loading state
+  if (loadingOffering || loadingUser || loadingCommunity || isLoadingProfile) {
     return <Skeleton className="w-full h-96" />;
   }
 
@@ -105,79 +156,105 @@ export default function OfferingDetails({
   const testimonials = community?.testimonials || [];
 
   const handleBookNow = async () => {
-    if (!session?.data?.user) {
-      signIn(undefined, {
-        callbackUrl: window.location.href,
-      });
-      return;
-    }
     setSelectedOffering(offering);
+  };
+  const formatNumber = (num: any) => {
+    if (!num) return 0;
+    if (num < 1000) return num;
+    return numbro(num).format({ average: true, mantissa: 1 }).toUpperCase();
   };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-6">
       <div className="bg-white rounded-3xl shadow-xl grid md:grid-cols-3 overflow-hidden">
         <div className="bg-gray-50 p-6 lg:py-10 flex flex-col items-center text-center border-r">
-          <div className="relative inline-block">
-            <img
-              src={avatar || "/avatar-placeholder.png"}
-              alt={fullName}
-              className="w-32 h-32 rounded-full object-cover"
-            />
-            {isBankAdded && (
-              <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-10 w-10 text-primary drop-shadow-md bg-white rounded-full" />
-            )}
+          <div
+            className="w-full h-40 bg-cover bg-center rounded-t-3xl"
+            style={{ backgroundImage: `url(${bgImgUrl})` }}
+          ></div>
+
+          <div className="relative flex justify-center -mt-16">
+            <div className="relative">
+              <img
+                src={avatarImgUrl || "/avatar-placeholder.png"}
+                alt={fullName}
+                className="w-40 h-40 object-cover border-4 border-white shadow"
+              />
+              {isBankAdded && (
+                <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-12 w-12 lg:mt-4 text-primary drop-shadow-md bg-white rounded-full" />
+              )}
+            </div>
           </div>
 
           <h3 className="text-2xl font-semibold mt-4">{fullName}</h3>
-          {/* <p className="text-sm text-gray-600 mt-1">
-            Clinical Psychologist & Mindfulness Expert
-          </p> */}
           <div className="mt-4 space-y-2 text-sm text-gray-700 text-left">
-            <p>🎓 {experience}+ Years Experience</p>
-            <p>👥 {sessionsTaken}+ Clients helped</p>
-            <p>🌐 {languageList.join(", ")}</p>
-          </div>
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {tags.map(
-              (
-                tag:
-                  | string
-                  | number
-                  | bigint
-                  | boolean
-                  | React.ReactElement<
-                      unknown,
-                      string | React.JSXElementConstructor<any>
-                    >
-                  | Iterable<React.ReactNode>
-                  | React.ReactPortal
-                  | Promise<
-                      | string
-                      | number
-                      | bigint
-                      | boolean
-                      | React.ReactPortal
-                      | React.ReactElement<
-                          unknown,
-                          string | React.JSXElementConstructor<any>
-                        >
-                      | Iterable<React.ReactNode>
-                      | null
-                      | undefined
-                    >
-                  | null
-                  | undefined,
-                i: React.Key | null | undefined
-              ) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
-                >
-                  {tag}
-                </span>
-              )
+            {experience > 0 && (
+              <p>
+                🎓{" "}
+                <span className="text-base font-semibold">{experience}+</span>{" "}
+                Years Experience
+              </p>
             )}
+
+            {sessionsTaken > 0 && (
+              <p>
+                👥{" "}
+                <span className="text-base font-semibold">
+                  {sessionsTaken}+
+                </span>{" "}
+                Clients helped
+              </p>
+            )}
+
+            {communityDetails?.youtube_followers > 0 && (
+              <p className="flex items-center gap-1">
+                <FaYoutube className="text-red-600" />
+                <span className="text-base font-semibold">
+                  {formatNumber(communityDetails?.youtube_followers)}+
+                </span>{" "}
+                Followers
+              </p>
+            )}
+
+            {communityDetails?.instagram_followers > 0 && (
+              <p className="flex items-center gap-1">
+                <FaInstagram className="text-pink-600" />
+                <span className="text-base font-semibold">
+                  {formatNumber(communityDetails?.instagram_followers)}+
+                </span>{" "}
+                Followers
+              </p>
+            )}
+
+            {communityDetails?.linkedin_followers > 0 && (
+              <p className="flex items-center gap-1">
+                <FaLinkedin className="text-blue-600" />
+                <span className="text-base font-semibold">
+                  {formatNumber(communityDetails?.linkedin_followers)}+
+                </span>{" "}
+                Followers
+              </p>
+            )}
+
+            {languageList?.length > 0 && (
+              <p>
+                🗣️{" "}
+                <span className="text-base font-semibold">
+                  {languageList.join(", ")}
+                </span>
+              </p>
+            )}
+          </div>
+
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            {tags.map((tag, i) => (
+              <span
+                key={i}
+                className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
 
@@ -238,12 +315,12 @@ export default function OfferingDetails({
               </li>
             </ul>
 
-            <h4 className="font-medium text-sm text-gray-800  mt-5">
+            <h4 className="font-medium text-sm text-gray-800 mt-5">
               🎯 How It Works
             </h4>
           </div>
 
-          <div className=" grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <div className="p-4 rounded-xl bg-gray-50 text-center">
               <p className="font-medium text-sm mb-1">
                 📅 Choose a Time That Suits You
@@ -257,8 +334,7 @@ export default function OfferingDetails({
                 🎥 Join Securely on Google Meet
               </p>
               <p className="text-xs text-gray-600">
-                You&apos;ll receive a private, secure link — no setup or app
-                needed
+                You'll receive a private, secure link — no setup or app needed
               </p>
             </div>
             <div className="p-4 rounded-xl bg-gray-50 text-center">
@@ -272,22 +348,11 @@ export default function OfferingDetails({
             </div>
           </div>
 
-          {/* {testimonials.length > 0 && (
-            <div className="mt-6 border-t pt-4">
-              <p className="text-sm italic text-gray-700 max-w-lg">
-                &quot;Transformation isn&apos;t a one-time event — it&apos;s a journey
-                we&apos;ll walk together, at your pace.&quot;
-              </p>
-            </div>
-          )} */}
           <div className="p-6 bg-white rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="text-xl font-semibold">
               ₹{price?.toLocaleString("en-IN")}{" "}
               <span className="text-sm font-normal">per session</span>
             </div>
-            {/* <div className="mt-2 text-sm text-gray-600">
-              Next available: Tomorrow 11:00 AM
-            </div> */}
             <Button
               onClick={handleBookNow}
               className="mt-4 md:mt-0 w-full md:w-auto"
