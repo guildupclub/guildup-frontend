@@ -39,6 +39,7 @@ interface TrendingPost {
   };
   body: string;
   up_votes: number;
+  created_at: string;
 }
 
 export function RightSidebar() {
@@ -108,6 +109,7 @@ export function RightSidebar() {
     router.push(`/post/${postId}`);
   };
 
+
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
       {!isCreator && (
@@ -132,8 +134,8 @@ export function RightSidebar() {
         </div>
       )}
 
-      <div className="bg-card rounded-xl shadow-sm border border-zinc-200/30 hover:shadow-md transition-shadow">
-        <h2 className="text-lg font-semibold px-4 py-1 border-b border-zinc-200/50">
+      <div className="bg-card p-4 pt-0 rounded-xl shadow-sm border-2 border-zinc400/30 hover:shadow-md transition-shadow">
+        <h2 className="text-lg font-semibold pt-2 pb-2">
           {StringConstants.TRENDING_POSTS}
         </h2>
         <div className="max-h-[470px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-zinc-900 overflow-auto scrollbar-none cursor-pointer">
@@ -143,7 +145,7 @@ export function RightSidebar() {
               .map((_, index) => (
                 <div
                   key={index}
-                  className="px-4 py-3 border-b border-zinc-200/50 last:border-0"
+                  className="p-4 border-2 border-zinc-200/50"
                 >
                   <div className="flex gap-3">
                     <div className="flex-1 space-y-2">
@@ -171,11 +173,11 @@ export function RightSidebar() {
                 <div
                   key={post._id}
                   onClick={() => handlePostClick(post?._id)}
-                  className="px-4 py-2 border-b border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer"
+                  className="p-2 mb-4 border-2 border-zinc-200/50 last:border-0 hover:bg-muted/10 transition-colors cursor-pointer rounded-lg"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 mb-3">
-                      <Avatar className="h-6 w-6 ring-1 ring-zinc-200/50 shadow-sm">
+                      <Avatar className="h-10 w-10 ring-1 ring-zinc-200/50 shadow-sm">
                         {post?.community_id?.image ? (
                           <AvatarImage
                             src={
@@ -185,11 +187,11 @@ export function RightSidebar() {
                           />
                         ) : (
                           <AvatarFallback className="bg-primary/10 text-primary">
-                            <User className="h-3 w-3" />
+                            <User className="h-4 w-4" />
                           </AvatarFallback>
                         )}
                       </Avatar>
-                      <span className="text-xs font-medium text-muted-foreground">
+                      <span className="text-sm font-semibold text-muted-foreground mb-1">
                         {post?.community_id && post.community_id.name
                           ? post.community_id.name
                           : ""}
