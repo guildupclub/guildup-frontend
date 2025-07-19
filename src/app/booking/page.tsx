@@ -60,6 +60,7 @@ const BookingPage = () => {
       );
       const data: Booking[] = response.data.data;
 
+      console.log("data", data);
       if (response.data.r === "s") {
         const upcoming = data.filter(
           (booking) => booking.status !== "completed"
@@ -114,10 +115,10 @@ const BookingPage = () => {
         closeButton
       />
 
-      <div className="flex flex-col bg-[#F2F2F2] gap-6 px-4 md:px-20 md:mx-5 mt-20">
+      <div className="flex flex-col w-[100vw] bg-[#F2F2F2] gap-6 px-4 md:px-20 md:mx-5 mt-20">
         <div className="h-30 flex flex-row items-center gap-3">
           <div>
-            <FaArrowLeft />
+            <FaArrowLeft /> 
           </div>
           <h1 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">
             Bookings
@@ -132,7 +133,7 @@ const BookingPage = () => {
             }`}
             onClick={() => setActiveTab("upcoming")}
           >
-            Upcoming
+            Live Bookings
           </button>
           <button
             className={`pb-2 ${
@@ -142,7 +143,7 @@ const BookingPage = () => {
             }`}
             onClick={() => setActiveTab("completed")}
           >
-            Completed
+            Past Bookings
           </button>
           {isCreator && (
             <button
@@ -169,8 +170,7 @@ const BookingPage = () => {
             </button>
           )}
         </div>
-
-        <div className="space-y-4 mt-6">
+        <div className="flex flex-row gap-2 justify-center items-center flex-wrap h-fit space-y-4 mt-6">
           {activeTab !== "availability" &&
             (activeTab === "upcoming"
               ? upcomingBookings
@@ -186,6 +186,9 @@ const BookingPage = () => {
                 guest={booking?.client_id?.name}
                 bookedOn={new Date(booking?.start_time).toLocaleString()}
                 amount={booking.offering_id?.price?.amount}
+                offeringName={booking.offering_id?.title}
+                offeringDescription={booking.offering_id?.description}
+                startTime={booking.start_time}
               />
             ))}
           {activeTab === "availability" && <Availablity userId={userId} />}

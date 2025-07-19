@@ -5,7 +5,7 @@ import type React from "react";
 import { useState, useCallback } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Heart, MoreVertical, Send, MessageCircleMore } from "lucide-react";
+import { Heart, MoreVertical, Send } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
 import { setActiveCommunity } from "@/redux/channelSlice";
@@ -22,7 +22,6 @@ import { removeSpecialCharacters } from "../utils/StringUtils";
 import { sendNotification } from "../utils/notification";
 import { processPostContent, youtubeEmbedStyles } from "../utils/embed-utils";
 import YouTubePlayer from "@/components/YouTubePlayer";
-import { toast } from "sonner";
 import { signIn } from "next-auth/react";
 
 interface PostCardeProps {
@@ -55,6 +54,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const community_name = post.community_id?.name;
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useSelector((state: any) => state.user);
   const queryClient = useQueryClient();
 
@@ -68,6 +68,21 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
   const communityParam = `${encodedCommunityName}-${community_id}`;
   const COMMUNITY_PROFILE_PATH = `/community/${communityParam}/profile`;
+
+  // Function to check if content is long (approximately 4 lines)
+  const isContentLong = (content: string) => {
+    const words = content.split(' ').length;
+    // Assuming roughly 15-20 words per line on average
+    return words > 20; // Approximately 4 lines worth of content
+  };
+
+  // Function to truncate content to approximately 4 lines
+  const getTruncatedContent = (content: string) => {
+    const words = content.split(' ');
+    if (words.length <= 20) return content;
+    return words.slice(0, 20).join(' ') + '...';
+  };
+
   // Use React Query to fetch post data including likes and comments
   const { data: postData } = useQuery({
     queryKey: ["post", post._id],
@@ -336,12 +351,19 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
   const communityName = post?.community_id?.name || "New Community";
   const fallbackLetter = communityName.trim().charAt(0).toUpperCase();
 
+  // Check if the original content is long
+  const contentIsLong = originalContent ? isContentLong(originalContent) : false;
+  const displayContent = originalContent && !isExpanded && contentIsLong 
+    ? getTruncatedContent(originalContent) 
+    : originalContent;
+
   return (
-    <div className="bg-card rounded-xl mb-4" ref={cardRef}>
+    <div className="bg-card border-2 border-zinc-300/60 rounded-xl mb-4" ref={cardRef}>
+      
       <div className="p-4">
         <div className="flex gap-3">
           <div className="flex-shrink-0 w-10">
-            <Avatar className="h-10 w-10 border-2 border-purple-500">
+            <Avatar className="h-11 w-11 border-2 border-purple-500">
               <AvatarImage
                 src={post?.community_id?.image || "/placeholder.svg"}
               />
@@ -357,8 +379,8 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
                 >
                   {post?.community_id?.name}
                 </h3>
-                <div className="flex items-center gap-1 mt-1">
-                  <span className="text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <span className="text-[0.7rem] font-semibold text-gray-500/80">
                     {moment(post.created_At).format("YYYY MMM DD, hh:mm A")}
                   </span>
                 </div>
@@ -368,7 +390,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
                 size="icon"
                 className="h-8 w-8 hover:bg-background"
               >
-                <MoreVertical className="h-5 w-5" />
+                <MoreVertical className="h-5 w-5 text-gray-500" />
               </Button>
             </div>
           </div>
@@ -376,13 +398,23 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
       </div>
 
       {/* Post content with bottom padding */}
-      <div className="px-4 pb-6">
+      <div className="px-4 pb-3">
         {/* Original content without YouTube URLs */}
-        {originalContent && originalContent.trim() !== "" && (
-          <p
-            className="text-sm text-accent"
-            dangerouslySetInnerHTML={{ __html: originalContent }}
-          />
+        {displayContent && displayContent.trim() !== "" && (
+          <div>
+            <p
+              className="text-sm text-accent"
+              dangerouslySetInnerHTML={{ __html: displayContent }}
+            />
+            {contentIsLong && (
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="text-blue-500 hover:text-blue-600 text-sm font-medium mt-2 transition-colors"
+              >
+                {isExpanded ? "Read Less" : "Read More"}
+              </button>
+            )}
+          </div>
         )}
 
         {/* YouTube embed if available - UPDATED TO USE YouTubePlayer */}
@@ -417,17 +449,20 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           </div>
         )}
       </div>
-      <div className="flex items-center px-4 md:px-16 py-3 border-t border-zinc-300/50 mx-4 justify-between">
+      <div className="flex items-center px-4 md:px-16 pb-2 mx-4 justify-between">
         {/* Left Icon */}
         <button
-          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full p-2"
+          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full"
           onClick={handleLikeClick}
         >
           <Heart
-            className={`h-5 w-5 ${isLiked ? "text-red-500 fill-red-500" : ""}`}
+            className={`text-blue-500 h-5 w-5 ${isLiked ? "text-blue-500 fill-blue-500" : ""}`}
           />
-          <span className="text-sm">
-            {formatNumber(postData?.up_votes || 0)} {StringConstants.LIKE}
+          <span className="text-[0.9rem] font-semibold text-gray-500/80">
+            <span className="text-blue-500 text-md mr-1">
+            {formatNumber(postData?.up_votes || 0)}
+            </span>
+             {StringConstants.LIKE}
           </span>
         </button>
 
@@ -444,15 +479,18 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
 
         {/* Right Icon */}
         <button
-          className="flex items-center gap-2 text-muted-foreground"
+          className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full"
           onClick={handleShareClick}
         >
-          <Send className="h-5 w-5" /> {StringConstants.SHARE}
+          <Send className="h-5 w-5 text-blue-500" /> 
+          <span className="text-[0.9rem] font-semibold text-gray-500/80">
+            {StringConstants.SHARE}
+          </span>
         </button>
       </div>
 
       {showComments && (
-        <div className="border-t border-zinc-300/50 ">
+      
           <div className="px-4 py-4">
             <div className="flex gap-2 mb-2">
               <Avatar className="h-8 w-8">
@@ -485,7 +523,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
               {showComments && <CommentSection postId={post._id} />}
             </div>
           </div>
-        </div>
+    
       )}
 
       {/* Add responsive styling for embedded iframes */}
