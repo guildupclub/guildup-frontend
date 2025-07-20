@@ -13,7 +13,7 @@ import { Badge } from "../ui/badge";
 import { IoVideocam } from "react-icons/io5";
 import { Button } from "../ui/button";
 import { ImUsers } from "react-icons/im";
-import { useSession, signIn } from "next-auth/react";
+
 import { toast } from "sonner";
 import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
@@ -31,22 +31,11 @@ interface MemoizedCommunityCardProps {
 
 const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
   ({ community, onClick }) => {
-    const { data: session } = useSession();
     const router = useRouter();
     const dispatch = useDispatch();
     const communityDetails = community?.community || community;
 
     const handleCardClick = useCallback(() => {
-      if (!session) {
-        toast("Please sign in to view this community", {
-          action: {
-            label: "Sign In",
-            onClick: () => signIn(),
-          },
-        });
-        return;
-      }
-
       if (!communityDetails || !communityDetails._id) {
         console.error("Invalid community data:", communityDetails);
         return;
@@ -81,21 +70,11 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
       // Navigate to community profile page
       router.push(`/community/${communityParams}/profile`);
-    }, [session, communityDetails, dispatch, router]);
+    }, [communityDetails, dispatch, router]);
 
     const handleViewProfile = useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
       
-      if (!session) {
-        toast("Please sign in to view this community", {
-          action: {
-            label: "Sign In",
-            onClick: () => signIn(),
-          },
-        });
-        return;
-      }
-
       if (!communityDetails || !communityDetails._id) {
         console.error("Invalid community data:", communityDetails);
         return;
@@ -130,7 +109,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
       // Navigate to community profile page
       router.push(`/community/${communityParams}/profile`);
-    }, [session, communityDetails, dispatch, router]);
+    }, [communityDetails, dispatch, router]);
 
     const handleShare = useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
