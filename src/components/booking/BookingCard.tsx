@@ -221,12 +221,14 @@ const BookingCard: React.FC<BookingCardProps> = ({
         </div>
       </CardContent>
     
-      <CardFooter className="flex justify-between gap-4">
-        <Button variant="outline" className="w-fit text-blue-500 border-2 border-blue-500 rounded-lg" onClick={onReschedule}>
-          <CalendarRange/> Reschedule Booking
+      <CardFooter className="flex justify-between gap-2 p-3">
+        <Button variant="outline" className="flex-1 text-blue-500 border-2 border-blue-500 rounded-lg text-xs px-1 py-1.5 min-w-0" onClick={onReschedule}>
+          <CalendarRange className="h-3 w-3 mr-1 flex-shrink-0"/> 
+          <span className="truncate">Reschedule</span>
         </Button>
-        <Button variant="outline" className="w-fit bg-blue-500 text-white rounded-lg" onClick={onCancel}>
-        <X/> Cancel Booking 
+        <Button variant="outline" className="flex-1 bg-blue-500 text-white rounded-lg text-xs px-1 py-1.5 min-w-0" onClick={onCancel}>
+          <X className="h-3 w-3 mr-1 flex-shrink-0"/> 
+          <span className="truncate">Cancel</span>
         </Button>
       </CardFooter>
     </Card>
