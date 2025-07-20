@@ -18,13 +18,13 @@ interface JobPosting {
 
 const jobPostings: JobPosting[] = [
   {
-    id: 'ui-designer',
-    title: 'UI/UX Designer',
-    description: 'Join our team and help us design the best possible user experience for our platform. You will be responsible for creating beautiful and intuitive interfaces that delight our users.',
-    skills: ['Figma', 'UI Design', 'UX Research', 'Prototyping', 'User Testing'],
+    id: 'founders-associate',
+    title: "Founder's Associate Intern",
+    description: "We do crazy things.\nAnd we need someone who's done the impossible before — because that's how we operate.\n\nExpect chaos, ownership, pressure, and growth.\nIf you're built different, you'll thrive here.\n\nWhat you'll handle:\nGTM Strategy · Creator Ops · Agency Coordination · Execution · Problem Solving",
+    skills: ['Problem Solving', 'GTM Strategy', 'Creator Ops', 'Agency Coordination', 'Execution'],
     location: 'Remote',
-    type: 'Part-time',
-    formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSfxqvoKkQLBd8wulhEyKNRtcrzSmDwLxWAVapMlwZAGI7Di8Q/viewform?embedded=true"
+    type: 'Full-time • 2 months',
+    formUrl: "https://forms.gle/dSpJarTspjK37hun7"
   },
   {
     id: 'frontend-dev',
@@ -65,10 +65,16 @@ export default function HiringPage() {
                   <span>{job.location}</span>
                   <span>•</span>
                   <span>{job.type}</span>
+                  {job.id === 'founders-associate' && (
+                    <>
+                      <span>•</span>
+                      <span className="text-green-600 font-medium">💰 ₹10,000/month</span>
+                    </>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
-                <p className="text-foreground mb-4">{job.description}</p>
+                <div className="text-foreground mb-4 whitespace-pre-line">{job.description}</div>
                 <div className="flex flex-wrap gap-2">
                   {job.skills.map((skill) => (
                     <Badge key={skill} variant="secondary">
