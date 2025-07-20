@@ -226,7 +226,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
             {/* Communities Grid */}
             <div
               id="card-container-top"
-              className="grid gap-3 sm:gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 pb-6"
+              className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
             >
               {filteredAndSortedCommunities.length > 0 ? (
                 filteredAndSortedCommunities.map((community, index) => (

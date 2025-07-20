@@ -170,7 +170,7 @@ const CommunitySection: React.FC<CommunitySectionProps> = ({
       ) : (
         <>
           {/* Communities Grid */}
-          <div id="card-container-top" className="grid gap-3 sm:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-6 z-0 lg:pb-0 pt-4 sm:pt-10">
+          <div id="card-container-top" className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6 z-0 lg:pb-0 pt-4 sm:pt-10">
             {communities.length > 0 ? (
               communities.map((community, index) => (
                 <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
