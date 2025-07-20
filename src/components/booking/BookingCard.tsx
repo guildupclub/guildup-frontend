@@ -164,9 +164,10 @@ const BookingCard: React.FC<BookingCardProps> = ({
       return timeString;
     }
   };
+  
 
   return (
-    <Card className="overflow-hidden w-fit h-[16rem] transition-all duration-200 hover:shadow-md">
+    <Card className="overflow-hidden w-fit h-[16rem] m-0 transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -193,8 +194,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         </div>
         <div className="flex flex-col mb-2 border-b border-zinc-200/80 pb-2">
-          <p className="text-sm font-semibold text-slate-900">{offeringName}</p>
-          <p className="text-sm text-slate-500">{offeringDescription}</p>
+          <p className="text-sm font-semibold text-slate-900 line-clamp-1 truncate">{offeringName}</p>
+          <p className="text-sm text-slate-500 line-clamp-2 truncate">{offeringDescription}</p>
         </div>
       </CardHeader>
       <CardContent className="pb-3 pt-0">
@@ -219,12 +220,12 @@ const BookingCard: React.FC<BookingCardProps> = ({
           </div>
         </div>
       </CardContent>
-
+    
       <CardFooter className="flex justify-between gap-4">
-        <Button variant="outline" className="w-fit text-blue-500 border-2 border-blue-500 rounded-lg">
+        <Button variant="outline" className="w-fit text-blue-500 border-2 border-blue-500 rounded-lg" onClick={onReschedule}>
           <CalendarRange/> Reschedule Booking
         </Button>
-        <Button variant="outline" className="w-fit bg-blue-500 text-white rounded-lg">
+        <Button variant="outline" className="w-fit bg-blue-500 text-white rounded-lg" onClick={onCancel}>
         <X/> Cancel Booking 
         </Button>
       </CardFooter>

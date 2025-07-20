@@ -227,21 +227,22 @@ const ProfilePage = () => {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-[#777BEA]/20  pb-16 text-primary">
+    <div className="min-h-screen bg-white  pb-16 text-primary">
       <div className="pt-20 md:pt-24 px-4 md:px-20 text-primary-f  min-h-screen">
-        <Card className="bg-white shadow-md rounded-lg overflow-hidden">
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-800 mb-6">My Profile</h1>
+        <Card className="bg-white shadow-none border-none overflow-hidden">
           {/* Profile header */}
-          <div className="bg-gradient-to-r from-[#334bff]/10 to-[#334bff]/5 p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="bg-white 5 p-6 md:p-8">
+            <div className="flex flex-col items-center gap-4">
               <Dialog>
                 <DialogTrigger asChild>
-                  <div className="relative group">
+                  <div className="relative group w-32 h-32 md:w-40 md:h-40">
                     <Image
                       src={avatarImgUrl || "/placeholder.svg"}
                       alt="Profile Picture"
-                      width={100}
-                      height={100}
-                      className="rounded-full border-4 border-white shadow-md hover:cursor-pointer transition-transform group-hover:scale-105"
+                      width={160}
+                      height={160}
+                      className="w-full h-full object-cover rounded-full shadow-md hover:cursor-pointer transition-transform group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/20 rounded-full opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                       <span className="text-white text-xs font-medium">
@@ -276,12 +277,6 @@ const ProfilePage = () => {
                 </DialogContent>
               </Dialog>
               <div className="text-center md:text-left">
-                <h2 className="font-semibold text-xl md:text-2xl leading-7 text-primary">
-                  {profile.name}
-                </h2>
-                <p className="text-[#19191A] text-sm md:text-base leading-7">
-                  {profile.email}
-                </p>
                 {profile.languages && profile.languages.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {profile.languages.slice(0, 2).map((lang, index) => (
@@ -305,7 +300,7 @@ const ProfilePage = () => {
                 )}
               </div>
               <Button
-                className={`md:ml-auto w-full md:w-auto px-10 py-2  transition ${
+                className={`realtive top-2 right-2 md:ml-auto w-full md:w-auto px-10 py-2  transition ${
                   isEditable ? "bg-gray-500 pointer-events-none" : ""
                 }`}
                 onClick={() => setIsEditable(true)}
@@ -317,21 +312,7 @@ const ProfilePage = () => {
           </div>
 
           <CardContent className="p-6">
-            <Tabs
-              defaultValue="personal"
-              className="w-full"
-              onValueChange={setActiveTab}
-              value={activeTab}
-            >
-              <TabsList className="grid grid-cols-2 mb-6 ">
-                <TabsTrigger value="personal">Personal Info</TabsTrigger>
-                {isCreator && (
-                  <TabsTrigger value="professional">
-                    Professional Info
-                  </TabsTrigger>
-                )}
-              </TabsList>
-
+            <Tabs defaultValue="personal" className="w-full">
               <TabsContent value="personal" className="space-y-6 ">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <InputField
@@ -368,77 +349,6 @@ const ProfilePage = () => {
                     onChange={handleChange}
                     disabled={!isEditable}
                   />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="professional" className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <InputField
-                    label="Years of Experience"
-                    name="year_of_experience"
-                    placeholder="Enter years of experience"
-                    value={profile.year_of_experience || ""}
-                    onChange={handleChange}
-                    disabled={!isEditable}
-                    type="number"
-                  />
-                  <InputField
-                    label="Sessions Conducted"
-                    name="session_conducted"
-                    placeholder="Enter number of sessions"
-                    value={profile.session_conducted || ""}
-                    onChange={handleChange}
-                    disabled={!isEditable}
-                    type="number"
-                  />
-
-                  <div className="col-span-1 md:col-span-2">
-                    <label className="block text-sm font-medium mb-1 text-muted-foreground">
-                      Languages
-                    </label>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {(profile.languages || []).map((language, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="flex items-center gap-1 px-3 py-1.5 text-primary-foreground"
-                        >
-                          {language}
-                          {isEditable && (
-                            <button
-                              onClick={() => handleRemoveLanguage(language)}
-                              className="ml-1 text-xs hover:text-red-500"
-                            >
-                              <FaTimes />
-                            </button>
-                          )}
-                        </Badge>
-                      ))}
-                    </div>
-                    {isEditable && (
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newLanguage}
-                          onChange={(e) => setNewLanguage(e.target.value)}
-                          placeholder="Add a language"
-                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-muted ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              handleAddLanguage();
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={handleAddLanguage}
-                          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gradient-to-r from-indigo-600 to-indigo-400 text-white hover:bg-indigo-500 h-10 px-4 py-2"
-                        >
-                          <FaPlus className="mr-1" /> Add
-                        </Button>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </TabsContent>
             </Tabs>

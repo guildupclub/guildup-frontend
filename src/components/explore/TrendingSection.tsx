@@ -67,27 +67,6 @@ function TrendingSection() {
 
   return (
     <div className="flex flex-col gap-4 py-12">
-      {/* Trending Tags Section */}
-      {!isCreator && (
-        <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold  font-sans">
-            Ready to Turn Your Expertise into income?
-          </h1>
-          <Dialog
-            open={session ? isDialogOpen : false}
-            onOpenChange={setIsDialogOpen}
-          >
-            <Button
-              className="w-full text-white shadow-md"
-              onClick={handleCreatorButtonClick}
-            >
-              {StringConstants.CREATE_A_PAGE}
-            </Button>
-
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
-          </Dialog>
-        </div>
-      )}
       <div className="bg-card p-4 rounded-lg h-[500px] overflow-auto scrollbar-none border border-zinc-200/30">
         <h2 className="text-lg font-semibold mb-3 border-b pb-2 border-zinc-200/50">
           Trending Tags

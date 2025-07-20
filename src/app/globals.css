@@ -252,3 +252,7 @@
 .animation-delay-300 {
   animation-delay: 300ms;
 }
+
+body {
+  background-color: white;
+}

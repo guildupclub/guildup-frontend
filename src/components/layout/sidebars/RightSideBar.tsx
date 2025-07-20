@@ -112,27 +112,6 @@ export function RightSidebar() {
 
   return (
     <aside className="right-0 h-screen w-80 pl-2 pt-4 pb-4 pe-5 space-y-4">
-      {!isCreator && (
-        <div className="bg-card rounded-xl p-4 w-full space-y-4 shadow-sm border border-zinc-200/30">
-          <h1 className="font-semibold font-sans">
-            Ready to Turn Your Expertise into income?
-          </h1>
-          <Dialog
-            open={session ? isDialogOpen : false}
-            onOpenChange={setIsDialogOpen}
-          >
-            <Button
-              className="w-full text-white shadow-md"
-              onClick={handleCreatorButtonClick}
-            >
-              {/* <span className="text-amber-300 hidden sm:inline">👋</span> */}
-              Join as Expert
-            </Button>
-
-            {session && <CreatorForm onClose={() => setIsDialogOpen(false)} />}
-          </Dialog>
-        </div>
-      )}
 
       <div className="bg-card p-4 pt-0 rounded-xl shadow-sm border-2 border-zinc400/30 hover:shadow-md transition-shadow">
         <h2 className="text-lg font-semibold pt-2 pb-2">
