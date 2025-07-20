@@ -9,6 +9,7 @@ import { RootState } from "@/redux/store";
 import Availablity from "@/components/booking/Availablity";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CalendarCheck, Calendar } from "lucide-react";
 
 interface Booking {
   _id: string;
@@ -22,13 +23,19 @@ interface Booking {
     description: string;
     type: string;
     duration: number;
+    community_id?: {
+      name: string;
+    };
   };
   provider_id: {
     _id: string;
     name: string;
     email: string;
   };
-  client_id: string;
+  client_id: {
+    _id: string;
+    name: string;
+  };
   start_time: string;
   status: string;
   payment_status: string;
@@ -105,7 +112,7 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="max-w-3xl pb-16">
+    <div className="max-w-3xl pb-16 bg-white">
       {/* Toast Notification Container */}
       <ToastContainer
         position="top-center"
@@ -115,20 +122,23 @@ const BookingPage = () => {
         closeButton
       />
 
-      <div className="flex flex-col w-[100vw] bg-[#F2F2F2] gap-6 px-4 md:px-20 md:mx-5 mt-20">
+      <div className="flex flex-col w-[100vw] bg-white gap-6 px-4 md:px-20 md:mx-5 mt-20">
         <div className="h-30 flex flex-row items-center gap-3">
-          <div>
+          <div className="text-blue-600">
             <FaArrowLeft /> 
           </div>
-          <h1 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">
+          <div className="flex flex-row justify-center item-center text-blue-600">
+            <CalendarCheck className="w-6 h-6 mr-2"/>
+          <span className="font-semibold text-2xl font-[Source Sans Pro] leading-7">
             Bookings
-          </h1>
+          </span>
+          </div>
         </div>
         <div className="flex space-x-6 items-center">
           <button
-            className={`pb-2 ${
+            className={`pb-2 font-semibold ${
               activeTab === "upcoming"
-                ? "text-blue-600 border-blue-600 border-b-2"
+                ? "text-blue-600 "
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab("upcoming")}
@@ -136,9 +146,9 @@ const BookingPage = () => {
             Live Bookings
           </button>
           <button
-            className={`pb-2 ${
+            className={`pb-2 font-semibold ${
               activeTab === "completed"
-                ? "text-blue-600 border-blue-600 border-b-2"
+                ? "text-blue-600 "
                 : "text-gray-500"
             }`}
             onClick={() => setActiveTab("completed")}
@@ -147,9 +157,9 @@ const BookingPage = () => {
           </button>
           {isCreator && (
             <button
-              className={`pb-2 ${
+              className={`pb-2 font-semibold ${
                 activeTab === "availability"
-                  ? "text-blue-600 border-blue-600 border-b-2"
+                  ? "text-blue-600 "
                   : "text-gray-500"
               }`}
               onClick={() => setActiveTab("availability")}
@@ -170,28 +180,48 @@ const BookingPage = () => {
             </button>
           )}
         </div>
-        <div className="flex flex-row gap-2 justify-center items-center flex-wrap h-fit space-y-4 mt-6">
-          {activeTab !== "availability" &&
-            (activeTab === "upcoming"
-              ? upcomingBookings
-              : completedBookings
-            ).map((booking: Booking) => (
-              <BookingCard
-                key={booking._id}
-                profileImage="/default-profile.jpg"
-                name={booking.offering_id?.community_id?.name}
-                role={booking.offering_id?.type}
-                service={booking.offering_id?.title}
-                host={booking.provider_id?.name}
-                guest={booking?.client_id?.name}
-                bookedOn={new Date(booking?.start_time).toLocaleString()}
-                amount={booking.offering_id?.price?.amount}
-                offeringName={booking.offering_id?.title}
-                offeringDescription={booking.offering_id?.description}
-                startTime={booking.start_time}
-              />
-            ))}
-          {activeTab === "availability" && <Availablity userId={userId} />}
+        <div className="flex flex-row gap-2 flex-wrap h-fit mt-6">
+          {activeTab === "availability" ? (
+            <Availablity userId={userId} />
+          ) : (
+            <>
+              {(activeTab === "upcoming" ? upcomingBookings : completedBookings).length > 0 ? (
+                (activeTab === "upcoming" ? upcomingBookings : completedBookings).map((booking: Booking) => (
+                  <BookingCard
+                    key={booking._id}
+                    profileImage="/default-profile.jpg"
+                    name={booking.offering_id?.community_id?.name || "Community"}
+                    role={booking.offering_id?.type}
+                    service={booking.offering_id?.title}
+                    host={booking.provider_id?.name}
+                    guest={booking?.client_id?.name || "Client"}
+                    bookedOn={new Date(booking?.start_time).toLocaleString()}
+                    amount={booking.offering_id?.price?.amount}
+                    offeringName={booking.offering_id?.title}
+                    offeringDescription={booking.offering_id?.description}
+                    startTime={booking.start_time}
+                    status={booking.status as "upcoming" | "completed" | "cancelled"}
+                  />
+                ))
+              ) : (
+                <div className="w-full text-center p-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                  {activeTab === "upcoming" ? (
+                    <>
+                      <CalendarCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No Live Bookings</h3>
+                      <p className="text-gray-500">You don't have any upcoming bookings at the moment.</p>
+                    </>
+                  ) : (
+                    <>
+                      <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No Past Bookings</h3>
+                      <p className="text-gray-500">You haven't completed any bookings yet.</p>
+                    </>
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
