@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import type React from "react";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import { useSelector, useDispatch } from "react-redux";
@@ -27,10 +27,12 @@ interface Community {
 
 interface EnhancedCommunitySectionProps {
   activeCategory: string;
+  activeSubCategory?: string;
 }
 
 const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
   activeCategory,
+  activeSubCategory,
 }) => {
   const loggedInUserId = useSelector(
     (state: RootState) => state.user.user?._id
@@ -52,6 +54,25 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
   const { filters, setFilters, clearFilters, filteredAndSortedCommunities } =
     useOfferingFilters(communities);
 
+  // Filter communities by subcategory if specified
+  const filteredCommunities = useMemo(() => {
+    if (!activeSubCategory) {
+      return filteredAndSortedCommunities;
+    }
+    
+    return filteredAndSortedCommunities.filter((community) => {
+      // Check if community has offerings that match the subcategory
+      if (community.offerings && Array.isArray(community.offerings)) {
+        return community.offerings.some((offering) => {
+          // Check offering tags, title, or description for subcategory match
+          const offeringText = `${offering.title || ''} ${offering.description || ''} ${offering.tags?.join(' ') || ''}`.toLowerCase();
+          return offeringText.includes(activeSubCategory.toLowerCase());
+        });
+      }
+      return false;
+    });
+  }, [filteredAndSortedCommunities, activeSubCategory]);
+
   const fetchCommunities = useCallback(
     async (pageNum: number, isLoadMore = false) => {
       try {
@@ -72,6 +93,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
             `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
             {
               categoryId: activeCategory,
+              subCategory: activeSubCategory, // Add subcategory filter
               page: pageNum,
               limit: COMMUNITIES_PER_PAGE,
             }
@@ -114,7 +136,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
         setLoadingMore(false);
       }
     },
-    [activeCategory]
+    [activeCategory, activeSubCategory]
   );
 
   useEffect(() => {
@@ -123,7 +145,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
       setHasMore(true);
       fetchCommunities(0, false);
     }
-  }, [activeCategory, fetchCommunities]);
+  }, [activeCategory, activeSubCategory, fetchCommunities]);
 
   const handleLoadMore = useCallback(() => {
     if (!loadingMore && hasMore) {
@@ -177,10 +199,10 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           <Loader />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div className="sticky top-24 h-fit">
               {/* Mobile Filter Toggle */}
               <div className="lg:hidden mb-4">
                 <Button
@@ -196,7 +218,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
               </div>
 
               {/* Filter Component */}
-              <div className={`${showFilters ? "block" : "hidden"} lg:block`}>
+              <div className={`${showFilters ? "block" : "hidden"} lg:block max-h-[calc(100vh-120px)] overflow-y-auto`}>
                 <OfferingFilters
                   filters={filters}
                   onFiltersChange={setFilters}
@@ -218,7 +240,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
                 </h2> */}
                 <p className="text-sm text-muted-foreground">
                   {totalCount > 0 &&
-                    `Showing ${filteredAndSortedCommunities.length} of ${totalCount} total experts`}
+                    `Showing ${filteredCommunities.length} of ${totalCount} total experts`}
                 </p>
               </div>
             </div>
@@ -228,8 +250,8 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
               id="card-container-top"
               className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
             >
-              {filteredAndSortedCommunities.length > 0 ? (
-                filteredAndSortedCommunities.map((community, index) => (
+              {filteredCommunities.length > 0 ? (
+                filteredCommunities.map((community, index) => (
                   <div
                     key={community._id}
                     className={index === 0 ? "first-expert-card" : ""}
@@ -259,7 +281,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
             {/* Load More Button */}
             {communities.length > 0 &&
               hasMore &&
-              filteredAndSortedCommunities.length > 0 && (
+              filteredCommunities.length > 0 && (
                 <div className="flex justify-center py-8">
                   <Button
                     onClick={handleLoadMore}
