@@ -63,6 +63,7 @@ function Page() {
   const [selectedCategory, setSelectedCategory] =
     useState<string>("All Category");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -259,7 +260,6 @@ function Page() {
     setIsLoading(true);
 
     // Update category state
-
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
@@ -267,6 +267,9 @@ function Page() {
       setSelectedCategory("All Category");
       setSelectedCategoryId("all");
     }
+
+    // Clear subcategory when switching categories
+    setSelectedSubCategory("");
 
     if (targetRef.current) {
       const headerOffset = 145;
@@ -280,6 +283,18 @@ function Page() {
     }
 
     setIsLoading(false);
+  };
+
+  const handleSubCategorySelect = (subCategory: string) => {
+    // Track subcategory selection
+    tracking.trackClick("subcategory_filter", {
+      category_id: selectedCategoryId,
+      category_name: selectedCategory,
+      subcategory: subCategory,
+      user_id: session?.user._id,
+    });
+
+    setSelectedSubCategory(subCategory);
   };
 
   useEffect(() => {
@@ -362,7 +377,7 @@ function Page() {
             </div>
 
             <div className="w-full max-w-[1920px] mx-auto">
-              <div className="sticky top-16 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100/30 py-6">
+              <div className="sticky top-16 z-50 bg-white border-b border-gray-100">
                 <div className="px-4 sm:px-6 lg:px-8">
                   <div className="flex flex-col gap-6">
                     <h2 className="text-xl font-medium text-gray-800 md:hidden">
@@ -376,7 +391,9 @@ function Page() {
                         <CategoryBar
                           categorys={category}
                           selectCategory={handleCategorySelect}
-                          selectedCategoryId={selectedCategory}
+                          selectedCategoryId={selectedCategoryId}
+                          selectSubCategory={handleSubCategorySelect}
+                          selectedSubCategory={selectedSubCategory}
                         />
                       </div>
                     </div>
@@ -385,7 +402,7 @@ function Page() {
               </div>
 
               {/* Main Content with Enhanced Filtering */}
-              <div className="pt-3 sm:pt-6 px-4 sm:px-6 lg:px-8">
+              <div className="pt-16 sm:pt-20 px-4 sm:px-6 lg:px-8">
                 <div className="flex-1 min-w-0" ref={targetRef}>
                   <div className="rounded-xl sm:rounded-2xl">
                     <div
@@ -397,6 +414,7 @@ function Page() {
                     ) : (
                       <EnhancedCommunitySection
                         activeCategory={selectedCategoryId}
+                        activeSubCategory={selectedSubCategory}
                       />
                     )}
                   </div>
