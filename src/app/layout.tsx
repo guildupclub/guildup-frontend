@@ -183,17 +183,17 @@ export default async function RootLayout({
           />
         </noscript>
         <CookieConsentProvider>
-          <PostHogProviderWrapper>
+          {/* <PostHogProviderWrapper> */}
             <Providers>
               <NavbarClient />
               <RouteChangeTracker />
               {children}
-              <GoogleOneTap />
+              {/* <GoogleOneTap /> */}
               <Toaster richColors position="top-center" />
               <CookieConsent />
               {/* <WelcomeBanner /> */}
             </Providers>
-          </PostHogProviderWrapper>
+          {/* </PostHogProviderWrapper> */}
         </CookieConsentProvider>
       </body>
     </html>

@@ -12,4 +12,4 @@ function PostHogProviderWrapper({ children }: { children: ReactNode }) {
   );
 }
 
-export default PostHogProviderWrapper; 
+// export default PostHogProviderWrapper; 
