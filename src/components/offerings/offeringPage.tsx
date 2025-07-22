@@ -165,201 +165,153 @@ export default function OfferingDetails({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-10 space-y-6">
-      <div className="bg-white rounded-3xl shadow-xl grid md:grid-cols-3 overflow-hidden">
-        <div className="bg-gray-50 p-6 lg:py-10 flex flex-col items-center text-center border-r">
-          <div
-            className="w-full h-40 bg-cover bg-center rounded-t-3xl"
-            style={{ backgroundImage: `url(${bgImgUrl})` }}
-          ></div>
-
-          <div className="relative flex justify-center -mt-16">
-            <div className="relative">
-              <img
-                src={avatarImgUrl || "/avatar-placeholder.png"}
-                alt={fullName}
-                className="w-40 h-40 object-cover border-4 border-white shadow"
-              />
-              {isBankAdded && (
-                <RiVerifiedBadgeFill className="absolute -right-1 top-3/4 transform -translate-y-1/2 translate-x-1/2 h-12 w-12 lg:mt-4 text-primary drop-shadow-md bg-white rounded-full" />
+    <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-6 sm:py-10 space-y-0">
+      {/* Responsive flex card: horizontal on md+, vertical on mobile */}
+      <div className="bg-white rounded-3xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch md:gap-8 p-4 sm:p-6 mb-0 relative z-0">
+        {/* Avatar section */}
+        <div className="flex flex-col items-center md:items-start justify-center md:justify-start md:w-1/4">
+          <img
+            src={avatarImgUrl || "/avatar-placeholder.png"}
+            alt={fullName}
+            className="w-40 h-40 sm:w-48 sm:h-48 object-cover border-4 border-white shadow rounded-full"
+          />
+        </div>
+        {/* Info section */}
+        <div className="flex-1 flex flex-col justify-center md:justify-start md:pl-6">
+          <h3 className="text-xl sm:text-2xl font-semibold text-center md:text-left mb-2 md:mb-3">{fullName}</h3>
+          {/* Info grid: 2 columns on mobile, 3+ on desktop */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-700 mb-2">
+            {experience > 0 && (
+              <div className="flex items-center gap-1">
+                <span role="img" aria-label="exp">🎓</span>
+                <span className="font-semibold">{experience}+</span>
+                <span>Years</span>
+              </div>
+            )}
+            {sessionsTaken > 0 && (
+              <div className="flex items-center gap-1">
+                <span role="img" aria-label="clients">👥</span>
+                <span className="font-semibold">{sessionsTaken}+</span>
+                <span>Clients</span>
+              </div>
+            )}
+            {languageList?.length > 0 && (
+              <div className="flex items-center gap-1 col-span-2 md:col-span-1">
+                <span role="img" aria-label="lang">🗣️</span>
+                <span className="font-semibold">{languageList.join(", ")}</span>
+              </div>
+            )}
+          </div>
+          {/* Social stats and badges section (above session details) */}
+          <div className="flex flex-col gap-2 mt-2">
+            {/* Social stats row */}
+            <div className="flex flex-row gap-4 justify-center md:justify-start items-center">
+              {/* YouTube, Instagram, LinkedIn icons and follower counts */}
+              {communityDetails?.youtube_followers > 0 && (
+                <div className="flex items-center gap-1">
+                  <FaYoutube className="text-red-600" />
+                  <span className="font-semibold">{formatNumber(communityDetails?.youtube_followers)}+</span>
+                </div>
+              )}
+              {communityDetails?.instagram_followers > 0 && (
+                <div className="flex items-center gap-1">
+                  <FaInstagram className="text-pink-600" />
+                  <span className="font-semibold">{formatNumber(communityDetails?.instagram_followers)}+</span>
+                </div>
+              )}
+              {communityDetails?.linkedin_followers > 0 && (
+                <div className="flex items-center gap-1">
+                  <FaLinkedin className="text-blue-600" />
+                  <span className="font-semibold">{formatNumber(communityDetails?.linkedin_followers)}+</span>
+                </div>
               )}
             </div>
+            {/* Badges/tags row */}
+            <div className="flex flex-row gap-2 justify-center md:justify-start items-center mt-1">
+              {/* ...existing badges/tags code... */}
+              <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded">Most Popular</span>
+              <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded">1:1 Online</span>
+              <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded">Flexible Slots</span>
+            </div>
           </div>
-
-          <h3 className="text-2xl font-semibold mt-4">{fullName}</h3>
-          <div className="mt-4 space-y-2 text-sm text-gray-700 text-left">
-            {experience > 0 && (
-              <p>
-                🎓{" "}
-                <span className="text-base font-semibold">{experience}+</span>{" "}
-                Years Experience
-              </p>
-            )}
-
-            {sessionsTaken > 0 && (
-              <p>
-                👥{" "}
-                <span className="text-base font-semibold">
-                  {sessionsTaken}+
-                </span>{" "}
-                Clients helped
-              </p>
-            )}
-
-            {communityDetails?.youtube_followers > 0 && (
-              <p className="flex items-center gap-1">
-                <FaYoutube className="text-red-600" />
-                <span className="text-base font-semibold">
-                  {formatNumber(communityDetails?.youtube_followers)}+
-                </span>{" "}
-                Followers
-              </p>
-            )}
-
-            {communityDetails?.instagram_followers > 0 && (
-              <p className="flex items-center gap-1">
-                <FaInstagram className="text-pink-600" />
-                <span className="text-base font-semibold">
-                  {formatNumber(communityDetails?.instagram_followers)}+
-                </span>{" "}
-                Followers
-              </p>
-            )}
-
-            {communityDetails?.linkedin_followers > 0 && (
-              <p className="flex items-center gap-1">
-                <FaLinkedin className="text-blue-600" />
-                <span className="text-base font-semibold">
-                  {formatNumber(communityDetails?.linkedin_followers)}+
-                </span>{" "}
-                Followers
-              </p>
-            )}
-
-            {languageList?.length > 0 && (
-              <p>
-                🗣️{" "}
-                <span className="text-base font-semibold">
-                  {languageList.join(", ")}
-                </span>
-              </p>
-            )}
-          </div>
-
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
-            {tags.map((tag, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
+          {/* Session details at the bottom of the card */}
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 py-2 md:py-3 w-full border-t border-gray-100 mt-3">
+            <div className="flex flex-col items-center text-xs text-gray-700">
+              <span className="font-semibold">Duration</span>
+              <span>{duration ? `${duration} min` : '—'}</span>
+            </div>
+            <div className="flex flex-col items-center text-xs text-gray-700">
+              <span className="font-semibold">Format</span>
+              <span>Video Call</span>
+            </div>
+            <div className="flex flex-col items-center text-xs text-gray-700">
+              <span className="font-semibold">Type</span>
+              <span>1:1 Session</span>
+            </div>
+            <div className="flex flex-col items-center text-xs text-gray-700">
+              <span className="font-semibold">Sessions</span>
+              <span>{sessionCount || '—'}</span>
+            </div>
           </div>
         </div>
+      </div>
+      {/* Explicit margin to match info card spacing */}
+      <div className="mt-2 sm:mt-4" />
+      {/* Invisible divider for consistent spacing */}
+      <div className="h-2 sm:h-4" aria-hidden="true"></div>
+      {/* Title and description card */}
+      <div className="bg-card rounded-xl border border-border/5 p-8 shadow-sm">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4">{title}</h2>
+        <p className="whitespace-pre-line text-muted-foreground mb-0">{description}</p>
+      </div>
+      {/* Invisible divider for consistent spacing before info cards */}
+      <div className="h-2 sm:h-4" aria-hidden="true"></div>
+      {/* Details section with amount and book button at the top (desktop only) */}
+      <div className="p-0 sm:p-0 md:col-span-2">
+        {/* Desktop: amount and book button side by side */}
+        <div className="hidden md:flex items-center justify-between gap-2 mb-2">
+          <div className="text-lg sm:text-xl font-semibold">₹{price?.toLocaleString("en-IN")}</div>
+          <Button onClick={handleBookNow} className="w-auto px-6 py-2 text-sm">Book Your Session</Button>
+        </div>
+        {/* Mobile: sticky book button at bottom */}
+        <div className="block md:hidden h-16"></div>
+        {/* What to Expect: only show on md+ screens */}
+        <div className="hidden md:block bg-gray-50 border-l-4 border-green-200 px-3 py-2 sm:px-4 sm:py-3 rounded-md mt-3">
+          <h4 className="font-medium text-xs sm:text-sm text-gray-800 mb-1 sm:mb-2">✅ What to Expect</h4>
+          <ul className="text-xs sm:text-sm space-y-1.5 sm:space-y-2 text-gray-700 pl-2">
+            <li>Tailored guidance designed around your unique goals and challenges</li>
+            <li>Proven tools & expert techniques to help you make lasting progress</li>
+            <li>A safe and supportive space to grow with clarity, compassion, and accountability</li>
+          </ul>
+          <h4 className="font-medium text-xs sm:text-sm text-gray-800 mt-2 sm:mt-5">🎯 How It Works</h4>
+        </div>
 
-        <div className="p-6 md:col-span-2 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-1 rounded">
-              Most Popular
-            </span>
-            <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded">
-              Next Available: Tomorrow
-            </span>
-            <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded">
-              1:1 Online
-            </span>
-            <span className="bg-orange-100 text-orange-700 text-xs font-medium px-2 py-1 rounded">
-              Flexible Slots
-            </span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mt-2">
+          <div className="p-4 rounded-xl bg-gray-50 text-center">
+            <p className="font-medium text-sm mb-1">
+              📅 Choose a Time That Suits You
+            </p>
+            <p className="text-xs text-gray-600">
+              Browse flexible slots and book a session that fits your schedule
+            </p>
           </div>
-
-          <h2 className="text-2xl font-semibold text-gray-800">{title}</h2>
-          <p className="text-gray-600 text-sm">{description}</p>
-
-          <div className="grid grid-cols-2 gap-4 text-sm mt-4">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-gray-500" />
-              <span>Duration: {duration} minutes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <VideoIcon className="w-4 h-4 text-gray-500" />
-              <span>Format: Video Call</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <UsersIcon className="w-4 h-4 text-gray-500" />
-              <span>Type: 1:1 Session</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <BookOpenCheckIcon className="w-4 h-4 text-gray-500" />
-              <span>Sessions: {sessionCount}</span>
-            </div>
+          <div className="p-4 rounded-xl bg-gray-50 text-center">
+            <p className="font-medium text-sm mb-1">
+              🎥 Join Securely on Google Meet
+            </p>
+            <p className="text-xs text-gray-600">
+              You&apos;ll receive a private, secure link — no setup or app
+              needed
+            </p>
           </div>
-
-          <div className="bg-gray-50 p-4 rounded-xl mt-6">
-            <h4 className="font-medium text-sm text-gray-800 mb-2">
-              ✅ What to Expect
-            </h4>
-            <ul className="text-sm space-y-2 text-gray-700">
-              <li>
-                Tailored guidance designed around your unique goals and
-                challenges
-              </li>
-              <li>
-                Proven tools & expert techniques to help you make lasting
-                progress
-              </li>
-              <li>
-                A safe and supportive space to grow with clarity, compassion,
-                and accountability
-              </li>
-            </ul>
-
-            <h4 className="font-medium text-sm text-gray-800 mt-5">
-              🎯 How It Works
-            </h4>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-gray-50 text-center">
-              <p className="font-medium text-sm mb-1">
-                📅 Choose a Time That Suits You
-              </p>
-              <p className="text-xs text-gray-600">
-                Browse flexible slots and book a session that fits your schedule
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50 text-center">
-              <p className="font-medium text-sm mb-1">
-                🎥 Join Securely on Google Meet
-              </p>
-              <p className="text-xs text-gray-600">
-                You&apos;ll receive a private, secure link — no setup or app
-                needed
-              </p>
-            </div>
-            <div className="p-4 rounded-xl bg-gray-50 text-center">
-              <p className="font-medium text-sm mb-1">
-                🔄 Reflect, Apply, Grow
-              </p>
-              <p className="text-xs text-gray-600">
-                Take your learnings into real life. Reflect on the shifts,
-                celebrate the small wins.
-              </p>
-            </div>
-          </div>
-
-          <div className="p-6 bg-white rounded-2xl shadow flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="text-xl font-semibold">
-              ₹{price?.toLocaleString("en-IN")}{" "}
-              <span className="text-sm font-normal">per session</span>
-            </div>
-            <Button
-              onClick={handleBookNow}
-              className="mt-4 md:mt-0 w-full md:w-auto"
-            >
-              Book Your Session
-            </Button>
+          <div className="p-4 rounded-xl bg-gray-50 text-center">
+            <p className="font-medium text-sm mb-1">
+              🔄 Reflect, Apply, Grow
+            </p>
+            <p className="text-xs text-gray-600">
+              Take your learnings into real life. Reflect on the shifts,
+              celebrate the small wins.
+            </p>
           </div>
         </div>
       </div>
@@ -374,7 +326,7 @@ export default function OfferingDetails({
           }}
           isOpen={!!selectedOffering}
           onClose={() => setSelectedOffering(null)}
-          communityId={communityId}
+          communityId={communityId || ""}
         />
       )}
 
@@ -383,6 +335,14 @@ export default function OfferingDetails({
         <span>🔁 Easy Reschedule</span>
         <span>🔒 Secure & Private</span>
       </div>
+    {/* Sticky Book Button for mobile */}
+    <div className="block md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 px-4 py-3 flex flex-row items-center justify-between shadow-lg">
+      <div className="text-2xl font-extrabold text-gray-900">
+        ₹{price?.toLocaleString("en-IN")}
+      </div>
+      <Button onClick={handleBookNow} className="ml-4 flex-1 max-w-xs text-base py-3 font-semibold">Book Your Session</Button>
     </div>
+    <div className="-mt-4"></div>
+  </div>
   );
 }
