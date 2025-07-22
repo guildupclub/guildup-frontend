@@ -19,6 +19,7 @@ import Loader from '@/components/Loader';
 import { useTracking } from '@/hooks/useTracking';
 import axios from 'axios';
 import { setUserFollowedCommunities } from '@/redux/userSlice';
+import Footer from '@/components/layout/Footer';
 
 interface Category {
   _id: string;
@@ -205,7 +206,7 @@ const ExplorePage: React.FC = () => {
       iconBg: 'bg-pink-100',
       cardBg: 'bg-gradient-to-b from-white to-pink-50',
       textColor: 'text-primary',
-      isSelected: true
+      isSelected: false
     },
     {
       name: 'Relationship and Parenting',
@@ -251,7 +252,7 @@ const ExplorePage: React.FC = () => {
     {
       name: 'Diabetes',
       icon: '🩸',
-      isSelected: true
+      isSelected: false
     },
     {
       name: 'Cholesterol',
@@ -431,7 +432,7 @@ const ExplorePage: React.FC = () => {
           </div>
 
           {/* Popular Sub Categories Section */}
-          <div className="bg-white py-16">
+          <div className="bg-gradient-to-b from-primary/2 to-white py-16">
             <div className="container mx-auto px-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Popular Sub categories</h2>
               
@@ -471,7 +472,7 @@ const ExplorePage: React.FC = () => {
             </div>
           </div>
         </div>
-
+        
         <PageTracker
           pageName="Explore"
           pageCategory="discovery"
