@@ -10,7 +10,7 @@ import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
-import GoogleOneTap from "@/components/GoogleOneTap";
+// import GoogleOneTap from "@/components/GoogleOneTap";
 
 import RouteChangeTracker from "@/components/RouteChangeTracker";
 import dynamic from "next/dynamic";
@@ -188,9 +188,9 @@ export default async function RootLayout({
               <NavbarClient />
               <RouteChangeTracker />
               {children}
-              <GoogleOneTap />
+              {/* <GoogleOneTap /> */}
               <Toaster richColors position="top-center" />
-              <CookieConsent />
+              {/* <CookieConsent /> */}
               {/* <WelcomeBanner /> */}
             </Providers>
           </PostHogProviderWrapper>
