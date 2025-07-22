@@ -12,6 +12,15 @@ const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
 
+  // Cleanup timeout on unmount - moved to top level
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
+
   if (!context) {
     console.error(
       "NotificationDropdown must be used within a NotificationProvider"
@@ -42,15 +51,6 @@ const NotificationDropdown = () => {
     }, 200); // 200ms delay before closing
     setHoverTimeout(timeout);
   };
-
-  // Cleanup timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-    };
-  }, [hoverTimeout]);
 
   const handleRefresh = async () => {
     try {
