@@ -376,15 +376,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               <div className="hidden md:flex items-center">
                 <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
                   <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
-                    <Link href="/" className="flex flex-col items-center">
+                    <Link href="/explore" className="flex flex-col items-center">
                       <Compass
                         className={`h-5 w-5 ${
-                          isActive("/") ? "text-primary" : ""
+                          isActive("/explore") ? "text-primary" : ""
                         }`}
                       />
                       <span
                         className={`text-xs lg:text-sm mt-1 hidden md:block ${
-                          isActive("/") ? "text-primary font-medium" : ""
+                          isActive("/explore") ? "text-primary font-medium" : ""
                         }`}
                       >
                         {StringConstants.EXPLORE}

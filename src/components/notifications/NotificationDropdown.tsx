@@ -1,12 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNotifications } from "./NotificationContext";
@@ -14,6 +9,17 @@ import { formatDistanceToNow } from "date-fns";
 
 const NotificationDropdown = () => {
   const context = useNotifications();
+  const [isOpen, setIsOpen] = useState(false);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Cleanup timeout on unmount - moved to top level
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   if (!context) {
     console.error(
@@ -30,6 +36,21 @@ const NotificationDropdown = () => {
     markAllAsRead,
     fetchNotifications,
   } = context;
+
+  const handleMouseEnter = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    const timeout = setTimeout(() => {
+      setIsOpen(false);
+    }, 200); // 200ms delay before closing
+    setHoverTimeout(timeout);
+  };
 
   const handleRefresh = async () => {
     try {
@@ -49,28 +70,27 @@ const NotificationDropdown = () => {
 
   try {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div className="flex flex-col items-center">
-            <button className="relative rounded-full text-gray-600  hover:bg-gray-50 transition-colors p-1">
-              <Bell className="h-5 w-5 mb-0 pb-0" />
+      <div 
+        className="relative"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <button className="relative p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+          <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
                 <Badge
                   variant="destructive"
-                  className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-xs"
+              className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 text-xs"
                 >
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </Badge>
               )}
             </button>
-            <span className="text-gray-600 text-xs lg:text-sm hidden md:block">
-              Notifications
-            </span>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-80 max-h-[400px] overflow-y-auto mt-2 bg-white">
+        
+        {isOpen && (
+          <div className="absolute right-0 top-full mt-2 w-80 max-h-[400px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
           <div className="flex items-center justify-between p-3 border-b">
-            <h3 className="font-medium ">Notifications</h3>
+              <h3 className="font-medium">Notifications</h3>
             <div className="flex gap-2 items-center">
               <button
                 onClick={handleRefresh}
@@ -104,9 +124,9 @@ const NotificationDropdown = () => {
           ) : notifications.length > 0 ? (
             <div className="py-2">
               {notifications.map((notification) => (
-                <DropdownMenuItem
+                  <div
                   key={notification._id}
-                  className={`p-3 cursor-pointer ${
+                    className={`p-3 cursor-pointer hover:bg-gray-50 ${
                     notification.read ? "bg-white" : "bg-zinc-100 font-semibold"
                   }`}
                   onClick={() => handleNotificationClick(notification._id)}
@@ -131,7 +151,7 @@ const NotificationDropdown = () => {
                       </p>
                     </div>
                   </div>
-                </DropdownMenuItem>
+                  </div>
               ))}
             </div>
           ) : (
@@ -139,8 +159,9 @@ const NotificationDropdown = () => {
               <p>No notifications yet</p>
             </div>
           )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </div>
+        )}
+      </div>
     );
   } catch (error) {
     console.error("Error rendering notification dropdown:", error);
