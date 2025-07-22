@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
-import { Search, Star, Users, MapPin, Clock, ChevronDown, MessageCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Search, Star, Users, MapPin, Clock, ChevronDown, MessageCircle, ArrowLeft, ArrowRight, HelpCircle, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -20,6 +20,7 @@ import { useTracking } from '@/hooks/useTracking';
 import axios from 'axios';
 import { setUserFollowedCommunities } from '@/redux/userSlice';
 import Footer from '@/components/layout/Footer';
+import ExpertCard from '@/components/explore/ExpertCard';
 
 interface Category {
   _id: string;
@@ -58,6 +59,17 @@ const ExplorePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const [communities, setCommunities] = useState<any[]>([]);
+  const [loadingCommunities, setLoadingCommunities] = useState(false);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  // State for filters
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('');
+  const [offeringType, setOfferingType] = useState('');
+  const [priceRange, setPriceRange] = useState('');
+  const [duration, setDuration] = useState('');
+  const [sortBy, setSortBy] = useState('relevance');
 
   useEffect(() => {
     setIsMounted(true);
@@ -104,6 +116,51 @@ const ExplorePage: React.FC = () => {
       fetchCommunities();
     }
   }, [session, status, isMounted, dispatch]);
+
+  const fetchCommunities = useCallback(async (pageNum = 0) => {
+    setLoadingCommunities(true);
+    try {
+      const params = new URLSearchParams({
+        page: String(pageNum),
+        limit: String(20),
+        offeringType,
+        priceRange,
+        duration,
+        sortBy,
+      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?${params.toString()}`
+      );
+      const newCommunities = res.data.data || [];
+      setCommunities(prev => pageNum === 0 ? newCommunities : [...prev, ...newCommunities]);
+      setHasMore(newCommunities.length > 0);
+    } finally {
+      setLoadingCommunities(false);
+    }
+  }, [offeringType, priceRange, duration, sortBy]);
+
+  useEffect(() => {
+    setPage(0);
+    fetchCommunities(0);
+  }, [offeringType, priceRange, duration, sortBy, fetchCommunities]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 &&
+        !loadingCommunities &&
+        hasMore
+      ) {
+        setPage(prev => {
+          const nextPage = prev + 1;
+          fetchCommunities(nextPage);
+          return nextPage;
+        });
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [loadingCommunities, hasMore, fetchCommunities]);
 
   const categoryToUrl = (name: string) => {
     return name.replace(/\s+/g, "-");
@@ -470,6 +527,110 @@ const ExplorePage: React.FC = () => {
                 ))}
               </div>
             </div>
+          </div>
+          {/* Communities Section */}
+          <div className="container mx-auto px-6 py-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+              <h2 className="text-2xl font-bold text-gray-900">All Communities</h2>
+              <div className="flex gap-2 flex-wrap">
+                <div className="relative">
+                  <select
+                    value={offeringType}
+                    onChange={e => setOfferingType(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Offering Type</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Coaching">Coaching</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Webinar">Webinar</option>
+                    <option value="Course">Course</option>
+                    <option value="Mentorship">Mentorship</option>
+                    <option value="Speaking">Speaking</option>
+                    <option value="Freelance Services">Freelance Services</option>
+                  </select>
+                  <Users className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={priceRange}
+                    onChange={e => setPriceRange(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Price Range</option>
+                    <option value="Free">Free</option>
+                    <option value="₹0 - ₹500">₹0 - ₹500</option>
+                    <option value="₹500 - ₹1000">₹500 - ₹1000</option>
+                    <option value="₹1000+">₹1000+</option>
+                  </select>
+                  <HelpCircle className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={duration}
+                    onChange={e => setDuration(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Duration</option>
+                    <option value="15 min">15 min</option>
+                    <option value="30 min">30 min</option>
+                    <option value="45 min">45 min</option>
+                    <option value="60 min">60 min</option>
+                    <option value="90 min+">90 min+</option>
+                  </select>
+                  <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="relevance">Sort by</option>
+                    <option value="rating">Rating</option>
+                    <option value="price: low to high">Price: Low to High</option>
+                    <option value="price: high to low">Price: High to Low</option>
+                    <option value="experience">Experience</option>
+                    <option value="newest">Newest</option>
+                  </select>
+                  <SlidersHorizontal className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {communities.map((communityObj, idx) => (
+                <ExpertCard
+                  key={communityObj.community ? communityObj.community._id : communityObj._id}
+                  expert={{
+                    name: communityObj.community ? communityObj.community.name : communityObj.name,
+                    specialty: communityObj.community ? communityObj.community.description : communityObj.description || '',
+                    rating: 5,
+                    sessions: communityObj.community ? communityObj.community.owner_sessions : communityObj.owner_sessions || 0,
+                    avatar: communityObj.community ? communityObj.community.image : communityObj.image || '/avatar-placeholder.png',
+                    verified: true,
+                    available: true,
+                    url: `/community/${communityObj.community ? communityObj.community._id : communityObj._id}`,
+                    languages: communityObj.community ? communityObj.community.owner_languages : communityObj.owner_languages || [],
+                    experience: String((communityObj.community ? communityObj.community.owner_experience : communityObj.owner_experience) || '1'),
+                    nextSlot: 'Tomorrow',
+                    price: '0',
+                    originalPrice: '',
+                    consultation: '',
+                    skills: communityObj.community ? communityObj.community.tags : communityObj.tags || [],
+                  }}
+                  index={idx % 2}
+                  currentIndex={idx}
+                />
+              ))}
+            </div>
+            {loadingCommunities && (
+              <div className="flex justify-center py-6">
+                <Loader />
+              </div>
+            )}
+            {!hasMore && communities.length > 0 && (
+              <div className="text-center text-gray-400 py-4">No more communities to load.</div>
+            )}
           </div>
         </div>
         

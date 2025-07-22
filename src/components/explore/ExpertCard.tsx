@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, Shield, Users, Calendar, Phone, Globe } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface Expert {
   name: string;
@@ -32,6 +33,31 @@ interface ExpertCardProps {
 }
 
 export default function ExpertCard({ expert, index, currentIndex }: ExpertCardProps) {
+  const router = useRouter();
+  const cardRef = React.useRef<HTMLDivElement>(null);
+
+  // Helper to slugify the community name
+  const slugify = (str: string) =>
+    str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const handleCardClick = () => {
+    if (expert && expert.url) {
+      // Extract community id and name from url or expert
+      // expert.url is like `/community/[id]`
+      const idMatch = expert.url.match(/\/community\/(\w+)/);
+      const communityId = idMatch ? idMatch[1] : '';
+      const communityName = slugify(expert.name);
+      if (communityId && communityName) {
+        router.push(`/community/${communityName}-${communityId}/profile`);
+      } else if (expert.url) {
+        router.push(expert.url);
+      }
+    }
+  };
+
   return (
     <motion.div
       key={`${expert.name}-${currentIndex}`}
@@ -43,9 +69,11 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
         ease: "easeInOut",
         delay: index * 0.1 
       }}
-      className="flex flex-col"
+      className="flex flex-col cursor-pointer"
+      ref={cardRef}
+      onClick={handleCardClick}
     >
-      <div className="bg-primary/5 rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full">
+      <div className="bg-primary/5 rounded-lg p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
         {/* Top Section - Expert Profile */}
         <div className="flex gap-4 mb-4">
           {/* Expert Image */}
@@ -65,7 +93,7 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
               <h3 className="text-lg font-bold text-gray-900 mb-1">{expert.name}</h3>
-              <p className="text-sm text-gray-600 mb-2">{expert.specialty}</p>
+              <p className="text-sm text-gray-600 mb-2 line-clamp-3">{expert.specialty}</p>
               
               {/* Consultation Details */}
               <div className="flex items-center gap-2 mb-2">
