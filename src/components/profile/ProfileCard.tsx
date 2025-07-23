@@ -19,67 +19,19 @@ import { OfferingsList } from "./OfferingsList";
 import { CallToActionBanner } from "./CallToActionBanner";
 import { ContentFeed } from "./ContentFeed";
 import { TestimonialSection } from "./TestimonialSection";
+import { ProfileSectionLeftHero } from "./ProfileSectionLeftHero";
 
-interface CommunityProfile {
-  user: {
-    user_name: string;
-    user_email: string;
-    user_avatar: string;
-    about?: string;
-    user_isBankDetailsAdded: boolean;
-    user_iscalendarConnected: boolean;
-    user_year_of_experience: number;
-    user_session_conducted: number;
-    user_languages: string[];
-  };
-  community: {
-    name: string;
-    num_member: number;
-    post_count: number;
-    description: string;
-    is_locked: boolean;
-    tags: string[];
-    image: string;
-    background_image: string;
-    youtube_followers: number;
-    instagram_followers: number;
-    linkedin_followers: number;
-  };
-}
 
 interface ProfileCardProps {
   communityId: string;
 }
 
-interface Offering {
-  _id: string;
-  title: string;
-  description: string;
-  type: string;
-  price: {
-    amount: number;
-    currency: string;
-  };
-  discounted_price: string;
-  when: Date;
-  duration: number;
-  is_free: boolean;
-  tags: string[];
-  rating: number;
-  total_ratings: number;
-}
 
-export function ProfileCard({ communityId }: ProfileCardProps) {
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
+export function ProfileCard() {
   const { data: session } = useSession();
   const params = useParams();
   const communityParam = params?.["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
-  const communityName =
-    lastHyphenIndex !== -1
-      ? communityParam.substring(0, lastHyphenIndex)
-      : null;
   const communityIdFromParam =
     lastHyphenIndex !== -1
       ? communityParam.substring(lastHyphenIndex + 1)
@@ -143,25 +95,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     return num?.toString() || "0";
   };
 
-  const getCurrentDate = () => {
-    const now = new Date();
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    };
-    return now.toLocaleDateString("en-US", options);
-  };
-
-  const getCurrentTime = () => {
-    const now = new Date();
-    return now.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
   const scrollToOfferings = () => {
     const offeringsSection = document.getElementById("offerings-section");
     if (offeringsSection) {
@@ -193,135 +126,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       <div className="max-w-7xl mx-auto p-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           
-          {/* Left Profile Section */}
-          <div className="flex flex-col items-center relative">
-            {/* Share Button - Top Right */}
-            <button className="absolute top-0 right-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700 transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17,8 12,3 7,8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
-            </button>
 
-            {/* Profile Image */}
-            <div className="relative mb-3">
-              <img
-                src={profile.community.image || "/defaultCommunityIcon.png"}
-                alt={profile.community.name}
-                className="w-32 h-32 rounded-full object-cover shadow-lg bg-gray-200"
-              />
-            </div>
-
-            {/* Rating Badge */}
-            <div className="mb-4">
-              <div className="bg-orange-400 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
-                <span>⭐</span>
-                <span>4.8 (30 reviews)</span>
-              </div>
-            </div>
-
-            {/* Name and Follow Button Section */}
-            <div className="text-center mb-4 w-full">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {profile.community.name}
-              </h1>
-              
-              {/* Community Owner Name - Under the community name */}
-              <p className="text-gray-500 text-sm mb-3">
-                {profile.user.user_name}
-              </p>
-              
-              {/* Follow/Edit Button - Centered below */}
-              <div className="flex justify-center">
-                {!isOwner ? (
-                  <button 
-                    onClick={() => followMutation.mutate()}
-                    disabled={followMutation.isPending}
-                    className="bg-blue-600 text-white px-4 py-1.5 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 text-xs font-medium flex items-center gap-1.5"
-                  >
-                    <span>👤</span>
-                    {followMutation.isPending ? "..." : isFollowing ? "Following" : "Follow"}
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => setIsEditing(true)}
-                    className="bg-gray-600 text-white px-4 py-1.5 rounded-md hover:bg-gray-700 transition-colors flex items-center justify-center gap-1.5 text-xs font-medium"
-                  >
-                    <Edit size={12} />
-                    Edit Profile
-                  </button>
-                )}
-              </div>
-            </div>
-              
-            {/* Tags - Two rows layout */}
-            <div className="w-full mb-6">
-              {/* First row - 5 tags */}
-              <div className="flex justify-center gap-2 mb-2">
-                {profile.community.tags?.slice(0, 5).map((tag: string, index: number) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              
-              {/* Second row - 3 tags centered */}
-              {profile.community.tags && profile.community.tags.length > 5 && (
-                <div className="flex justify-center gap-2">
-                  {profile.community.tags.slice(5, 8).map((tag: string, index: number) => (
-                    <span
-                      key={index + 5}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons - Side by side as shown in image */}
-            <div className="w-full flex gap-2 mb-6">
-              <ChatSupportButton
-                expertEmail={profile.user.user_email}
-                expertDetails={{
-                  name: profile.user.user_name,
-                  image: profile.user.user_avatar || profile.community.image,
-                  email: profile.user.user_email,
-                }}
-                isBankConnected={profile.user.user_isBankDetailsAdded}
-                className="flex-1 !px-4 !py-3 !text-xs !font-medium !min-h-[44px] !bg-green-50 !border-green-500 !text-green-600 hover:!bg-green-100 !rounded-lg"
-              />
-              
-              <button 
-                onClick={scrollToOfferings}
-                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium min-h-[44px]"
-              >
-                <Phone size={14} />
-                Quick Explore Call
-              </button>
-            </div>
-
-            {/* Social Media - Centered */}
-            <div className="flex gap-3 justify-center">
-              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
-                <FaFacebook className="text-white text-sm" />
-              </div>
-              <div className="w-8 h-8 bg-pink-500 rounded flex items-center justify-center cursor-pointer hover:bg-pink-600 transition-colors">
-                <GrInstagram className="text-white text-sm" />
-              </div>
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center cursor-pointer hover:bg-gray-800 transition-colors">
-                <FaTwitter className="text-white text-sm" />
-              </div>
-              <div className="w-8 h-8 bg-blue-400 rounded flex items-center justify-center cursor-pointer hover:bg-blue-500 transition-colors">
-                <FaLinkedinIn className="text-white text-sm" />
-              </div>
-            </div>
-          </div>
+          <ProfileSectionLeftHero
+            profile={profile}
+            isOwner={isOwner}
+            isFollowing={isFollowing}
+            followMutation={followMutation}
+            setIsEditing={setIsEditing}
+            scrollToOfferings={scrollToOfferings}
+          />
 
           {/* Right Content Section */}
           <div className="flex flex-col">
