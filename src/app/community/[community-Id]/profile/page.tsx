@@ -25,7 +25,7 @@ export default function Page() {
       dispatch(
         setCommunityData({
           communityId: communityId,
-          userId: null, 
+          userId: "", 
         })
       );
     }
