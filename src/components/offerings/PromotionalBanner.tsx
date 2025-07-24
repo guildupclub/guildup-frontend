@@ -31,7 +31,7 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   // 3. Offering ID contains keywords like "promo", "special", "deal", "sale"
   const hasSignificantDiscount = ((originalPrice - discountedPrice) / originalPrice) >= 0.15;
   const hasPromoKeywords = /promo|special|deal|sale|offer|discount/i.test(offeringId);
-  const shouldShowBanner = true; // Always show banner
+  const shouldShowBanner = eligibleOfferingIds.includes(offeringId); // Always show banner
 
   useEffect(() => {
     if (!shouldShowBanner) return;
