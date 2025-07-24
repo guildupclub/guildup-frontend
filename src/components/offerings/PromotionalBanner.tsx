@@ -19,19 +19,14 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   const [animatedPrice, setAnimatedPrice] = useState(originalPrice);
   const [slotsLeft, setSlotsLeft] = useState(limitedSlots);
 
-  // Show banner only for specific offering IDs or when there's a significant discount
+  // Show banner only for the specific offering
   const eligibleOfferingIds = [
-    "68736ffc7292d227edb954cf", // Add your specific offering IDs here
     "687135a760c4b417811f345e",
+    "688088d8db6573f8f8b68bd3" // Specific offering from guildup.club
   ];
   
-  // Show banner if: 
-  // 1. Offering ID matches promotional offerings
-  // 2. There's a discount of 15% or more
-  // 3. Offering ID contains keywords like "promo", "special", "deal", "sale"
-  const hasSignificantDiscount = ((originalPrice - discountedPrice) / originalPrice) >= 0.15;
-  const hasPromoKeywords = /promo|special|deal|sale|offer|discount/i.test(offeringId);
-  const shouldShowBanner = eligibleOfferingIds.includes(offeringId); // Always show banner
+  // Show banner only if offering ID matches the specific promotional offering
+  const shouldShowBanner = eligibleOfferingIds.includes(offeringId);
 
   useEffect(() => {
     if (!shouldShowBanner) return;

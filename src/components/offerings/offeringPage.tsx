@@ -173,7 +173,7 @@ export default function OfferingDetails({
         originalPrice={price + Math.floor(price * 0.3)} // Simulating original price as 30% higher
         discountedPrice={price}
         limitedSlots={Math.floor(Math.random() * 8) + 3} // Random slots between 3-10
-        offeringId={"687135a760c4b417811f345e"}
+        offeringId={offeringId}
       />
      </div>
       
