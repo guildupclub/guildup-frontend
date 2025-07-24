@@ -106,7 +106,7 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
             {/* Original Price */}
             <div className="text-center">
               <span className="text-white/70 text-xs line-through">
-                ₹{originalPrice.toLocaleString("en-IN")}
+                ₹{999}
               </span>
             </div>
 
