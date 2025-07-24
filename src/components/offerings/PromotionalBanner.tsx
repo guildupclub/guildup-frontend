@@ -22,7 +22,7 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   // Show banner only for specific offering IDs or when there's a significant discount
   const eligibleOfferingIds = [
     "68736ffc7292d227edb954cf", // Add your specific offering IDs here
-    "687135a760c4b417811f345e"
+    "687135a760c4b417811f345e",
   ];
   
   // Show banner if: 
@@ -31,7 +31,7 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   // 3. Offering ID contains keywords like "promo", "special", "deal", "sale"
   const hasSignificantDiscount = ((originalPrice - discountedPrice) / originalPrice) >= 0.15;
   const hasPromoKeywords = /promo|special|deal|sale|offer|discount/i.test(offeringId);
-  const shouldShowBanner = eligibleOfferingIds.includes(offeringId) || hasSignificantDiscount || hasPromoKeywords;
+  const shouldShowBanner = true; // Always show banner
 
   useEffect(() => {
     if (!shouldShowBanner) return;
