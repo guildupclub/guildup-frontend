@@ -139,7 +139,7 @@ export default function OfferingDetails({
   const offering = offeringData?.data;
   const user = userData?.data;
   const community = communityData?.data;
-
+  const communityName = community?.name;
   const fullName = user?.name || "";
   const price = offering?.price?.amount || 0;
   const duration = offering?.duration || 60;
@@ -182,14 +182,14 @@ export default function OfferingDetails({
         {/* Avatar section */}
         <div className="flex flex-col items-center md:items-start justify-center md:justify-start md:w-1/4">
           <img
-            src={avatarImgUrl || "/avatar-placeholder.png"}
+            src={avatarImgUrl}
             alt={fullName}
             className="w-40 h-40 sm:w-48 sm:h-48 object-cover border-4 border-white shadow rounded-full"
           />
         </div>
         {/* Info section */}
         <div className="flex-1 flex flex-col justify-center md:justify-start md:pl-6">
-          <h3 className="text-xl sm:text-2xl font-semibold text-center md:text-left mb-2 md:mb-3">{fullName}</h3>
+          <h3 className="text-xl sm:text-2xl font-semibold text-center md:text-left mb-2 md:mb-3">{communityName}</h3>
           {/* Info grid: 2 columns on mobile, 3+ on desktop */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-700 mb-2">
             {experience > 0 && (
