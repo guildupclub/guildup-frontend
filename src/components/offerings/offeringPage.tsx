@@ -14,6 +14,7 @@ import { RiVerifiedBadgeFill } from "react-icons/ri";
 import { signIn, useSession } from "next-auth/react";
 import { FaInstagram, FaLinkedin, FaYoutube } from "react-icons/fa6";
 import numbro from "numbro";
+import PromotionalBanner from "./PromotionalBanner";
 
 interface Offering {
   _id: string;
@@ -166,6 +167,16 @@ export default function OfferingDetails({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-6 sm:py-10 space-y-0">
+      {/* Promotional Banner */}
+     <div className="w-full">
+      <PromotionalBanner
+        originalPrice={price + Math.floor(price * 0.3)} // Simulating original price as 30% higher
+        discountedPrice={price}
+        limitedSlots={Math.floor(Math.random() * 8) + 3} // Random slots between 3-10
+        offeringId={offeringId}
+      />
+     </div>
+      
       {/* Responsive flex card: horizontal on md+, vertical on mobile */}
       <div className="bg-white rounded-3xl shadow-xl flex flex-col md:flex-row items-center md:items-stretch md:gap-8 p-4 sm:p-6 mb-0 relative z-0">
         {/* Avatar section */}
