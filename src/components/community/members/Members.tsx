@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
-import { UserCircle, MoreHorizontal } from "lucide-react";
+import { UserCircle, MoreHorizontal, MessageCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -57,11 +58,28 @@ export default function Members({ communityId }: MembersProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const baseUrlBackend = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  const router = useRouter();
 
   const { user } = useSelector((state: RootState) => state.user);
   const removerUserId = user?._id;
 
   const activeCommunityId = communityId;
+
+  const handleStartChat = (member: Member) => {
+    const followerDetails = {
+      name: member.user_id.name,
+      email: member.user_id.email,
+      image: member.user_id.avatar
+    };
+
+    const params = new URLSearchParams({
+      receiverEmail: followerDetails.email,
+      receiverName: followerDetails.name,
+      ...(followerDetails.image && { receiverImage: followerDetails.image })
+    });
+
+    router.push(`/chat?${params.toString()}`);
+  };
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -154,7 +172,7 @@ export default function Members({ communityId }: MembersProps) {
                   </div>
                 </div>
               ))
-            : members.map((member) => (
+            : members.filter((member) => member.user_id).map((member) => (
                 <div
                   key={member._id}
                   className="flex items-center justify-between p-4 rounded-lg bg-background transition-colors"
@@ -197,11 +215,28 @@ export default function Members({ communityId }: MembersProps) {
                       </p>
                     </div>
                   </div>
-                  {members.find(
-                    (m) => m.user_id._id === user?._id && m.is_owner
-                  ) &&
-                    member.user_id._id !== user?._id && (
-                      <DropdownMenu>
+                  <div className="flex items-center gap-2">
+                    {/* Start Chat Button - Only for community owners */}
+                    {members.find(
+                      (m) => m.user_id && m.user_id._id === user?._id && m.is_owner
+                    ) &&
+                      member.user_id._id !== user?._id && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleStartChat(member)}
+                          className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 hover:text-blue-800"
+                        >
+                          <MessageCircle className="h-3 w-3" />
+                          <span className="text-xs">Chat</span>
+                        </Button>
+                    )}
+                    {/* Existing dropdown menu for removing users */}
+                    {members.find(
+                      (m) => m.user_id && m.user_id._id === user?._id && m.is_owner
+                    ) &&
+                      member.user_id._id !== user?._id && (
+                        <DropdownMenu>
                         <DropdownMenuTrigger>
                           <button
                             aria-label="Options"
@@ -222,6 +257,7 @@ export default function Members({ communityId }: MembersProps) {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
+                  </div>
                 </div>
               ))}
         </div>

@@ -41,6 +41,7 @@ import { BsCalendarCheck } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { setActiveCommunity } from "@/redux/channelSlice";
+import { useChatContext } from "@/contexts/ChatContext";
 
 interface BookingDialogProps {
   offering: {
@@ -94,6 +95,9 @@ export function BookingDialog({
   const userId = useSelector((state: RootState) => state.user.user?._id);
   const user = useSelector((state: RootState) => state.user.user);
   const isLoggedIn = !!userId;
+  
+  // Chat context for automatic message after booking
+  const { sendMessage, startNewChat } = useChatContext();
 
   // Use guest info if not logged in, otherwise use user info
   const name = isLoggedIn ? user?.name || "" : guestName;
@@ -361,6 +365,7 @@ export function BookingDialog({
             toast.error("Booking failed — missing booking ID.");
             return;
           }
+          initiateChat();
 
           setIsProcessing(false);
           toast.success("Booking confirmed successfully!");
@@ -442,13 +447,14 @@ export function BookingDialog({
             if (verifyResponse.data.r === "s") {
               const bookingId = verifyResponse?.data?.data?._id;
               if (!bookingId) {
-                toast.error("Booking failed — missing booking ID.");
+                toast.error("Booking failed.");
+                console.log("Booking failed - missing booking ID", verifyResponse.data);
                 return;
               }
 
               setIsProcessing(false);
               toast.success("Booking confirmed successfully!");
-
+                
               // Close dialog and redirect to booking confirmation page
               onClose();
               const offeringParams = new URLSearchParams({
@@ -465,6 +471,8 @@ export function BookingDialog({
                 selectedTime: selectedSlot?.start || "",
               });
               router.push(`/booking-confirmation?${offeringParams.toString()}`);
+
+              initiateChat();
 
               tracking.trackUserAction("paid_booking_confirmed", {
                 offering_id: offering._id,
@@ -604,6 +612,23 @@ export function BookingDialog({
     }
     setIsProcessing(false);
   };
+
+  const initiateChat = async () => {
+    console.log("Initiating chat");
+    console.log("Active community data", activeCommunityData);
+    const expertDetails = {
+      name: activeCommunityData?.user?.user_name,
+      email: activeCommunityData?.user?.user_email,
+      image: activeCommunityData?.user?.user_avatar || activeCommunityData?.user?.user_image
+    };
+    const bookingDate = selectedDate ? format(selectedDate, "MMMM d, yyyy") : "TBD";
+    const bookingTime = selectedSlot?.start ? format(new Date(selectedSlot.start), "h:mm a") : "TBD";
+    const autoMessage = `Hey!\nI have just booked a session with you.\n\nOn ${bookingDate}: ${bookingTime}`;
+    console.log("Sending message to", expertDetails.email, autoMessage, user?.email);
+    sendMessage(expertDetails.email, autoMessage, user?.email);
+    // startNewChat(expertDetails.email, expertDetails);
+    console.log("Automatic booking chat message sent successfully");
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
