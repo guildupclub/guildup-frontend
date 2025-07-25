@@ -70,7 +70,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     sendMessage, 
     setCurrentChat, 
     markAsRead, 
-    startNewChat 
+    startNewChat,
+    deleteConversation 
   } = useChatContext();
   
   const [newMessage, setNewMessage] = useState('');
@@ -83,6 +84,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [editingMessage, setEditingMessage] = useState<any>(null);
   const [editText, setEditText] = useState('');
+  
+  // Delete conversation states
+  const [deletingChat, setDeletingChat] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // File attachment states
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
@@ -184,6 +189,30 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setShowConversations(false);
     }
   }, [receiverEmail, receiverDetails, user?._id]);
+
+  // Delete conversation handlers
+  const handleDeleteChat = (chatId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingChat(chatId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!deletingChat) return;
+
+    try {
+      await deleteConversation(deletingChat);
+      setShowDeleteConfirm(false);
+      setDeletingChat(null);
+    } catch (error) {
+      // Error is already handled in the deleteConversation function
+    }
+  };
+
+  const cancelDeleteChat = () => {
+    setShowDeleteConfirm(false);
+    setDeletingChat(null);
+  };
 
   // Calculate unread message counts
   useEffect(() => {
@@ -700,17 +729,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 if (!otherParticipant) return null;
 
                 return (
-                  <button
+                  <div
                     key={conversation.id}
-                    onClick={() => {
-                      setCurrentChat(conversation.id);
-                      setShowConversations(false);
-                    }}
-                    className={`w-full p-3 border-b border-gray-100 text-left hover:bg-gray-50 transition-colors ${
+                    className={`group relative w-full border-b border-gray-100 hover:bg-gray-50 transition-colors ${
                       currentChat === conversation.id ? 'bg-blue-50 border-l-4 border-l-primary' : ''
                     }`}
                   >
-                    <div className="flex items-start gap-2">
+                    <button
+                      onClick={() => {
+                        setCurrentChat(conversation.id);
+                        setShowConversations(false);
+                      }}
+                      className="w-full p-3 text-left flex items-start gap-2"
+                    >
                       <div className="relative">
                         <Avatar className="h-8 w-8 mt-0.5">
                           <AvatarImage src={otherParticipant.image} />
@@ -751,8 +782,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                           </span>
                         </div>
                       </div>
-                    </div>
-                  </button>
+                    </button>
+                    
+                    {/* Delete button - visible on hover */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeletingChat(conversation.id);
+                        setShowDeleteConfirm(true);
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-100 rounded text-red-500 hover:text-red-700"
+                      title="Delete conversation"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
                 );
               })}
             </div>
@@ -1411,6 +1455,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="h-5 w-5 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Delete Conversation</h3>
+                <p className="text-sm text-gray-600">This action cannot be undone.</p>
+              </div>
+            </div>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete this conversation? All messages will be permanently removed from your view.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button variant="outline" onClick={cancelDeleteChat} className="px-4 py-2">
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteChat} className="px-4 py-2 bg-red-600 hover:bg-red-700">
+                Delete
+              </Button>
             </div>
           </div>
         </div>

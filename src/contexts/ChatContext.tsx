@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { chatDatabase } from '../../firebase-chat';
-import { ref, push, onValue, update, serverTimestamp } from 'firebase/database';
+import { ref, push, onValue, update, serverTimestamp, get, remove } from 'firebase/database';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/redux/store';
 import { toast } from 'sonner';
@@ -32,6 +32,7 @@ interface ChatConversation {
   lastMessage: string;
   lastMessageTime: any;
   unreadCount: number;
+  deletedBy?: string[]; // Track users who have deleted this conversation
   participantDetails: {
     [email: string]: {
       name: string;
@@ -51,6 +52,7 @@ interface ChatContextType {
   setCurrentChat: (chatId: string | null) => void;
   markAsRead: (chatId: string) => void;
   startNewChat: (receiverEmail: string, receiverDetails: { name: string; email: string; image?: string }) => string;
+  deleteConversation: (chatId: string) => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -93,7 +95,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const cleanReceiverData = {
-      name: receiverDetails.name || 'Expert',
+      name: receiverDetails.name,
       email: receiverDetails.email || '',
       image: receiverDetails.image || ''
     };
@@ -105,6 +107,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         [sanitizedUserEmail]: cleanUserData,
         [sanitizedReceiverEmail]: cleanReceiverData
       },
+      deletedBy: [], // Initialize deletedBy as empty array
       createdAt: serverTimestamp(),
       lastMessage: '',
       lastMessageTime: serverTimestamp()
@@ -188,6 +191,51 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, { onlyOnce: true });
   };
 
+  // Delete conversation (user-specific - only hide from current user's view)
+  const deleteConversation = async (chatId: string) => {
+    if (!user?.email) {
+      throw new Error('User not authenticated');
+    }
+
+    try {
+      const sanitizedUserEmail = removeSpecialCharacters(user.email);
+      const conversationRef = ref(chatDatabase, `conversations/${chatId}`);
+      
+      // Get current conversation data
+      const conversationSnapshot = await get(conversationRef);
+      const conversationData = conversationSnapshot.val();
+
+      if (!conversationData) {
+        throw new Error('Conversation not found');
+      }
+
+      // Add current user to deletedBy array
+      const updatedDeletedBy = conversationData.deletedBy || [];
+      if (!updatedDeletedBy.includes(sanitizedUserEmail)) {
+        updatedDeletedBy.push(sanitizedUserEmail);
+      }
+
+      await update(conversationRef, {
+        deletedBy: updatedDeletedBy
+      });
+
+      // Update local state to remove conversation immediately
+      setConversations(prev => prev.filter(conv => conv.id !== chatId));
+      
+      // If this was the current chat, clear it
+      if (currentChat === chatId) {
+        setCurrentChat(null);
+        setMessages([]);
+      }
+
+      toast.success('Conversation deleted');
+    } catch (error) {
+      console.error('Error deleting conversation:', error);
+      toast.error('Failed to delete conversation');
+      throw error;
+    }
+  };
+
   // Load conversations and calculate total unread count
   useEffect(() => {
     if (!user?.email) return;
@@ -202,7 +250,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (data) {
         const userConversations = Object.keys(data)
-          .filter(chatId => data[chatId].participants?.includes(sanitizedUserEmail))
+          .filter(chatId => {
+            const conversation = data[chatId];
+            return conversation.participants?.includes(sanitizedUserEmail) &&
+                   !conversation.deletedBy?.includes(sanitizedUserEmail);
+          })
           .map(chatId => ({
             id: chatId,
             ...data[chatId],
@@ -325,7 +377,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sendMessage,
     setCurrentChat,
     markAsRead,
-    startNewChat
+    startNewChat,
+    deleteConversation
   };
 
   return (
