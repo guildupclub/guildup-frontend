@@ -678,7 +678,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   return (
-    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white">
+    <div className="flex w-full h-[90%] md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white">
       
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
@@ -687,7 +687,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <p className="text-xs text-gray-500">Connect with Experts</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white">
+        <div className="flex-1 overflow-y-auto bg-white scrollbar-hide">
           {conversations.length === 0 ? (
             <div className="p-4 text-center">
               <MessageCircle className="h-6 w-6 text-gray-400 mx-auto mb-2" />
