@@ -45,7 +45,7 @@ function ChatContent() {
 
   if (!user?.email) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="h-screen w-screen bg-background flex items-center justify-center p-4 fixed inset-0 overflow-hidden">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -63,10 +63,11 @@ function ChatContent() {
 
   return (
     <ChatProvider>
-      <div className="h-screen bg-white flex flex-col overflow-hidden fixed inset-0 mt-24">
-        {/* Chat Interface - Full height minus header and bottom navbar on mobile */}
-        <div className="flex-1 max-h-[90%] w-full md:container md:mx-auto p-0 md:p-4 pb-16 md:pb-0">
-          <div className="h-full w-full bg-white md:rounded-lg md:border md:shadow-sm">
+      {/* Full viewport container - mobile-first approach */}
+      <div className="h-screen w-screen bg-white fixed inset-0 overflow-hidden md:relative md:h-[calc(100vh-80px)] md:w-full">
+        {/* Chat Interface - Takes full available space */}
+        <div className="h-full w-full md:container md:mx-auto md:p-4 md:h-full">
+          <div className="h-full w-full bg-white md:rounded-lg md:border md:shadow-sm md:max-h-[calc(100vh-160px)]">
             <ChatInterface 
               receiverEmail={expertDetails?.email}
               receiverDetails={expertDetails ? {
@@ -85,7 +86,7 @@ function ChatContent() {
 export default function ChatPage() {
   return (
     <Suspense fallback={
-      <div className="h-screen bg-background flex items-center justify-center">
+      <div className="h-screen w-screen bg-background flex items-center justify-center fixed inset-0">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     }>
