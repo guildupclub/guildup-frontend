@@ -86,6 +86,13 @@ export function BookingDialog({
   >("date");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<any>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCouponCode, setAppliedCouponCode] = useState("");
+  const [orderData, setOrderData] = useState(null);
+  const [appliedCouponInfo, setAppliedCouponInfo] = useState(null);
+  const [priceAfterDiscount, setPriceAfterDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
+
 
   // New states for guest user registration
   const [guestName, setGuestName] = useState("");
@@ -126,6 +133,47 @@ export function BookingDialog({
   const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
   const communityParams = `${encodedCommunityName}-${communityIdFromParam}`;
 
+const handleApplyCoupon = async () => {
+  if (!couponCode.trim()) {
+    setCouponMessage("Please enter a valid coupon code.");
+    setAppliedCouponInfo(null);
+    return;
+  }
+
+  try {
+    const obj = {
+        code: couponCode.trim().toUpperCase(),
+        userId: userId,
+        cartTotal: offering.price.amount,
+      };
+
+      console.log("Applying coupon with data:", obj);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/coupon/preview`,
+      obj
+    );
+
+    if (response.data.valid) {
+      setAppliedCouponInfo(response.data);
+      setPriceAfterDiscount(response.data.finalTotal);
+      setCouponMessage(response.data.message);
+      setAppliedCouponCode(couponCode.trim().toUpperCase());
+    } else {
+      setCouponMessage(response.data.message);
+      setAppliedCouponInfo(null);
+      setPriceAfterDiscount(offering.price.amount);
+    }
+  } catch (error) {
+    setCouponMessage(
+      //@ts-ignore
+      error?.response?.data?.message || "Error validating coupon."
+    );
+    setAppliedCouponInfo(null);
+    setPriceAfterDiscount(offering.price.amount);
+  }
+};
+
+
   const { data: profile, isLoading } = useQuery({
     queryKey: ["communityProfile", communityIdFromParam],
     queryFn: async () => {
@@ -161,7 +209,7 @@ export function BookingDialog({
 
   useEffect(() => {
     if (!offering) return;
-
+    setPriceAfterDiscount(offering.price.amount);
     if (offering.type === "webinar") {
       setBookingStep("confirmation");
       const webinarDate = new Date(offering.when);
@@ -353,11 +401,13 @@ export function BookingDialog({
           date: selectedDate,
           slot: selectedSlot,
           startTime,
+          couponCode: appliedCouponCode
         }
       );
 
       if (response.data.r === "s") {
         console.log("Order Created:", response.data.data);
+        setOrderData(response.data.data);
 
         if (offering.is_free) {
           const bookingId = response?.data?.data?._id;
@@ -441,6 +491,7 @@ export function BookingDialog({
                 offering_id: offering._id,
                 user_id: bookingUserId,
                 startTime,
+                couponCode: appliedCouponCode,
               }
             );
 
@@ -567,6 +618,7 @@ export function BookingDialog({
           user_id: currentUserId,
           offering_id: offering._id,
           startTime: selectedSlot!.start,
+          couponCode: appliedCouponCode,
         }
       );
 
@@ -778,9 +830,20 @@ export function BookingDialog({
                     <FaRupeeSign className="w-5 h-5 text-green-500 mx-2" />
                     <div className="flex flex-col">
                       <span className="text-xs text-gray-500">Price</span>
-                      <span className="text-sm font-semibold text-gray-800">
-                        {offering.price.amount}
-                      </span>
+                      {appliedCouponInfo ? (
+                        <div className="flex items-center gap-2">
+                          <span className="line-through text-gray-500 text-sm">
+                            ₹{offering.price.amount}
+                          </span>
+                          <span className="text-sm font-semibold text-primary">
+                            ₹{priceAfterDiscount}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-sm font-semibold text-gray-800">
+                          ₹{offering.price.amount}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -949,6 +1012,73 @@ export function BookingDialog({
                             Your WhatsApp number is required for booking
                             confirmation & reminders.
                           </p>
+                        </div>
+                        {/* <div className="space-y-2">
+                          <Label
+                            htmlFor="couponCode"
+                            className="text-sm font-medium text-muted-foreground"
+                          >
+                            Coupon Code
+                          </Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="couponCode"
+                              value={couponCode}
+                              onChange={(e) =>
+                                setCouponCode(e.target.value.toUpperCase())
+                              }
+                              placeholder="Enter coupon code"
+                              className="flex-1 p-2 border border-border/30 rounded-lg text-sm uppercase"
+                            />
+                            <Button
+                              onClick={handleApplyCoupon}
+                              className="px-4 bg-primary hover:bg-primary/90 rounded-lg shadow-sm"
+                            >
+                              Apply
+                            </Button>
+                          </div>
+                          {appliedCouponCode && (
+                            <p className="text-sm text-green-600">
+                              Applied: {appliedCouponCode}
+                            </p>
+                          )}
+                        </div> */}
+                        <div className="space-y-2">
+                          <Label
+                            htmlFor="couponCode"
+                            className="text-sm font-medium text-muted-foreground"
+                          >
+                            Coupon Code
+                          </Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="couponCode"
+                              value={couponCode}
+                              onChange={(e) =>
+                                setCouponCode(e.target.value.toUpperCase())
+                              }
+                              placeholder="Enter coupon code"
+                              className="flex-1 p-2 border border-border/30 rounded-lg text-sm uppercase"
+                            />
+                            <Button
+                              onClick={handleApplyCoupon}
+                              className="px-4 bg-primary hover:bg-primary/90 rounded-lg shadow-sm"
+                            >
+                              Apply
+                            </Button>
+                          </div>
+
+                          {couponMessage && (
+                            <p
+                              className={`text-sm ${
+                                appliedCouponInfo
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {couponMessage}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
