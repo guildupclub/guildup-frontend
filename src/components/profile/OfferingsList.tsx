@@ -221,7 +221,7 @@ export function OfferingsList({ offerings = mockOfferings }: OfferingsListProps)
 
             {/* What's Included */}
             <div className="mb-6">
-              <h5 className="text-sm font-semibold text-gray-800 mb-3">What's included:</h5>
+              <h5 className="text-sm font-semibold text-gray-800 mb-3">What&apos;s included:</h5>
               <div className="space-y-2">
                 {offering.features?.map((feature, index) => (
                   <div key={index} className="flex items-center gap-2">
