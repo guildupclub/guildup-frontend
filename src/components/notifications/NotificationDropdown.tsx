@@ -88,7 +88,7 @@ const NotificationDropdown = () => {
             </button>
         
         {isOpen && (
-          <div className="absolute right-0 top-full mt-2 w-80 max-h-[400px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+          <div className="absolute right-0 top-full mt-2 w-80 md:w-80 max-h-[400px] overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50 notification-dropdown-mobile">
           <div className="flex items-center justify-between p-3 border-b">
               <h3 className="font-medium">Notifications</h3>
             <div className="flex gap-2 items-center">

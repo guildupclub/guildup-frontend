@@ -37,6 +37,7 @@ import { chatDatabase } from '../../../firebase-chat';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
 import { GoogleMeetButton } from '@/components/google-meet/GoogleMeetButton';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 interface FileAttachment {
   id: string;
@@ -61,6 +62,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   receiverEmail, 
   receiverDetails 
 }) => {
+  const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
   const { 
     conversations, 
@@ -678,16 +680,28 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   return (
-    <div className="flex w-full h-full md:border md:border-gray-200 md:rounded-lg overflow-hidden bg-white">
+    <div className="flex w-full h-full overflow-hidden bg-white md:border md:border-gray-200 md:rounded-lg">
       
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
-      <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
-        <div className="p-3 border-b border-gray-200 bg-white">
-          <h2 className="text-base font-semibold text-gray-900">Messages</h2>
-          <p className="text-xs text-gray-500">Connect with Experts</p>
+      <div className={`${showConversations ? 'flex w-full h-full absolute inset-0 z-50 bg-white' : 'hidden'} md:flex md:w-72 md:relative md:inset-auto md:z-auto md:bg-gray-50 flex-col border-r border-gray-200`}>
+        <div className="p-3 border-b border-gray-200 bg-white sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">Messages</h2>
+              <p className="text-xs text-gray-500">Connect with Experts</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden p-2"
+              onClick={() => router.push('/')}
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto bg-white">
+        <div className="flex-1 overflow-y-auto bg-white scrollbar-hide mobile-chat-messages">
           {conversations.length === 0 ? (
             <div className="p-4 text-center">
               <MessageCircle className="h-6 w-6 text-gray-400 mx-auto mb-2" />
@@ -706,15 +720,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       setCurrentChat(conversation.id);
                       setShowConversations(false);
                     }}
-                    className={`w-full p-3 border-b border-gray-100 text-left hover:bg-gray-50 transition-colors ${
+                    className={`w-full p-3 md:p-3 px-4 md:px-3 border-b border-gray-100 text-left hover:bg-gray-50 transition-colors touch-manipulation mobile-touch-target ${
                       currentChat === conversation.id ? 'bg-blue-50 border-l-4 border-l-primary' : ''
                     }`}
                   >
-                    <div className="flex items-start gap-2">
-                      <div className="relative">
-                        <Avatar className="h-8 w-8 mt-0.5">
+                    <div className="flex items-start gap-3 md:gap-2">
+                      <div className="relative flex-shrink-0">
+                        <Avatar className="h-10 w-10 md:h-8 md:w-8 mt-0.5">
                           <AvatarImage src={otherParticipant.image} />
-                          <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
+                          <AvatarFallback className="bg-gray-200 text-gray-700 text-sm md:text-xs">
                             {otherParticipant.name?.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
@@ -723,28 +737,28 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-0.5">
-                          <p className="font-medium text-sm text-gray-900 truncate">
+                        <div className="flex items-center justify-between mb-1 md:mb-0.5">
+                          <p className="font-medium text-sm md:text-sm text-gray-900 truncate">
                             {otherParticipant.name}
                           </p>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                             {conversation.lastMessageTime && (
-                              <span className="text-xs text-gray-400 flex-shrink-0">
+                              <span className="text-xs text-gray-400">
                                 {formatMessageTime(conversation.lastMessageTime)}
                               </span>
                             )}
                             {unreadCounts[conversation.id] > 0 && (
-                              <div className="bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                              <div className="bg-red-500 text-white text-xs rounded-full h-5 w-5 md:h-4 md:w-4 flex items-center justify-center font-medium">
                                 {unreadCounts[conversation.id] > 9 ? '9+' : unreadCounts[conversation.id]}
                               </div>
                             )}
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-gray-500 truncate pr-2">
                             {conversation.lastMessage || 'No messages yet'}
                           </p>
-                          <span className={`text-xs ml-2 flex-shrink-0 ${
+                          <span className={`text-xs flex-shrink-0 ${
                             isUserOnline(otherParticipant.email) ? 'text-green-600' : 'text-gray-400'
                           }`}>
                             {isUserOnline(otherParticipant.email) ? 'Online' : ''}
@@ -761,15 +775,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Chat Area - Full screen on mobile */}
-      <div className={`${showConversations ? 'hidden' : 'flex'} md:flex flex-col flex-1 min-w-0 relative ${
-        isKeyboardVisible ? 'pb-16 md:pb-0' : ''
+      <div className={`${showConversations ? 'hidden md:flex' : 'flex'} flex-col flex-1 min-w-0 relative h-full ${
+        isKeyboardVisible ? 'pb-0' : ''
       }`}>
         {/* Drag and Drop Overlay */}
         {isDragOver && (
-          <div className="absolute inset-0 bg-blue-50/90 border-2 border-dashed border-blue-300 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-blue-50/90 border-2 border-dashed border-blue-300 z-50 flex items-center justify-center p-4">
             <div className="text-center">
               <Paperclip className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-              <p className="text-lg font-semibold text-blue-700 mb-2">Drop files to attach</p>
+              <p className="text-base md:text-lg font-semibold text-blue-700 mb-2">Drop files to attach</p>
               <p className="text-sm text-blue-600">Support: Images (JPG, PNG, GIF, WebP, HEIC) and PDF up to 20MB</p>
             </div>
           </div>
@@ -793,11 +807,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             onDrop={handleDrop}
           >
             {/* Chat Header */}
-            <div className="flex items-center gap-3 p-3 border-b border-gray-200 bg-white flex-shrink-0">
+            <div className="flex items-center gap-3 p-3 md:p-3 px-4 md:px-3 border-b border-gray-200 bg-white flex-shrink-0 mobile-chat-header-sticky">
               <Button
                 variant="ghost"
                 size="sm"
-                className="md:hidden p-1"
+                className="md:hidden p-2 mobile-touch-target touch-manipulation"
                 onClick={() => setShowConversations(true)}
               >
                 <ArrowLeft className="h-5 w-5" />
@@ -809,21 +823,21 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 
                 return otherParticipant ? (
                   <>
-                    <div className="relative">
-                      <Avatar className="h-8 w-8">
+                    <div className="relative flex-shrink-0">
+                      <Avatar className="h-9 w-9 md:h-8 md:w-8">
                         <AvatarImage src={otherParticipant.image} />
-                        <AvatarFallback className="bg-gray-200 text-gray-700 text-xs">
+                        <AvatarFallback className="bg-gray-200 text-gray-700 text-sm md:text-xs">
                           {otherParticipant.name?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       {isUserOnline(otherParticipant.email) && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border border-white"></div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 md:w-2.5 md:h-2.5 bg-green-500 rounded-full border border-white"></div>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-gray-900">{otherParticipant.name}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-base md:text-sm text-gray-900 truncate">{otherParticipant.name}</p>
                       <div className="flex items-center gap-1">
-                        <p className={`text-xs ${
+                        <p className={`text-sm md:text-xs truncate ${
                           isUserOnline(otherParticipant.email) ? 'text-green-600' : 'text-gray-500'
                         }`}>
                           {getStatusText(otherParticipant.email)}
@@ -832,12 +846,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     </div>
                     
                     {/* Google Meet Button */}
-                    <GoogleMeetButton
-                      receiverEmail={otherParticipant.email}
-                      receiverName={otherParticipant.name}
-                      size="sm"
-                      variant="ghost"
-                    />
+                    <div className="flex-shrink-0">
+                      <GoogleMeetButton
+                        receiverEmail={otherParticipant.email}
+                        receiverName={otherParticipant.name}
+                        size="sm"
+                        variant="ghost"
+                        // className="mobile-touch-target touch-manipulation"
+                      />
+                    </div>
                   </>
                 ) : null;
               })()}
@@ -845,11 +862,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Messages */}
             <div 
-              className={`flex-1 overflow-y-auto min-h-0 relative ${
+              className={`flex-1 overflow-y-auto min-h-0 relative scroll-smooth ${
                 isKeyboardVisible ? 'mb-safe-area-inset-bottom' : ''
               }`}
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+              }}
             >
-              <div className="p-3 pb-0">
+              <div className="p-3 md:p-3 px-4 md:px-3 pb-0">
                 {loading ? (
                   <div className="flex items-center justify-center h-64">
                     <div className="animate-spin rounded-full h-5 w-5 border-primary"></div>
@@ -874,10 +895,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                       return (
                         <div
                           key={message.id}
-                          className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} group`}
+                          className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} group px-2 md:px-0`}
                         >
                           <div
-                            className={`max-w-[85%] sm:max-w-xs lg:max-w-sm px-3 py-2 rounded-lg relative ${
+                            className={`mobile-message-bubble max-w-[85%] sm:max-w-xs lg:max-w-sm px-3 md:px-3 py-2.5 md:py-2 rounded-lg relative ${
                               isOwnMessage
                                 ? 'bg-primary text-white'
                                 : 'bg-gray-100 text-gray-900'
@@ -940,7 +961,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                             ) : (
                               <>
                                 {/* Message text with link detection */}
-                                <div className="text-sm whitespace-pre-wrap">
+                                <div className="text-sm md:text-sm leading-relaxed whitespace-pre-wrap break-words">
                                   {detectAndRenderLinks(replyData ? replyData.reply : message.message)}
                                 </div>
                                 
@@ -1126,11 +1147,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </div>
 
             {/* Message Input - Fixed at bottom with simplified mobile positioning */}
-            <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 ${
+            <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 safe-area-inset-bottom ${
               isKeyboardVisible 
-                ? 'fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto' 
+                ? 'fixed bottom-0 left-0 right-0 z-50 shadow-lg md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto md:shadow-none' 
                 : ''
-            }`}>
+            }`}
+              style={{
+                paddingBottom: isKeyboardVisible ? 'max(12px, env(safe-area-inset-bottom))' : '12px'
+              }}
+            >
               {/* Attachment Preview */}
               {attachments.length > 0 && (
                 <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
