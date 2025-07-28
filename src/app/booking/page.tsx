@@ -209,7 +209,7 @@ const BookingPage = () => {
                   </svg>
                 </div>
                 <p className="text-lg font-medium">No {activeTab === "upcoming" ? "live" : "past"} bookings</p>
-                <p className="text-sm">You don't have any {activeTab === "upcoming" ? "upcoming" : "completed"} bookings yet.</p>
+                <p className="text-sm">You don&apos;t have any {activeTab === "upcoming" ? "upcoming" : "completed"} bookings yet.</p>
               </div>
             </div>
           )}
