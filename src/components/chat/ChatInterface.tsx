@@ -97,15 +97,31 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dropZoneRef = useRef<HTMLDivElement>(null);
 
-  // Handle mobile keyboard visibility
+  // Handle mobile keyboard visibility with improved detection
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const handleResize = () => {
-        // On mobile, if the visual viewport is smaller than window height, keyboard is open
         const visualViewport = (window as any).visualViewport;
         if (visualViewport) {
-          const keyboardOpen = visualViewport.height < window.innerHeight * 0.75;
+          // More reliable keyboard detection
+          const keyboardOpen = visualViewport.height < window.innerHeight * 0.8;
           setIsKeyboardVisible(keyboardOpen);
+        }
+      };
+
+      const handleFocus = () => {
+        // When input is focused, assume keyboard might be visible
+        if (window.innerWidth <= 768) {
+          setIsKeyboardVisible(true);
+        }
+      };
+
+      const handleBlur = () => {
+        // When input loses focus, keyboard is likely hidden
+        if (window.innerWidth <= 768) {
+          setTimeout(() => {
+            setIsKeyboardVisible(false);
+          }, 100);
         }
       };
 
@@ -113,15 +129,25 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if ((window as any).visualViewport) {
         (window as any).visualViewport.addEventListener('resize', handleResize);
         (window as any).visualViewport.addEventListener('scroll', handleResize);
-        return () => {
-          (window as any).visualViewport.removeEventListener('resize', handleResize);
-          (window as any).visualViewport.removeEventListener('scroll', handleResize);
-        };
       } else {
         // Fallback for browsers without visual viewport
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
       }
+
+      // Add focus/blur listeners for better mobile detection
+      document.addEventListener('focusin', handleFocus);
+      document.addEventListener('focusout', handleBlur);
+
+      return () => {
+        if ((window as any).visualViewport) {
+          (window as any).visualViewport.removeEventListener('resize', handleResize);
+          (window as any).visualViewport.removeEventListener('scroll', handleResize);
+        } else {
+          window.removeEventListener('resize', handleResize);
+        }
+        document.removeEventListener('focusin', handleFocus);
+        document.removeEventListener('focusout', handleBlur);
+      };
     }
   }, []);
 
@@ -130,11 +156,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     if (isKeyboardVisible && inputRef.current) {
       // Small delay to ensure keyboard is fully visible
       setTimeout(() => {
-        inputRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 150);
+        if (window.innerWidth <= 768) {
+          // On mobile, scroll to bottom to show the fixed input
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: 'smooth'
+          });
+        } else {
+          inputRef.current?.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+          });
+        }
+      }, 200);
     }
   }, [isKeyboardVisible]);
 
@@ -845,9 +879,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Messages */}
             <div 
-              className={`flex-1 overflow-y-auto min-h-0 relative ${
-                isKeyboardVisible ? 'mb-safe-area-inset-bottom' : ''
+              className={`flex-1 overflow-y-auto min-h-0 relative scroll-smooth ${
+                isKeyboardVisible ? 'pb-20' : ''
               }`}
+              style={{ 
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+                paddingBottom: isKeyboardVisible && window.innerWidth <= 768 ? '80px' : '0px'
+              }}
             >
               <div className="p-3 pb-0">
                 {loading ? (
@@ -1125,12 +1164,18 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               </div>
             </div>
 
-            {/* Message Input - Fixed at bottom with simplified mobile positioning */}
+            {/* Message Input - Fixed at bottom with proper mobile positioning */}
             <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 ${
-              isKeyboardVisible 
-                ? 'fixed bottom-0 left-0 right-0 z-50 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto' 
+              isKeyboardVisible && window.innerWidth <= 768
+                ? 'mobile-chat-input-fixed' 
                 : ''
-            }`}>
+            }`}
+              style={{
+                paddingBottom: isKeyboardVisible && window.innerWidth <= 768
+                  ? `max(12px, env(safe-area-inset-bottom))` 
+                  : '12px'
+              }}
+            >
               {/* Attachment Preview */}
               {attachments.length > 0 && (
                 <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
@@ -1291,9 +1336,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   onChange={handleTextareaChange}
                   onKeyPress={handleKeyPress}
                   placeholder={replyingTo ? "Type your reply..." : "Type a message..."}
-                  className="flex-1 text-sm md:text-base rounded-xl pr-16 md:pr-20 resize-none min-h-[40px] max-h-[120px] mobile-chat-input"
+                  className="flex-1 text-sm md:text-base rounded-xl pr-16 md:pr-20 resize-none min-h-[40px] max-h-[120px] mobile-chat-input focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   rows={1}
                   disabled={isUploading}
+                  style={{
+                    fontSize: window.innerWidth <= 768 ? '16px' : '14px', // Prevent zoom on iOS
+                    lineHeight: '1.4',
+                    padding: '12px 16px'
+                  }}
                 />
                 
                 {/* Emoji button */}

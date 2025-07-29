@@ -166,6 +166,33 @@
     overflow-wrap: break-word;
   }
   
+  /* Fixed chat input container for mobile */
+  .mobile-chat-input-fixed {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    padding: 12px;
+    z-index: 50;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Safe area support for mobile */
+  @supports (padding: max(0px)) {
+    .mobile-chat-input-fixed {
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+  }
+  
+  /* Prevent body scroll when keyboard is open */
+  .mobile-keyboard-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+  
   /* Handle visual viewport for keyboards */
   @supports (height: 100dvh) {
     .mobile-keyboard-adjust {
