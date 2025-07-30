@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
-import { Search, Star, Users, MapPin, Clock, ChevronDown, MessageCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Search, Star, Users, MapPin, Clock, ChevronDown, MessageCircle, ArrowLeft, ArrowRight, HelpCircle, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,6 @@ import { useSession } from 'next-auth/react';
 import { PageTracker } from '@/components/analytics/PageTracker';
 import CategoryBar from '@/components/explore/CategoryBar';
 import FeaturedExperts from '@/components/explore/FeaturedExperts';
-import { CategoryNavbar } from '@/components/layout/CategoryNavbar';
 import Loader from '@/components/Loader';
 import { useTracking } from '@/hooks/useTracking';
 import axios from 'axios';
@@ -32,20 +31,16 @@ interface Category {
 function SearchParamsProvider({
   children,
   onCategoryFromUrl,
-  onSearchFromUrl,
 }: {
   children: React.ReactNode;
   onCategoryFromUrl: (category: string | null) => void;
-  onSearchFromUrl: (search: string | null) => void;
 }) {
   const searchParams = useSearchParams();
   
   useEffect(() => {
     const categoryFromUrl = searchParams?.get("category");
-    const searchFromUrl = searchParams?.get("q");
     onCategoryFromUrl(categoryFromUrl ?? null);
-    onSearchFromUrl(searchFromUrl ?? null);
-  }, [searchParams, onCategoryFromUrl, onSearchFromUrl]);
+  }, [searchParams, onCategoryFromUrl]);
 
   return <>{children}</>;
 }
@@ -69,26 +64,16 @@ const ExplorePage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
 
-     // State for filters (removed - keeping only for compatibility)
-   const [selectedFilterCategory, setSelectedFilterCategory] = useState('');
-   const [offeringType, setOfferingType] = useState('');
-   const [priceRange, setPriceRange] = useState('');
-   const [duration, setDuration] = useState('');
-   const [sortBy, setSortBy] = useState('relevance');
-   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  // State for filters
+  const [selectedFilterCategory, setSelectedFilterCategory] = useState('');
+  const [offeringType, setOfferingType] = useState('');
+  const [priceRange, setPriceRange] = useState('');
+  const [duration, setDuration] = useState('');
+  const [sortBy, setSortBy] = useState('relevance');
 
-     useEffect(() => {
-     setIsMounted(true);
-   }, []);
-
-   // Cleanup timeout on unmount
-   useEffect(() => {
-     return () => {
-       if (searchTimeout) {
-         clearTimeout(searchTimeout);
-       }
-     };
-   }, []);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Fetch categories
   useEffect(() => {
@@ -132,43 +117,32 @@ const ExplorePage: React.FC = () => {
     }
   }, [session, status, isMounted, dispatch]);
 
-     const fetchCommunities = useCallback(async (pageNum = 0) => {
-     setLoadingCommunities(true);
-     try {
-       const params = new URLSearchParams({
-         page: String(pageNum),
-         limit: String(20),
-       });
-       
-       // Add category filter if not "All Category"
-       if (selectedCategoryId && selectedCategoryId !== 'all') {
-         params.append('category', selectedCategoryId);
-       }
-       
-       const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?${params.toString()}`;
-       console.log('Fetching communities with URL:', apiUrl);
-       
-       const res = await axios.get(apiUrl);
-       console.log('API Response:', res.data);
-       
-       const newCommunities = res.data.data || [];
-       console.log('Fetched communities count:', newCommunities.length);
-       
-       setCommunities(prev => pageNum === 0 ? newCommunities : [...prev, ...newCommunities]);
-       setHasMore(newCommunities.length > 0);
-     } catch (error: any) {
-       console.error('Error fetching communities:', error);
-       console.error('Error details:', error?.response?.data);
-     } finally {
-       setLoadingCommunities(false);
-     }
-   }, [selectedCategoryId]);
+  const fetchCommunities = useCallback(async (pageNum = 0) => {
+    setLoadingCommunities(true);
+    try {
+      const params = new URLSearchParams({
+        page: String(pageNum),
+        limit: String(20),
+        offeringType,
+        priceRange,
+        duration,
+        sortBy,
+      });
+      const res = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?${params.toString()}`
+      );
+      const newCommunities = res.data.data || [];
+      setCommunities(prev => pageNum === 0 ? newCommunities : [...prev, ...newCommunities]);
+      setHasMore(newCommunities.length > 0);
+    } finally {
+      setLoadingCommunities(false);
+    }
+  }, [offeringType, priceRange, duration, sortBy]);
 
-     // Fetch communities when filters change
-   useEffect(() => {
-     setPage(0);
-     fetchCommunities(0);
-   }, [fetchCommunities]);
+  useEffect(() => {
+    setPage(0);
+    fetchCommunities(0);
+  }, [offeringType, priceRange, duration, sortBy, fetchCommunities]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -213,32 +187,18 @@ const ExplorePage: React.FC = () => {
     [categories]
   );
 
-     const handleSearchFromUrl = useCallback(
-     (searchFromUrl: string | null) => {
-       if (searchFromUrl) {
-         // If there's a search query in URL, redirect to search page
-         const params = new URLSearchParams();
-         params.set('q', searchFromUrl);
-         if (selectedCategory !== 'All Category') {
-           params.set('category', categoryToUrl(selectedCategory));
-         }
-         router.push(`/search?${params.toString()}`);
-       }
-     },
-     [selectedCategory, router]
-   );
+  // Update URL when category changes
+  useEffect(() => {
+    if (!categories.length) return;
 
-     // Update URL when category changes
-   useEffect(() => {
-     if (!categories.length) return;
-
-     // Add category if not "All Category"
-     if (selectedCategory !== "All Category") {
-       router.replace(`/explore?category=${categoryToUrl(selectedCategory)}`, { scroll: false });
-     } else {
-       router.replace('/explore', { scroll: false });
-     }
-   }, [selectedCategory, router, categories]);
+    if (selectedCategory === "All Category") {
+      router.replace("/explore", { scroll: false });
+    } else {
+      router.replace(`/explore?category=${categoryToUrl(selectedCategory)}`, {
+        scroll: false,
+      });
+    }
+  }, [selectedCategory, router, categories]);
 
   const handleCategorySelect = (categoryId: string) => {
     const selectedCat = categories.find(
@@ -276,47 +236,15 @@ const ExplorePage: React.FC = () => {
     setIsLoading(false);
   };
 
-     const handleSearch = () => {
-     if (searchQuery.trim()) {
-       tracking.trackClick("explore_search", {
-         search_query: searchQuery.trim(),
-         user_id: session?.user._id,
-       });
-       
-       // Redirect to search page with query
-       const params = new URLSearchParams();
-       params.set('q', searchQuery.trim());
-       if (selectedCategory !== 'All Category') {
-         params.set('category', categoryToUrl(selectedCategory));
-       }
-       router.push(`/api/search?${params.toString()}`);
-     }
-   };
-
-   // Handle real-time search as user types in communities section
-   const handleCommunitySearch = (value: string) => {
-     setSearchQuery(value);
-     
-     // Clear existing timeout
-     if (searchTimeout) {
-       clearTimeout(searchTimeout);
-     }
-     
-     // Set new timeout for debounced search redirect
-     const timeout = setTimeout(() => {
-       if (value.trim()) {
-         // Redirect to search page with query
-         const params = new URLSearchParams();
-         params.set('q', value.trim());
-         if (selectedCategory !== 'All Category') {
-           params.set('category', categoryToUrl(selectedCategory));
-         }
-         router.push(`/api/search?${params.toString()}`);
-       }
-     }, 500); // 500ms debounce for typing
-     
-     setSearchTimeout(timeout);
-   };
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      tracking.trackClick("explore_search", {
+        search_query: searchQuery.trim(),
+        user_id: session?.user._id,
+      });
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   // Popular categories for the bottom section
   const popularCategories = [
@@ -421,10 +349,7 @@ const ExplorePage: React.FC = () => {
         </div>
       }
     >
-      <SearchParamsProvider 
-        onCategoryFromUrl={handleCategoryFromUrl}
-        onSearchFromUrl={handleSearchFromUrl}
-      >
+      <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
         <div className="min-h-screen bg-white">
           {/* Header Section */}
           <div className="bg-white pt-8 pb-6">
@@ -466,13 +391,6 @@ const ExplorePage: React.FC = () => {
               </motion.div>
             </div>
           </div>
-
-          {/* Category Navbar */}
-          <CategoryNavbar 
-            categories={categories}
-            activeCategory={selectedCategory}
-            onCategorySelect={handleCategorySelect}
-          />
 
           {/* Featured Experts Section */}
           <div className="bg-white py-8">
@@ -611,42 +529,76 @@ const ExplorePage: React.FC = () => {
             </div>
           </div>
           {/* Communities Section */}
-          <div id="communities-section" className="container mx-auto px-6 py-12">
-                         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-               <div>
-                 <h2 className="text-2xl font-bold text-gray-900">All Communities</h2>
-                 <p className="text-sm text-gray-600 mt-1">
-                   Discover and connect with communities in your area of interest
-                 </p>
-               </div>
-               <div className="flex gap-2 flex-wrap">
-                 {/* Search Button - redirects to search page */}
-                 <div className="relative">
-                   <Input
-                     type="text"
-                     placeholder="Search communities..."
-                     value={searchQuery}
-                     onChange={(e) => handleCommunitySearch(e.target.value)}
-                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                     className="w-48 border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
-                   />
-                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                 </div>
-               </div>
-             </div>
-                         {/* No results message for empty community list */}
-             {!loadingCommunities && communities.length === 0 && (
-               <div className="text-center py-12">
-                 <div className="text-gray-500 mb-4">
-                   <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                   <p className="text-lg font-medium">No communities available</p>
-                   <p className="text-sm">Check back later for new communities</p>
-                 </div>
-               </div>
-             )}
-             
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {communities.map((communityObj, idx) => (
+          <div className="container mx-auto px-6 py-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+              <h2 className="text-2xl font-bold text-gray-900">All Communities</h2>
+              <div className="flex gap-2 flex-wrap">
+                <div className="relative">
+                  <select
+                    value={offeringType}
+                    onChange={e => setOfferingType(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Offering Type</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Coaching">Coaching</option>
+                    <option value="Workshop">Workshop</option>
+                    <option value="Webinar">Webinar</option>
+                    <option value="Course">Course</option>
+                    <option value="Mentorship">Mentorship</option>
+                    <option value="Speaking">Speaking</option>
+                    <option value="Freelance Services">Freelance Services</option>
+                  </select>
+                  <Users className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={priceRange}
+                    onChange={e => setPriceRange(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Price Range</option>
+                    <option value="Free">Free</option>
+                    <option value="₹0 - ₹500">₹0 - ₹500</option>
+                    <option value="₹500 - ₹1000">₹500 - ₹1000</option>
+                    <option value="₹1000+">₹1000+</option>
+                  </select>
+                  <HelpCircle className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={duration}
+                    onChange={e => setDuration(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="">Duration</option>
+                    <option value="15 min">15 min</option>
+                    <option value="30 min">30 min</option>
+                    <option value="45 min">45 min</option>
+                    <option value="60 min">60 min</option>
+                    <option value="90 min+">90 min+</option>
+                  </select>
+                  <Clock className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    className="border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
+                  >
+                    <option value="relevance">Sort by</option>
+                    <option value="rating">Rating</option>
+                    <option value="price: low to high">Price: Low to High</option>
+                    <option value="price: high to low">Price: High to Low</option>
+                    <option value="experience">Experience</option>
+                    <option value="newest">Newest</option>
+                  </select>
+                  <SlidersHorizontal className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {communities.map((communityObj, idx) => (
                 <ExpertCard
                   key={communityObj.community ? communityObj.community._id : communityObj._id}
                   expert={{

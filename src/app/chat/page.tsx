@@ -45,7 +45,7 @@ function ChatContent() {
 
   if (!user?.email) {
     return (
-      <div className="h-screen w-screen bg-background flex items-center justify-center p-4 fixed inset-0 overflow-hidden">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -63,11 +63,41 @@ function ChatContent() {
 
   return (
     <ChatProvider>
-      {/* Full viewport container - mobile-first approach */}
-      <div className="h-screen w-screen bg-white fixed inset-0 overflow-hidden md:relative md:h-[calc(100vh-80px)] md:w-full">
-        {/* Chat Interface - Takes full available space */}
-        <div className="h-full w-full md:container md:mx-auto md:p-4 md:h-full">
-          <div className="h-full w-full bg-white md:rounded-lg md:border md:shadow-sm md:max-h-[calc(100vh-160px)]">
+      <div className="h-screen bg-background flex flex-col overflow-hidden">
+        {/* Header - Now always visible, sticky on mobile - positioned right under navbar */}
+        <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex-shrink-0 sticky top-0 z-40">
+          <div className="px-4 py-3 md:py-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" asChild className="p-1">
+                <Link href="/">
+                  <ArrowLeft className="h-4 w-4" />
+                </Link>
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                <div>
+                  <h1 className="text-base md:text-lg font-semibold">
+                    {expertDetails ? `Chat with ${expertDetails.name}` : 'Expert Support Chat'}
+                  </h1>
+                  <p className="text-xs text-muted-foreground hidden md:block">
+                    {expertDetails ? 'Start a conversation with this verified expert' : 'Manage your expert conversations'}
+                  </p>
+                </div>
+              </div>
+
+              <Badge variant="outline" className="ml-auto bg-green-50 text-green-700 border-green-200 text-xs">
+                <Shield className="h-3 w-3 mr-1" />
+                <span className="hidden sm:inline">Verified Expert</span>
+                <span className="sm:hidden">Expert</span>
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Chat Interface - Full height minus header and bottom navbar on mobile */}
+        <div className="flex-1 min-h-0 w-full md:container md:mx-auto p-0 md:p-4 pb-16 md:pb-0">
+          <div className="h-full w-full bg-background md:rounded-lg md:border md:shadow-sm">
             <ChatInterface 
               receiverEmail={expertDetails?.email}
               receiverDetails={expertDetails ? {
@@ -86,7 +116,7 @@ function ChatContent() {
 export default function ChatPage() {
   return (
     <Suspense fallback={
-      <div className="h-screen w-screen bg-background flex items-center justify-center fixed inset-0">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     }>

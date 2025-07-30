@@ -358,7 +358,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
     : originalContent;
 
   return (
-    <div className="bg-card border-2 border-zinc-200 rounded-lg mb-4" ref={cardRef}>
+    <div className="bg-card border-2 border-zinc-300/60 rounded-xl mb-4" ref={cardRef}>
       
       <div className="p-4">
         <div className="flex gap-3">
@@ -456,10 +456,10 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           onClick={handleLikeClick}
         >
           <Heart
-            className={` h-5 w-5 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
+            className={`text-blue-500 h-5 w-5 ${isLiked ? "text-blue-500 fill-blue-500" : ""}`}
           />
-          <span className="text-[0.9rem] font-semibold text-gray-500">
-            <span className="text-gray-500 text-md mr-1">
+          <span className="text-[0.9rem] font-semibold text-gray-500/80">
+            <span className="text-blue-500 text-md mr-1">
             {formatNumber(postData?.up_votes || 0)}
             </span>
              {StringConstants.LIKE}
@@ -482,7 +482,7 @@ export function PostCarde({ post, cardRef, userID }: PostCardeProps) {
           className="flex items-center gap-2 text-muted-foreground hover:text-zinc-300 rounded-full"
           onClick={handleShareClick}
         >
-          <Send className="h-5 w-5 text-gray-500" /> 
+          <Send className="h-5 w-5 text-blue-500" /> 
           <span className="text-[0.9rem] font-semibold text-gray-500/80">
             {StringConstants.SHARE}
           </span>

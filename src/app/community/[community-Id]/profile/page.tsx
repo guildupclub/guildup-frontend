@@ -25,14 +25,14 @@ export default function Page() {
       dispatch(
         setCommunityData({
           communityId: communityId,
-          userId: "", 
+          userId: null, 
         })
       );
     }
   }, [communityId, dispatch]);
 
   return (
-    <div className="h-screen bg-white grow max-w-screen w-full md:ml-6 md:py-6">
+    <div className="min-h-screen bg-background grow max-w-screen w-full md:ml-6 md:py-24">
       {communityId && <ProfileCard communityId={communityId} />}
     </div>
   );
