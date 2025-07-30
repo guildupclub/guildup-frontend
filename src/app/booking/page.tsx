@@ -105,7 +105,7 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="max-w-3xl pb-16">
+    <div className="min-h-screen bg-white">
       {/* Toast Notification Container */}
       <ToastContainer
         position="top-center"
@@ -115,31 +115,32 @@ const BookingPage = () => {
         closeButton
       />
 
-      <div className="flex flex-col w-[100vw] bg-[#F2F2F2] gap-6 px-4 md:px-20 md:mx-5 mt-20">
-        <div className="h-30 flex flex-row items-center gap-3">
-          <div>
-            <FaArrowLeft /> 
-          </div>
-          <h1 className="font-semibold text-2xl font-[Source Sans Pro] leading-7">
-            Bookings
-          </h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-8">
+          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <FaArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900">Bookings</h1>
         </div>
-        <div className="flex space-x-6 items-center">
+
+        {/* Tabs */}
+        <div className="flex space-x-8 border-b border-gray-200 mb-8">
           <button
-            className={`pb-2 ${
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === "upcoming"
-                ? "text-blue-600 border-blue-600 border-b-2"
-                : "text-gray-500"
+                ? "border-primary text-primary"
+                : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("upcoming")}
           >
             Live Bookings
           </button>
           <button
-            className={`pb-2 ${
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === "completed"
-                ? "text-blue-600 border-blue-600 border-b-2"
-                : "text-gray-500"
+                ? "border-primary text-primary"
+                : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
             onClick={() => setActiveTab("completed")}
           >
@@ -147,51 +148,71 @@ const BookingPage = () => {
           </button>
           {isCreator && (
             <button
-              className={`pb-2 ${
+              className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                 activeTab === "availability"
-                  ? "text-blue-600 border-blue-600 border-b-2"
-                  : "text-gray-500"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
               onClick={() => setActiveTab("availability")}
             >
               Availability
             </button>
           )}
+        </div>
 
-          {/* Show Button Only When User is a Creator */}
-          {isCreator && (
+        {/* Attendance Toggle Button for Creators */}
+        {isCreator && (
+          <div className="mb-6">
             <button
               onClick={handleAttendanceToggle}
-              className="ml-6 px-4 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition duration-200"
+              className="px-4 py-2 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg transition duration-200"
             >
-              {attendanceTracking
-                ? "Turn Off Attendance"
-                : "Turn On Attendance"}
+              {attendanceTracking ? "Turn Off Attendance" : "Turn On Attendance"}
             </button>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="space-y-6">
+          {activeTab === "availability" ? (
+            <Availablity userId={userId} />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {(activeTab === "upcoming" ? upcomingBookings : completedBookings).map((booking: Booking) => (
+                <BookingCard
+                  key={booking._id}
+                  profileImage="/default-profile.jpg"
+                  name={booking.offering_id?.community_id?.name}
+                  role={booking.offering_id?.type}
+                  service={booking.offering_id?.title}
+                  host={booking.provider_id?.name}
+                  guest={booking?.client_id?.name}
+                  bookedOn={booking?.start_time}
+                  amount={booking.offering_id?.price?.amount || 0}
+                  offeringName={booking.offering_id?.title}
+                  offeringDescription={booking.offering_id?.description}
+                  startTime={booking.start_time}
+                  isLiveBooking={activeTab === "upcoming"}
+                  meetingUrl={booking.offering_id?.meeting_url || booking.meeting_url}
+                />
+              ))}
+            </div>
           )}
-        </div>
-        <div className="flex flex-row gap-2 justify-center items-center flex-wrap h-fit space-y-4 mt-6">
-          {activeTab !== "availability" &&
-            (activeTab === "upcoming"
-              ? upcomingBookings
-              : completedBookings
-            ).map((booking: Booking) => (
-              <BookingCard
-                key={booking._id}
-                profileImage="/default-profile.jpg"
-                name={booking.offering_id?.community_id?.name}
-                role={booking.offering_id?.type}
-                service={booking.offering_id?.title}
-                host={booking.provider_id?.name}
-                guest={booking?.client_id?.name}
-                bookedOn={new Date(booking?.start_time).toLocaleString()}
-                amount={booking.offering_id?.price?.amount}
-                offeringName={booking.offering_id?.title}
-                offeringDescription={booking.offering_id?.description}
-                startTime={booking.start_time}
-              />
-            ))}
-          {activeTab === "availability" && <Availablity userId={userId} />}
+
+          {/* Empty State */}
+          {(activeTab === "upcoming" ? upcomingBookings : completedBookings).length === 0 && activeTab !== "availability" && (
+            <div className="text-center py-12">
+              <div className="text-gray-500">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-medium">No {activeTab === "upcoming" ? "live" : "past"} bookings</p>
+                <p className="text-sm">You don&apos;t have any {activeTab === "upcoming" ? "upcoming" : "completed"} bookings yet.</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
