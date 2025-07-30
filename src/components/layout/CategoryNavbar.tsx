@@ -1,38 +1,41 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
-const categories = [
-  'Fitness & Yoga',
-  'Nutrition and Diet', 
-  'Relationship and Parenting',
-  'Mental Health',
-  'Personal Growth',
-  'Others'
-];
+interface Category {
+  _id: string;
+  name: string;
+}
 
-export function CategoryNavbar() {
-  const [activeCategory, setActiveCategory] = useState('Fitness & Yoga');
+interface CategoryNavbarProps {
+  categories?: Category[];
+  activeCategory?: string;
+  onCategorySelect?: (categoryId: string) => void;
+}
 
+export function CategoryNavbar({ 
+  categories = [], 
+  activeCategory = 'All Category',
+  onCategorySelect 
+}: CategoryNavbarProps) {
   return (
     <div className="bg-white border-b border-gray-200 px-4 py-2">
       <div className="container mx-auto">
-        <div className="flex items-center justify-center space-x-8 overflow-x-auto scrollbar-hide">
+        <div className="flex items-center justify-start md:justify-center space-x-6 md:space-x-8 overflow-x-auto scrollbar-hide category-navbar-mobile" style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
           {categories.map((category) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
+              key={category._id}
+              onClick={() => onCategorySelect?.(category._id)}
               className={cn(
-                "whitespace-nowrap pb-2 text-sm font-medium transition-all duration-200 flex-shrink-0 relative",
-                activeCategory === category
+                "whitespace-nowrap pb-2 text-sm font-medium transition-all duration-200 flex-shrink-0 relative min-w-fit",
+                activeCategory === category.name
                   ? "text-primary"
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
-              {category}
-              {activeCategory === category && (
+              {category.name}
+              {activeCategory === category.name && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></div>
               )}
             </button>

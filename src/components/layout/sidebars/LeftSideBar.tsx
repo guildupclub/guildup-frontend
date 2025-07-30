@@ -169,7 +169,9 @@ export function LeftSidebar() {
           id: myCommunities[0]?._id, // Now it's properly set
           name: myCommunities[0]?.name,
           image: myCommunities[0]?.image,
-          background_image: myCommunities[0]?.background_image
+          background_image: myCommunities[0]?.background_image,
+          user_isBankDetailsAdded: false,
+          user_iscalendarConnected: false
         })
       );
     }
@@ -181,7 +183,9 @@ export function LeftSidebar() {
         id: community._id, // Now it's properly set
         name: community.name,
         image: community.image,
-        background_image: community.background_image
+        background_image: community.background_image,
+        user_isBankDetailsAdded: false,
+        user_iscalendarConnected: false
       })
     );
     dispatch(
