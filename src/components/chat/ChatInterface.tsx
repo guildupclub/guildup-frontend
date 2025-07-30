@@ -714,7 +714,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   return (
-    <div className="flex w-full h-full overflow-hidden bg-white md:border md:border-gray-200 md:rounded-lg">
+    <div className="flex w-full h-full overflow-hidden bg-white md:border md:border-gray-200 md:rounded-lg mobile-chat-container">
       
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex w-full h-full absolute inset-0 z-50 bg-white' : 'hidden'} md:flex md:w-72 md:relative md:inset-auto md:z-auto md:bg-gray-50 flex-col border-r border-gray-200`}>
@@ -897,12 +897,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {/* Messages */}
             <div 
               className={`flex-1 overflow-y-auto min-h-0 relative scroll-smooth ${
-                isKeyboardVisible ? 'pb-20' : ''
+                window.innerWidth <= 768 ? 'pb-20' : ''
               }`}
               style={{ 
                 WebkitOverflowScrolling: 'touch',
                 overscrollBehavior: 'contain',
-                paddingBottom: isKeyboardVisible && window.innerWidth <= 768 ? '80px' : '0px'
+                paddingBottom: window.innerWidth <= 768 ? '80px' : '0px'
               }}
             >
               <div className="p-3 md:p-3 px-4 md:px-3 pb-0">
@@ -1183,12 +1183,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* Message Input - Fixed at bottom with proper mobile positioning */}
             <div className={`border-t border-gray-200 bg-white flex-shrink-0 p-3 ${
-              isKeyboardVisible && window.innerWidth <= 768
-                ? 'mobile-chat-input-fixed' 
-                : ''
+              window.innerWidth <= 768 ? 'mobile-chat-input-fixed' : ''
             }`}
               style={{
-                paddingBottom: isKeyboardVisible && window.innerWidth <= 768
+                paddingBottom: window.innerWidth <= 768
                   ? `max(12px, env(safe-area-inset-bottom))` 
                   : '12px'
               }}
@@ -1316,8 +1314,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               {/* Emoji Picker */}
               {showEmojiPicker && (
                 <div className={`emoji-picker absolute ${
-                  isKeyboardVisible ? 'bottom-16' : 'bottom-20'
-                } right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-50 max-w-xs`}>
+                  window.innerWidth <= 768 ? 'bottom-16' : 'bottom-20'
+                } right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-[9998] max-w-xs`}>
                   <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
                     {['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤐', '🤑', '🤠', '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '👇', '☝️', '✋', '🤚', '🖐️', '🖖', '👋', '🤝', '🙏', '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💯', '💥', '💫', '⭐', '🌟', '✨', '⚡', '🔥', '💨', '☀️', '🌙', '⭐', '🌈', '☘️', '🍀', '🌸', '🌺', '🌻', '🌷'].map((emoji) => (
                       <button
