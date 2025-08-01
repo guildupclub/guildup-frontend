@@ -20,12 +20,12 @@ import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
-import { ArrowRight } from "lucide-react";
 import { motion, useScroll } from "framer-motion";
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
+import { Brain, Dumbbell, ArrowRight } from "lucide-react";
 
 
 import VideoPlaceholder from "@/components/VideoPlaceholder";
@@ -359,6 +359,106 @@ function Page() {
           <div className="relative z-10">
             <div ref={heroRef}>
               <Hero />
+            </div>
+
+            {/* Guildup Mind & Body Section */}
+            <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-24">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                    Discover Your <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Perfect Expert</span>
+                  </h2>
+                  <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                    Get specialised guidance and support for your mind and body wellness journey
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+                  {/* Guildup Mind Card */}
+                  <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 sm:p-10 border border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-xl">
+                    <div className="absolute top-4 right-4">
+                      <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
+                        <Brain className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                        Guildup Mind
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Connect with mental health professionals, life coaches, and wellness experts. 
+                        Find communities focused on mindfulness, personal growth, and emotional well-being.
+                      </p>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                        Mental Health & Therapy
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                        Life Coaching & Personal Development
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                        Mindfulness & Meditation
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() => router.push('/mind')}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
+                    >
+                      Explore Experts
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </Button>
+                  </div>
+
+                  {/* Guildup Body Card */}
+                  <div className="group relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-10 border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
+                    <div className="absolute top-4 right-4">
+                      <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full">
+                        <Dumbbell className="h-6 w-6 text-white" />
+                      </div>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                        Guildup Body
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed">
+                        Join fitness communities led by certified trainers, nutritionists, and health experts. 
+                        Transform your physical health with personalized guidance and support.
+                      </p>
+                    </div>
+
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        Fitness Training & Workouts
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        Nutrition & Diet Planning
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        Health & Wellness Coaching
+                      </div>
+                    </div>
+
+                    <Button
+                      onClick={() => router.push('/body')}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
+                    >
+                      Explore Experts
+                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="w-full max-w-[1920px] mx-auto">
