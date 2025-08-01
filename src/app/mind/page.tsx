@@ -197,42 +197,100 @@ export default function MindPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
-                <Brain className="h-8 w-8 text-white" />
+      {/* Free Discovery Call Banner - Top */}
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 mt-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-white/25 rounded-full backdrop-blur-sm animate-pulse">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-base sm:text-xl">🧠 Free Discovery Call!</h3>
+                <p className="text-purple-100 text-xs sm:text-base hidden sm:block">Book a 15-minute consultation with wellness experts</p>
+                <p className="text-purple-100 text-xs sm:hidden">15-min consultation with wellness experts</p>
               </div>
             </div>
-                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent">
-               Mind & Wellness
-             </h1>
-             <p className="text-xl sm:text-2xl text-purple-100 max-w-3xl mx-auto mb-8 leading-relaxed">
-               Discover communities focused on mental health, personal growth, and inner transformation
-             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-                             <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Mental Health
-               </span>
-               <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Life Coaching
-               </span>
-               <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Personal Growth
-               </span>
-            </div>
+                         <Button 
+               className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-lg whitespace-nowrap"
+               onClick={() => {
+                 const communitiesSection = document.getElementById('communities-section');
+                 if (communitiesSection) {
+                   communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                 }
+               }}
+             >
+               📞 Book Free Call
+             </Button>
           </div>
         </div>
       </div>
 
-      {/* Communities Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                           {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 text-black">
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Floating Particles */}
+            <div className="absolute top-20 left-10 w-2 h-2 bg-indigo-300 rounded-full animate-pulse opacity-60"></div>
+            <div className="absolute top-32 right-20 w-3 h-3 bg-purple-300 rounded-full animate-bounce opacity-40"></div>
+            <div className="absolute top-40 left-1/4 w-1 h-1 bg-pink-300 rounded-full animate-ping opacity-70"></div>
+            <div className="absolute top-60 right-1/3 w-2 h-2 bg-indigo-400 rounded-full animate-pulse opacity-50"></div>
+            <div className="absolute top-80 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-bounce opacity-60"></div>
+            
+            
+            
+            {/* Floating Brain Icons */}
+            <div className="absolute top-1/4 left-5 animate-float-slow opacity-30">
+              <Brain className="w-6 h-6 text-indigo-400" />
+            </div>
+            <div className="absolute top-1/3 right-8 animate-float-slower opacity-40">
+              <Brain className="w-4 h-4 text-purple-400" />
+            </div>
+            <div className="absolute top-2/3 left-8 animate-float-slow opacity-35">
+              <Brain className="w-5 h-5 text-pink-400" />
+            </div>
+            
+            {/* Geometric Shapes */}
+            <div className="absolute top-1/2 right-1/4 w-6 h-6 border-2 border-indigo-300 rounded-lg animate-spin-slow opacity-30"></div>
+            <div className="absolute top-3/4 left-1/4 w-4 h-4 bg-purple-300 rounded-full animate-pulse opacity-40"></div>
+            <div className="absolute top-1/4 right-1/3 w-3 h-3 border border-pink-300 transform rotate-45 animate-pulse opacity-50"></div>
+          </div>
+          
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+            <div className="text-center">
+              <div className="flex justify-center mb-6">
+                <div className="p-3 bg-white/80 rounded-full backdrop-blur-sm shadow-lg animate-pulse">
+                  <Brain className="h-8 w-8 text-indigo-600" />
+                </div>
+              </div>
+                           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 animate-fade-in">
+                 Mind & Wellness
+               </h1>
+               <p className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed animate-fade-in-delay">
+                 Discover communities focused on mental health, personal growth, and inner transformation
+               </p>
+              <div className="flex flex-wrap justify-center gap-4 text-sm animate-fade-in-delay-2">
+                               <span className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-indigo-200 hover:scale-105 transition-transform duration-300">
+                   <Sparkles className="h-4 w-4 animate-pulse" />
+                   Mental Health
+                 </span>
+                 <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-purple-200 hover:scale-105 transition-transform duration-300">
+                   <Sparkles className="h-4 w-4 animate-pulse" />
+                   Life Coaching
+                 </span>
+                 <span className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-pink-200 hover:scale-105 transition-transform duration-300">
+                   <Sparkles className="h-4 w-4 animate-pulse" />
+                   Personal Growth
+                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+             {/* Communities Section */}
+       <div id="communities-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center items-center py-16">
             <Loader />
@@ -240,7 +298,7 @@ export default function MindPage() {
         ) : (
           <>
             {/* Communities Grid */}
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-6">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pb-6">
               {communities.length > 0 ? (
                                  communities.map((community, index) => (
                    <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>

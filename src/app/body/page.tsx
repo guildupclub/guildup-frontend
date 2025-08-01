@@ -197,42 +197,72 @@ export default function BodyPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
-                <Dumbbell className="h-8 w-8 text-white" />
+      {/* Free Discovery Call Banner - Top */}
+      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border-b-4 border-green-30 mt-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-white/25 rounded-full backdrop-blur-sm animate-pulse">
+                <svg className="w-4 h-4 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-bold text-base sm:text-xl">🎯 Free Discovery Call!</h3>
+                <p className="text-green-100 text-xs sm:text-base hidden sm:block">Book a 15-minute consultation with fitness experts</p>
+                <p className="text-green-100 text-xs sm:hidden">Take your first step towards a healthier you</p>
               </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-white to-emerald-200 bg-clip-text text-transparent">
-              Body & Fitness
-            </h1>
-                         <p className="text-xl sm:text-2xl text-emerald-100 max-w-3xl mx-auto mb-8 leading-relaxed">
-               Join communities dedicated to physical health, nutrition, and fitness transformation
-             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
-                             <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Fitness Goals
-               </span>
-               <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Nutrition
-               </span>
-               <span className="px-4 py-2 bg-white/20 rounded-full backdrop-blur-sm flex items-center gap-2">
-                 <Sparkles className="h-4 w-4" />
-                 Health & Wellness
-               </span>
-            </div>
+                         <Button 
+               className="bg-green-500 text-white hover:bg-green-50 font-bold px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-lg whitespace-nowrap"
+               onClick={() => {
+                 const communitiesSection = document.getElementById('communities-section');
+                 if (communitiesSection) {
+                   communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                 }
+               }}
+             >
+               📞 Book Free Call
+             </Button>
           </div>
         </div>
       </div>
 
-      {/* Communities Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    {/* Hero Section */}
+        <div className="relative overflow-hidden bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 text-black">
+         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+           <div className="text-center">
+             <div className="flex justify-center mb-6">
+               <div className="p-3 bg-green-500 rounded-full backdrop-blur-sm">
+                 <Dumbbell className="h-8 w-8 text-white" />
+               </div>
+             </div>
+                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900">
+                Body & Fitness
+              </h1>
+                           <p className="text-xl sm:text-2xl text-gray-800 max-w-3xl mx-auto mb-8 leading-relaxed">
+                 Join communities dedicated to physical health, nutrition, and fitness transformation
+               </p>
+             <div className="flex flex-wrap justify-center gap-4 text-sm">
+                              <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
+                  <Sparkles className="h-4 w-4" />
+                  Fitness Goals
+                </span>
+                <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
+                  <Sparkles className="h-4 w-4" />
+                  Nutrition
+                </span>
+                <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
+                  <Sparkles className="h-4 w-4" />
+                  Health & Wellness
+                </span>
+             </div>
+           </div>
+         </div>
+       </div>
+
+             {/* Communities Section */}
+       <div id="communities-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center items-center py-16">
             <Loader />
@@ -240,7 +270,7 @@ export default function BodyPage() {
         ) : (
           <>
             {/* Communities Grid */}
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 pb-6">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pb-6">
               {communities.length > 0 ? (
                                  communities.map((community, index) => (
                    <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
@@ -251,42 +281,42 @@ export default function BodyPage() {
                    </div>
                  ))
               ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-                  <div className="p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full mb-6">
-                    <Users className="h-16 w-16 text-green-600" />
-                  </div>
-                                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                     No fitness communities found
-                   </h3>
-                   <p className="text-gray-600 max-w-md">
-                     We&apos;re working on bringing you the best fitness and nutrition communities. Check back soon!
-                   </p>
-                </div>
+                                 <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                   <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full mb-6">
+                     <Users className="h-16 w-16 text-green-500" />
+                   </div>
+                                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      No fitness communities found
+                    </h3>
+                    <p className="text-gray-600 max-w-md">
+                      We&apos;re working on bringing you the best fitness and nutrition communities. Check back soon!
+                    </p>
+                 </div>
               )}
             </div>
 
             {/* Load More Button */}
             {communities.length > 0 && hasMore && (
               <div className="flex justify-center py-8">
-                <Button
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  variant="outline"
-                  size="lg"
-                  className="group relative overflow-hidden border-green-200 hover:border-green-400 bg-white hover:bg-green-50 transition-all duration-300"
-                >
-                  {loadingMore ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600 mr-2"></div>
-                      Loading more...
-                    </>
-                  ) : (
-                    <>
-                      <span className="mr-2">Load More Communities</span>
-                      <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
-                    </>
-                  )}
-                </Button>
+                                 <Button
+                   onClick={handleLoadMore}
+                   disabled={loadingMore}
+                   variant="outline"
+                   size="lg"
+                   className="group relative overflow-hidden border-green-200 hover:border-green-400 bg-white hover:bg-green-50 transition-all duration-300"
+                 >
+                   {loadingMore ? (
+                     <>
+                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500 mr-2"></div>
+                       Loading more...
+                     </>
+                   ) : (
+                     <>
+                       <span className="mr-2">Load More Communities</span>
+                       <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
+                     </>
+                   )}
+                 </Button>
               </div>
             )}
 
@@ -304,7 +334,7 @@ export default function BodyPage() {
                         setTotalCount(0);
                         fetchBodyCommunities(0, false);
                       }}
-                      className="text-green-600 hover:text-green-800"
+                                             className="text-green-500 hover:text-green-700"
                     >
                       Reset to see all results
                     </Button>
