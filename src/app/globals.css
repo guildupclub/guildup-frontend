@@ -252,3 +252,205 @@
 .animation-delay-300 {
   animation-delay: 300ms;
 }
+
+/* Custom animations for mind page */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-slower {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-delay {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-delay-2 {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  66% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 3s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 4s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s ease-out forwards;
+}
+
+.animate-fade-in-delay {
+  animation: fade-in-delay 1.5s ease-out forwards;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fade-in-delay-2 2s ease-out forwards;
+}
+
+/* Sparkling Laser with Disappearing Tail */
+@keyframes laser-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes sparkle-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes trail-fade {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+.laser-orbit {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  width: 500px;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  animation: laser-orbit 6s linear infinite;
+}
+
+.laser-sparkle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sparkle-core {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #fff 0%, #60a5fa 30%, #3b82f6 70%, #1d4ed8 100%);
+  border-radius: 50%;
+  box-shadow: 
+    0 0 10px #60a5fa,
+    0 0 20px #3b82f6,
+    0 0 30px #1d4ed8;
+  animation: sparkle-pulse 0.5s ease-in-out infinite;
+}
+
+.sparkle-trail {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, #60a5fa, transparent);
+  border-radius: 2px;
+  animation: trail-fade 0.8s ease-out infinite;
+}
+
+.sparkle-trail-delay-1 {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 15px;
+  background: linear-gradient(to bottom, #60a5fa, transparent);
+  border-radius: 2px;
+  animation: trail-fade 0.8s ease-out infinite 0.1s;
+}
+
+.sparkle-trail-delay-2 {
+  position: absolute;
+  top: 43px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+  background: linear-gradient(to bottom, #60a5fa, transparent);
+  border-radius: 2px;
+  animation: trail-fade 0.8s ease-out infinite 0.2s;
+}
+
+.sparkle-trail-delay-3 {
+  position: absolute;
+  top: 53px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 5px;
+  background: linear-gradient(to bottom, #60a5fa, transparent);
+  border-radius: 2px;
+  animation: trail-fade 0.8s ease-out infinite 0.3s;
+}
