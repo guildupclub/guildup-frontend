@@ -259,7 +259,7 @@ export default function BodyPage() {
                      No fitness communities found
                    </h3>
                    <p className="text-gray-600 max-w-md">
-                     We're working on bringing you the best fitness and nutrition communities. Check back soon!
+                     We&apos;re working on bringing you the best fitness and nutrition communities. Check back soon!
                    </p>
                 </div>
               )}

@@ -259,7 +259,7 @@ export default function MindPage() {
                      No mind-focused communities found
                    </h3>
                    <p className="text-gray-600 max-w-md">
-                     We're working on bringing you the best mental health and wellness communities. Check back soon!
+                     We&apos;re working on bringing you the best mental health and wellness communities. Check back soon!
                    </p>
                 </div>
               )}
