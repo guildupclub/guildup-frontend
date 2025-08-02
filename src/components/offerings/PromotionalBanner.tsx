@@ -66,7 +66,6 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
 
   if (!shouldShowBanner) return null;
 
-
   return (
     <div
       className={`relative overflow-hidden bg-gradient-to-r from-primary/90 via-blue-600 to-primary/80 rounded-xl shadow-lg transition-all duration-700 transform ${
@@ -80,39 +79,40 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/5 rounded-full animate-ping"></div>
       </div>
 
-      <div className="relative z-10 px-3 py-2">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          {/* Coupon Code Label */}
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-yellow-300 animate-bounce" />
-            <span className="text-yellow-300 font-bold text-sm">
-              Use coupon code <span className="bg-yellow-400 text-black px-2 py-1 rounded">GUILD100</span> to get 100% off on your first 3 bookings
-            </span>
+      <div className="relative z-10 px-3 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Price Display Section */}
+          <div className="flex items-center gap-3 flex-1 justify-center sm:justify-start">
+            {/* Original Price */}
+            <div className="flex flex-col items-center sm:items-start">
+              <div className="text-2xl sm:text-3xl font-bold text-white">
+                ₹{discountedPrice?.toLocaleString("en-IN")}
+              </div>
+              <div className="text-xs text-gray-300">Session Price</div>
+            </div>
           </div>
 
-          {/* Coupon Code Section */}
-          <div className="flex items-center gap-2 flex-1 justify-center">
-            {/* Coupon Code */}
-            <div className="bg-yellow-400/20 backdrop-blur-sm rounded px-3 py-2 border border-yellow-400">
-              <div className="text-yellow-300 text-sm font-bold">
-                GUILD100
+          {/* Limited Time Offer Section */}
+          <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/30">
+            <Clock className="w-4 h-4 text-white" />
+            <div className="text-center">
+              <div className="text-white text-sm sm:text-base font-bold">
+                Limited Time
               </div>
               <div className="text-white text-xs">
-                100% OFF
+                {slotsLeft} slots left
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Arrow */}
-            <div className="text-white animate-pulse text-xs">
-              →
-            </div>
-
-            {/* First 3 Bookings */}
-            <div className="bg-white/20 backdrop-blur-sm rounded px-2 py-1 border border-green-400">
-              <div className="text-white text-sm font-bold">
-                First 3 Bookings
-              </div>
-            </div>
+        {/* Additional Info - Mobile Friendly */}
+        <div className="mt-3 text-center sm:text-left">
+          <div className="text-white text-xs sm:text-sm opacity-90">
+            ⏰ Book your session now before slots fill up!
+          </div>
+          <div className="text-white text-xs opacity-75 mt-1">
+            🎯 Expert guidance • Flexible scheduling • Secure booking
           </div>
         </div>
       </div>

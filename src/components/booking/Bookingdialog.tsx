@@ -571,6 +571,29 @@ export function BookingDialog({
                   <BiSolidOffer className="h-5 w-5 text-green-600" />
                   {offering?.type.toUpperCase()}
                 </p>
+                
+                {/* Promotional Coupon Message */}
+                <div className="mt-3 p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm">
+                  <div className="flex items-center justify-center gap-1 sm:gap-2">
+                    <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5">
+                      <span className="text-xs sm:text-sm font-medium text-blue-700">
+                        Apply coupon
+                      </span>
+                      <span className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-bold text-xs shadow-sm border border-yellow-300">
+                        GUILD100
+                      </span>
+                      <span className="text-xs sm:text-sm font-medium text-blue-700">
+                        to get
+                      </span>
+                      <span className="bg-green-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-bold text-xs">
+                        100% OFF
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-1 font-medium text-center">
+                    on your first 3 discovery sessions
+                  </p>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
