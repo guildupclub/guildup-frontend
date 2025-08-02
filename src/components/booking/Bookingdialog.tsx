@@ -174,12 +174,12 @@ export function BookingDialog({
         toast.success("Login successful!");
         const { user, token } = response.data.data;
 
-        // Store user data and token in session storage
+        // Store user data and token in session storage to match main login flow
         sessionStorage.setItem("user", JSON.stringify(user));
-        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("name", user.name);
         sessionStorage.setItem("id", user._id);
-        if (user.name) sessionStorage.setItem("name", user.name);
-        if (user.email) sessionStorage.setItem("email", user.email);
+        sessionStorage.setItem("token", token);
+        sessionStorage.setItem("email", user.email);
 
         dispatch(
           setUser({
@@ -209,12 +209,21 @@ export function BookingDialog({
       return;
     }
     try {
+      const storedUser = sessionStorage.getItem("user");
+      const userId = reduxUser?._id || (storedUser ? JSON.parse(storedUser)._id : undefined);
+
+      if (!userId) {
+        toast.error("Please log in to apply a coupon.");
+        return;
+      }
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/coupon/preview`,
         {
           code: couponCode.trim().toUpperCase(),
-          userId: reduxUser?._id,
+          userId: userId,
           cartTotal: offering.price.amount,
+          offeringId: offering._id,
         }
       );
       if (response.data.valid) {
