@@ -141,6 +141,8 @@ const handleApplyCoupon = async () => {
         code: couponCode.trim().toUpperCase(),
         userId: userId,
         cartTotal: offering.price.amount,
+        // we will also pass offeringId:
+        offeringId: offering._id,
       };
 
       console.log("Applying coupon with data:", obj);

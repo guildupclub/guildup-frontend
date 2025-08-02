@@ -78,7 +78,9 @@ export function LeftmostSidebar() {
     const result = await response.json();
     console.log("comm", result);
     const validCommunities = result?.data?.filter(
-      (community: Community | null) => community !== null
+      (community: Community | null) => {
+        return (community !== null && community.user_id == userId);
+      }
     );
 
     dispatch(setUserFollowedCommunities(validCommunities));
