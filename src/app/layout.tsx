@@ -8,6 +8,7 @@ import NavbarClient from "@/components/layout/NavbarClient";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
+import CouponBanner from "@/components/banner/CouponBanner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import Script from "next/script";
 // import GoogleOneTap from "@/components/GoogleOneTap";
@@ -186,6 +187,7 @@ export default async function RootLayout({
           <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
+              <CouponBanner />
               <RouteChangeTracker />
               {children}
               {/* <GoogleOneTap /> */}

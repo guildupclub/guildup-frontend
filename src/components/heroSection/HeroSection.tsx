@@ -141,14 +141,7 @@ export default function Hero() {
     setIsDialogOpen(true);
   };
 
-  const handleBannerClick = () => {
-    if(activeCommunity){
-      router.push(`/community/${activeCommunity.name}-${activeCommunity.id}/profile`)
-    }
-    else {
-      toast.info("You need to be an expert to join the campaign");
-    }
-  }
+
 
   const handleStartJourneyClick = () => {
     // Scroll to the categories/experts section
@@ -187,51 +180,7 @@ export default function Hero() {
 
       {/* Main Content */}
       <div className="relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="pt-12 lg:pt-16 pb-4 lg:pb-8 min-w-full">
-          {/* Campaign Banner - Show to all users */}
-          <motion.div
-            className="mb-4 lg:mb-6 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-12"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 py-3 px-4 sm:px-6 text-white text-sm font-medium text-center shadow-lg">
-              {/* Mobile Layout */}
-              <div className="flex md:hidden items-center justify-center gap-2 pt-2 cursor-pointer hover:bg-white/10 transition-colors duration-200" onClick={handleBannerClick}>
-                <span className="text-lg">🔥</span>
-                <span className="font-semibold text-xs">Spotlight Campaign - Only 25 Experts!</span>
-                <svg
-                  className="h-3 w-3 ml-2 transition-transform duration-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-
-              {/* Desktop Layout */}
-              <div className="hidden md:flex items-center justify-center gap-2 w-full cursor-pointer hover:bg-white/10 transition-colors duration-200" onClick={handleBannerClick}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🔥</span>
-                  <span className="font-semibold">GuildUp Spotlight Campaign Launching Soon — Only 25 Experts Will Be Featured!</span>
-                </div>
-                <div className="ml-4 flex items-center gap-2 text-xs bg-white/20 px-3 py-1 rounded-full">
-                  <span>🎯</span>
-                  <span>0% Commission, Homepage Spotlight & Access to 20,000+ Users</span>
-                </div>
-                <svg
-                  className="h-4 w-4 ml-3 transition-transform duration-200"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </div>
-            </div>
-          </motion.div>
-
-
-
+        <div className="pt-4 lg:pt-6 pb-4 lg:pb-8 min-w-full">
           {/* Main Hero Content */}
           <div className="max-w-7xl mx-auto">
             {/* Centered Search Section */}
