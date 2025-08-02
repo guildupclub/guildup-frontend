@@ -411,7 +411,6 @@ export function BookingDialog({
 
       if (response.data.r === "s") {
         const order = response.data.data;
-        // if after applying coupon, the amount is 0 or offering is free
         if (appliedCouponInfo) {
           setPriceAfterDiscount(appliedCouponInfo.finalTotal);
         } else {
