@@ -101,6 +101,8 @@ export function BookingDialog({
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
+  const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
+
   // Redux state
   const reduxUser = useSelector((state: RootState) => state.user.user);
   const isLoggedIn = !!reduxUser?._id;
@@ -368,10 +370,19 @@ export function BookingDialog({
         return;
       }
 
+      const storedUser = sessionStorage.getItem("user");
+      const userId = reduxUser?._id || (storedUser ? JSON.parse(storedUser)._id : undefined);
+
+      if (!userId) {
+        toast.error("Please log in to book a slot.");
+        setIsProcessing(false);
+        return;
+      }
+
       const watiResponse = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/profile/wati/addContact`,
         {
-          userId: reduxUser?._id,
+          userId: userId,
           phone: phoneWithoutFormatting,
         }
       );
@@ -390,7 +401,7 @@ export function BookingDialog({
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-order`,
         {
           offering_id: offering._id,
-          user_id: reduxUser?._id,
+          user_id: userId,
           date: selectedDate,
           slot: selectedSlot,
           startTime,
@@ -415,6 +426,7 @@ export function BookingDialog({
             description: "Slot Booking Payment",
             order_id: order.id,
             handler: async (paymentResponse: any) => {
+              setIsRazorpayOpen(false);
               const verifyResponse = await axios.post(
                 `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-payment`,
                 {
@@ -422,7 +434,7 @@ export function BookingDialog({
                   razorpay_payment_id: paymentResponse.razorpay_payment_id,
                   razorpay_signature: paymentResponse.razorpay_signature,
                   offering_id: offering._id,
-                  user_id: reduxUser?._id,
+                  user_id: userId,
                   startTime,
                   couponCode: appliedCouponCode,
                 }
@@ -447,8 +459,14 @@ export function BookingDialog({
             theme: {
               color: "#3399cc",
             },
+            modal: {
+              ondismiss: () => {
+                setIsRazorpayOpen(false);
+              },
+            },
           };
           const razorpayInstance = new window.Razorpay(razorpayOptions);
+          setIsRazorpayOpen(true);
           razorpayInstance.open();
         }
       } else {
@@ -467,7 +485,7 @@ export function BookingDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose} modal={!isRazorpayOpen}>
       <DialogContent className="sm:max-w-[1000px] p-0 overflow-y-auto max-h-[100vh] text-muted border border-border/50 rounded-xl shadow-xl">
         <div className="bg-background grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* Left Section - Welcome Panel */}
@@ -848,7 +866,7 @@ export function BookingDialog({
                     <Button
                       onClick={handleBookSlot}
                       className="bg-primary w-full hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
-                      disabled={isProcessing || !isLoggedIn}
+                      disabled={isProcessing || !(isLoggedIn || (typeof window !== 'undefined' && window.sessionStorage.getItem('token')))}
                     >
                       {isProcessing ? (
                         <>
