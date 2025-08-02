@@ -13,7 +13,7 @@ const CouponBanner: React.FC = () => {
 
   return (
     <div
-      className={`fixed top-16 z-40 w-full overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-purple-500 transition-all duration-700 transform ${
+      className={`fixed top-16 z-40 w-full overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 transition-all duration-700 transform ${
         isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
       }`}
     >
@@ -37,9 +37,9 @@ const CouponBanner: React.FC = () => {
                   <Gift className="w-5 h-5 text-yellow-300 animate-bounce" />
                   <Star className="w-3 h-3 text-yellow-400 absolute -top-1 -right-1 animate-pulse" />
                 </div>
-                <div className="flex items-center gap-1 bg-red-500/20 px-2 py-1 rounded-full border border-red-400/30">
-                  <Clock className="w-3 h-3 text-red-200" />
-                  <span className="text-red-100 text-xs font-bold">LIMITED TIME!</span>
+                <div className="flex items-center gap-1 bg-orange-500/20 px-2 py-1 rounded-full border border-orange-400/30">
+                  <Clock className="w-3 h-3 text-orange-200" />
+                  <span className="text-orange-100 text-xs font-bold">LIMITED TIME!</span>
                 </div>
               </div>
 
@@ -66,9 +66,9 @@ const CouponBanner: React.FC = () => {
               </div>
 
               {/* Right side - Additional urgency */}
-              <div className="flex items-center gap-1 bg-orange-500/20 px-2 py-1 rounded-full border border-orange-400/30">
-                <Zap className="w-3 h-3 text-orange-200" />
-                <span className="text-orange-100 text-xs font-bold">HOT DEAL!</span>
+              <div className="flex items-center gap-1 bg-emerald-500/20 px-2 py-1 rounded-full border border-emerald-400/30">
+                <Zap className="w-3 h-3 text-emerald-200" />
+                <span className="text-emerald-100 text-xs font-bold">HOT DEAL!</span>
               </div>
             </div>
           </div>
@@ -89,9 +89,9 @@ const CouponBanner: React.FC = () => {
                 <Gift className="w-4 h-4 text-yellow-300 animate-bounce" />
                 <Star className="w-2 h-2 text-yellow-400 absolute -top-0.5 -right-0.5 animate-pulse" />
               </div>
-              <div className="flex items-center gap-1 bg-red-500/20 px-1 py-0.5 rounded-full border border-red-400/30">
-                <Clock className="w-2 h-2 text-red-200" />
-                <span className="text-red-100 text-xs font-bold">LIMITED!</span>
+              <div className="flex items-center gap-1 bg-orange-500/20 px-1 py-0.5 rounded-full border border-orange-400/30">
+                <Clock className="w-2 h-2 text-orange-200" />
+                <span className="text-orange-100 text-xs font-bold">LIMITED!</span>
               </div>
             </div>
 
@@ -124,7 +124,7 @@ const CouponBanner: React.FC = () => {
 
       {/* Enhanced decorative borders */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 animate-pulse"></div>
-      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400"></div>
+      <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-400"></div>
     </div>
   );
 };
