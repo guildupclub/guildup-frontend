@@ -209,8 +209,8 @@ export default function MindPage() {
               </div>
               <div>
                 <h3 className="font-bold text-base sm:text-xl">💡 Your First 3 Expert Sessions Are FREE</h3>
-                <p className="text-purple-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized guidance from India's top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
-                <p className="text-purple-100 text-xs sm:hidden">✨ Experience personalized guidance from India's top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
+                <p className="text-purple-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized guidance from India&apos;s top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
+                <p className="text-purple-100 text-xs sm:hidden">✨ Experience personalized guidance from India&apos;s top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
               </div>
             </div>
                          <Button 
