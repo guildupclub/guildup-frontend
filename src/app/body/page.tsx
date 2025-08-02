@@ -198,7 +198,7 @@ export default function BodyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {/* Free Discovery Call Banner - Top */}
-      <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border-b-4 border-green-30 mt-16">
+      <div className="hidden md:block sticky top-16 bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border-b-4 border-green-300 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-2 sm:gap-4">
@@ -208,13 +208,13 @@ export default function BodyPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-base sm:text-xl">🎯 Free Discovery Call!</h3>
-                <p className="text-green-100 text-xs sm:text-base hidden sm:block">Book a 15-minute consultation with fitness experts</p>
-                <p className="text-green-100 text-xs sm:hidden">Take your first step towards a healthier you</p>
+                <h3 className="font-bold text-base sm:text-xl">💡 Your First 3 Expert Sessions Are FREE</h3>
+                <p className="text-green-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized guidance from India's top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
+                <p className="text-green-100 text-xs sm:hidden">✨ Experience personalized guidance from India's top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
               </div>
             </div>
                          <Button 
-               className="bg-green-500 text-white hover:bg-green-50 font-bold px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-lg whitespace-nowrap"
+               className="bg-white text-green-700 hover:bg-green-50 font-bold px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-base whitespace-nowrap flex-shrink-0"
                onClick={() => {
                  const communitiesSection = document.getElementById('communities-section');
                  if (communitiesSection) {
@@ -222,41 +222,76 @@ export default function BodyPage() {
                  }
                }}
              >
-               📞 Book Free Call
+               🎯 Book Free Session
              </Button>
           </div>
         </div>
       </div>
 
                     {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 text-black">
-         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div className="relative overflow-hidden bg-gradient-to-br from-mint-50 via-emerald-50 to-blue-50 text-black">
+          {/* Floating background icons */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-20 left-10 opacity-[0.05] animate-float">
+              <Dumbbell className="h-16 w-16 text-gray-600" />
+            </div>
+            <div className="absolute top-32 right-16 opacity-[0.05] animate-float-delay">
+              <div className="w-12 h-12 rounded-full bg-green-200"></div>
+            </div>
+            <div className="absolute bottom-32 left-20 opacity-[0.05] animate-float-delay-2">
+              <div className="w-8 h-8 bg-blue-200 rounded-full"></div>
+            </div>
+            <div className="absolute top-48 left-1/3 opacity-[0.05] animate-float">
+              <div className="w-10 h-10 bg-teal-200 rounded-lg"></div>
+            </div>
+          </div>
+          
+         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
            <div className="text-center">
-             <div className="flex justify-center mb-6">
-               <div className="p-3 bg-green-500 rounded-full backdrop-blur-sm">
-                 <Dumbbell className="h-8 w-8 text-white" />
+             <div className="flex justify-center mb-8">
+               <div className="p-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full backdrop-blur-sm shadow-lg">
+                 <Dumbbell className="h-10 w-10 text-white" />
                </div>
              </div>
-                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900">
-                Body & Fitness
+                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 text-gray-900 leading-tight">
+                💪 Lose Weight, Gain Energy & Transform Your Body
               </h1>
-                           <p className="text-xl sm:text-2xl text-gray-800 max-w-3xl mx-auto mb-8 leading-relaxed">
-                 Join communities dedicated to physical health, nutrition, and fitness transformation
+                           <p className="text-xl sm:text-2xl text-gray-700 max-w-4xl mx-auto mb-12 leading-relaxed">
+                 Work 1:1 with trusted fitness coaches, yoga instructors & nutrition experts<br />
+                 to achieve your health and fitness goals.
                </p>
-             <div className="flex flex-wrap justify-center gap-4 text-sm">
-                              <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
-                  <Sparkles className="h-4 w-4" />
-                  Fitness Goals
-                </span>
-                <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
-                  <Sparkles className="h-4 w-4" />
-                  Nutrition
-                </span>
-                <span className="px-4 py-2 bg-green-500 rounded-full backdrop-blur-sm flex items-center gap-2 text-white">
-                  <Sparkles className="h-4 w-4" />
-                  Health & Wellness
-                </span>
+             <div className="flex flex-wrap justify-center gap-3 mb-10">
+               <span className="px-6 py-3 bg-green-100 text-green-700 rounded-full border border-green-200 hover:bg-green-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Weight Loss
+               </span>
+               <span className="px-6 py-3 bg-blue-100 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Strength Training
+               </span>
+               <span className="px-6 py-3 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Nutrition
+               </span>
+               <span className="px-6 py-3 bg-pink-100 text-pink-700 rounded-full border border-pink-200 hover:bg-pink-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Fitness Goals
+               </span>
+               <span className="px-6 py-3 bg-orange-100 text-orange-700 rounded-full border border-orange-200 hover:bg-orange-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 PCOS & Hormonal Health
+               </span>
              </div>
+             
+             {/* CTA Button */}
+             <div className="flex justify-center">
+               <button 
+                 className="px-8 py-4 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-semibold rounded-full hover:from-green-500 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                 onClick={() => {
+                   const communitiesSection = document.getElementById('communities-section');
+                   if (communitiesSection) {
+                     communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                   }
+                 }}
+               >
+                 🎯 Book Free Session
+                </button>
+              </div>
            </div>
          </div>
        </div>

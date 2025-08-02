@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Add spacing for coupon banner */
+body {
+  padding-top: 128px; /* navbar height (64px) + coupon banner height (~64px) */
+}
+
+@media (max-width: 768px) {
+  body {
+    padding-top: 148px; /* navbar height (64px) + coupon banner height (~84px) on mobile */
+  }
+}
+
 @layer base {  
   :root {
     
@@ -281,6 +292,33 @@
   }
 }
 
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes float-delay {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes float-delay-2 {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -332,6 +370,18 @@
 
 .animate-float-slower {
   animation: float-slower 4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float-delay 3.5s ease-in-out infinite;
+}
+
+.animate-float-delay-2 {
+  animation: float-delay-2 4.5s ease-in-out infinite;
 }
 
 .animate-fade-in {

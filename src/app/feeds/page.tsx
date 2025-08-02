@@ -28,7 +28,7 @@ export default function Home() {
   }
 
   return (
-    <div className=" min-h-screen pt-16 bg-gradient-to-r from-[#777BEA]/20  text-muted">
+    <div className="min-h-screen bg-gradient-to-r from-[#777BEA]/20 text-muted">
       <HomePage />
     </div>
   );

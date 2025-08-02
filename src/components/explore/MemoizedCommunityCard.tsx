@@ -331,7 +331,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
               className="w-full text-xs py-1.5 h-7 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
               onClick={handleCardClick}
             >
-              Start your journey →
+              Claim Free Session Now →
             </Button>
           </div>
         </div>

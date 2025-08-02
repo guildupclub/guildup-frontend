@@ -19,14 +19,8 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
   const [animatedPrice, setAnimatedPrice] = useState(originalPrice);
   const [slotsLeft, setSlotsLeft] = useState(limitedSlots);
 
-  // Show banner only for the specific offering
-  const eligibleOfferingIds = [
-    "687135a760c4b417811f345e",
-    "688088d8db6573f8f8b68bd3" // Specific offering from guildup.club
-  ];
-  
-  // Show banner only if offering ID matches the specific promotional offering
-  const shouldShowBanner = eligibleOfferingIds.includes(offeringId);
+  // Show banner for all offerings during the coupon campaign
+  const shouldShowBanner = true;
 
   useEffect(() => {
     if (!shouldShowBanner) return;
@@ -88,21 +82,24 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
 
       <div className="relative z-10 px-3 py-2">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          {/* Limited Time Offer Label */}
-          <div className="flex items-center gap-1">
-            <Zap className="w-3 h-3 text-yellow-300 animate-bounce" />
-            <span className="text-yellow-300 font-bold text-xs uppercase tracking-wide">
-              Limited Time Offer
+          {/* Coupon Code Label */}
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-yellow-300 animate-bounce" />
+            <span className="text-yellow-300 font-bold text-sm">
+              Use coupon code <span className="bg-yellow-400 text-black px-2 py-1 rounded">GUILD100</span> to get 100% off on your first 3 bookings
             </span>
           </div>
 
-          {/* Horizontal Price Section */}
+          {/* Coupon Code Section */}
           <div className="flex items-center gap-2 flex-1 justify-center">
-            {/* Original Price */}
-            <div className="text-center">
-              <span className="text-white/70 text-xs line-through">
-                ₹{999}
-              </span>
+            {/* Coupon Code */}
+            <div className="bg-yellow-400/20 backdrop-blur-sm rounded px-3 py-2 border border-yellow-400">
+              <div className="text-yellow-300 text-sm font-bold">
+                GUILD100
+              </div>
+              <div className="text-white text-xs">
+                100% OFF
+              </div>
             </div>
 
             {/* Arrow */}
@@ -110,13 +107,10 @@ const PromotionalBanner: React.FC<PromotionalBannerProps> = ({
               →
             </div>
 
-            {/* Discounted Price - Highlighted */}
-            <div className="bg-white/20 backdrop-blur-sm rounded px-2 py-1 border border-yellow-400 pb-1">
-              <div className="text-white text-base font-bold">
-                ₹{animatedPrice.toLocaleString("en-IN")}
-                {animatedPrice !== discountedPrice && (
-                  <span className="inline-block ml-1 animate-spin text-xs">⬇️</span>
-                )}
+            {/* First 3 Bookings */}
+            <div className="bg-white/20 backdrop-blur-sm rounded px-2 py-1 border border-green-400">
+              <div className="text-white text-sm font-bold">
+                First 3 Bookings
               </div>
             </div>
           </div>
