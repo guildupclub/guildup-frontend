@@ -91,6 +91,8 @@ export function BookingDialog({
   const [appliedCouponInfo, setAppliedCouponInfo] = useState(null);
   const [priceAfterDiscount, setPriceAfterDiscount] = useState(0);
   const [couponMessage, setCouponMessage] = useState("");
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [isCouponApplied, setIsCouponApplied] = useState(false);
 
   // User-related state (single source for form fields)
   const [name, setName] = useState("");
@@ -100,6 +102,7 @@ export function BookingDialog({
   // OTP flow state
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
 
   const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
 
@@ -162,6 +165,7 @@ export function BookingDialog({
   };
 
   const handleVerifyOtp = async () => {
+    setIsVerifying(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`,
@@ -202,6 +206,8 @@ export function BookingDialog({
       }
     } catch (error) {
       toast.error("Failed to verify OTP");
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -210,12 +216,14 @@ export function BookingDialog({
       setCouponMessage("Please enter a valid coupon code.");
       return;
     }
+    setIsApplyingCoupon(true);
     try {
       const storedUser = sessionStorage.getItem("user");
       const userId = reduxUser?._id || (storedUser ? JSON.parse(storedUser)._id : undefined);
 
       if (!userId) {
         toast.error("Please log in to apply a coupon.");
+        setIsApplyingCoupon(false);
         return;
       }
 
@@ -233,10 +241,12 @@ export function BookingDialog({
         setPriceAfterDiscount(response.data.finalTotal);
         setCouponMessage(response.data.message);
         setAppliedCouponCode(couponCode.trim().toUpperCase());
+        setIsCouponApplied(true);
       } else {
         setCouponMessage(response.data.message);
         setAppliedCouponInfo(null);
         setPriceAfterDiscount(offering.price.amount);
+        setIsCouponApplied(false);
       }
     } catch (error) {
       setCouponMessage(
@@ -244,6 +254,9 @@ export function BookingDialog({
       );
       setAppliedCouponInfo(null);
       setPriceAfterDiscount(offering.price.amount);
+      setIsCouponApplied(false);
+    } finally {
+      setIsApplyingCoupon(false);
     }
   };
 
@@ -411,6 +424,11 @@ export function BookingDialog({
 
       if (response.data.r === "s") {
         const order = response.data.data;
+        if (appliedCouponInfo) {
+          setPriceAfterDiscount(appliedCouponInfo.finalTotal);
+        } else {
+          setPriceAfterDiscount(offering.price.amount);
+        }
         if (offering.is_free || order.amount === 0) {
           toast.success("Booking confirmed successfully!");
           onClose();
@@ -761,13 +779,13 @@ export function BookingDialog({
                         <Label htmlFor="phone">
                           Phone Number <span className="text-red-500">*</span>
                         </Label>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <PhoneInput
                             international
                             defaultCountry="IN"
                             value={phone}
                             onChange={(value) => setPhone(value || "")}
-                            className="w-full p-2 shadow-md border border-border/30 rounded-md"
+                            className="w-full flex-1 min-w-0 p-2 shadow-md border border-border/30 rounded-md"
                             required
                             placeholder="Enter your phone number"
                             disabled={isLoggedIn || otpSent}
@@ -776,6 +794,7 @@ export function BookingDialog({
                             <Button
                               onClick={handleSendOtp}
                               disabled={!phone || !name || !email}
+                              className="w-full md:w-auto"
                             >
                               Send OTP
                             </Button>
@@ -800,8 +819,9 @@ export function BookingDialog({
                             <Button
                               onClick={handleVerifyOtp}
                               className="bg-primary"
+                              disabled={isVerifying}
                             >
-                              Verify & Login
+                              {isVerifying ? "Verifying..." : "Verify & Login"}
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground">
@@ -834,17 +854,19 @@ export function BookingDialog({
                           <Input
                             id="couponCode"
                             value={couponCode}
-                            onChange={(e) =>
-                              setCouponCode(e.target.value.toUpperCase())
-                            }
+                            onChange={(e) => {
+                              setCouponCode(e.target.value.toUpperCase());
+                              setIsCouponApplied(false);
+                            }}
                             placeholder="Enter coupon code"
                             className="flex-1 p-2 border border-border/30 rounded-lg text-sm uppercase"
                           />
                           <Button
                             onClick={handleApplyCoupon}
                             className="px-4 bg-primary hover:bg-primary/90 rounded-lg shadow-sm"
+                            disabled={isApplyingCoupon || isCouponApplied}
                           >
-                            Apply
+                            {isApplyingCoupon ? "Applying..." : "Apply"}
                           </Button>
                         </div>
                         {couponMessage && (
