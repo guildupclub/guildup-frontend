@@ -142,6 +142,21 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       });
     }, [communityDetails]);
 
+    const handleClaimFreeSession = useCallback((e: React.MouseEvent) => {
+      e.stopPropagation();
+      
+      if (!communityDetails?.min_offering_id) {
+        console.error("No minimum offering ID available:", communityDetails);
+        toast.error("Session booking unavailable", {
+          description: "Please try again later or contact support",
+        });
+        return;
+      }
+
+      // Navigate to the offering page
+      router.push(`/offering/${communityDetails.min_offering_id}`);
+    }, [communityDetails, router]);
+
     const formatNumber = (num: number) => {
       return numbro(num).format({ average: true, mantissa: 1 });
     };
@@ -329,7 +344,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
               variant="ghost"
               size="sm"
               className="w-full text-xs py-1.5 h-7 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-              onClick={handleCardClick}
+              onClick={handleClaimFreeSession}
             >
               Claim Free Session Now →
             </Button>

@@ -25,6 +25,7 @@ interface Community {
   instagram_followers?: number;
   youtube_followers?: number;
   tags?: string[];
+  min_offering_id?: string;
 }
 
 // Body-related category IDs
@@ -92,7 +93,8 @@ export default function BodyPage() {
           linkedin_followers: community.linkedin_followers || 0,
           instagram_followers: community.instagram_followers || 0,
           youtube_followers: community.youtube_followers || 0,
-          tags: community.tags || []
+          tags: community.tags || [],
+          min_offering_id: community.min_offering_id
         }));
 
         if (isLoadMore) {
