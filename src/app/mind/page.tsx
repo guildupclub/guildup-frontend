@@ -27,12 +27,11 @@ interface Community {
   tags?: string[];
 }
 
-// Mind-related search terms for filtering communities
-const MIND_KEYWORDS = [
-  'mental', 'health', 'wellness', 'coaching', 'therapy', 
-  'mindfulness', 'meditation', 'psychology', 'life', 'personal', 
-  'growth', 'mind', 'brain', 'emotional', 'stress', 'anxiety',
-  'depression', 'counseling', 'therapist', 'psychologist'
+// Mind-related category IDs
+const MIND_CATEGORY_IDS = [
+  "67cab2669b3cd869f1d3ee98",
+  "67cab2809b3cd869f1d3ee99",
+  "67cab23e9b3cd869f1d3ee97"
 ];
 
 export default function MindPage() {
@@ -60,79 +59,54 @@ export default function MindPage() {
         setCommunities([]);
       }
 
-      // Fetch all communities and then filter for mind-related ones
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE * 3}` // Get more results to filter from
-        );
+      // Use the new filter API to get mind-related communities
+      const filterPayload = {
+        categoryIds: MIND_CATEGORY_IDS,
+        priceRange: {
+          min: 0,
+          max: 300
+        },
+        offeringTypes: ["discovery-call", "consultation"]
+      };
 
-        if (
-          response &&
-          response.data &&
-          response.data.r === "s" &&
-          Array.isArray(response.data.data)
-        ) {
-                      // Extract community data from the response format
-            const communitiesFromResponse = response.data.data.map((item: any) => {
-              if (item.community) {
-                return {
-                  _id: item.community._id,
-                  user_id: item.community.user_id?._id || item.community.user_id,
-                  name: item.community.name,
-                  description: item.community.description,
-                  image: item.community.image,
-                  // Add other fields that might be needed
-                  owner_experience: item.community.owner_experience,
-                  owner_sessions: item.community.owner_sessions,
-                  num_member: item.community.num_member,
-                  linkedin_followers: item.community.linkedin_followers,
-                  instagram_followers: item.community.instagram_followers,
-                  youtube_followers: item.community.youtube_followers,
-                  tags: item.community.tags,
-                };
-              }
-              // If the item is directly a community (not wrapped in community property)
-              return {
-                _id: item._id,
-                user_id: item.user_id?._id || item.user_id,
-                name: item.name,
-                description: item.description,
-                image: item.image,
-                owner_experience: item.owner_experience,
-                owner_sessions: item.owner_sessions,
-                num_member: item.num_member,
-                linkedin_followers: item.linkedin_followers,
-                instagram_followers: item.instagram_followers,
-                youtube_followers: item.youtube_followers,
-                tags: item.tags || item.additional_tags,
-              };
-            });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/filter-by-offerings`,
+        filterPayload
+      );
 
-          // Filter communities to only include mind-related ones
-          const mindRelatedCommunities = communitiesFromResponse.filter((community: any) => {
-            const name = community.name?.toLowerCase() || '';
-            const description = community.description?.toLowerCase() || '';
-            const tags = community.tags?.join(' ').toLowerCase() || '';
-            
-            const text = `${name} ${description} ${tags}`;
-            return MIND_KEYWORDS.some(keyword => text.includes(keyword));
-          });
+      if (
+        response &&
+        response.data &&
+        response.data.r === "s" &&
+        Array.isArray(response.data.data)
+      ) {
+        // Transform the response data to match our Community interface
+        const transformedCommunities = response.data.data.map((community: any) => ({
+          _id: community._id,
+          user_id: community.user_id,
+          name: community.name,
+          description: community.description,
+          image: community.image,
+          owner_experience: community.owner_experience || 0,
+          owner_sessions: community.owner_sessions || 0,
+          num_member: community.num_member || 0,
+          linkedin_followers: community.linkedin_followers || 0,
+          instagram_followers: community.instagram_followers || 0,
+          youtube_followers: community.youtube_followers || 0,
+          tags: community.tags || []
+        }));
 
-          if (isLoadMore) {
-            setCommunities(prev => [...prev, ...mindRelatedCommunities]);
-          } else {
-            setCommunities(mindRelatedCommunities);
-          }
-          
-          setHasMore(mindRelatedCommunities.length === COMMUNITIES_PER_PAGE);
-          setTotalCount(prev => prev + mindRelatedCommunities.length);
+        if (isLoadMore) {
+          setCommunities(prev => [...prev, ...transformedCommunities]);
+        } else {
+          setCommunities(transformedCommunities);
         }
-      } catch (error) {
-        console.error("Error fetching mind communities:", error);
-        setHasMore(false);
+        
+        setHasMore(transformedCommunities.length === COMMUNITIES_PER_PAGE);
+        setTotalCount(response.data.meta?.totalCommunities || transformedCommunities.length);
       }
     } catch (error) {
-      console.error("Error fetching mind communities", error);
+      console.error("Error fetching mind communities:", error);
       setHasMore(false);
     } finally {
       setLoading(false);
