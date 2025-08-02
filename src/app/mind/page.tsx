@@ -198,7 +198,7 @@ export default function MindPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
       {/* Free Discovery Call Banner - Top */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 mt-16">
+      <div className="hidden md:block sticky top-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
             <div className="flex items-center gap-2 sm:gap-4">
@@ -208,13 +208,13 @@ export default function MindPage() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-bold text-base sm:text-xl">🧠 Free Discovery Call!</h3>
-                <p className="text-purple-100 text-xs sm:text-base hidden sm:block">Book a 15-minute consultation with wellness experts</p>
-                <p className="text-purple-100 text-xs sm:hidden">15-min consultation with wellness experts</p>
+                <h3 className="font-bold text-base sm:text-xl">💡 Your First 3 Expert Sessions Are FREE</h3>
+                <p className="text-purple-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized guidance from India&apos;s top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
+                <p className="text-purple-100 text-xs sm:hidden">✨ Experience personalized guidance from India&apos;s top verified experts, completely free for your first 3 sessions! 🧘‍♀️💪🧠</p>
               </div>
             </div>
                          <Button 
-               className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-4 sm:px-8 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-lg whitespace-nowrap"
+               className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-xs sm:text-base whitespace-nowrap flex-shrink-0"
                onClick={() => {
                  const communitiesSection = document.getElementById('communities-section');
                  if (communitiesSection) {
@@ -222,68 +222,75 @@ export default function MindPage() {
                  }
                }}
              >
-               📞 Book Free Call
+               🎯 Book Free Session
              </Button>
           </div>
         </div>
       </div>
 
                            {/* Hero Section */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 text-black">
-          {/* Animated Background Elements */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-lavender-50 via-indigo-50 to-blue-50 text-black">
+          {/* Floating background icons */}
           <div className="absolute inset-0 overflow-hidden">
-            {/* Floating Particles */}
-            <div className="absolute top-20 left-10 w-2 h-2 bg-indigo-300 rounded-full animate-pulse opacity-60"></div>
-            <div className="absolute top-32 right-20 w-3 h-3 bg-purple-300 rounded-full animate-bounce opacity-40"></div>
-            <div className="absolute top-40 left-1/4 w-1 h-1 bg-pink-300 rounded-full animate-ping opacity-70"></div>
-            <div className="absolute top-60 right-1/3 w-2 h-2 bg-indigo-400 rounded-full animate-pulse opacity-50"></div>
-            <div className="absolute top-80 left-1/3 w-1 h-1 bg-purple-400 rounded-full animate-bounce opacity-60"></div>
-            
-            
-            
-            {/* Floating Brain Icons */}
-            <div className="absolute top-1/4 left-5 animate-float-slow opacity-30">
-              <Brain className="w-6 h-6 text-indigo-400" />
+            <div className="absolute top-20 left-10 opacity-[0.05] animate-float">
+              <Brain className="h-16 w-16 text-gray-600" />
             </div>
-            <div className="absolute top-1/3 right-8 animate-float-slower opacity-40">
-              <Brain className="w-4 h-4 text-purple-400" />
+            <div className="absolute top-32 right-16 opacity-[0.05] animate-float-delay">
+              <Sparkles className="h-12 w-12 text-purple-400" />
             </div>
-            <div className="absolute top-2/3 left-8 animate-float-slow opacity-35">
-              <Brain className="w-5 h-5 text-pink-400" />
+            <div className="absolute bottom-32 left-20 opacity-[0.05] animate-float-delay-2">
+              <div className="w-8 h-8 bg-indigo-200 rounded-full"></div>
             </div>
-            
-            {/* Geometric Shapes */}
-            <div className="absolute top-1/2 right-1/4 w-6 h-6 border-2 border-indigo-300 rounded-lg animate-spin-slow opacity-30"></div>
-            <div className="absolute top-3/4 left-1/4 w-4 h-4 bg-purple-300 rounded-full animate-pulse opacity-40"></div>
-            <div className="absolute top-1/4 right-1/3 w-3 h-3 border border-pink-300 transform rotate-45 animate-pulse opacity-50"></div>
+            <div className="absolute top-48 left-1/3 opacity-[0.05] animate-float">
+              <div className="w-10 h-10 bg-blue-200 rounded-lg"></div>
+            </div>
           </div>
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-            <div className="text-center">
-              <div className="flex justify-center mb-6">
-                <div className="p-3 bg-white/80 rounded-full backdrop-blur-sm shadow-lg animate-pulse">
-                  <Brain className="h-8 w-8 text-indigo-600" />
-                </div>
-              </div>
-                           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-gray-900 animate-fade-in">
-                 Mind & Wellness
+         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
+           <div className="text-center">
+             <div className="flex justify-center mb-8">
+               <div className="p-4 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full backdrop-blur-sm shadow-lg">
+                 <Brain className="h-10 w-10 text-white" />
+               </div>
+             </div>
+                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 text-gray-900 leading-tight animate-fade-in">
+                 🧠 Find Calm, Heal & Grow with Expert Support
                </h1>
-               <p className="text-xl sm:text-2xl text-gray-700 max-w-3xl mx-auto mb-8 leading-relaxed animate-fade-in-delay">
-                 Discover communities focused on mental health, personal growth, and inner transformation
+               <p className="text-xl sm:text-2xl text-gray-700 max-w-4xl mx-auto mb-8 leading-relaxed animate-fade-in-delay">
+                 Connect 1:1 with verified therapists, counselors & life coaches.<br />
+                 Get personalized support for your mental wellness journey.
                </p>
-              <div className="flex flex-wrap justify-center gap-4 text-sm animate-fade-in-delay-2">
-                               <span className="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-indigo-200 hover:scale-105 transition-transform duration-300">
-                   <Sparkles className="h-4 w-4 animate-pulse" />
-                   Mental Health
-                 </span>
-                 <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-purple-200 hover:scale-105 transition-transform duration-300">
-                   <Sparkles className="h-4 w-4 animate-pulse" />
-                   Life Coaching
-                 </span>
-                 <span className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full backdrop-blur-sm flex items-center gap-2 border border-pink-200 hover:scale-105 transition-transform duration-300">
-                   <Sparkles className="h-4 w-4 animate-pulse" />
-                   Personal Growth
-                 </span>
+               <p className="text-sm italic text-gray-600 mb-10 animate-fade-in-delay">
+                 Trusted experts. Confidential guidance.
+               </p>
+              <div className="flex flex-wrap justify-center gap-3 mb-10 animate-fade-in-delay-2">
+                               <span className="px-6 py-3 bg-indigo-100 text-indigo-700 rounded-full border border-indigo-200 hover:bg-indigo-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Anxiety
+               </span>
+               <span className="px-6 py-3 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Stress
+               </span>
+               <span className="px-6 py-3 bg-pink-100 text-pink-700 rounded-full border border-pink-200 hover:bg-pink-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Healing
+               </span>
+               <span className="px-6 py-3 bg-blue-100 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
+                 Personal Growth
+               </span>
+              </div>
+             
+             {/* CTA Button */}
+             <div className="flex justify-center animate-fade-in-delay-2">
+               <button 
+                 className="px-8 py-4 bg-gradient-to-r from-indigo-400 to-purple-500 text-white font-semibold rounded-full hover:from-indigo-500 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                 onClick={() => {
+                   const communitiesSection = document.getElementById('communities-section');
+                   if (communitiesSection) {
+                     communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                   }
+                 }}
+               >
+                 🎯 Book Free Session
+                </button>
               </div>
             </div>
           </div>

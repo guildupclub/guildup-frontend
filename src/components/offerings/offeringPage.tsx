@@ -167,7 +167,7 @@ export default function OfferingDetails({
 
   return (
     <div className="w-full max-w-6xl mx-auto px-2 sm:px-4 py-6 sm:py-10 space-y-0">
-      {/* Promotional Banner */}
+      {/* Promotional Banner - Now showing coupon info */}
      <div className="w-full">
       <PromotionalBanner
         originalPrice={price + Math.floor(price * 0.3)} // Simulating original price as 30% higher
