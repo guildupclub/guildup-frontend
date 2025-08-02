@@ -832,9 +832,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             <div className="h-44 lg:h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
               <Image
                 src={
-                  profile?.community.background_image != undefined
-                    ? profile?.community.background_image
-                    : bgImgUrl
+                  profile?.community.background_image ||
+                  bgImgUrl ||
+                  "/guildup-logo.png"
                 }
                 alt="Profile banner"
                 width={1200}
@@ -866,7 +866,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <div className="absolute -top-20 left-4 lg:left-10">
                 <div className="relative">
                   <Image
-                    src={profile?.community?.image || avatarImgUrl}
+                    src={
+                      profile?.community?.image ||
+                      avatarImgUrl ||
+                      "/guildup-logo.png"
+                    }
                     alt={profile?.community?.name || "Community Avatar"}
                     width={200}
                     height={200}
