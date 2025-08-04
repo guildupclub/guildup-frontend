@@ -31,25 +31,10 @@ export async function GET(request: NextRequest) {
 
     // Add category filter if provided
     if (category && category !== 'all') {
-      // Convert category name to category ID by fetching categories first
-      try {
-        const categoriesResponse = await fetch(`${API_BASE_URL}/v1/category`);
-        if (categoriesResponse.ok) {
-          const categoriesData = await categoriesResponse.json();
-          const categoryName = category.replace(/-/g, ' '); // Convert URL format back to name
-          const categoryObj = categoriesData.data.find(
-            (cat: any) => cat.name.toLowerCase() === categoryName.toLowerCase()
-          );
-          if (categoryObj) {
-            requestBody.categoryId = categoryObj._id;
-            console.log('Search API - Adding category filter:', categoryName, '->', categoryObj._id);
-          } else {
-            console.log('Search API - Category not found:', categoryName);
-          }
-        }
-      } catch (error) {
-        console.error('Search API - Error fetching categories:', error);
-      }
+      // The frontend is sending the category ID directly, so we can use it
+      requestBody.categoryId = category;
+      console.log('Search API - Adding category filter:', category);
+      console.log('Search API - Full request body:', requestBody);
     }
 
     console.log('Search API - Request URL:', backendUrl);

@@ -135,13 +135,12 @@ function SearchPageContent() {
       setSearchQuery(queryFromUrl);
     }
     
-    // Handle category from URL - now expecting category name instead of ID
+    // Handle category from URL - expecting category ID
     if (categories.length > 0) {
       if (categoryFromUrl) {
-        // Convert URL format back to category name (e.g., "Fitness-Yoga" -> "Fitness & Yoga")
-        const categoryName = urlToCategory(categoryFromUrl);
+        // The categoryFromUrl is now the category ID
         const categoryObj = categories.find(
-          (cat: Category) => cat.name.toLowerCase() === categoryName.toLowerCase()
+          (cat: Category) => cat._id === categoryFromUrl
         );
         if (categoryObj && categoryObj._id !== selectedCategoryId) {
           setSelectedCategory(categoryObj.name);
@@ -156,9 +155,7 @@ function SearchPageContent() {
     
     // Perform search when we have query and categories are loaded
     if (queryFromUrl && categories.length > 0 && !isInitialLoad) {
-      const finalCategoryId = categoryFromUrl ? 
-        categories.find(cat => cat.name.toLowerCase() === urlToCategory(categoryFromUrl).toLowerCase())?._id || "all" 
-        : "all";
+      const finalCategoryId = categoryFromUrl || "all";
       performSearch(queryFromUrl, finalCategoryId);
     }
     
@@ -245,12 +242,8 @@ function SearchPageContent() {
            let categoryId = "all";
            
            if (categoryFromUrl) {
-             // Convert category name from URL to category ID
-             const categoryName = urlToCategory(categoryFromUrl);
-             const categoryObj = categoriesData.find(
-               (cat: Category) => cat.name.toLowerCase() === categoryName.toLowerCase()
-             );
-             categoryId = categoryObj?._id || "all";
+             // The categoryFromUrl is now the category ID
+             categoryId = categoryFromUrl;
            }
            
            if (queryFromUrl) {
@@ -284,11 +277,7 @@ function SearchPageContent() {
       params.set('q', value.trim());
     }
     if (selectedCategoryId !== 'all') {
-      // Find the category name for the selected category ID
-      const selectedCat = categories.find((cat: Category) => cat._id === selectedCategoryId);
-      if (selectedCat) {
-        params.set('category', categoryToUrl(selectedCat.name));
-      }
+      params.set('category', selectedCategoryId);
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
@@ -308,8 +297,11 @@ function SearchPageContent() {
   const handleCategorySelect = (categoryId: string) => {
     const selectedCat = categories.find((cat: Category) => cat._id === categoryId);
 
+    console.log('=== CATEGORY SELECTION DEBUG ===');
     console.log('Category selected:', categoryId, selectedCat);
     console.log('Current state - selectedCategory:', selectedCategory, 'selectedCategoryId:', selectedCategoryId);
+    console.log('All categories:', categories.map(cat => ({ id: cat._id, name: cat.name })));
+    console.log('=== END DEBUG ===');
 
     // Update state
     if (selectedCat) {
@@ -322,13 +314,13 @@ function SearchPageContent() {
       setSelectedCategoryId("all");
     }
 
-    // Update URL with new category - now using category name instead of ID
+    // Update URL with new category - using category ID for API calls
     const params = new URLSearchParams();
     if (searchQuery.trim()) {
       params.set('q', searchQuery.trim());
     }
     if (selectedCat && selectedCat.name !== "All Category") {
-      params.set('category', categoryToUrl(selectedCat.name)); // Store category name in URL format
+      params.set('category', selectedCat._id); // Store category ID for API calls
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
