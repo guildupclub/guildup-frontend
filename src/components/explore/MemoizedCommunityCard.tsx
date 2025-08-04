@@ -214,141 +214,136 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
     return (
       <Card 
-        className="p-0 h-[220px] sm:h-[240px] md:h-[260px] flex flex-row hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100 overflow-hidden"
+        className="p-0 h-[540px] sm:h-[560px] flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 overflow-hidden relative rounded-xl"
         onClick={handleCardClick}
       >
-        {/* Left Side - Profile Image and Buttons (same layout for mobile and desktop) */}
-        <div className="w-1/3 sm:w-1/3 h-full flex flex-col items-center justify-between p-2 sm:p-4 pt-2 sm:pt-4">
-          {/* Profile Image */}
-          <div className="w-full h-3/4 sm:h-5/6 relative rounded-lg overflow-hidden mb-2 sm:mb-2">
-            <Image
-              src={avatarImgUrl || "/placeholder.svg"}
-              alt={communityDetails?.name || "Expert"}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-            />
-          </div>
-          
-          {/* Action Buttons - Mobile: Share button below image, Desktop: Both buttons */}
-          <div className="w-full flex flex-col space-y-1">
-            {/* Share Button - Visible on both mobile and desktop */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs py-1.5 h-7 sm:h-8 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
-              onClick={handleShare}
-            >
-              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1 sm:mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-              </svg>
-              <span className="hidden sm:inline">Share</span>
-            </Button>
-            
-            {/* View Profile Button - Hidden on mobile, visible on desktop */}
-            <div className="hidden sm:block">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full text-xs py-1.5 h-7 sm:h-8 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800 transition-all duration-200 shadow-sm hover:shadow-md"
-                onClick={handleViewProfile}
-              >
-                <svg className="w-3 h-3 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                View Profile
-              </Button>
-            </div>
-          </div>
+        {/* Top Section - Profile Image */}
+        <div className="w-full h-72 relative overflow-hidden bg-gray-100">
+          <Image
+            src={avatarImgUrl || "/placeholder.svg"}
+            alt={communityDetails?.name || "Expert"}
+            fill
+            className="object-cover"
+            style={{
+              objectPosition: 'center 20%', // Focus on face area
+              objectFit: 'contain'
+              // Show full image within container bounds
+            }}
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                          onLoad={(e) => {
+                // Simple face positioning without scaling
+                const img = e.target as HTMLImageElement;
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                
+                if (aspectRatio < 0.8) {
+                  // Very tall portrait - face is likely in upper third
+                  img.style.objectPosition = 'center 15%';
+                } else if (aspectRatio < 1.2) {
+                  // Portrait/square - face is likely in upper quarter
+                  img.style.objectPosition = 'center 18%';
+                } else if (aspectRatio < 1.8) {
+                  // Landscape - face is likely in center-upper area
+                  img.style.objectPosition = 'center 22%';
+                } else {
+                  // Very wide landscape - face is likely in center
+                  img.style.objectPosition = 'center 25%';
+                }
+              }}
+          />
         </div>
 
-        {/* Right Side - Content (mini version for mobile, full for desktop) */}
-        <div className="flex-1 p-2 sm:p-4 flex flex-col justify-between h-full min-w-0">
-          {/* Top Content - Flexible Height */}
-          <div className="flex-1 flex flex-col space-y-2 sm:space-y-2 min-h-0">
-            {/* Name - Fixed Height */}
-            <div className="h-6 sm:h-8 flex items-center min-w-0">
-              <h3 className="text-sm sm:text-lg font-bold text-gray-900 truncate w-full">
+        {/* Content Section */}
+        <div className="flex-1 p-4 flex flex-col justify-between">
+          {/* Expert Info */}
+          <div className="space-y-2">
+            {/* Name and Rating */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">
                 {communityDetails?.name || "Expert Name"}
               </h3>
+              <span className="text-sm text-gray-600">⭐ 4.9 / 5</span>
             </div>
 
-            {/* Experience & Sessions - Fixed Height */}
-            <div className="h-8 sm:h-12 flex flex-col space-y-1 sm:space-y-1">
-              <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-                <FaBriefcase className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-gray-600 truncate">
-                  {communityDetails?.owner_experience || "5+"} years experience
-                </span>
-              </div>
-              <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0">
-                <FaBullseye className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-600 flex-shrink-0" />
-                <span className="text-xs sm:text-sm text-gray-600 truncate">
-                  {formatNumber(communityDetails?.owner_sessions || 100)} sessions completed
-                </span>
+            {/* Verified Badge and Languages */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded-full">✓ Verified Expert</span>
+              <span className="text-sm text-gray-600">
+                {communityDetails?.languages ? communityDetails.languages.join(", ") : "English, Hindi"}
+              </span>
+            </div>
+
+            {/* Experience & Sessions - Emphasized */}
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🎓</span>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {communityDetails?.owner_experience ? `${communityDetails.owner_experience}+ years` : "5+ years"}
+                    </div>
+                    <div className="text-xs text-gray-500">Experience</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📊</span>
+                  <div>
+                    <div className="text-sm font-semibold text-gray-900">
+                      {communityDetails?.owner_sessions ? formatNumber(communityDetails.owner_sessions) : "200+"}
+                    </div>
+                    <div className="text-xs text-gray-500">Sessions</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Tags - Flexible Height */}
-            <div className="min-h-[24px] sm:min-h-[32px] max-h-[32px] sm:max-h-[48px] flex flex-wrap gap-1 sm:gap-2 overflow-hidden">
+            {/* Expertise Tags */}
+            <div className="flex flex-wrap gap-2">
               {tags && tags.length > 0 ? (
                 tags.slice(0, 3).map((tag, index) => (
                   <Badge
                     key={index}
                     variant="secondary"
-                    className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 max-w-[70px] sm:max-w-[80px] truncate flex-shrink-0 ${getTagColor(index)}`}
+                    className={`text-xs px-2 py-1 ${getTagColor(index)}`}
                   >
                     {tag}
                   </Badge>
                 ))
               ) : (
-                <Badge variant="secondary" className="text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-50 text-gray-600 flex-shrink-0">
-                  Wellness
-                </Badge>
-              )}
-            </div>
-
-            {/* Social Proof - Fixed Height */}
-            <div className="h-6 sm:h-8 flex items-center space-x-2 sm:space-x-3 min-w-0 overflow-hidden mb-5 sm:mb-6">
-              {communityDetails?.linkedin_followers > 0 && (
-                <div className="flex items-center space-x-1 flex-shrink-0">
-                  <FaLinkedinIn className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-blue-600" />
-                  <span className="text-xs text-gray-600">{formatNumber(communityDetails.linkedin_followers)}</span>
-                </div>
-              )}
-              {communityDetails?.instagram_followers > 0 && (
-                <div className="flex items-center space-x-1 flex-shrink-0">
-                  <GrInstagram className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-pink-600" />
-                  <span className="text-xs text-gray-600">{formatNumber(communityDetails.instagram_followers)}</span>
-                </div>
-              )}
-              {communityDetails?.youtube_followers > 0 && (
-                <div className="flex items-center space-x-1 flex-shrink-0">
-                  <BsYoutube className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-red-600" />
-                  <span className="text-xs text-gray-600">{formatNumber(communityDetails.youtube_followers)}</span>
-                </div>
-              )}
-              {communityDetails?.num_member > 0 && (
-                <div className="flex items-center space-x-1 flex-shrink-0">
-                  <ImUsers className="w-2.5 h-2.5 sm:w-4 sm:h-4 text-gray-600" />
-                  <span className="text-xs text-gray-600">{formatNumber(communityDetails.num_member)}</span>
-                </div>
+                <>
+                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200">
+                    Wellness
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-green-50 text-green-700 border border-green-200">
+                    Nutrition
+                  </Badge>
+                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-purple-50 text-purple-700 border border-purple-200">
+                    Fitness
+                  </Badge>
+                </>
               )}
             </div>
           </div>
 
-          {/* Bottom - CTA Button */}
-          <div className="h-8 sm:h-12 flex items-center min-w-0 mt-1 sm:mt-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full text-xs py-1.5 h-7 sm:h-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-              onClick={handleClaimFreeSession}
-            >
-              Claim Free Session Now →
-            </Button>
+          {/* Pricing & Offer Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-500 line-through">₹1,000 / session</span>
+                <span className="text-lg font-bold text-green-600">FREE Today</span>
+              </div>
+            </div>
+            <p className="text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg border border-indigo-200">
+              💎 Use coupon <span className="font-bold text-indigo-700">GUILD100</span> to claim your free session
+            </p>
           </div>
+
+          {/* CTA Button */}
+          <Button
+            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+            onClick={handleClaimFreeSession}
+          >
+            🎁 Claim Free Session →
+          </Button>
         </div>
       </Card>
     );

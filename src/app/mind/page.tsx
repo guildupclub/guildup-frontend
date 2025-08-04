@@ -26,6 +26,7 @@ interface Community {
   youtube_followers?: number;
   tags?: string[];
   min_offering_id?: string;
+
 }
 
 // Mind-related category IDs
@@ -95,7 +96,8 @@ export default function MindPage() {
           instagram_followers: community.instagram_followers || 0,
           youtube_followers: community.youtube_followers || 0,
           tags: community.tags || [],
-          min_offering_id: community.min_offering_id
+          min_offering_id: community.min_offering_id,
+
         }));
 
         if (isLoadMore) {
@@ -172,8 +174,8 @@ export default function MindPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      {/* Free Discovery Call Banner - Top */}
+    <div className="min-h-screen">
+            {/* Free Discovery Call Banner - Top */}
       <div className="hidden md:block sticky top-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
@@ -204,75 +206,86 @@ export default function MindPage() {
         </div>
       </div>
 
-                           {/* Hero Section */}
+        {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-lavender-50 via-indigo-50 to-blue-50 text-black">
           {/* Floating background icons */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 left-10 opacity-[0.05] animate-float">
-              <Brain className="h-16 w-16 text-gray-600" />
+            <div className="absolute top-10 left-8 opacity-[0.05] animate-float">
+              <Brain className="h-12 w-12 text-gray-600" />
             </div>
-            <div className="absolute top-32 right-16 opacity-[0.05] animate-float-delay">
-              <Sparkles className="h-12 w-12 text-purple-400" />
-            </div>
-            <div className="absolute bottom-32 left-20 opacity-[0.05] animate-float-delay-2">
-              <div className="w-8 h-8 bg-indigo-200 rounded-full"></div>
-            </div>
-            <div className="absolute top-48 left-1/3 opacity-[0.05] animate-float">
-              <div className="w-10 h-10 bg-blue-200 rounded-lg"></div>
+            <div className="absolute top-20 right-12 opacity-[0.05] animate-float-delay">
+              <Sparkles className="h-8 w-8 text-purple-400" />
             </div>
           </div>
           
-         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-           <div className="text-center">
-             <div className="flex justify-center mb-8">
-               <div className="p-4 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full backdrop-blur-sm shadow-lg">
-                 <Brain className="h-10 w-10 text-white" />
-               </div>
-             </div>
-                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 text-gray-900 leading-tight animate-fade-in">
-                 🧠 Find Calm, Heal & Grow with Expert Support
-               </h1>
-               <p className="text-xl sm:text-2xl text-gray-700 max-w-4xl mx-auto mb-8 leading-relaxed animate-fade-in-delay">
-                 Connect 1:1 with verified therapists, counselors & life coaches.<br />
-                 Get personalized support for your mental wellness journey.
-               </p>
-               <p className="text-sm italic text-gray-600 mb-10 animate-fade-in-delay">
-                 Trusted experts. Confidential guidance.
-               </p>
-              <div className="flex flex-wrap justify-center gap-3 mb-10 animate-fade-in-delay-2">
-                               <span className="px-6 py-3 bg-indigo-100 text-indigo-700 rounded-full border border-indigo-200 hover:bg-indigo-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Anxiety
-               </span>
-               <span className="px-6 py-3 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Stress
-               </span>
-               <span className="px-6 py-3 bg-pink-100 text-pink-700 rounded-full border border-pink-200 hover:bg-pink-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Healing
-               </span>
-               <span className="px-6 py-3 bg-blue-100 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Personal Growth
-               </span>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div className="text-center">
+              <div className="flex justify-center mb-6">
+                <div className="p-3 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full backdrop-blur-sm shadow-lg">
+                  <Brain className="h-8 w-8 text-white" />
+                </div>
               </div>
-             
-             {/* CTA Button */}
-             <div className="flex justify-center animate-fade-in-delay-2">
-               <button 
-                 className="px-8 py-4 bg-gradient-to-r from-indigo-400 to-purple-500 text-white font-semibold rounded-full hover:from-indigo-500 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                 onClick={() => {
-                   const communitiesSection = document.getElementById('communities-section');
-                   if (communitiesSection) {
-                     communitiesSection.scrollIntoView({ behavior: 'smooth' });
-                   }
-                 }}
-               >
-                 🎯 Book Free Session
-                </button>
+              
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 text-gray-900 leading-tight animate-fade-in">
+                💡 Get Your FREE Expert Session Today
+              </h1>
+              
+              <p className="text-sm sm:text-base text-gray-700 max-w-xl mx-auto mb-4 leading-relaxed animate-fade-in-delay">
+                Work 1:1 with verified therapists, life coaches & wellness experts — normally ₹1,000+ per session, free for a limited time.
+              </p>
+
+              {/* 3-Step Visual Funnel */}
+              <div className="flex justify-center items-center gap-2 mb-4 animate-fade-in-delay-2">
+                {/* Step 1 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-xs">1</div>
+                  <span className="text-xs font-medium text-gray-800">Pick expert</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-indigo-500 font-bold text-sm">→</div>
+
+                {/* Step 2 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">2</div>
+                  <span className="text-xs font-medium text-gray-800">Apply GUILD100</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-purple-500 font-bold text-sm">→</div>
+
+                {/* Step 3 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xs">3</div>
+                  <span className="text-xs font-medium text-gray-800">Book FREE</span>
+                </div>
               </div>
+              
+
             </div>
           </div>
         </div>
 
-             {/* Communities Section */}
+        {/* Ready to Transform CTA Section */}
+        <div className="bg-gradient-to-br from-lavender-50 via-indigo-50 to-blue-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Transform Your Mind?</h2>
+            <p className="text-gray-700 mb-6">Join thousands who&apos;ve already experienced the power of expert guidance</p>
+            <button 
+              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold rounded-xl hover:from-indigo-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              onClick={() => {
+                const communitiesSection = document.getElementById('communities-section');
+                if (communitiesSection) {
+                  communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              🎯 Book My Free Session →
+            </button>
+          </div>
+        </div>
+
+        {/* Communities Section */}
        <div id="communities-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center items-center py-16">
@@ -281,7 +294,7 @@ export default function MindPage() {
         ) : (
           <>
             {/* Communities Grid */}
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pb-6">
+            <div className="grid gap-4 grid-cols-1 pb-6">
               {communities.length > 0 ? (
                                  communities.map((community, index) => (
                    <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
