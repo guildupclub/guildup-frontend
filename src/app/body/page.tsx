@@ -269,7 +269,7 @@ export default function BodyPage() {
         <div className="bg-gradient-to-br from-mint-50 via-emerald-50 to-blue-50 py-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Transform Your Body?</h2>
-            <p className="text-gray-700 mb-6">Join thousands who've already achieved their fitness goals with expert guidance</p>
+            <p className="text-gray-700 mb-6">Join thousands who&apos;ve already achieved their fitness goals with expert guidance</p>
             <button 
               className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               onClick={() => {
