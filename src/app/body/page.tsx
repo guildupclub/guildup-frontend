@@ -26,6 +26,7 @@ interface Community {
   youtube_followers?: number;
   tags?: string[];
   min_offering_id?: string;
+
 }
 
 // Body-related category IDs
@@ -94,7 +95,8 @@ export default function BodyPage() {
           instagram_followers: community.instagram_followers || 0,
           youtube_followers: community.youtube_followers || 0,
           tags: community.tags || [],
-          min_offering_id: community.min_offering_id
+          min_offering_id: community.min_offering_id,
+
         }));
 
         if (isLoadMore) {
@@ -171,7 +173,7 @@ export default function BodyPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div className="min-h-screen">
       {/* Free Discovery Call Banner - Top */}
       <div className="hidden md:block sticky top-16 bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg border-b-4 border-green-300 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
@@ -203,75 +205,86 @@ export default function BodyPage() {
         </div>
       </div>
 
-                    {/* Hero Section */}
+        {/* Hero Section */}
         <div className="relative overflow-hidden bg-gradient-to-br from-mint-50 via-emerald-50 to-blue-50 text-black">
           {/* Floating background icons */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 left-10 opacity-[0.05] animate-float">
-              <Dumbbell className="h-16 w-16 text-gray-600" />
+            <div className="absolute top-10 left-8 opacity-[0.05] animate-float">
+              <Dumbbell className="h-12 w-12 text-gray-600" />
             </div>
-            <div className="absolute top-32 right-16 opacity-[0.05] animate-float-delay">
-              <div className="w-12 h-12 rounded-full bg-green-200"></div>
-            </div>
-            <div className="absolute bottom-32 left-20 opacity-[0.05] animate-float-delay-2">
-              <div className="w-8 h-8 bg-blue-200 rounded-full"></div>
-            </div>
-            <div className="absolute top-48 left-1/3 opacity-[0.05] animate-float">
-              <div className="w-10 h-10 bg-teal-200 rounded-lg"></div>
+            <div className="absolute top-20 right-12 opacity-[0.05] animate-float-delay">
+              <div className="w-8 h-8 rounded-full bg-green-200"></div>
             </div>
           </div>
           
-         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-           <div className="text-center">
-             <div className="flex justify-center mb-8">
-               <div className="p-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full backdrop-blur-sm shadow-lg">
-                 <Dumbbell className="h-10 w-10 text-white" />
-               </div>
-             </div>
-                          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 text-gray-900 leading-tight">
-                💪 Lose Weight, Gain Energy & Transform Your Body
-              </h1>
-                           <p className="text-xl sm:text-2xl text-gray-700 max-w-4xl mx-auto mb-12 leading-relaxed">
-                 Work 1:1 with trusted fitness coaches, yoga instructors & nutrition experts<br />
-                 to achieve your health and fitness goals.
-               </p>
-             <div className="flex flex-wrap justify-center gap-3 mb-10">
-               <span className="px-6 py-3 bg-green-100 text-green-700 rounded-full border border-green-200 hover:bg-green-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Weight Loss
-               </span>
-               <span className="px-6 py-3 bg-blue-100 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Strength Training
-               </span>
-               <span className="px-6 py-3 bg-purple-100 text-purple-700 rounded-full border border-purple-200 hover:bg-purple-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Nutrition
-               </span>
-               <span className="px-6 py-3 bg-pink-100 text-pink-700 rounded-full border border-pink-200 hover:bg-pink-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 Fitness Goals
-               </span>
-               <span className="px-6 py-3 bg-orange-100 text-orange-700 rounded-full border border-orange-200 hover:bg-orange-200 hover:scale-105 transition-all duration-200 font-medium text-sm">
-                 PCOS & Hormonal Health
-               </span>
-             </div>
-             
-             {/* CTA Button */}
-             <div className="flex justify-center">
-               <button 
-                 className="px-8 py-4 bg-gradient-to-r from-green-400 to-emerald-500 text-white font-semibold rounded-full hover:from-green-500 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                 onClick={() => {
-                   const communitiesSection = document.getElementById('communities-section');
-                   if (communitiesSection) {
-                     communitiesSection.scrollIntoView({ behavior: 'smooth' });
-                   }
-                 }}
-               >
-                 🎯 Book Free Session
-                </button>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+            <div className="text-center">
+              <div className="flex justify-center mb-6">
+                <div className="p-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full backdrop-blur-sm shadow-lg">
+                  <Dumbbell className="h-8 w-8 text-white" />
+                </div>
               </div>
-           </div>
-         </div>
-       </div>
+              
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 text-gray-900 leading-tight">
+                💪 Get Your FREE Expert Session Today
+              </h1>
+              
+              <p className="text-sm sm:text-base text-gray-700 max-w-xl mx-auto mb-4 leading-relaxed">
+                Work 1:1 with verified fitness trainers, nutritionists & wellness coaches — normally ₹1,000+ per session, free for a limited time.
+              </p>
 
-             {/* Communities Section */}
+              {/* 3-Step Visual Funnel */}
+              <div className="flex justify-center items-center gap-2 mb-4">
+                {/* Step 1 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-xs">1</div>
+                  <span className="text-xs font-medium text-gray-800">Pick expert</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-green-500 font-bold text-sm">→</div>
+
+                {/* Step 2 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xs">2</div>
+                  <span className="text-xs font-medium text-gray-800">Apply GUILD100</span>
+                </div>
+
+                {/* Arrow */}
+                <div className="text-emerald-500 font-bold text-sm">→</div>
+
+                {/* Step 3 */}
+                <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
+                  <div className="w-6 h-6 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-xs">3</div>
+                  <span className="text-xs font-medium text-gray-800">Book FREE</span>
+                </div>
+              </div>
+              
+
+            </div>
+          </div>
+        </div>
+
+        {/* Ready to Transform CTA Section */}
+        <div className="bg-gradient-to-br from-mint-50 via-emerald-50 to-blue-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Transform Your Body?</h2>
+            <p className="text-gray-700 mb-6">Join thousands who've already achieved their fitness goals with expert guidance</p>
+            <button 
+              className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              onClick={() => {
+                const communitiesSection = document.getElementById('communities-section');
+                if (communitiesSection) {
+                  communitiesSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+            >
+              🎯 Book My Free Session →
+            </button>
+          </div>
+        </div>
+
+        {/* Communities Section */}
        <div id="communities-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {loading ? (
           <div className="flex justify-center items-center py-16">
@@ -280,7 +293,7 @@ export default function BodyPage() {
         ) : (
           <>
             {/* Communities Grid */}
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pb-6">
+            <div className="grid gap-4 grid-cols-1 pb-6">
               {communities.length > 0 ? (
                                  communities.map((community, index) => (
                    <div key={community._id} className={index === 0 ? "first-expert-card" : ""}>
