@@ -431,9 +431,11 @@ export function BookingDialog({
         }
         if (offering.is_free || order.amount === 0) {
           toast.success("Booking confirmed successfully!");
+          // Store bookingId in sessionStorage
+          sessionStorage.setItem('bookingId', order._id);
           onClose();
           router.push(
-            `/booking-confirmation?bookingId=${order._id}&title=${offering.title}&duration=${offering.duration}&price=${offering.price.amount}&currency=${offering.price.currency}&type=${offering.type}&isFree=true&providerName=${activeCommunityData?.community?.name}&selectedDate=${selectedDate?.toISOString()}&selectedTime=${selectedSlot?.start}`
+            `/booking-confirmation`
           );
         } else {
           const razorpayOptions = {
@@ -460,9 +462,11 @@ export function BookingDialog({
 
               if (verifyResponse.data.r === "s") {
                 toast.success("Booking confirmed successfully!");
+                // Store bookingId in sessionStorage
+                sessionStorage.setItem('bookingId', verifyResponse.data.data._id);
                 onClose();
                 router.push(
-                  `/booking-confirmation?bookingId=${verifyResponse.data.data._id}&title=${offering.title}&duration=${offering.duration}&price=${offering.price.amount}&currency=${offering.price.currency}&type=${offering.type}&isFree=false&providerName=${activeCommunityData?.community?.name}&selectedDate=${selectedDate?.toISOString()}&selectedTime=${selectedSlot?.start}`
+                  `/booking-confirmation`
                 );
               } else {
                 toast.error("Payment verification failed");

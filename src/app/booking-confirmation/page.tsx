@@ -34,57 +34,54 @@ interface Booking {
 }
 
 export default function BookingConfirmation() {
-  const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Get data from URL parameters
-  const bookingId = searchParams.get("bookingId");
-  const serviceTitle = searchParams.get("title") || "Service Booking";
-  const duration = Number.parseInt(searchParams.get("duration") || "0");
-  const price = Number.parseFloat(searchParams.get("price") || "0");
-  const currency = searchParams.get("currency") || "INR";
-  const serviceType = searchParams.get("type") || "consultation";
-  const isFree = searchParams.get("isFree") === "true";
-  const providerName = searchParams.get("providerName") || "Service Provider";
-  const selectedDateParam = searchParams.get("selectedDate");
-  const selectedTimeParam = searchParams.get("selectedTime");
-
+  // Get bookingId from sessionStorage
+  const [bookingId, setBookingId] = useState<string | null>(null);
   const [booking, setBooking] = useState<Booking | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Parse dates from URL parameters
-  const selectedDate = selectedDateParam ? new Date(selectedDateParam) : null;
-  const selectedTime = selectedTimeParam ? new Date(selectedTimeParam) : null;
+  // Helper functions to format booking data
+  const formatBookingDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
-  const formattedDate = selectedDate
-    ? selectedDate.toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "Date not available";
+  const formatBookingTime = (dateString: string) => {
+    return new Date(dateString).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
-  const formattedTime = selectedTime
-    ? selectedTime.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true,
-      })
-    : "Time not available";
+  const formatEndTime = (startTime: string, duration: number) => {
+    if (!startTime || !duration) return null;
+    const endTime = new Date(new Date(startTime).getTime() + duration * 60000);
+    return endTime.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
 
-  const formattedEndTime =
-    selectedTime && duration > 0
-      ? new Date(selectedTime.getTime() + duration * 60000).toLocaleTimeString(
-          "en-US",
-          {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }
-        )
-      : null;
+  // Get bookingId from sessionStorage on component mount
+  useEffect(() => {
+    const storedBookingId = sessionStorage.getItem('bookingId');
+    if (storedBookingId) {
+      setBookingId(storedBookingId);
+      // Clear it from sessionStorage after retrieving
+      sessionStorage.removeItem('bookingId');
+    } else {
+      setError(true);
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!bookingId) {
@@ -188,8 +185,8 @@ export default function BookingConfirmation() {
               All Set!
             </h2>
             <p className="text-sm text-gray-600">
-              Your {serviceType} is confirmed.{" "}
-              {isFree ? "Enjoy!" : "Payment processed."}
+              Your {booking?.offering_id?.type || "consultation"} is confirmed.{" "}
+              {booking?.offering_id?.is_free ? "Enjoy!" : "Payment processed."}
             </p>
           </div>
 
@@ -203,8 +200,8 @@ export default function BookingConfirmation() {
                   Service
                 </span>
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {serviceTitle}
-                  {isFree && (
+                  {booking?.offering_id?.title || "Service Booking"}
+                  {booking?.offering_id?.is_free && (
                     <span className="ml-1 text-xs text-green-600">FREE</span>
                   )}
                 </p>
@@ -222,7 +219,7 @@ export default function BookingConfirmation() {
                     Date
                   </span>
                   <p className="text-sm font-medium text-gray-900">
-                    {formattedDate}
+                    {booking?.start_time ? formatBookingDate(booking.start_time) : "Date not available"}
                   </p>
                 </div>
               </div>
@@ -235,8 +232,9 @@ export default function BookingConfirmation() {
                     Time
                   </span>
                   <p className="text-sm font-medium text-gray-900">
-                    {formattedTime}
-                    {formattedEndTime && ` - ${formattedEndTime}`}
+                    {booking?.start_time ? formatBookingTime(booking.start_time) : "Time not available"}
+                    {booking?.start_time && booking?.offering_id?.duration && 
+                      ` - ${formatEndTime(booking.start_time, booking.offering_id.duration)}`}
                   </p>
                 </div>
               </div>
@@ -249,7 +247,7 @@ export default function BookingConfirmation() {
                     Duration
                   </span>
                   <p className="text-sm font-medium text-gray-900">
-                    {duration || "N/A"} minutes
+                    {booking?.offering_id?.duration || "N/A"} minutes
                   </p>
                 </div>
               </div>
@@ -262,7 +260,7 @@ export default function BookingConfirmation() {
                     Price
                   </span>
                   <p className="text-sm font-medium text-gray-900">
-                    {isFree ? "FREE" : `${currency} ${price}`}
+                    {booking?.offering_id?.is_free ? "FREE" : `${booking?.offering_id?.price?.currency || "INR"} ${booking?.offering_id?.price?.amount || 0}`}
                   </p>
                 </div>
               </div>
@@ -275,7 +273,7 @@ export default function BookingConfirmation() {
                   Provider
                 </span>
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {providerName}
+                  {booking?.provider_id?.name || booking?.offering_id?.community_id?.name || "Service Provider"}
                 </p>
                 <div className="flex gap-0.5 mt-0.5">
                   {[...Array(5)].map((_, i) => (
