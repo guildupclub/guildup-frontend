@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,14 +35,6 @@ interface ExpertCardProps {
 export default function ExpertCard({ expert, index, currentIndex }: ExpertCardProps) {
   const router = useRouter();
   const cardRef = React.useRef<HTMLDivElement>(null);
-
-  // Helper to slugify the community name
-  const slugify = (str: string) =>
-    str
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-
   const handleCardClick = () => {
     if (expert && expert.url) {
       // The expert.url is already in the correct format: `/community/[name]-[id]/profile`
@@ -51,7 +43,17 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
     }
   };
 
+  const handleBookingClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to the booking page with the expert's ID
+    const expertId = expert.url.split('/').pop()?.split('-').pop() || '';
+    // Extract community ID from the URL structure
+    const communityId = expert.url.split('/')[2] || 'default-community';
+    router.push(`/community/${communityId}/offerings/${expertId}`);
+  };
+
   return (
+    <>
     <motion.div
       key={`${expert.name}-${currentIndex}`}
       initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
@@ -154,7 +156,7 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
         {/* Call to Action Button */}
         <Button 
           className="w-full bg-primary hover:bg-primary/90 text-white font-semibold mt-auto text-sm md:text-base py-2 md:py-2"
-          onClick={() => window.open(expert.url, '_blank', 'noopener,noreferrer')}
+          onClick={handleBookingClick}
         >
           <Phone className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
           <span className="hidden sm:inline">Quick Explore Call</span>
@@ -162,5 +164,8 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
         </Button>
       </div>
     </motion.div>
+
+    </>
+
   );
 } 

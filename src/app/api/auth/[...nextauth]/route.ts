@@ -51,9 +51,14 @@ const handler = NextAuth({
           const db = client.db(process.env.MONGO_DB_NAME );
           const usersCollection = db.collection("users");
 
-          const userExists = await usersCollection.findOne({
-            email: user.email,
-          });
+          // Handle both email and phone-based users
+          let userExists;
+          if (user.email) {
+            userExists = await usersCollection.findOne({ email: user.email });
+          } else if (user.phone) {
+            userExists = await usersCollection.findOne({ phone: user.phone });
+          }
+          
           console.log("User Exists:", userExists);
 
           if (!userExists) {
@@ -69,6 +74,10 @@ const handler = NextAuth({
           } else {
             token.isNewUser = false;
             token._id = userExists._id.toString();
+            // Add phone to token if available
+            if (userExists.phone) {
+              token.phone = userExists.phone;
+            }
             console.log("Existing User - Setting isNewUser flag to false");
           }
 
@@ -90,6 +99,12 @@ const handler = NextAuth({
       console.log("Session Callback - Token:", token);
       session.user._id = token._id;
       session.user.isNewUser = token.isNewUser;
+      
+      // Add phone to session if available
+      if (token.phone) {
+        session.user.phone = token.phone;
+      }
+      
       console.log("Session Callback - Session User:", session.user);
       return session;
     },
@@ -176,6 +191,59 @@ const handler = NextAuth({
           }
         } catch (error) {
           console.error("Error in Google One Tap authorization:", error);
+          throw error;
+        }
+      },
+    }),
+
+    CredentialsProvider({
+      id: "credentials",
+      name: "phone-credentials",
+      credentials: {
+        phone: { type: "text" },
+      },
+
+      async authorize(credentials, req) {
+        const phone = credentials?.phone;
+        if (!phone) {
+          throw new Error("Phone number is required");
+        }
+
+        try {
+          console.log("Phone credentials authorization - looking for phone:", phone);
+          const db = client.db(process.env.MONGO_DB_NAME);
+          const usersCollection = db.collection("users");
+
+          // Find user by phone number
+          const existingUser = await usersCollection.findOne({ phone });
+          console.log("User found by phone:", existingUser ? "Yes" : "No");
+
+          if (existingUser) {
+            console.log("Returning user data for phone-based login:", {
+              id: existingUser._id.toString(),
+              name: existingUser.name,
+              email: existingUser.email,
+              phone: existingUser.phone
+            });
+            
+            return {
+              id: existingUser._id.toString(),
+              name: existingUser.name,
+              email: existingUser.email,
+              phone: existingUser.phone,
+              image: existingUser.image,
+            };
+          } else {
+            // User doesn't exist yet - this can happen if OTP verification is still in progress
+            // or if there's a timing issue between user creation and this lookup
+            console.warn("User not found for phone:", phone, "- this might be a timing issue");
+            
+            // Instead of throwing an error, return null to indicate user not found
+            // This allows the booking flow to continue without NextAuth session
+            return null;
+          }
+        } catch (error) {
+          console.error("Error in phone credentials authorization:", error);
           throw error;
         }
       },

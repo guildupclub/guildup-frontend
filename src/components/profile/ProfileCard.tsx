@@ -477,7 +477,7 @@ export function ProfileCard() {
 
       {/* Offerings Section */}
       <div id="offerings-section">
-        <OfferingsList />
+        <OfferingsList offerings={offerings} />
       </div>
 
       {/* Call to Action Banner */}
@@ -485,12 +485,17 @@ export function ProfileCard() {
 
       {/* Content Feed */}
       <ContentFeed 
-        communityId={communityIdFromParam || ""} 
+        expertId={profile.user._id}
+        communityId={profile.community?._id}
         expertName={profile.user.user_name} 
       />
 
       {/* Testimonial Section */}
-      <TestimonialSection />
+      <TestimonialSection 
+        expertId={profile.user._id}
+        communityId={profile.community?._id}
+        expertName={profile.user.user_name}
+      />
     </div>
   );
 }
