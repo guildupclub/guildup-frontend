@@ -17,17 +17,22 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Handle wildcard query for showing all communities
+    const searchQuery = query.trim() === "*" ? "" : query.trim();
+
     // Use the backend search endpoint that actually works
     const backendUrl = `${API_BASE_URL}/v1/community/look`;
     
     const requestBody = {
-      query: query.trim(),
+      query: searchQuery,
       page: parseInt(page) || 0,
+      limit: 20,
     };
 
     // Add category filter if provided
     if (category && category !== 'all') {
-      requestBody.category = category;
+      requestBody.categoryId = category;
+      console.log('Search API - Adding category filter:', category);
     }
 
     console.log('Search API - Request URL:', backendUrl);

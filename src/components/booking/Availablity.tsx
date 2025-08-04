@@ -125,6 +125,7 @@ export const Availability = ({ userId }: AvailabilityProps) => {
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [hasChanges, setHasChanges] = React.useState(false);
+  const [calendarConnected, setCalendarConnected] = React.useState(false);
   const originalData = React.useRef<Record<string, DayAvailability>>(
     JSON.parse(JSON.stringify(defaultAvailability))
   );
@@ -156,7 +157,22 @@ export const Availability = ({ userId }: AvailabilityProps) => {
       setLoading(false);
     };
 
+    const checkCalendarConnection = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/availability/${userId}`
+        );
+        if (response.data.r === "s") {
+          setCalendarConnected(true);
+        }
+      } catch (error) {
+        console.log("Calendar not connected or error checking connection");
+        setCalendarConnected(false);
+      }
+    };
+
     fetchAvailability();
+    checkCalendarConnection();
   }, [userId]);
 
   // Check for changes
@@ -197,6 +213,25 @@ export const Availability = ({ userId }: AvailabilityProps) => {
             <CardDescription className="text-gray-500 text-sm mt-1">
               Set your availability for booking services.
             </CardDescription>
+            <div className="flex items-center gap-2 mt-2">
+              <div className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                calendarConnected 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-yellow-100 text-yellow-700'
+              }`}>
+                <div className={`w-2 h-2 rounded-full ${
+                  calendarConnected ? 'bg-green-500' : 'bg-yellow-500'
+                }`}></div>
+                <span className="font-medium">
+                  {calendarConnected ? 'Calendar Connected' : 'Calendar Not Connected'}
+                </span>
+              </div>
+              {!calendarConnected && (
+                <span className="text-xs text-gray-500">
+                  Connect your Google Calendar to sync availability
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-2 self-start sm:self-auto ml-auto sm:ml-0">
             {hasChanges && (

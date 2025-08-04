@@ -33,7 +33,7 @@ export default function Page() {
 
   return (
     <div className="h-screen bg-white grow max-w-screen w-full md:ml-6 md:py-6">
-      {communityId && <ProfileCard communityId={communityId} />}
+      {communityId && <ProfileCard />}
     </div>
   );
 }
