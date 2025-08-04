@@ -69,6 +69,15 @@ function SearchPageContent() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  // Helper functions for URL conversion
+  const categoryToUrl = (name: string) => {
+    return name.replace(/\s+/g, "-");
+  };
+
+  const urlToCategory = (url: string) => {
+    return url.replace(/-/g, " ");
+  };
+
   // Function to map community data to Expert format
   const mapCommunityToExpert = (result: any): Expert => {
     console.log('Mapping result:', result);
@@ -126,23 +135,24 @@ function SearchPageContent() {
       setSearchQuery(queryFromUrl);
     }
     
-         // Handle category from URL
-     if (categories.length > 0) {
-       if (categoryFromUrl) {
-         // categoryFromUrl is now the category ID
-         const categoryObj = categories.find(
-           (cat: Category) => cat._id === categoryFromUrl
-         );
-         if (categoryObj && categoryObj._id !== selectedCategoryId) {
-           setSelectedCategory(categoryObj.name);
-           setSelectedCategoryId(categoryObj._id);
-         }
-       } else if (selectedCategoryId !== "all") {
-         // Reset to "All Category" if no category in URL
-         setSelectedCategory("All Category");
-         setSelectedCategoryId("all");
-       }
-     }
+    // Handle category from URL - now expecting category name instead of ID
+    if (categories.length > 0) {
+      if (categoryFromUrl) {
+        // Convert URL format back to category name (e.g., "Fitness-Yoga" -> "Fitness & Yoga")
+        const categoryName = urlToCategory(categoryFromUrl);
+        const categoryObj = categories.find(
+          (cat: Category) => cat.name.toLowerCase() === categoryName.toLowerCase()
+        );
+        if (categoryObj && categoryObj._id !== selectedCategoryId) {
+          setSelectedCategory(categoryObj.name);
+          setSelectedCategoryId(categoryObj._id);
+        }
+      } else if (selectedCategoryId !== "all") {
+        // Reset to "All Category" if no category in URL
+        setSelectedCategory("All Category");
+        setSelectedCategoryId("all");
+      }
+    }
     
     // Perform search when we have query and categories are loaded
     if (queryFromUrl && categories.length > 0 && !isInitialLoad) {
@@ -232,7 +242,16 @@ function SearchPageContent() {
          const categoryFromUrl = searchParams?.get("category") || "";
          
          if (queryFromUrl || categoryFromUrl) {
-           const categoryId = categoryFromUrl || "all";
+           let categoryId = "all";
+           
+           if (categoryFromUrl) {
+             // Convert category name from URL to category ID
+             const categoryName = urlToCategory(categoryFromUrl);
+             const categoryObj = categoriesData.find(
+               (cat: Category) => cat.name.toLowerCase() === categoryName.toLowerCase()
+             );
+             categoryId = categoryObj?._id || "all";
+           }
            
            if (queryFromUrl) {
              performSearch(queryFromUrl, categoryId);
@@ -265,7 +284,11 @@ function SearchPageContent() {
       params.set('q', value.trim());
     }
     if (selectedCategoryId !== 'all') {
-      params.set('category', selectedCategoryId);
+      // Find the category name for the selected category ID
+      const selectedCat = categories.find((cat: Category) => cat._id === selectedCategoryId);
+      if (selectedCat) {
+        params.set('category', categoryToUrl(selectedCat.name));
+      }
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
@@ -299,13 +322,13 @@ function SearchPageContent() {
       setSelectedCategoryId("all");
     }
 
-    // Update URL with new category
+    // Update URL with new category - now using category name instead of ID
     const params = new URLSearchParams();
     if (searchQuery.trim()) {
       params.set('q', searchQuery.trim());
     }
     if (selectedCat && selectedCat.name !== "All Category") {
-      params.set('category', selectedCat._id); // Store category ID instead of name
+      params.set('category', categoryToUrl(selectedCat.name)); // Store category name in URL format
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
@@ -386,9 +409,9 @@ function SearchPageContent() {
   }, [searchTimeout]);
 
     return (
-    <div className="min-h-screen bg-white">
+    <div className=" bg-white">
       {/* Header Section */}
-      <div className="bg-white pt-4 md:pt-8 pb-4 md:pb-6 border-b border-gray-100">
+      <div className="bg-white text-primary pt-4 md:pt-8 pb-4 md:pb-6 border-b border-gray-100">
         <div className="container mx-auto px-4 md:px-6">
           <motion.h1 
             className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 mb-4 md:mb-6"
@@ -396,7 +419,7 @@ function SearchPageContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Search Communities
+            Search Experts
           </motion.h1>
 
           {/* Search Bar */}
@@ -410,7 +433,7 @@ function SearchPageContent() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 md:h-5 md:w-5" />
               <Input
                 type="text"
-                placeholder="Search communities..."
+                placeholder="Search Experts..."
                 className="pl-10 pr-10 py-2 md:py-3 text-base md:text-lg border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
@@ -434,7 +457,7 @@ function SearchPageContent() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-xs md:text-sm text-gray-600">
+            {/* <p className="text-xs md:text-sm text-gray-600">
               {loading 
                 ? 'Loading...' 
                 : searchQuery 
@@ -443,7 +466,7 @@ function SearchPageContent() {
                     ? `${results.length} ${results.length === 1 ? 'community' : 'communities'} in ${selectedCategory}`
                     : `${results.length} ${results.length === 1 ? 'community' : 'communities'} available`
               }
-            </p>
+            </p> */}
             {selectedCategory !== 'All Category' && (
               <Badge variant="secondary" className="text-xs w-fit">
                 Category: {selectedCategory}
@@ -463,7 +486,7 @@ function SearchPageContent() {
       )}
 
              {/* Results Section */}
-       <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
+       <div className="bg-white container mx-auto px-4 md:px-6 py-4 md:py-8">
          <AnimatePresence mode="wait">
            {/* Loading State */}
            {loading && (
@@ -513,7 +536,7 @@ function SearchPageContent() {
              >
                <Users className="h-12 w-12 md:h-16 md:w-16 mx-auto mb-3 md:mb-4 text-gray-300" />
                <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
-                 No communities found
+                 No Experts found, Please use a different category.
                </h2>
                <p className="text-sm md:text-base text-gray-500 mb-3 md:mb-4 px-2">
                  {searchQuery.trim() 
@@ -534,14 +557,6 @@ function SearchPageContent() {
                                                                                                                                    {/* Results */}
              {!loading && results.length > 0 && (
               <div>
-                <p className="mb-3 md:mb-4 text-xs md:text-sm text-blue-600">
-                  {searchQuery.trim() 
-                    ? `Found ${results.length} results - rendering as cards`
-                    : selectedCategoryId !== "all"
-                      ? `Found ${results.length} communities in ${selectedCategory}`
-                      : `Showing ${results.length} communities`
-                  }
-                </p>
                 <motion.div 
                   key="results"
                   className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"
@@ -560,7 +575,6 @@ function SearchPageContent() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3, delay: index * 0.05 }}
-                          className="border border-gray-200 rounded-lg p-1 md:p-2"
                         >
                           <ExpertCard
                             expert={expert}
@@ -573,7 +587,7 @@ function SearchPageContent() {
                       console.error('Error mapping result:', error, result);
                       return (
                         <div key={index} className="border border-red-200 bg-red-50 p-3 md:p-4 rounded-lg">
-                          <p className="text-red-600 text-sm">Error rendering card</p>
+                          <p className="text-red-600 text-sm">That is not you, that is us. We are working on it.</p>
                           <pre className="text-xs text-red-500 mt-2 overflow-auto">
                             {JSON.stringify(result, null, 2)}
                           </pre>
