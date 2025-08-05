@@ -429,7 +429,7 @@ export function BookingDialog({
         } else {
           setPriceAfterDiscount(offering.price.amount);
         }
-        if (offering.is_free || order.amount === 0) {
+        if (offering.is_free || priceAfterDiscount === 0 || order.amount === 0) {
           toast.success("Booking confirmed successfully!");
           onClose();
           router.push(
