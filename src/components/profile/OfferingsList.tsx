@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Share, Phone, Calendar, Clock, Shield, CheckCircle, ArrowUp } from "lucide-react";
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { BookingDialog } from '@/components/booking/Bookingdialog';
 
 interface Offering {
   _id: string;
@@ -102,11 +104,22 @@ const formatPrice = (offering: Offering) => {
 export function OfferingsList({ offerings }: OfferingsListProps) {
   const router = useRouter();
   const displayOfferings = offerings && offerings.length > 0 ? offerings : [];
+  
+  // State for booking dialog
+  const [selectedOffering, setSelectedOffering] = useState<Offering | null>(null);
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
 
   const handleBookingClick = (offering: Offering, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/community/${offering.community_id}/offerings/${offering._id}`);
+    
+    console.log('=== BOOKING CLICK DEBUG ===');
+    console.log('Offering:', offering);
+    console.log('Opening booking dialog for offering:', offering._id);
+    
+    // Set the selected offering and open the booking dialog
+    setSelectedOffering(offering);
+    setIsBookingDialogOpen(true);
   };
 
   const handleViewAllOfferings = () => {
@@ -114,6 +127,30 @@ export function OfferingsList({ offerings }: OfferingsListProps) {
       const communityId = offerings[0].community_id;
       router.push(`/community/${communityId}/offerings`);
     }
+  };
+
+  const handleCloseBookingDialog = () => {
+    setIsBookingDialogOpen(false);
+    setSelectedOffering(null);
+  };
+
+  // Transform offering data to match BookingDialog interface
+  const transformOfferingForDialog = (offering: Offering) => {
+    return {
+      _id: offering._id,
+      title: offering.title,
+      description: offering.description || '',
+      type: offering.type || 'consultation',
+      price: typeof offering.price === 'number' 
+        ? { amount: offering.price, currency: 'INR' }
+        : offering.price || { amount: 0, currency: 'INR' },
+      discounted_price: typeof offering.discounted_price === 'string'
+        ? parseFloat(offering.discounted_price)
+        : (offering.discounted_price as number) || 0,
+      when: offering.when || new Date(),
+      duration: offering.duration || 60,
+      is_free: offering.is_free || false,
+    };
   };
 
 
@@ -273,6 +310,15 @@ export function OfferingsList({ offerings }: OfferingsListProps) {
         </div>
       )}
 
+      {/* Booking Dialog */}
+      {selectedOffering && (
+        <BookingDialog
+          offering={transformOfferingForDialog(selectedOffering)}
+          isOpen={isBookingDialogOpen}
+          onClose={handleCloseBookingDialog}
+          communityId={selectedOffering.community_id}
+        />
+      )}
     </div>
   );
 } 
