@@ -188,7 +188,7 @@ export default function OnboardingForm({
   const handleArrayToggle = (field: keyof FormData, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: prev[field] as string[]?.includes(value)
+      [field]: (prev[field] as string[])?.includes(value)
         ? (prev[field] as string[]).filter(item => item !== value)
         : [...(prev[field] as string[]), value]
     }));
@@ -263,7 +263,7 @@ export default function OnboardingForm({
                 <User className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold">Tell us about yourself</h3>
-              <p className="text-gray-600">Let's start with the basics</p>
+              <p className="text-gray-600">Let&apos;s start with the basics</p>
             </div>
             
             <div className="space-y-4">

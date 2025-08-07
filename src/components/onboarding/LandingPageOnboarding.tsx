@@ -241,7 +241,7 @@ export default function LandingPageOnboarding({
             
             <div className="space-y-3">
               <h2 className="text-2xl font-bold text-gray-900">
-                🙋‍♀️ We're here to help you!
+                🙋‍♀️ We&apos;re here to help you!
               </h2>
               <p className="text-gray-600 text-lg">
                 Answer a few quick questions so we can guide you to the right expert.
@@ -252,7 +252,7 @@ export default function LandingPageOnboarding({
               onClick={handleNext}
               className={`w-full bg-gradient-to-r ${config.primaryColor} text-white text-lg py-4 hover:opacity-90 transition-all duration-300`}
             >
-              Let's Go →
+              Let&apos;s Go →
             </Button>
           </div>
         );
@@ -293,7 +293,7 @@ export default function LandingPageOnboarding({
             
             {formData.struggles.length >= 3 && (
               <p className="text-sm text-gray-500 text-center">
-                You've selected 3 items. You can deselect to choose different ones.
+                You&apos;ve selected 3 items. You can deselect to choose different ones.
               </p>
             )}
           </div>
@@ -337,7 +337,7 @@ export default function LandingPageOnboarding({
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
               <h2 className="text-xl font-semibold text-gray-900">
-                What's your preferred expert type?
+                What&apos;s your preferred expert type?
               </h2>
             </div>
             
@@ -525,7 +525,7 @@ export default function LandingPageOnboarding({
             
             <div className="space-y-3">
               <h2 className="text-2xl font-bold text-gray-900">
-                🎉 Thank you! We'll help match you with the right expert.
+                🎉 Thank you! We&apos;ll help match you with the right expert.
               </h2>
               <p className="text-gray-600">
                 Meanwhile, feel free to browse expert profiles below 👇

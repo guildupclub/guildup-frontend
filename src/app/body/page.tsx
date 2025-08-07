@@ -208,8 +208,8 @@ export default function BodyPage() {
               </div>
               <div>
                 <h3 className="font-bold text-base sm:text-xl">💪 Your First 3 Fitness Sessions Are FREE</h3>
-                <p className="text-green-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized fitness guidance from India's top verified trainers, completely free for your first 3 sessions! 🏋️‍♀️💪🥗</p>
-                <p className="text-green-100 text-xs sm:hidden">✨ Experience personalized fitness guidance from India's top verified trainers, completely free for your first 3 sessions! 🏋️‍♀️💪🥗</p>
+                <p className="text-green-100 text-xs sm:text-sm hidden sm:block">✨ Experience personalized fitness guidance from India&apos;s top verified trainers, completely free for your first 3 sessions! 🏋️‍♀️💪🥗</p>
+                <p className="text-green-100 text-xs sm:hidden">✨ Experience personalized fitness guidance from India&apos;s top verified trainers, completely free for your first 3 sessions! 🏋️‍♀️💪🥗</p>
               </div>
             </div>
             <Button 
@@ -289,7 +289,7 @@ export default function BodyPage() {
       <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Transform Your Body?</h2>
-          <p className="text-gray-700 mb-6">Join thousands who've already experienced the power of expert fitness guidance</p>
+          <p className="text-gray-700 mb-6">Join thousands who&apos;ve already experienced the power of expert fitness guidance</p>
           <button 
             className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             onClick={() => {
@@ -331,9 +331,9 @@ export default function BodyPage() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     No fitness communities found
                   </h3>
-                  <p className="text-gray-600 max-w-md">
-                    We're working on bringing you the best fitness and wellness communities. Check back soon!
-                  </p>
+                                     <p className="text-gray-600 max-w-md">
+                     We&apos;re working on bringing you the best fitness and wellness communities. Check back soon!
+                   </p>
                 </div>
               )}
             </div>
