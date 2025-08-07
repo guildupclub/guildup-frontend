@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, Brain, Sparkles, Users } from "lucide-react";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import Loader from "@/components/Loader";
+import LandingPageOnboarding from "@/components/onboarding/LandingPageOnboarding";
+import { useLandingPageOnboarding } from "@/hooks/useLandingPageOnboarding";
 
 interface Community {
   _id: string;
@@ -42,6 +44,21 @@ export default function MindPage() {
   );
   const dispatch = useDispatch();
   const router = useRouter();
+
+  // Onboarding popup hook
+  const {
+    isOpen: isOnboardingOpen,
+    handleClose: handleOnboardingClose,
+    handleComplete: handleOnboardingComplete,
+    triggerOnboarding
+  } = useLandingPageOnboarding({
+    variant: 'mind',
+    delay: 2500, // 2.5 seconds
+    onComplete: (data) => {
+      console.log('Onboarding completed:', data);
+      // You can add additional logic here like redirecting to signup
+    }
+  });
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
@@ -175,7 +192,15 @@ export default function MindPage() {
 
   return (
     <div className="min-h-screen">
-            {/* Free Discovery Call Banner - Top */}
+      {/* Onboarding Popup */}
+      <LandingPageOnboarding
+        isOpen={isOnboardingOpen}
+        onClose={handleOnboardingClose}
+        variant="mind"
+        onComplete={handleOnboardingComplete}
+      />
+
+      {/* Free Discovery Call Banner - Top */}
       <div className="hidden md:block sticky top-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">

@@ -504,3 +504,178 @@ body {
   border-radius: 2px;
   animation: trail-fade 0.8s ease-out infinite 0.3s;
 }
+
+/* Onboarding Form Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+/* Floating animation for background elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes float-delay {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: float-delay 4s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Fade in animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDelay {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDelay2 {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fade-in-delay {
+  animation: fadeInDelay 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.animate-fade-in-delay-2 {
+  animation: fadeInDelay2 0.6s ease-out forwards;
+  animation-delay: 0.4s;
+}
+
+/* Lavender color for mind page */
+.lavender-50 {
+  background-color: #faf5ff;
+}
+
+.lavender-100 {
+  background-color: #f3e8ff;
+}
+
+.lavender-200 {
+  background-color: #e9d5ff;
+}
+
+.lavender-300 {
+  background-color: #d8b4fe;
+}
+
+.lavender-400 {
+  background-color: #c084fc;
+}
+
+.lavender-500 {
+  background-color: #a855f7;
+}
+
+.lavender-600 {
+  background-color: #9333ea;
+}
+
+.lavender-700 {
+  background-color: #7c3aed;
+}
+
+.lavender-800 {
+  background-color: #6b21a8;
+}
+
+.lavender-900 {
+  background-color: #581c87;
+}
+
+/* First expert card special styling */
+.first-expert-card {
+  position: relative;
+}
+
+.first-expert-card::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #a855f7, #3b82f6, #8b5cf6, #06b6d4);
+  border-radius: 16px;
+  z-index: -1;
+  animation: borderGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes borderGlow {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
