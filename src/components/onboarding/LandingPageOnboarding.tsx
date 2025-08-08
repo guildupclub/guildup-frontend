@@ -30,6 +30,8 @@ import {
   Globe
 } from 'lucide-react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser, setSessionId } from '@/redux/userSlice';
 
 interface LandingPageOnboardingProps {
   isOpen: boolean;
@@ -58,6 +60,7 @@ interface FormData {
   mobile: string;
   age: string;
   gender: string;
+  otp: string;
 }
 
 const STRUGGLES = [
@@ -100,16 +103,19 @@ const GENDERS = [
   { id: 'prefer-not-to-say', label: 'Prefer not to say' }
 ];
 
-export default function LandingPageOnboarding({ 
+export default function LandingPageOnboarding({
   isOpen, 
   onClose, 
   variant, 
   onComplete 
 }: LandingPageOnboardingProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     struggles: [],
     expertType: '',
@@ -120,11 +126,20 @@ export default function LandingPageOnboarding({
     email: '',
     mobile: '+91 ',
     age: '',
-    gender: ''
+    gender: '',
+    otp: ''
   });
 
   const totalScreens = 7; // Including welcome and confirmation
   const progress = ((currentScreen - 1) / (totalScreens - 2)) * 100; // Exclude welcome and confirmation screens
+
+  useEffect(() => {
+    if (currentScreen === totalScreens) {
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    }
+  }, [currentScreen, onClose, totalScreens]);
 
   const getVariantConfig = () => {
     switch (variant) {
@@ -197,27 +212,72 @@ export default function LandingPageOnboarding({
       case 5: // Language
         return formData.languages.length > 0;
       case 6: // Personal Info
-        return formData.fullName.trim() && formData.email.trim() && formData.mobile.trim() !== '+91 ';
+        return formData.fullName.trim() && formData.email.trim() && formData.mobile.trim() !== '+91 ' && isOtpVerified;
       default:
         return true;
+    }
+  };
+
+  const handleSendOtp = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/request-otp`, {
+        phone: formData.mobile.replace(/\D/g, '')
+      });
+      if (response.data.r === 's') {
+        toast.success('OTP sent to your WhatsApp number!');
+        setIsOtpSent(true);
+      } else {
+        toast.error('Failed to send OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('OTP error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`, {
+        phone: formData.mobile.replace(/\D/g, ''),
+        otp: formData.otp,
+        name: formData.fullName,
+        email: formData.email
+      });
+      if (response.data.r === 's') {
+        toast.success('OTP verified successfully!');
+        setIsOtpVerified(true);
+        const { user, token } = response.data.data;
+        dispatch(setUser(user));
+        dispatch(setSessionId(token));
+      } else {
+        toast.error('Invalid OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/landing-page`, {
-        ...formData,
-        variant,
-        timestamp: new Date().toISOString(),
-        source: 'landing-page-onboarding'
-      });
-
-      toast.success('Thank you! We\'ll help match you with the right expert.');
-      
       if (onComplete) {
         onComplete(formData);
       }
+      // await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/landing-page`, {
+      //   ...formData,
+      //   variant,
+      //   timestamp: new Date().toISOString(),
+      //   source: 'landing-page-onboarding'
+      // });
+
+      toast.success("Thank you! We'll help match you with the right expert shortly.");
       
       setCurrentScreen(totalScreens); // Show confirmation screen
     } catch (error) {
@@ -273,7 +333,7 @@ export default function LandingPageOnboarding({
               {STRUGGLES.map((struggle) => (
                 <div
                   key={struggle.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.struggles.includes(struggle.id)
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -312,7 +372,7 @@ export default function LandingPageOnboarding({
               {EXPERT_TYPES.map((expert) => (
                 <div
                   key={expert.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.expertType === expert.id
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -345,7 +405,7 @@ export default function LandingPageOnboarding({
               {EXPERT_GENDERS.map((gender) => (
                 <div
                   key={gender.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.expertGender === gender.id
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -378,7 +438,7 @@ export default function LandingPageOnboarding({
               {LANGUAGES.map((language) => (
                 <div
                   key={language.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.languages.includes(language.id)
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -450,33 +510,6 @@ export default function LandingPageOnboarding({
                 </div>
               </div>
               
-              <div>
-                <Label htmlFor="mobile">WhatsApp Number *</Label>
-                <div className="relative mt-1">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    value={formData.mobile}
-                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
-                    placeholder="Enter your WhatsApp number"
-                    className="pl-10"
-                  />
-                </div>
-
-                
-                <Button
-                  type="button"
-                  className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
-                  onClick={() => {
-                    // OTP functionality would go here
-                    toast.success('OTP sent to your WhatsApp number!');
-                  }}
-                >
-                  📱 Send OTP
-                </Button>
-              </div>
-              
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="age">Age</Label>
@@ -511,6 +544,58 @@ export default function LandingPageOnboarding({
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div>
+                <Label htmlFor="mobile">WhatsApp Number *</Label>
+                <div className="relative mt-1">
+                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="mobile"
+                    type="tel"
+                    value={formData.mobile}
+                    onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
+                    placeholder="Enter your WhatsApp number"
+                    className="pl-10"
+                    disabled={isOtpSent}
+                  />
+                </div>
+
+                
+                {!isOtpSent ? (
+                  <Button
+                    type="button"
+                    className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                    onClick={handleSendOtp}
+                    disabled={isLoading || !formData.mobile.trim() || formData.mobile.trim().length < 10}
+                  >
+                    {isLoading ? 'Sending...' : 'Send OTP'}
+                  </Button>
+                ) : (
+                  <div className="mt-4">
+                    <Label htmlFor="otp">Enter OTP *</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="otp"
+                        type="text"
+                        value={formData.otp}
+                        onChange={(e) => setFormData(prev => ({ ...prev, otp: e.target.value }))}
+                        placeholder="Enter 6-digit OTP"
+                        className="pl-10"
+                        maxLength={6}
+                        disabled={isOtpVerified}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                      onClick={handleVerifyOtp}
+                      disabled={isLoading || !formData.otp.trim() || formData.otp.trim().length !== 6 || isOtpVerified}
+                    >
+                      {isLoading ? 'Verifying...' : isOtpVerified ? 'Verified' : 'Verify OTP'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -601,10 +686,10 @@ export default function LandingPageOnboarding({
           <div className="p-4 border-t border-gray-100">
             <Button
               onClick={currentScreen === 6 ? handleSubmit : handleNext}
-              disabled={!isScreenValid(currentScreen) || isLoading}
+              disabled={!isScreenValid(currentScreen) || isLoading || (currentScreen === 6 && !isOtpVerified)}
               className={`w-full bg-gradient-to-r ${config.primaryColor} text-white py-3 hover:opacity-90 transition-all duration-300`}
             >
-              {isLoading ? (
+              {isLoading && currentScreen !== 6 ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Processing...
@@ -623,4 +708,4 @@ export default function LandingPageOnboarding({
       </div>
     </div>
   );
-} 
+}
