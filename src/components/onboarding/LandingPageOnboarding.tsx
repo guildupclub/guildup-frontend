@@ -257,12 +257,12 @@ export default function LandingPageOnboarding({
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/landing-page`, {
-        ...formData,
-        variant,
-        timestamp: new Date().toISOString(),
-        source: 'landing-page-onboarding'
-      });
+      // await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/landing-page`, {
+      //   ...formData,
+      //   variant,
+      //   timestamp: new Date().toISOString(),
+      //   source: 'landing-page-onboarding'
+      // });
 
       toast.success('Thank you! We\'ll help match you with the right expert.');
       
