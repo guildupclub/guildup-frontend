@@ -13,6 +13,8 @@ import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import Loader from "@/components/Loader";
 import LandingPageOnboarding from "@/components/onboarding/LandingPageOnboarding";
 import { useLandingPageOnboarding } from "@/hooks/useLandingPageOnboarding";
+import { useToast } from "@/hooks/use-toast";
+import { setUser } from "@/redux/userSlice";
 
 interface Community {
   _id: string;
@@ -38,27 +40,76 @@ const MIND_CATEGORY_IDS = [
   "67cab23e9b3cd869f1d3ee97"
 ];
 
+console.log("Backend requests will be made to : ", process.env.NEXT_PUBLIC_BACKEND_BASE_URL)
+
 export default function MindPage() {
   const loggedInUserId = useSelector(
     (state: RootState) => state.user.user?._id
   );
   const dispatch = useDispatch();
   const router = useRouter();
+  const { toast } = useToast();
 
   // Onboarding popup hook
-  const {
-    isOpen: isOnboardingOpen,
-    handleClose: handleOnboardingClose,
-    handleComplete: handleOnboardingComplete,
-    triggerOnboarding
-  } = useLandingPageOnboarding({
-    variant: 'mind',
-    delay: 2500, // 2.5 seconds
-    onComplete: (data) => {
-      console.log('Onboarding completed:', data);
-      // You can add additional logic here like redirecting to signup
+const {
+  isOpen: isOnboardingOpen,
+  handleClose: handleOnboardingClose,
+  handleComplete: handleOnboardingComplete,
+  triggerOnboarding
+} = useLandingPageOnboarding({
+  variant: "mind",
+  delay: 2500,
+  onComplete: async (data) => {
+    console.log("Onboarding completed:", data);
+
+    const mobileNumber = data.mobile?.replace("+", "") || "";
+
+    try {
+      // ✅ Store user in sessionStorage & Redux
+      // sessionStorage.setItem("user", JSON.stringify(data.user));
+      // sessionStorage.setItem("name", data.user.name);
+      // sessionStorage.setItem("id", data.user._id);
+      // sessionStorage.setItem("token", data.token);
+      // sessionStorage.setItem("email", data.user.email);
+
+      // dispatch(
+      //   setUser({
+      //     user: data.user,
+      //     token: data.token
+      //   })
+      // );
+
+      // 3️⃣ Save Onboarding Data
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding-user`, {
+        name: data.fullName,
+        email: data.email,
+        phone: mobileNumber,
+        interestedCategories: data.struggles || ["mind"],
+        preferredSessionType: data.expertType || "discovery-call",
+        budgetRange: { min: 0, max: 300 },
+        additionalNotes: "",
+        userId: data.user._id
+      });
+
+      console.log("Onboarding data saved successfully");
+
+      // Redirect based on new/existing user
+      // if (data.isNewUser) {
+      //   router.push("/onboarding");
+      // } else {
+      //   router.push("/feeds");
+      // }
+    } catch (err) {
+      console.error("Error in onboarding flow:", err);
+      toast({
+        title: "An error occurred",
+        description: "Please try again.",
+        variant: "destructive",
+      });
     }
-  });
+  }
+});
+
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);

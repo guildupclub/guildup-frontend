@@ -58,6 +58,7 @@ interface FormData {
   mobile: string;
   age: string;
   gender: string;
+  otp: string;
 }
 
 const STRUGGLES = [
@@ -100,7 +101,7 @@ const GENDERS = [
   { id: 'prefer-not-to-say', label: 'Prefer not to say' }
 ];
 
-export default function LandingPageOnboarding({ 
+export default function LandingPageOnboarding({
   isOpen, 
   onClose, 
   variant, 
@@ -110,6 +111,8 @@ export default function LandingPageOnboarding({
   const [currentScreen, setCurrentScreen] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     struggles: [],
     expertType: '',
@@ -120,7 +123,8 @@ export default function LandingPageOnboarding({
     email: '',
     mobile: '+91 ',
     age: '',
-    gender: ''
+    gender: '',
+    otp: ''
   });
 
   const totalScreens = 7; // Including welcome and confirmation
@@ -197,9 +201,56 @@ export default function LandingPageOnboarding({
       case 5: // Language
         return formData.languages.length > 0;
       case 6: // Personal Info
-        return formData.fullName.trim() && formData.email.trim() && formData.mobile.trim() !== '+91 ';
+        return formData.fullName.trim() && formData.email.trim() && formData.mobile.trim() !== '+91 ' && isOtpVerified;
       default:
         return true;
+    }
+  };
+
+  const handleSendOtp = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/request-otp`, {
+        phone: formData.mobile.replace(/\D/g, '')
+      });
+      if (response.data.r === 's') {
+        toast.success('OTP sent to your WhatsApp number!');
+        setIsOtpSent(true);
+      } else {
+        toast.error('Failed to send OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('OTP error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`, {
+        phone: formData.mobile.replace(/\D/g, ''),
+        otp: formData.otp,
+        name: formData.fullName,
+        email: formData.email
+      });
+      if (response.data.r === 's') {
+        toast.success('OTP verified successfully!');
+        setIsOtpVerified(true);
+        if (onComplete) {
+          onComplete({ ...formData, ...response.data.data });
+        }
+        handleSubmit();
+      } else {
+        toast.error('Invalid OTP. Please try again.');
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -214,10 +265,6 @@ export default function LandingPageOnboarding({
       });
 
       toast.success('Thank you! We\'ll help match you with the right expert.');
-      
-      if (onComplete) {
-        onComplete(formData);
-      }
       
       setCurrentScreen(totalScreens); // Show confirmation screen
     } catch (error) {
@@ -273,7 +320,7 @@ export default function LandingPageOnboarding({
               {STRUGGLES.map((struggle) => (
                 <div
                   key={struggle.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.struggles.includes(struggle.id)
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -312,7 +359,7 @@ export default function LandingPageOnboarding({
               {EXPERT_TYPES.map((expert) => (
                 <div
                   key={expert.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.expertType === expert.id
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -345,7 +392,7 @@ export default function LandingPageOnboarding({
               {EXPERT_GENDERS.map((gender) => (
                 <div
                   key={gender.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.expertGender === gender.id
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -378,7 +425,7 @@ export default function LandingPageOnboarding({
               {LANGUAGES.map((language) => (
                 <div
                   key={language.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
                     formData.languages.includes(language.id)
                       ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
                       : 'border-gray-200 hover:border-gray-300'
@@ -461,20 +508,45 @@ export default function LandingPageOnboarding({
                     onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value }))}
                     placeholder="Enter your WhatsApp number"
                     className="pl-10"
+                    disabled={isOtpSent}
                   />
                 </div>
 
                 
-                <Button
-                  type="button"
-                  className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
-                  onClick={() => {
-                    // OTP functionality would go here
-                    toast.success('OTP sent to your WhatsApp number!');
-                  }}
-                >
-                  📱 Send OTP
-                </Button>
+                {!isOtpSent ? (
+                  <Button
+                    type="button"
+                    className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                    onClick={handleSendOtp}
+                    disabled={isLoading || !formData.mobile.trim() || formData.mobile.trim().length < 10}
+                  >
+                    {isLoading ? 'Sending...' : 'Send OTP'}
+                  </Button>
+                ) : (
+                  <div className="mt-4">
+                    <Label htmlFor="otp">Enter OTP *</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="otp"
+                        type="text"
+                        value={formData.otp}
+                        onChange={(e) => setFormData(prev => ({ ...prev, otp: e.target.value }))}
+                        placeholder="Enter 6-digit OTP"
+                        className="pl-10"
+                        maxLength={6}
+                        disabled={isOtpVerified}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      className="w-full mt-2 bg-blue-500 hover:bg-blue-600 text-white border-0 shadow-md hover:shadow-lg transition-all duration-200"
+                      onClick={handleVerifyOtp}
+                      disabled={isLoading || !formData.otp.trim() || formData.otp.trim().length !== 6 || isOtpVerified}
+                    >
+                      {isLoading ? 'Verifying...' : isOtpVerified ? 'Verified' : 'Verify OTP'}
+                    </Button>
+                  </div>
+                )}
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -623,4 +695,5 @@ export default function LandingPageOnboarding({
       </div>
     </div>
   );
-} 
+}
+ 
