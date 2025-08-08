@@ -86,9 +86,12 @@ const {
         phone: mobileNumber,
         interestedCategories: data.struggles || ["mind"],
         preferredSessionType: data.expertType || "discovery-call",
-        budgetRange: { min: 0, max: 300 },
-        additionalNotes: "",
-        userId: data.user._id
+        additionalNotes: data.otherLanguage || "",
+        userId: data.user._id,
+        expertGender: data.expertGender,
+        languages: data.languages,
+        age: data.age,
+        gender: data.gender,
       });
 
       console.log("Onboarding data saved successfully");

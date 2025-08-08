@@ -30,6 +30,8 @@ import {
   Globe
 } from 'lucide-react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser, setSessionId } from '@/redux/userSlice';
 
 interface LandingPageOnboardingProps {
   isOpen: boolean;
@@ -108,6 +110,7 @@ export default function LandingPageOnboarding({
   onComplete 
 }: LandingPageOnboardingProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
   const [currentScreen, setCurrentScreen] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
@@ -129,6 +132,14 @@ export default function LandingPageOnboarding({
 
   const totalScreens = 7; // Including welcome and confirmation
   const progress = ((currentScreen - 1) / (totalScreens - 2)) * 100; // Exclude welcome and confirmation screens
+
+  useEffect(() => {
+    if (currentScreen === totalScreens) {
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    }
+  }, [currentScreen, onClose, totalScreens]);
 
   const getVariantConfig = () => {
     switch (variant) {
@@ -239,10 +250,9 @@ export default function LandingPageOnboarding({
       if (response.data.r === 's') {
         toast.success('OTP verified successfully!');
         setIsOtpVerified(true);
-        if (onComplete) {
-          onComplete({ ...formData, ...response.data.data });
-        }
-        handleSubmit();
+        const { user, token } = response.data.data;
+        dispatch(setUser(user));
+        dispatch(setSessionId(token));
       } else {
         toast.error('Invalid OTP. Please try again.');
       }
@@ -257,6 +267,9 @@ export default function LandingPageOnboarding({
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
+      if (onComplete) {
+        onComplete(formData);
+      }
       // await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/landing-page`, {
       //   ...formData,
       //   variant,
@@ -264,7 +277,7 @@ export default function LandingPageOnboarding({
       //   source: 'landing-page-onboarding'
       // });
 
-      toast.success('Thank you! We\'ll help match you with the right expert.');
+      toast.success("Thank you! We'll help match you with the right expert shortly.");
       
       setCurrentScreen(totalScreens); // Show confirmation screen
     } catch (error) {
@@ -497,6 +510,42 @@ export default function LandingPageOnboarding({
                 </div>
               </div>
               
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="age">Age</Label>
+                  <div className="relative mt-1">
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                      id="age"
+                      type="number"
+                      value={formData.age}
+                      onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
+                      placeholder="Age"
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENDERS.map((gender) => (
+                        <SelectItem key={gender.id} value={gender.id}>
+                          {gender.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="mobile">WhatsApp Number *</Label>
                 <div className="relative mt-1">
@@ -547,42 +596,6 @@ export default function LandingPageOnboarding({
                     </Button>
                   </div>
                 )}
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="age">Age</Label>
-                  <div className="relative mt-1">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      id="age"
-                      type="number"
-                      value={formData.age}
-                      onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
-                      placeholder="Age"
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select
-                    value={formData.gender}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {GENDERS.map((gender) => (
-                        <SelectItem key={gender.id} value={gender.id}>
-                          {gender.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </div>
           </div>
@@ -673,10 +686,10 @@ export default function LandingPageOnboarding({
           <div className="p-4 border-t border-gray-100">
             <Button
               onClick={currentScreen === 6 ? handleSubmit : handleNext}
-              disabled={!isScreenValid(currentScreen) || isLoading}
+              disabled={!isScreenValid(currentScreen) || isLoading || (currentScreen === 6 && !isOtpVerified)}
               className={`w-full bg-gradient-to-r ${config.primaryColor} text-white py-3 hover:opacity-90 transition-all duration-300`}
             >
-              {isLoading ? (
+              {isLoading && currentScreen !== 6 ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Processing...
@@ -696,4 +709,3 @@ export default function LandingPageOnboarding({
     </div>
   );
 }
- 
