@@ -35,9 +35,9 @@ interface Community {
 
 // Mind-related category IDs
 const MIND_CATEGORY_IDS = [
+  "67cab23e9b3cd869f1d3ee97",
   "67cab2669b3cd869f1d3ee98",
-  "67cab2809b3cd869f1d3ee99",
-  "67cab23e9b3cd869f1d3ee97"
+  "67cab2809b3cd869f1d3ee99"
 ];
 
 console.log("Backend requests will be made to : ", process.env.NEXT_PUBLIC_BACKEND_BASE_URL)

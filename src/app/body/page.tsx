@@ -32,9 +32,8 @@ interface Community {
 
 // Body-related category IDs (fitness, nutrition, etc.)
 const BODY_CATEGORY_IDS = [
-  "67cab2669b3cd869f1d3ee98", // Replace with actual body/fitness category IDs
-  "67cab2809b3cd869f1d3ee99",
-  "67cab23e9b3cd869f1d3ee97"
+  "67cab1fb9b3cd869f1d3ee95",
+  "67cab21f9b3cd869f1d3ee96"
 ];
 
 export default function BodyPage() {
