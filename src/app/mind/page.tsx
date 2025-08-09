@@ -11,6 +11,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowDown, Brain, Sparkles, Users } from "lucide-react";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import Loader from "@/components/Loader";
+import LandingPageOnboarding from "@/components/onboarding/LandingPageOnboarding";
+import { useLandingPageOnboarding } from "@/hooks/useLandingPageOnboarding";
+import { useToast } from "@/hooks/use-toast";
+import { setUser } from "@/redux/userSlice";
 
 interface Community {
   _id: string;
@@ -36,12 +40,79 @@ const MIND_CATEGORY_IDS = [
   "67cab23e9b3cd869f1d3ee97"
 ];
 
+console.log("Backend requests will be made to : ", process.env.NEXT_PUBLIC_BACKEND_BASE_URL)
+
 export default function MindPage() {
   const loggedInUserId = useSelector(
     (state: RootState) => state.user.user?._id
   );
   const dispatch = useDispatch();
   const router = useRouter();
+  const { toast } = useToast();
+
+  // Onboarding popup hook
+const {
+  isOpen: isOnboardingOpen,
+  handleClose: handleOnboardingClose,
+  handleComplete: handleOnboardingComplete,
+  triggerOnboarding
+} = useLandingPageOnboarding({
+  variant: "mind",
+  delay: 2500,
+  onComplete: async (data) => {
+    console.log("Onboarding completed:", data);
+
+    const mobileNumber = data.mobile?.replace("+", "") || "";
+
+    try {
+      // ✅ Store user in sessionStorage & Redux
+      // sessionStorage.setItem("user", JSON.stringify(data.user));
+      // sessionStorage.setItem("name", data.user.name);
+      // sessionStorage.setItem("id", data.user._id);
+      // sessionStorage.setItem("token", data.token);
+      // sessionStorage.setItem("email", data.user.email);
+
+      // dispatch(
+      //   setUser({
+      //     user: data.user,
+      //     token: data.token
+      //   })
+      // );
+
+      // 3️⃣ Save Onboarding Data
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding-user`, {
+        name: data.fullName,
+        email: data.email,
+        phone: mobileNumber,
+        interestedCategories: data.struggles || ["mind"],
+        preferredSessionType: data.expertType || "discovery-call",
+        additionalNotes: data.otherLanguage || "",
+        userId: data.user._id,
+        expertGender: data.expertGender,
+        languages: data.languages,
+        age: data.age,
+        gender: data.gender,
+      });
+
+      console.log("Onboarding data saved successfully");
+
+      // Redirect based on new/existing user
+      // if (data.isNewUser) {
+      //   router.push("/onboarding");
+      // } else {
+      //   router.push("/feeds");
+      // }
+    } catch (err) {
+      console.error("Error in onboarding flow:", err);
+      toast({
+        title: "An error occurred",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  }
+});
+
 
   const [communities, setCommunities] = useState<Community[]>([]);
   const [loading, setLoading] = useState(false);
@@ -175,7 +246,15 @@ export default function MindPage() {
 
   return (
     <div className="min-h-screen">
-            {/* Free Discovery Call Banner - Top */}
+      {/* Onboarding Popup */}
+      <LandingPageOnboarding
+        isOpen={isOnboardingOpen}
+        onClose={handleOnboardingClose}
+        variant="mind"
+        onComplete={handleOnboardingComplete}
+      />
+
+      {/* Free Discovery Call Banner - Top */}
       <div className="hidden md:block sticky top-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg border-b-4 border-indigo-400 z-30">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
