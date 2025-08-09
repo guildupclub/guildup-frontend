@@ -232,7 +232,7 @@ export default function OnboardingForm({
     setIsLoading(true);
     try {
       // Save onboarding data
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding/save`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding-user`, {
         ...formData,
         variant,
         timestamp: new Date().toISOString()
