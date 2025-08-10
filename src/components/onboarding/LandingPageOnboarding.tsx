@@ -270,22 +270,9 @@ export default function LandingPageOnboarding({
       if (onComplete) {
         onComplete(formData);
       }
-      await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding-user`, {
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.mobile,
-        interestedCategories: formData.struggles,
-        preferredSessionType: formData.expertType || "discovery-call",
-        additionalNotes: formData.otherLanguage || "",
-        expertGender: formData.expertGender,
-        languages: formData.languages,
-        age: formData.age,
-        gender: formData.gender,
-        variant,
-        timestamp: new Date().toISOString(),
-        source: 'landing-page-onboarding'
-      });
-
+      // API call removed - now handled by the pages' onComplete callbacks
+      // This prevents duplicate API calls and ensures consistency
+      
       toast.success("Thank you! We'll help match you with the right expert shortly.");
       
       setCurrentScreen(totalScreens); // Show confirmation screen

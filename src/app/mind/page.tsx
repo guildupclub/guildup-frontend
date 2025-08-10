@@ -87,7 +87,7 @@ const {
         interestedCategories: data.struggles || ["mind"],
         preferredSessionType: data.expertType || "discovery-call",
         additionalNotes: data.otherLanguage || "",
-        userId: data.user._id,
+        userId: data.user?._id, // Added optional chaining for safety
         expertGender: data.expertGender,
         languages: data.languages,
         age: data.age,
