@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 
 interface Offering {
@@ -41,8 +41,15 @@ interface Community {
   avatar?: string;
 }
 
-export default function CommunityOfferingsPage({ params }: { params: { communityId: string } }) {
+export default function CommunityOfferingsPage() {
   const router = useRouter();
+  const params = useParams();
+  const communityParam = params["community-Id"] as string;
+  
+  // Extract community ID from the parameter (format: "community-name-communityId")
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityId = lastHyphenIndex !== -1 ? communityParam.substring(lastHyphenIndex + 1) : communityParam;
+  
   const [offerings, setOfferings] = useState<Offering[]>([]);
   const [community, setCommunity] = useState<Community | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,21 +58,23 @@ export default function CommunityOfferingsPage({ params }: { params: { community
   const [selectedType, setSelectedType] = useState<string>('all');
 
   useEffect(() => {
-    fetchCommunityAndOfferings();
-  }, [params.communityId]);
+    if (communityId) {
+      fetchCommunityAndOfferings();
+    }
+  }, [communityId]);
 
   const fetchCommunityAndOfferings = async () => {
     try {
       setLoading(true);
       
       // Fetch community details
-      const communityResponse = await axios.get(`/api/communities/${params.communityId}`);
+      const communityResponse = await axios.get(`/api/communities/${communityId}`);
       if (communityResponse.data) {
         setCommunity(communityResponse.data);
       }
 
       // Fetch offerings for this community
-      const offeringsResponse = await axios.get(`/api/offerings/community/${params.communityId}`);
+      const offeringsResponse = await axios.get(`/api/offerings/community/${communityId}`);
       if (offeringsResponse.data) {
         setOfferings(offeringsResponse.data);
       }
@@ -154,7 +163,7 @@ export default function CommunityOfferingsPage({ params }: { params: { community
   };
 
   const handleOfferingClick = (offering: Offering) => {
-    router.push(`/community/${params.communityId}/offerings/${offering._id}`);
+    router.push(`/community/${communityParam}/offerings/${offering._id}`);
   };
 
   if (loading) {

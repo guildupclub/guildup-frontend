@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { formatDateForDisplay } from '@/utils/dateUtils';
 import { 
   DateSelectionStep, 
@@ -68,8 +68,16 @@ const STEPS = [
   { id: 5, title: 'Payment', icon: CreditCard },
 ];
 
-export default function BookingPage({ params }: { params: { communityId: string; offeringId: string } }) {
+export default function BookingPage() {
   const router = useRouter();
+  const params = useParams();
+  const communityParam = params["community-Id"] as string;
+  const offeringId = params["offeringId"] as string;
+  
+  // Extract community ID from the parameter (format: "community-name-communityId")
+  const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
+  const communityId = lastHyphenIndex !== -1 ? communityParam.substring(lastHyphenIndex + 1) : communityParam;
+  
   const [offering, setOffering] = useState<Offering | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [bookingData, setBookingData] = useState<BookingData>({
@@ -86,13 +94,15 @@ export default function BookingPage({ params }: { params: { communityId: string;
   const progress = (currentStep / STEPS.length) * 100;
 
   useEffect(() => {
-    fetchOffering();
-  }, [params.offeringId]);
+    if (offeringId) {
+      fetchOffering();
+    }
+  }, [offeringId]);
 
   const fetchOffering = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/offerings/${params.offeringId}`);
+      const response = await axios.get(`/api/offerings/${offeringId}`);
       if (response.data) {
         setOffering(response.data);
         setBookingData(prev => ({
