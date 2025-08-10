@@ -336,7 +336,7 @@ export default function LandingPageOnboarding({
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
               <h2 className="text-xl font-semibold text-gray-900">
-                What's bothering you right now?
+                What&apos;s bothering you right now?
               </h2>
               <p className="text-gray-600 text-sm">
                 Pick up to 3
