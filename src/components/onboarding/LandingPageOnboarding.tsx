@@ -63,18 +63,28 @@ interface FormData {
   otp: string;
 }
 
-const STRUGGLES = [
-  { id: 'anxiety-stress', label: 'Anxiety or Stress', emoji: '🧠' },
-  { id: 'low-energy', label: 'Low energy or fatigue', emoji: '💤' },
-  { id: 'weight-issues', label: 'Weight issues (gain or loss)', emoji: '🍔' },
-  { id: 'hormonal', label: 'PCOS, Thyroid, or Hormonal Imbalance', emoji: '🧘' },
-  { id: 'fitness-goals', label: 'Strength or fitness goals', emoji: '💪' },
-  { id: 'relationships', label: 'Relationship or breakup issues', emoji: '💔' },
-  { id: 'confidence', label: 'Self-confidence or self-worth', emoji: '🔄' },
-  { id: 'poor-sleep', label: 'Poor sleep', emoji: '😴' },
-  { id: 'digestion', label: 'Digestion or chronic health', emoji: '🩺' },
-  { id: 'not-sure', label: 'Not sure, need general guidance', emoji: '❓' }
+const MIND_STRUGGLES = [
+  { id: 'anxiety-stress', label: 'Feeling stressed or anxious', emoji: '😰' },
+  { id: 'overthinking', label: "Can't stop overthinking", emoji: '🤯' },
+  { id: 'trouble-sleeping', label: 'Trouble sleeping', emoji: '😴' },
+  { id: 'relationship-hurt', label: 'Breakup or relationship hurt', emoji: '💔' },
+  { id: 'feeling-low', label: 'Feeling low or sad', emoji: '😔' },
+  { id: 'past-trauma', label: 'Past trauma or bad memories', emoji: '😞' },
+  { id: 'marriage-trust', label: 'Marriage or trust problems', emoji: '💍' },
+  { id: 'parenting', label: 'Parenting challenges', emoji: '👶' }
 ];
+
+const BODY_STRUGGLES = [
+  { id: 'lose-weight', label: 'Want to lose weight', emoji: '⚖️' },
+  { id: 'gain-weight', label: 'Want to gain weight or muscle', emoji: '💪' },
+  { id: 'pcos-thyroid', label: 'PCOS or thyroid problems', emoji: '🦋' },
+  { id: 'digestion-gut', label: 'Digestion or gut issues', emoji: '🩺' },
+  { id: 'always-tired', label: 'Always feeling tired', emoji: '😴' },
+  { id: 'injury-pain', label: 'Injury or constant pain', emoji: '🤕' },
+  { id: 'stiffness-flexibility', label: 'Stiffness or low flexibility', emoji: '🧘' }
+];
+
+// Get struggles based on variant - will be defined inside the component
 
 const EXPERT_TYPES = [
   { id: 'therapist', label: 'Therapist / Counselor', emoji: '🧘‍♂️' },
@@ -130,7 +140,7 @@ export default function LandingPageOnboarding({
     otp: ''
   });
 
-  const totalScreens = 7; // Including welcome and confirmation
+  const totalScreens = 6; // Including welcome and confirmation
   const progress = ((currentScreen - 1) / (totalScreens - 2)) * 100; // Exclude welcome and confirmation screens
 
   useEffect(() => {
@@ -166,6 +176,11 @@ export default function LandingPageOnboarding({
 
   const config = getVariantConfig();
   const Icon = config.icon;
+
+  // Get struggles based on variant
+  const getStruggles = () => {
+    return variant === 'mind' ? MIND_STRUGGLES : BODY_STRUGGLES;
+  };
 
   const handleNext = () => {
     if (currentScreen < totalScreens) {
@@ -203,18 +218,21 @@ export default function LandingPageOnboarding({
 
   const isScreenValid = (screen: number) => {
     switch (screen) {
-      case 2: // Struggles
-        return formData.struggles.length > 0;
-      case 3: // Expert Type
-        return formData.expertType !== '';
-      case 4: // Expert Gender
-        return formData.expertGender !== '';
-      case 5: // Language
-        return formData.languages.length > 0;
-      case 6: // Personal Info
-        return formData.fullName.trim() && formData.email.trim() && formData.mobile.trim() !== '+91 ' && isOtpVerified;
-      default:
+      case 1: // Welcome - always valid
         return true;
+      case 2: // Struggles - need at least 1 struggle selected
+        return formData.struggles.length > 0;
+      case 3: // Expert Gender - need to select gender preference
+        return formData.expertGender !== '';
+      case 4: // Language - need to select at least 1 language
+        return formData.languages.length > 0;
+      case 5: // Personal Info - need name, email, mobile, and verified OTP
+        return formData.fullName.trim() !== '' && 
+               formData.email.trim() !== '' && 
+               formData.mobile.trim() !== '+91 ' && 
+               isOtpVerified;
+      default:
+        return false;
     }
   };
 
@@ -313,20 +331,20 @@ export default function LandingPageOnboarding({
           </div>
         );
 
-      case 2: // Struggles
+      case 2: // Struggles (variant-specific)
         return (
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
               <h2 className="text-xl font-semibold text-gray-900">
-                What are you currently struggling with?
+                What's bothering you right now?
               </h2>
               <p className="text-gray-600 text-sm">
-                Choose up to 3
+                Pick up to 3
               </p>
             </div>
             
             <div className="grid gap-3">
-              {STRUGGLES.map((struggle) => (
+              {getStruggles().map((struggle) => (
                 <div
                   key={struggle.id}
                   className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
@@ -355,40 +373,7 @@ export default function LandingPageOnboarding({
           </div>
         );
 
-      case 3: // Expert Type
-        return (
-          <div className={`space-y-6 ${slideClass}`}>
-            <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-gray-900">
-                What kind of expert are you looking for?
-              </h2>
-            </div>
-            
-            <div className="grid gap-3">
-              {EXPERT_TYPES.map((expert) => (
-                <div
-                  key={expert.id}
-                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${ 
-                    formData.expertType === expert.id
-                      ? `${config.borderColor} bg-gradient-to-r ${config.bgGradient}`
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => setFormData(prev => ({ ...prev, expertType: expert.id }))}
-                >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl">{expert.emoji}</span>
-                    <span className="font-medium text-gray-900">{expert.label}</span>
-                    {formData.expertType === expert.id && (
-                      <Check className="w-5 h-5 text-green-600 ml-auto" />
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 4: // Expert Gender
+      case 3: // Expert Gender
         return (
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
@@ -421,7 +406,7 @@ export default function LandingPageOnboarding({
           </div>
         );
 
-      case 5: // Language
+      case 4: // Language
         return (
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
@@ -467,7 +452,7 @@ export default function LandingPageOnboarding({
           </div>
         );
 
-      case 6: // Personal Info
+      case 5: // Personal Info
         return (
           <div className={`space-y-6 ${slideClass}`}>
             <div className="text-center space-y-2">
@@ -681,16 +666,16 @@ export default function LandingPageOnboarding({
         {currentScreen > 1 && currentScreen < totalScreens && (
           <div className="p-4 border-t border-gray-100">
             <Button
-              onClick={currentScreen === 6 ? handleSubmit : handleNext}
-              disabled={!isScreenValid(currentScreen) || isLoading || (currentScreen === 6 && !isOtpVerified)}
+              onClick={currentScreen === 5 ? handleSubmit : handleNext}
+              disabled={!isScreenValid(currentScreen) || isLoading || (currentScreen === 5 && !isOtpVerified)}
               className={`w-full bg-gradient-to-r ${config.primaryColor} text-white py-3 hover:opacity-90 transition-all duration-300`}
             >
-              {isLoading && currentScreen !== 6 ? (
+              {isLoading && currentScreen !== 5 ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                   Processing...
                 </>
-              ) : currentScreen === 6 ? (
+              ) : currentScreen === 5 ? (
                 'Complete & Get Matched'
               ) : (
                 <>
