@@ -13,6 +13,7 @@ import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import Loader from "@/components/Loader";
 import LandingPageOnboarding from "@/components/onboarding/LandingPageOnboarding";
 import { useLandingPageOnboarding } from "@/hooks/useLandingPageOnboarding";
+import { useToast } from "@/hooks/use-toast";
 
 interface Community {
   _id: string;
@@ -42,6 +43,7 @@ export default function BodyPage() {
   );
   const dispatch = useDispatch();
   const router = useRouter();
+  const { toast } = useToast();
 
   // Onboarding popup hook
   const {
@@ -52,9 +54,36 @@ export default function BodyPage() {
   } = useLandingPageOnboarding({
     variant: 'body',
     delay: 2500, // 2.5 seconds
-    onComplete: (data) => {
+    onComplete: async (data) => {
       console.log('Onboarding completed:', data);
-      // You can add additional logic here like redirecting to signup
+
+      const mobileNumber = data.mobile?.replace("+", "") || "";
+
+      try {
+        // Save Onboarding Data
+        await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/onboarding-user`, {
+          name: data.fullName,
+          email: data.email,
+          phone: mobileNumber,
+          interestedCategories: data.struggles || ["body"],
+          preferredSessionType: data.expertType || "discovery-call",
+          additionalNotes: data.otherLanguage || "",
+          userId: data.user?._id,
+          expertGender: data.expertGender,
+          languages: data.languages,
+          age: data.age,
+          gender: data.gender,
+        });
+
+        console.log("Onboarding data saved successfully");
+      } catch (err) {
+        console.error("Error in onboarding flow:", err);
+        toast({
+          title: "An error occurred",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   });
 
