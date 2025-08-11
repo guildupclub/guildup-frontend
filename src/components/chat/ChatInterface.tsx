@@ -29,8 +29,7 @@ import {
   Image as ImageIcon,
   FileText,
   Download,
-  Trash2,
-  Link
+  Trash2
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
@@ -39,6 +38,7 @@ import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/datab
 import { GoogleMeetButton } from '@/components/google-meet/GoogleMeetButton';
 import { toast } from 'sonner';
 import router from 'next/router';
+import Link from 'next/link';
 
 interface FileAttachment {
   id: string;
@@ -715,9 +715,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
         <div className="p-3 border-b flex flex-row border-gray-200 bg-white gap-2">
           <span className="flex  justify-start items-center">
-            <a href="/">
+            <Link href="/">
               <ArrowLeft className="h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-800 transition-colors"/>
-            </a>
+            </Link>
           </span>
           <h2 className="text-base font-semibold text-gray-900">Messages</h2>
         </div>
