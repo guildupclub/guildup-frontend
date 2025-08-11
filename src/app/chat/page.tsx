@@ -27,9 +27,10 @@ function ChatContent() {
   useEffect(() => {
     if (!searchParams) return;
     
-    const expertEmail = searchParams.get('expertEmail');
-    const expertName = searchParams.get('expertName');
-    const expertImage = searchParams.get('expertImage');
+    // Handle both parameter naming conventions
+    const expertEmail = searchParams.get('expertEmail') || searchParams.get('receiverEmail');
+    const expertName = searchParams.get('expertName') || searchParams.get('receiverName');
+    const expertImage = searchParams.get('expertImage') || searchParams.get('receiverImage');
 
     if (expertEmail && expertName) {
       setExpertDetails({
