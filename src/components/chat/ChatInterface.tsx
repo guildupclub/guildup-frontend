@@ -29,7 +29,8 @@ import {
   Image as ImageIcon,
   FileText,
   Download,
-  Trash2
+  Trash2,
+  Link
 } from 'lucide-react';
 import { formatDistance } from 'date-fns';
 import { removeSpecialCharacters } from '../utils/StringUtils';
@@ -37,6 +38,7 @@ import { chatDatabase } from '../../../firebase-chat';
 import { ref, onValue, set, onDisconnect, serverTimestamp } from 'firebase/database';
 import { GoogleMeetButton } from '@/components/google-meet/GoogleMeetButton';
 import { toast } from 'sonner';
+import router from 'next/router';
 
 interface FileAttachment {
   id: string;
@@ -711,9 +713,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       
       {/* Conversations List - Hidden on mobile unless showConversations is true */}
       <div className={`${showConversations ? 'flex' : 'hidden'} md:flex md:w-72 flex-col border-r border-gray-200 bg-gray-50 ${showConversations ? 'w-full' : ''}`}>
-        <div className="p-3 border-b border-gray-200 bg-white">
+        <div className="p-3 border-b flex flex-row border-gray-200 bg-white gap-2">
+          <span className="flex  justify-start items-center">
+            <a href="/">
+              <ArrowLeft className="h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-800 transition-colors"/>
+            </a>
+          </span>
           <h2 className="text-base font-semibold text-gray-900">Messages</h2>
-          <p className="text-xs text-gray-500">Connect with Experts</p>
         </div>
 
         <div className="flex-1 overflow-y-auto bg-white">
