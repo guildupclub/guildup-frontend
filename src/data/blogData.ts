@@ -13,50 +13,17 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
   {
     id: "1",
-    title: "The Future of Community Building in Digital Spaces",
-    excerpt: "Explore how digital communities are evolving and what it means for creators and members alike. Discover the latest trends and strategies.",
-    author: "Sarah Johnson",
-    date: "2024-01-15",
-    readTime: "5 min",
-    category: "Community",
-    image: "https://picsum.photos/400/250?random=1",
-    slug: "future-of-community-building"
+    title: "Why Does One Bloat? Understanding the Causes and Solutions",
+    excerpt: "Discover the real reasons behind bloating and learn proven strategies to reduce discomfort and improve digestive health.",
+    author: "Dr. Priya Sharma",
+    date: "2025-07-25",
+    readTime: "6 min read",
+    category: "Digestive Health",
+    image: "/blog-images/Gemini_Generated_Image_1ttijj1ttijj1tti.jpeg",
+    slug: "why-does-one-bloat"
   },
   {
     id: "2",
-    title: "Building Meaningful Connections Online",
-    excerpt: "Learn effective strategies for fostering genuine relationships in virtual environments. Tips and best practices from successful community leaders.",
-    author: "Mike Chen",
-    date: "2024-01-12",
-    readTime: "8 min",
-    category: "Networking",
-    image: "https://picsum.photos/400/250?random=2",
-    slug: "building-meaningful-connections"
-  },
-  {
-    id: "3",
-    title: "The Art of Digital Storytelling",
-    excerpt: "Master the craft of engaging your audience through compelling narratives. Techniques that work across all digital platforms.",
-    author: "Emma Wilson",
-    date: "2024-01-10",
-    readTime: "6 min",
-    category: "Content",
-    image: "https://picsum.photos/400/250?random=3",
-    slug: "art-of-digital-storytelling"
-  },
-  {
-    id: "4",
-    title: "Growing Your Personal Brand",
-    excerpt: "Essential steps to establish and grow your personal brand in today's competitive digital landscape. From strategy to execution.",
-    author: "David Rodriguez",
-    date: "2024-01-08",
-    readTime: "10 min",
-    category: "Branding",
-    image: "https://picsum.photos/400/250?random=4",
-    slug: "growing-personal-brand"
-  },
-  {
-    id: "5",
     title: "Community Monetization Strategies",
     excerpt: "Discover ethical and effective ways to monetize your community while maintaining trust and value for your members.",
     author: "Lisa Park",
@@ -67,7 +34,7 @@ export const blogPosts: BlogPost[] = [
     slug: "community-monetization-strategies"
   },
   {
-    id: "6",
+    id: "3",
     title: "The Psychology of Online Engagement",
     excerpt: "Understanding what drives people to engage online and how to create content that resonates with your audience.",
     author: "Dr. James Smith",

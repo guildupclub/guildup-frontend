@@ -679,3 +679,312 @@ body {
     opacity: 1;
   }
 }
+
+/* Custom Blog Styles */
+@layer components {
+  /* Enhanced Blog Typography */
+  .blog-content {
+    @apply text-lg leading-relaxed text-gray-700;
+  }
+
+  .blog-content h1 {
+    @apply text-4xl font-bold text-gray-900 mb-8 leading-tight;
+  }
+
+  .blog-content h2 {
+    @apply text-3xl font-bold text-gray-900 mt-16 mb-8 pb-4 border-b border-gray-200;
+  }
+
+  .blog-content h3 {
+    @apply text-2xl font-semibold text-gray-800 mt-12 mb-6;
+  }
+
+  .blog-content h4 {
+    @apply text-xl font-semibold text-gray-800 mt-10 mb-4;
+  }
+
+  .blog-content p {
+    @apply text-lg text-gray-700 leading-relaxed mb-6;
+  }
+
+  .blog-content ul, .blog-content ol {
+    @apply my-6 space-y-2;
+  }
+
+  .blog-content li {
+    @apply text-lg text-gray-700 leading-relaxed;
+  }
+
+  .blog-content strong {
+    @apply font-semibold text-gray-900;
+  }
+
+  .blog-content em {
+    @apply italic text-gray-700;
+  }
+
+  .blog-content blockquote {
+    @apply border-l-4 border-primary pl-6 italic text-gray-700 bg-gray-50 py-4 px-6 rounded-r-lg my-8;
+  }
+
+  .blog-content code {
+    @apply bg-gray-100 px-3 py-1 rounded-md text-sm font-mono text-gray-800;
+  }
+
+  .blog-content pre {
+    @apply bg-gray-900 text-gray-100 p-6 rounded-lg overflow-x-auto my-8;
+  }
+
+  .blog-content table {
+    @apply w-full border-collapse my-8;
+  }
+
+  .blog-content th {
+    @apply border border-gray-300 bg-gray-50 px-6 py-4 text-left font-semibold text-gray-900;
+  }
+
+  .blog-content td {
+    @apply border border-gray-300 px-6 py-4 text-gray-700;
+  }
+
+  .blog-content img {
+    @apply rounded-lg shadow-lg my-8;
+  }
+
+  /* Custom Callout Boxes */
+  .callout-info {
+    @apply bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg;
+  }
+
+  .callout-warning {
+    @apply bg-yellow-50 border-l-4 border-yellow-500 p-4 my-6 rounded-r-lg;
+  }
+
+  .callout-success {
+    @apply bg-green-50 border-l-4 border-green-500 p-4 my-6 rounded-r-lg;
+  }
+
+  .callout-danger {
+    @apply bg-red-50 border-l-4 border-red-500 p-4 my-6 rounded-r-lg;
+  }
+
+  .callout-tip {
+    @apply bg-purple-50 border-l-4 border-purple-500 p-4 my-6 rounded-r-lg;
+  }
+
+  /* Enhanced List Styles */
+  .blog-content ul li::marker {
+    @apply text-primary;
+  }
+
+  .blog-content ol li::marker {
+    @apply text-primary font-semibold;
+  }
+
+  /* Table of Contents */
+  .toc-link {
+    @apply block text-sm hover:text-primary transition-colors duration-200;
+  }
+
+  .toc-link.level-2 {
+    @apply font-semibold text-gray-900;
+  }
+
+  .toc-link.level-3 {
+    @apply font-medium text-gray-700 ml-4;
+  }
+
+  /* Author Card */
+  .author-card {
+    @apply bg-white p-6 rounded-xl border border-gray-200 shadow-sm;
+  }
+
+  .author-avatar {
+    @apply w-16 h-16 bg-gradient-to-br from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-2xl shadow-lg;
+  }
+
+  /* Newsletter Signup */
+  .newsletter-card {
+    @apply bg-gradient-to-br from-primary to-blue-600 text-white p-6 rounded-xl;
+  }
+
+  .newsletter-input {
+    @apply w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50;
+  }
+
+  .newsletter-button {
+    @apply w-full bg-white text-primary px-4 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg;
+  }
+
+  /* Related Articles */
+  .related-article {
+    @apply bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden;
+  }
+
+  .related-article-image {
+    @apply relative h-56 bg-gray-200;
+  }
+
+  .related-article-overlay {
+    @apply absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-300;
+  }
+
+  /* Social Sharing */
+  .social-share-button {
+    @apply p-3 text-gray-600 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-100;
+  }
+
+  /* Reading Progress Bar */
+  .reading-progress {
+    @apply fixed top-0 left-0 w-full h-1 bg-gray-200 z-50;
+  }
+
+  .reading-progress-bar {
+    @apply h-full bg-primary transition-all duration-300;
+  }
+
+  /* Sticky Sidebar */
+  .sticky-sidebar {
+    @apply sticky top-24;
+  }
+
+  /* Right Panel Alignment */
+  .blog-sidebar {
+    @apply lg:ml-12 lg:mr-0;
+  }
+
+  .blog-sidebar .author-card,
+  .blog-sidebar .newsletter-card,
+  .blog-sidebar .stats-card {
+    @apply shadow-lg border-2 border-gray-100;
+  }
+
+  /* Additional spacing for better visual separation */
+  .blog-sidebar > * {
+    @apply ml-2;
+  }
+
+  /* Ensure proper right alignment */
+  .blog-sidebar .sticky-sidebar {
+    @apply right-0;
+  }
+
+  /* Enhanced Tags */
+  .blog-tag {
+    @apply px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors cursor-pointer;
+  }
+
+  /* Call to Action */
+  .cta-section {
+    @apply mt-16 p-8 bg-gradient-to-r from-primary to-blue-600 rounded-2xl text-white text-center;
+  }
+
+  .cta-button {
+    @apply inline-flex items-center gap-2 bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors shadow-lg;
+  }
+
+  /* Article Stats */
+  .stats-card {
+    @apply bg-gray-50 p-6 rounded-xl border border-gray-200;
+  }
+
+  .stats-row {
+    @apply flex justify-between items-center;
+  }
+
+  .stats-label {
+    @apply text-gray-600;
+  }
+
+  .stats-value {
+    @apply font-semibold text-gray-900;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .blog-content h1 {
+      @apply text-3xl;
+    }
+
+    .blog-content h2 {
+      @apply text-2xl;
+    }
+
+    .blog-content h3 {
+      @apply text-xl;
+    }
+
+    .blog-content p {
+      @apply text-base;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .blog-content h1 {
+      @apply text-2xl;
+    }
+
+    .blog-content h2 {
+      @apply text-xl;
+    }
+
+    .blog-content h3 {
+      @apply text-lg;
+    }
+
+    .blog-content p {
+      @apply text-sm;
+    }
+  }
+}
+
+/* Custom Scrollbar for Code Blocks */
+.blog-content pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.blog-content pre::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.blog-content pre::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+.blog-content pre::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Smooth Scrolling for Table of Contents */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus Styles for Accessibility */
+.blog-content a:focus,
+.blog-content button:focus {
+  @apply outline-none ring-2 ring-primary ring-opacity-50;
+}
+
+/* Print Styles */
+@media print {
+  .blog-content {
+    @apply text-black;
+  }
+
+  .blog-content h1,
+  .blog-content h2,
+  .blog-content h3 {
+    @apply text-black border-black;
+  }
+
+  .callout-info,
+  .callout-warning,
+  .callout-success,
+  .callout-danger,
+  .callout-tip {
+    @apply border-black bg-white;
+  }
+}

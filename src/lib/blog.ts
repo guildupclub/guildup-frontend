@@ -68,7 +68,17 @@ export async function parseMarkdownFile(fileName: string): Promise<BlogPost | nu
       .use(remarkHtml, { sanitize: false })
       .process(content);
 
-    const contentHtml = processedContent.toString();
+    let contentHtml = processedContent.toString();
+
+    // Add IDs to headings for table of contents
+    contentHtml = contentHtml.replace(
+      /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/g,
+      (match, level, text) => {
+        const cleanText = text.replace(/<[^>]*>/g, '');
+        const id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        return `<h${level} id="${id}">${text}</h${level}>`;
+      }
+    );
 
     // Generate ID from filename
     const id = fileName.replace(/\.md$/, '');
