@@ -70,7 +70,7 @@ export default function BookingConfirmation({
             <XCircle className="h-8 w-8 text-red-600" />
           </motion.div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">Booking Failed</h3>
-          <p className="text-sm text-gray-600">We couldn't complete your booking</p>
+          <p className="text-sm text-gray-600">We couldn&apos;t complete your booking</p>
         </div>
 
         {/* Error Details */}
@@ -203,9 +203,9 @@ export default function BookingConfirmation({
       {/* Next Steps */}
       <Card className="bg-blue-50 border-blue-200">
         <CardContent className="p-4">
-          <h4 className="font-medium text-blue-900 mb-2">What's Next?</h4>
+          <h4 className="font-medium text-blue-900 mb-2">What&apos;s Next?</h4>
           <ul className="text-sm text-blue-700 space-y-1">
-            <li>• You'll receive a confirmation email shortly</li>
+            <li>• You&apos;ll receive a confirmation email shortly</li>
             <li>• A calendar invite will be sent to your email</li>
             <li>• Join the session 5 minutes before the scheduled time</li>
             <li>• Check your email for the meeting link</li>

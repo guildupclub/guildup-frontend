@@ -189,7 +189,7 @@ export function OfferingsList({ offerings }: OfferingsListProps) {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No Offerings Available</h3>
-          <p className="text-gray-600">This community hasn't created any offerings yet.</p>
+          <p className="text-gray-600">This community hasn&apos;t created any offerings yet.</p>
         </div>
       )}
 
@@ -235,7 +235,7 @@ export function OfferingsList({ offerings }: OfferingsListProps) {
                   
                   {/* What's Included */}
                   <div>
-                    <h5 className="text-sm font-semibold text-gray-800 mb-3">What's included:</h5>
+                    <h5 className="text-sm font-semibold text-gray-800 mb-3">What&apos;s included:</h5>
                     <div className="space-y-2">
                       {offering.features && offering.features.length > 0 ? (
                         offering.features.slice(0, 5).map((feature, index) => (
@@ -267,8 +267,8 @@ export function OfferingsList({ offerings }: OfferingsListProps) {
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900">
-                    <span>June 25, 2025</span>
-                    <span>{offering.duration || 30} mins</span>
+                    {/* <span>June 25, 2025</span> */}
+                    {/* <span>{offering.duration || 30} mins</span> */}
                   </div>
                 </div>
 

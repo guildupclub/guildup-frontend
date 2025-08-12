@@ -113,7 +113,7 @@ export function ContentFeed({
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Content Feed</h2>
         <h3 className="text-3xl font-bold text-primary">
-          Check {expertName}'s Daily Updates
+          Check {expertName}&apos;s Daily Updates &nbsp;
         </h3>
       </div>
 

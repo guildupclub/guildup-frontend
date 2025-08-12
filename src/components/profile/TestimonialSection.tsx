@@ -118,7 +118,7 @@ export function TestimonialSection({
     <div className="max-w-7xl mx-auto px-8 py-16 bg-white">
       {/* Header Section */}
       <div className="text-center mb-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Client's words for us</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Client&apos;s words for us</h2>
         <h3 className="text-3xl font-bold text-primary">
           {testimonials.length}+ Learners Trusted {expertName}
         </h3>

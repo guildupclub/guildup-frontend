@@ -931,7 +931,7 @@ const handleApplyCoupon = async () => {
                         <div className="flex flex-col items-center justify-center py-8 space-y-4">
                           <Loader2 className="w-8 h-8 animate-spin text-primary" />
                           <p className="text-sm text-muted-foreground text-center">
-                            Fetching available slots from creator's calendar...
+                            Fetching available slots from creator&apos;s calendar...
                           </p>
                         </div>
                       )}
