@@ -167,42 +167,70 @@ export function BookingDialog({
   const handleVerifyOtp = async () => {
     setIsVerifying(true);
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`,
-        {
-          phone: phone.replace("+", ""),
-          name,
-          email,
-          otp,
-        }
-      );
-      if (response.data.r === "s") {
-        toast.success("Login successful!");
-        const { user, token } = response.data.data;
-
-        // Store user data and token in session storage to match main login flow
-        sessionStorage.setItem("user", JSON.stringify(user));
-        sessionStorage.setItem("name", user.name);
-        sessionStorage.setItem("id", user._id);
-        sessionStorage.setItem("token", token);
-        sessionStorage.setItem("email", user.email);
-
-        dispatch(
-          setUser({
-            user,
-            token,
-          })
+      // If user is already logged in, we need to update their profile with the new phone number
+      if (isLoggedIn && reduxUser) {
+        // Update user profile with new phone number
+        const response = await axios.patch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit`,
+          {
+            updateData: { phone: phone },
+            userId: reduxUser._id,
+          }
         );
-        // Pre-fill form with user data from backend
-        setName(user.name || "");
-        setEmail(user.email || "");
-        if (user.phone) {
-          setPhone(user.phone.startsWith("+") ? user.phone : `+${user.phone}`);
+        
+        if (response.data.r === "s") {
+          toast.success("Phone number updated successfully!");
+          // Update the redux state with new phone number
+          dispatch(
+            setUser({
+              user: { ...reduxUser, phone: phone },
+              token: reduxUser.token || "",
+            })
+          );
+          setOtp("");
+          setOtpSent(false);
+        } else {
+          toast.error(response.data.message || "Failed to update phone number");
         }
-        setOtp("");
-        setOtpSent(false);
       } else {
-        toast.error(response.data.message || "Failed to verify OTP");
+        // Original flow for non-logged in users
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`,
+          {
+            phone: phone.replace("+", ""),
+            name,
+            email,
+            otp,
+          }
+        );
+        if (response.data.r === "s") {
+          toast.success("Login successful!");
+          const { user, token } = response.data.data;
+
+          // Store user data and token in session storage to match main login flow
+          sessionStorage.setItem("user", JSON.stringify(user));
+          sessionStorage.setItem("name", user.name);
+          sessionStorage.setItem("id", user._id);
+          sessionStorage.setItem("token", token);
+          sessionStorage.setItem("email", user.email);
+
+          dispatch(
+            setUser({
+              user,
+              token,
+            })
+          );
+          // Pre-fill form with user data from backend
+          setName(user.name || "");
+          setEmail(user.email || "");
+          if (user.phone) {
+            setPhone(user.phone.startsWith("+") ? user.phone : `+${user.phone}`);
+          }
+          setOtp("");
+          setOtpSent(false);
+        } else {
+          toast.error(response.data.message || "Failed to verify OTP");
+        }
       }
     } catch (error) {
       toast.error("Failed to verify OTP");
@@ -811,9 +839,9 @@ export function BookingDialog({
                             className="w-full flex-1 min-w-0 p-2 shadow-md border border-border/30 rounded-md"
                             required
                             placeholder="Enter your phone number"
-                            disabled={isLoggedIn || otpSent}
+                            disabled={otpSent}
                           />
-                          {!isLoggedIn && !otpSent && (
+                          {!otpSent && (
                             <Button
                               onClick={handleSendOtp}
                               disabled={!phone || !name || !email}
@@ -825,7 +853,7 @@ export function BookingDialog({
                         </div>
                       </div>
 
-                      {!isLoggedIn && otpSent && (
+                      {otpSent && (
                         <div className="space-y-2 rounded-lg bg-primary/5 p-4">
                           <Label htmlFor="otp">
                             Enter OTP <span className="text-red-500">*</span>
@@ -844,7 +872,7 @@ export function BookingDialog({
                               className="bg-primary"
                               disabled={isVerifying}
                             >
-                              {isVerifying ? "Verifying..." : "Verify & Login"}
+                              {isVerifying ? "Verifying..." : (isLoggedIn ? "Verify & Update" : "Verify & Login")}
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground">
@@ -861,8 +889,10 @@ export function BookingDialog({
 
                       {isLoggedIn && (
                         <p className="text-xs text-muted-foreground">
-                          Your WhatsApp number is required for booking
-                          confirmation & reminders.
+                          {reduxUser?.phone 
+                            ? "Your WhatsApp number is required for booking confirmation & reminders."
+                            : "Please add your phone number to proceed with the booking. We'll send you a verification OTP."
+                          }
                         </p>
                       )}
 
