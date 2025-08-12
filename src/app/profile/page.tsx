@@ -8,6 +8,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { toast } from "sonner";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import {
   Dialog,
   DialogTrigger,
@@ -61,6 +63,7 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
   const [newLanguage, setNewLanguage] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<string>("personal");
+  const [phoneNumber, setPhoneNumber] = React.useState<string>("");
   const isCreator = user?.is_creator ? true : false;
 
   React.useEffect(() => {
@@ -74,6 +77,11 @@ const ProfilePage = () => {
         if (response.data.r === "s") {
           setProfile(response.data.data);
           setProfileCopy(response.data.data);
+          
+          // Initialize phone number state with the profile data
+          if (response.data.data.phone) {
+            setPhoneNumber(response.data.data.phone);
+          }
 
           if (response.data.data.avatar) {
             setAvatarImgUrl(response.data.data.avatar);
@@ -92,10 +100,18 @@ const ProfilePage = () => {
 
   const updateUserProfile = async () => {
     try {
+      // Prepare the update data with proper phone number handling
+      const updateData = { ...changedFields };
+      
+      // If phone number was changed, ensure it includes the country code
+      if (phoneNumber && phoneNumber !== profile?.phone) {
+        updateData.phone = phoneNumber;
+      }
+      
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit`,
         {
-          updateData: changedFields,
+          updateData,
           userId,
         }
       );
@@ -106,6 +122,10 @@ const ProfilePage = () => {
         toast.success("Profile Updated Successfully!");
         setProfile(response.data.data.user);
         setProfileCopy(response.data.data.user);
+        // Update the phone number state to match the backend response
+        if (response.data.data.user.phone) {
+          setPhoneNumber(response.data.data.user.phone);
+        }
       }
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -121,11 +141,31 @@ const ProfilePage = () => {
     setChangedFields((prevChanged) => ({ ...prevChanged, [name]: value }));
   };
 
+  const handlePhoneChange = (value: string | undefined) => {
+    if (!profile) return;
+    const phoneValue = value || "";
+    setPhoneNumber(phoneValue);
+    setProfile((prevProfile) =>
+      prevProfile ? { ...prevProfile, phone: phoneValue } : null
+    );
+    setChangedFields((prevChanged) => ({ ...prevChanged, phone: phoneValue }));
+  };
+
   const handleSave = () => {
     if (profile) {
       updateUserProfile();
       setIsEditable(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Reset to original profile data
+    if (profileCopy) {
+      setProfile(profileCopy);
+      setPhoneNumber(profileCopy.phone || "");
+    }
+    setChangedFields({});
+    setIsEditable(false);
   };
 
   const handleAddLanguage = () => {
@@ -355,11 +395,25 @@ const ProfilePage = () => {
                     label="Phone Number"
                     name="phone"
                     placeholder="Enter your phone number"
-                    value={profile.phone}
+                    value={phoneNumber}
                     onChange={handleChange}
                     disabled={!isEditable}
-                    prefix="+91"
                   />
+                  {isEditable && (
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-[#19191A] text-base font-normal leading-7 font-[Source Sans Pro] mb-2">
+                        Update Phone Number
+                      </label>
+                      <PhoneInput
+                        international
+                        defaultCountry="IN"
+                        value={phoneNumber}
+                        onChange={handlePhoneChange}
+                        className="w-full p-2 rounded-md bg-white decoration-none shadow-md border border-gray-100 text-muted-foreground"
+                        placeholder="Enter your phone number"
+                      />
+                    </div>
+                  )}
                   <InputField
                     label="Location"
                     name="location"
@@ -448,11 +502,7 @@ const ProfilePage = () => {
                 <Button
                   variant="outline"
                   className="text-primary"
-                  onClick={() => {
-                    setProfile(profileCopy);
-                    setChangedFields({});
-                    setIsEditable(false);
-                  }}
+                  onClick={handleCancel}
                 >
                   Cancel
                 </Button>
