@@ -10,11 +10,13 @@ import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
 import CouponBanner from "@/components/banner/CouponBanner";
 import CookieConsent from "@/components/cookies/CookieConsent";
-import Script from "next/script";
+import AnalyticsWrapper from "@/components/analytics/AnalyticsWrapper";
+import AttributionInitializer from "@/components/analytics/AttributionInitializer";
 // import GoogleOneTap from "@/components/GoogleOneTap";
 
 import RouteChangeTracker from "@/components/RouteChangeTracker";
 import dynamic from "next/dynamic";
+import Script from "next/script";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,11 +31,12 @@ const guildup_logo_final = "/guildup_logo_final.png";
 export const metadata: Metadata = {
   title: "GuildUp",
   description:
-    "Discover trusted experts across Therapy, Mental Health, and Nutrition. Real guidance, personalized to you.",
+    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+  metadataBase: new URL("https://guildup.club"),
   openGraph: {
     title: "GuildUp",
     description:
-      "Discover trusted experts across Therapy, Mental Health, and Nutrition. Real guidance, personalized help.",
+      "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help.",
     url: "https://guildup.club",
     siteName: "GuildUp",
     images: [
@@ -161,35 +164,6 @@ export default async function RootLayout({
             `,
           }}
         />
-        {/* Organization & WebSite JSON-LD */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "GuildUp",
-              url: "https://guildup.club",
-              logo: "https://guildup.club/guildup-logo.png"
-            })
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: "GuildUp",
-              url: "https://guildup.club",
-              potentialAction: {
-                "@type": "SearchAction",
-                target: "https://guildup.club/api/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              }
-            })
-          }}
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -211,6 +185,8 @@ export default async function RootLayout({
             PageView&noscript=1"
           />
         </noscript>
+        <AnalyticsWrapper />
+        <AttributionInitializer />
         <CookieConsentProvider>
           <PostHogProviderWrapper>
             <Providers>
