@@ -16,6 +16,20 @@ export default function FeedPage() {
 
   return (
     <div className="min-h-screen flex grow bg-background">
+      {/* Structured data for better indexing */}
+      {communityParam ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Community",
+              name: communityParam.replace(/-/g, " "),
+              url: `https://guildup.club/community/${communityParam}/feed`,
+            }),
+          }}
+        />
+      ) : null}
       {activeCommunityId ? (
         <Feed communityId={activeCommunityId as string} />
       ) : (

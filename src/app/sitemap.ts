@@ -89,7 +89,7 @@ function createCommunitySlug(community: Community): string {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.guildup.club'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://guildup.club'
   
   try {
     // Get all blog posts and communities in parallel
