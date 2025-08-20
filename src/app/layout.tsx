@@ -31,6 +31,7 @@ export const metadata: Metadata = {
   title: "GuildUp",
   description:
     "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+  metadataBase: new URL("https://guildup.club"),
   openGraph: {
     title: "GuildUp",
     description:
