@@ -29,11 +29,11 @@ const guildup_logo_final = "/guildup_logo_final.png";
 export const metadata: Metadata = {
   title: "GuildUp",
   description:
-    "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help — just when you need it.",
+    "Discover trusted experts across Therapy, Mental Health, and Nutrition. Real guidance, personalized to you.",
   openGraph: {
     title: "GuildUp",
     description:
-      "Discover trusted coaches, therapists & experts. One platform. Real guidance. Personalized help.",
+      "Discover trusted experts across Therapy, Mental Health, and Nutrition. Real guidance, personalized help.",
     url: "https://guildup.club",
     siteName: "GuildUp",
     images: [
@@ -159,6 +159,35 @@ export default async function RootLayout({
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
               })(window, document, "clarity", "script", "rgpxrvmq3a");
             `,
+          }}
+        />
+        {/* Organization & WebSite JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "GuildUp",
+              url: "https://guildup.club",
+              logo: "https://guildup.club/guildup-logo.png"
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "GuildUp",
+              url: "https://guildup.club",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://guildup.club/api/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            })
           }}
         />
       </head>

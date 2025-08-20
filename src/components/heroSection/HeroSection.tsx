@@ -199,7 +199,7 @@ export default function Hero() {
                   Your Journey. Our <span className="text-blue-600">Trusted Experts</span>.
                 </h1>
                 <p className="text-sm lg:text-base text-gray-700 max-w-2xl mx-auto font-medium">
-                  <span className="text-blue-600 font-semibold">120+ experts</span> across therapy, fitness, nutrition, and more.
+                  <span className="text-blue-600 font-semibold">120+ experts</span> across Therapy, Mental Health, Nutrition, and more.
                 </p>
               </div>
 
@@ -208,7 +208,7 @@ export default function Hero() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search for Anxiety, Yoga, Relationship..."
+                    placeholder="Search for Therapy, Mental Health, Nutrition..."
                     className="w-full h-12 lg:h-14 px-5 lg:px-6 py-3 text-sm lg:text-base bg-white border border-gray-300 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
