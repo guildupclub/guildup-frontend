@@ -43,6 +43,7 @@ import { MdOutlineRssFeed } from "react-icons/md";
 import { useChatContext } from "@/contexts/ChatContext";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { useTracking } from "@/hooks/useTracking";
+import { API_ENDPOINTS } from "@/config/constants";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const COMMUNITY_FEED_PATH = "/feed";
@@ -251,28 +252,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       user_id: session?.user._id,
     });
 
-    if (!session) {
-      localStorage.setItem("openCreatorModal", "true");
-      tracking.trackUserAction("signup_prompt_shown", {
-        trigger: "creator_button",
-        location: "home_page",
-      });
-
-      tracking.trackClick("signin_from_redirect", {
-        trigger: "creator_button_prompt",
-      });
-      signIn(undefined, {
-        callbackUrl: `${window.location.origin}`,
-      });
-
-      return;
+    const expertUrl = API_ENDPOINTS.expertUrl;
+    let newWindow = window.open(expertUrl, '_blank');
+    console.log("expertURL", expertUrl);
+    console.log("newWindow", newWindow);
+    if (newWindow) {
+      newWindow.focus();
     }
-    tracking.trackUserAction("creator_form_opened", {
-      source: "header_button",
-      user_id: session.user._id,
-    });
-
-    setIsDialogOpen(true);
+    newWindow = null;
+    return;
   };
 
   useEffect(() => {

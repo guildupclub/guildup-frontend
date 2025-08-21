@@ -7,6 +7,7 @@ export const API_ENDPOINTS = {
   getCategories: `${API_BASE_URL}/v1/category/`,
   getSignUrl: `${API_BASE_URL}/v1/post/getGCPSignUrl`,
   editCommunity: `${API_BASE_URL}/v1/community/edit`,
+  expertUrl: `https://expert.guildup.club`,
 }
 
 export const API_FRONTEND_URL = process.env.NEXTAUTH_URL||"https://dev.guildup.club/"
