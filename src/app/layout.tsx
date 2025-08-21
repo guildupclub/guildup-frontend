@@ -85,9 +85,13 @@ export default async function RootLayout({
     `,
           }}
         />
-        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-8TF2QM56T0">
+        <Script 
+        id="ga4-loader"
+        async src="https://www.googletagmanager.com/gtag/js?id=G-8TF2QM56T0">
         </Script>
-        <Script dangerouslySetInnerHTML={{
+        <Script
+        id="ga4"
+         dangerouslySetInnerHTML={{
             __html: `
           window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
