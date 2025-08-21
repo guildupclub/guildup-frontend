@@ -97,6 +97,10 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
     <Card
       onClick={() => onClick(community.community._id)}
       className="group w-full border border-zinc-200 rounded-xl cursor-pointer min-h-[320px] h-full overflow-hidden bg-white transition-all duration-500 hover:shadow-lg shadow-sm hover:shadow-blue-100/20 hover:border-blue-200/30 relative active:bg-white focus:bg-white"
+      data-analytics-type="community-card"
+      data-analytics-name={communityDetails.name}
+      data-community-id={communityDetails._id}
+      data-community-name={communityDetails.name}
     >
       {/* Shine effect overlay */}
       <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -266,6 +270,10 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                 <Button
                   className="bg-gradient-to-r from-indigo-600 to-indigo-400"
                   onClick={handleOfferingClick}
+                  data-analytics-type="community-cta"
+                  data-analytics-name="Book Now"
+                  data-community-id={communityDetails._id}
+                  data-community-name={communityDetails.name}
                 >
                   Book Now
                 </Button>

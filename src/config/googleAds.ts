@@ -10,3 +10,4 @@ export const GOOGLE_ADS_CONVERSIONS: Record<string, GoogleAdsConversion> = {
 	// lead: { conversionId: "AW-XXXX", conversionLabel: "ZZZZ" },
 	// purchase: { conversionId: "AW-XXXX", conversionLabel: "TTTT", defaultValue: 0 },
 };
+
