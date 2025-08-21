@@ -147,9 +147,9 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       
       if (!communityDetails?.min_offering_id) {
         console.error("No minimum offering ID available:", communityDetails);
-        toast.error("Session booking unavailable", {
-          description: "Please try again later or contact support",
-        });
+        // toast.error("Session booking unavailable", {
+        //   description: "Please try again later or contact support",
+        // });
         return;
       }
 
