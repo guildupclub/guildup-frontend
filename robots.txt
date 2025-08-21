@@ -1,4 +1,4 @@
-# robots.txt for https://www.guildup.club/
+# robots.txt for https://guildup.club/
 User-agent: *
 Allow: /
 Allow: /api/search
