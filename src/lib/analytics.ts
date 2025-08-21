@@ -130,3 +130,4 @@ export const trackCustomEvent = (
     trackFacebookEvent(eventName, parameters);
   }
 };
+
