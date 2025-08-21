@@ -102,3 +102,4 @@ export function attachAttribution<T extends Record<string, any>>(parameters: T):
 		last_touch_at: attr.lastTouchAt,
 	};
 }
+

@@ -216,6 +216,10 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       <Card 
         className="p-0 h-[540px] sm:h-[560px] flex flex-col hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 overflow-hidden relative rounded-xl"
         onClick={handleCardClick}
+        data-analytics-type="community-card"
+        data-analytics-name={communityDetails?.name || "Expert"}
+        data-community-id={communityDetails?._id || ""}
+        data-community-name={communityDetails?.name || ""}
       >
         {/* Top Section - Profile Image */}
         <div className="w-full h-72 relative overflow-hidden bg-gray-100">
@@ -341,6 +345,10 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
           <Button
             className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             onClick={handleClaimFreeSession}
+            data-analytics-type="community-cta"
+            data-analytics-name="Claim Free Session"
+            data-community-id={communityDetails?._id || ""}
+            data-community-name={communityDetails?.name || ""}
           >
             🎁 Claim Free Session →
           </Button>

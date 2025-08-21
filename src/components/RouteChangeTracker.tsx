@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { trackPageView } from "@/lib/analytics";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const RouteChangeTracker = () => {
@@ -10,10 +11,11 @@ const RouteChangeTracker = () => {
 
   useEffect(() => {
     const url = `${pathname}${searchParams.toString() ? `?${searchParams}` : ""}`;
-    window.dataLayer?.push({
-      event: "pageview",
-      page: url,
-    });
+    // Console log and analytics event via centralized utility
+    try {
+      console.log("[analytics] page_view", { page: url });
+      trackPageView(document.title, window.location.origin + url);
+    } catch {}
   }, [pathname, searchParams]);
 
   return null;

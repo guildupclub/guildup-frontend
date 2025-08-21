@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
+import { trackCustomEvent } from "@/lib/analytics";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
@@ -37,15 +38,54 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  analyticsName?: string;
+  analyticsCategory?: string;
+  analyticsParams?: Record<string, any>;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, analyticsName, analyticsCategory, analyticsParams, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+    const findClosestCommunityContext = (start: HTMLElement | null) => {
+      let el: HTMLElement | null = start;
+      while (el && el !== document.body && el !== document.documentElement) {
+        const id = el.getAttribute?.("data-community-id");
+        const name = el.getAttribute?.("data-community-name");
+        if (id || name) return { community_id: id || undefined, community_name: name || undefined };
+        el = el.parentElement;
+      }
+      return {} as { community_id?: string; community_name?: string };
+    };
+    const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+      try {
+        const target = e.currentTarget as HTMLElement | null;
+        const inferredName =
+          analyticsName ||
+          target?.getAttribute("data-analytics-name") ||
+          (typeof props.children === "string" ? props.children : target?.textContent?.trim()?.slice(0, 80) || undefined);
+        const context = findClosestCommunityContext(target);
+        const payload = {
+          name: inferredName,
+          variant,
+          size,
+          category: analyticsCategory || "ui",
+          page_location: typeof window !== "undefined" ? window.location.href : undefined,
+          page_path: typeof window !== "undefined" ? window.location.pathname : undefined,
+          page_title: typeof document !== "undefined" ? document.title : undefined,
+          ...context,
+          ...(analyticsParams || {}),
+        } as Record<string, any>;
+        // Console visibility
+        try { console.log("[analytics] button_click", payload); } catch {}
+        trackCustomEvent("button_click", payload);
+      } catch {}
+      onClick?.(e);
+    };
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onClick={handleClick}
         {...props}
       />
     );
