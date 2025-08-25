@@ -380,6 +380,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
+                  
+
                   <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
                     <Link href="/feeds" className="flex flex-col items-center">
                       <MdOutlineRssFeed

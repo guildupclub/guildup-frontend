@@ -51,8 +51,8 @@ const NotificationDropdown = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex flex-col items-center">
-            <button className="relative rounded-full text-gray-600  hover:bg-gray-50 transition-colors p-1">
+          <button className="flex flex-col items-center">
+            <div className="relative rounded-full text-gray-600 hover:bg-gray-50 transition-colors p-1">
               <Bell className="h-5 w-5 mb-0 pb-0" />
               {unreadCount > 0 && (
                 <Badge
@@ -62,11 +62,11 @@ const NotificationDropdown = () => {
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </Badge>
               )}
-            </button>
+            </div>
             <span className="text-gray-600 text-xs lg:text-sm hidden md:block">
               Notifications
             </span>
-          </div>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-80 max-h-[400px] overflow-y-auto mt-2 bg-white">
           <div className="flex items-center justify-between p-3 border-b">
