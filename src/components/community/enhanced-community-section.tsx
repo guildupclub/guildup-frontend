@@ -177,118 +177,91 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           <Loader />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              {/* Mobile Filter Toggle */}
-              <div className="lg:hidden mb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="w-full justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    <span>Filters & Sort</span>
-                  </div>
-                </Button>
-              </div>
+        <div className="space-y-6">
+          {/* Top Filters */}
+          <div className="bg-white border rounded-lg p-4">
+            <OfferingFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              onClearFilters={clearFilters}
+            />
+          </div>
 
-              {/* Filter Component */}
-              <div className={`${showFilters ? "block" : "hidden"} lg:block`}>
-                <OfferingFilters
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  onClearFilters={clearFilters}
-                  className="bg-white border rounded-lg p-4"
-                />
-              </div>
+          {/* Results Summary */}
+          <div className="mb-2 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                {totalCount > 0 &&
+                  `Showing ${filteredAndSortedCommunities.length} of ${totalCount} total experts`}
+              </p>
             </div>
           </div>
 
           {/* Communities Grid */}
-          <div className="lg:col-span-3">
-            {/* Results Summary */}
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                {/* <h2 className="text-xl font-semibold">
-                  {filteredAndSortedCommunities.length} Expert
-                  {filteredAndSortedCommunities.length !== 1 ? "s" : ""} Found
-                </h2> */}
-                <p className="text-sm text-muted-foreground">
-                  {totalCount > 0 &&
-                    `Showing ${filteredAndSortedCommunities.length} of ${totalCount} total experts`}
-                </p>
-              </div>
-            </div>
-
-            {/* Communities Grid */}
-            <div
-              id="card-container-top"
-              className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
-            >
-              {filteredAndSortedCommunities.length > 0 ? (
-                filteredAndSortedCommunities.map((community, index) => {
-                  const stableKey =
-                    (community as any)._id ||
-                    (community as any).community?._id ||
-                    `${(community as any).name || (community as any).community?.name || "community"}-${index}`;
-                  return (
-                    <div
-                      key={stableKey}
-                      className={index === 0 ? "first-expert-card" : ""}
-                    >
-                      <MemoizedCommunityCard
-                        community={community}
-                        onClick={() => handleClickCommunity(community)}
-                      />
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                  <Users className="h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-lg font-medium text-gray-500 mb-2">
-                    No experts found
-                  </p>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Try adjusting your filters or selecting a different category
-                  </p>
-                  <Button variant="outline" onClick={clearFilters}>
-                    Clear all filters
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Load More Button */}
-            {communities.length > 0 &&
-              hasMore &&
-              filteredAndSortedCommunities.length > 0 && (
-                <div className="flex justify-center py-8">
-                  <Button
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    variant="outline"
-                    size="lg"
-                    className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all duration-300"
+          <div
+            id="card-container-top"
+            className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
+          >
+            {filteredAndSortedCommunities.length > 0 ? (
+              filteredAndSortedCommunities.map((community, index) => {
+                const stableKey =
+                  (community as any)._id ||
+                  (community as any).community?._id ||
+                  `${(community as any).name || (community as any).community?.name || "community"}-${index}`;
+                return (
+                  <div
+                    key={stableKey}
+                    className={index === 0 ? "first-expert-card" : ""}
                   >
-                    {loadingMore ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                        Loading more...
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-2">Load More Experts</span>
-                        <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
+                    <MemoizedCommunityCard
+                      community={community}
+                      onClick={() => handleClickCommunity(community)}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                <Users className="h-16 w-16 text-gray-300 mb-4" />
+                <p className="text-lg font-medium text-gray-500 mb-2">
+                  No experts found
+                </p>
+                <p className="text-sm text-gray-400 mb-4">
+                  Try adjusting your filters or selecting a different category
+                </p>
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear all filters
+                </Button>
+              </div>
+            )}
           </div>
+
+          {/* Load More Button */}
+          {communities.length > 0 &&
+            hasMore &&
+            filteredAndSortedCommunities.length > 0 && (
+              <div className="flex justify-center py-8">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  variant="outline"
+                  size="lg"
+                  className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all duration-300"
+                >
+                  {loadingMore ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                      Loading more...
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">Load More Experts</span>
+                      <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
         </div>
       )}
     </div>
@@ -296,3 +269,4 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
 };
 
 export default EnhancedCommunitySection;
+

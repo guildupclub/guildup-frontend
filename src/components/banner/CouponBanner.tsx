@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Zap, Clock, Star, Gift } from "lucide-react";
 
 const CouponBanner: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false); // initial mount animation
+  const [isShown, setIsShown] = useState(true); // hide on scroll
 
   useEffect(() => {
     // Show banner after a short delay
@@ -11,11 +12,22 @@ const CouponBanner: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setIsShown(y < 40);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div
-      className={`fixed top-16 z-40 w-full overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 transition-all duration-700 transform ${
-        isVisible ? "translate-y-0 opacity-100" : "-translate-y-4 opacity-0"
+      className={`fixed top-16 z-40 w-full overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 transition-transform duration-500 ${
+        isVisible && isShown ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       }`}
+      aria-hidden={!isShown}
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">

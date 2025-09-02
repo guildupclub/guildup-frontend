@@ -22,35 +22,26 @@ function CategoryBar({
   };
 
   return (
-    <div className="w-full">
-      <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide">
+    <nav className="w-full" aria-label="Category navigation">
+      <div className="flex gap-6 overflow-x-auto pb-1 scrollbar-hide">
         {categorys?.map((cat: Category) => (
           <button
             key={cat._id}
             onClick={() => handleCategorySelect(cat._id)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 flex-shrink-0 border border-white/20 backdrop-blur-sm relative overflow-hidden group
+            aria-current={selectedCategoryId === cat._id ? "page" : undefined}
+            className={`pb-2 -mb-px whitespace-nowrap text-sm font-medium flex-shrink-0 border-b-2 transition-colors duration-200
               ${
                 selectedCategoryId === cat._id
-                  ? "bg-gradient-to-r from-blue-600/90 to-indigo-600/90 text-white shadow-lg shadow-blue-600/20 border-blue-400/30"
-                  : "bg-white/60 text-gray-700 hover:bg-white/80 hover:border-blue-200/50 hover:shadow-md hover:shadow-blue-100/30 shadow-sm"
+                  ? "text-indigo-700 border-indigo-600"
+                  : "text-gray-600 hover:text-gray-900 border-transparent"
               }
             `}
           >
-            {/* Glass effect overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-white/5 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            
-            {/* Glass border highlight */}
-            <div className={`absolute inset-0 rounded-lg border transition-all duration-300 ${
-              selectedCategoryId === cat._id 
-                ? "border-blue-300/40" 
-                : "border-white/30 group-hover:border-white/50"
-            }`} />
-            
-            <span className="relative whitespace-nowrap">{cat.name}</span>
+            {cat.name}
           </button>
         ))}
       </div>
-    </div>
+    </nav>
   );
 }
 

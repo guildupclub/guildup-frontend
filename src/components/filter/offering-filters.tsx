@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +11,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Slider } from "@/components/ui/slider"
 import { ArrowUpDown, Filter, X } from "lucide-react"
 
@@ -54,7 +54,6 @@ const SORT_OPTIONS = [
 ]
 
 export function OfferingFilters({ filters, onFiltersChange, onClearFilters, className }: OfferingFiltersProps) {
-  const [isOpen, setIsOpen] = useState(false)
 
   const handleOfferingTypeChange = (type: string, checked: boolean) => {
     const newTypes = checked ? [...filters.offeringTypes, type] : filters.offeringTypes.filter((t) => t !== type)
@@ -88,70 +87,24 @@ export function OfferingFilters({ filters, onFiltersChange, onClearFilters, clas
     filters.isFree !== null
 
   return (
-    <div className={className}>
-      {/* Mobile Filter Toggle */}
-      <div className="md:hidden mb-4">
-        <Button variant="outline" onClick={() => setIsOpen(!isOpen)} className="w-full justify-between">
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4" />
-            <span>Filters</span>
-            {hasActiveFilters && (
-              <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">Active</span>
-            )}
-          </div>
-        </Button>
-      </div>
-
-      {/* Sort Dropdown - Always Visible */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-lg">Sort & Filter</h3>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm">
-              <ArrowUpDown className="h-4 w-4 mr-2" />
-              Sort by
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuRadioGroup value={filters.sortBy} onValueChange={handleSortChange}>
-              {SORT_OPTIONS.map((option) => (
-                <DropdownMenuRadioItem key={option.value} value={option.value}>
-                  {option.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Clear Filters Button */}
-      {hasActiveFilters && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClearFilters}
-          className="mb-4 text-muted-foreground hover:text-foreground"
-        >
-          <X className="h-4 w-4 mr-2" />
-          Clear all filters
-        </Button>
-      )}
-
-      {/* Filter Content */}
-      <div className={`space-y-4 ${isOpen || window.innerWidth >= 768 ? "block" : "hidden"} md:block`}>
-        <Accordion type="multiple" defaultValue={["type", "price", "duration"]} className="w-full">
-          {/* Offering Type Filter */}
-          <AccordionItem value="type">
-            <AccordionTrigger className="text-base font-medium">
-              Offering Type
-              {filters.offeringTypes.length > 0 && (
-                <span className="ml-2 bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
-                  {filters.offeringTypes.length}
-                </span>
-              )}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-3">
+    <div className={`w-full ${className || ""}`}>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+        {/* Left: Compact filter dropdowns */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Offering Type */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" /> Type
+                {filters.offeringTypes.length > 0 && (
+                  <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {filters.offeringTypes.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-3 w-64" align="start">
+              <div className="space-y-2">
                 {OFFERING_TYPES.map((type) => (
                   <div key={type.value} className="flex items-center space-x-2">
                     <Checkbox
@@ -165,84 +118,97 @@ export function OfferingFilters({ filters, onFiltersChange, onClearFilters, clas
                   </div>
                 ))}
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            </PopoverContent>
+          </Popover>
 
-          {/* Price Range Filter */}
-          <AccordionItem value="price">
-            <AccordionTrigger className="text-base font-medium">Price Range (₹)</AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4">
-                <div className="px-2">
-                  <Slider
-                    value={filters.priceRange}
-                    onValueChange={handlePriceRangeChange}
-                    max={10000}
-                    min={0}
-                    step={100}
-                    className="w-full"
-                  />
-                </div>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>₹{filters.priceRange[0]}</span>
-                  <span>₹{filters.priceRange[1]}</span>
-                </div>
-
-                {/* Free/Paid Toggle */}
-                <div className="space-y-2 pt-2 border-t">
-                  <div className="flex items-center space-x-2">
+          {/* Duration */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                Duration
+                {filters.duration.length > 0 && (
+                  <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {filters.duration.length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-3 w-64" align="start">
+              <div className="space-y-2">
+                {DURATION_OPTIONS.map((d) => (
+                  <div key={d.value} className="flex items-center space-x-2">
                     <Checkbox
-                      id="free-only"
-                      checked={filters.isFree === true}
-                      onCheckedChange={(checked) => handleFreeFilterChange(checked ? true : null)}
+                      id={`duration-${d.value}`}
+                      checked={filters.duration.includes(d.value)}
+                      onCheckedChange={(checked) => handleDurationChange(d.value, checked as boolean)}
                     />
-                    <Label htmlFor="free-only" className="text-sm font-normal cursor-pointer">
-                      Free only
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="paid-only"
-                      checked={filters.isFree === false}
-                      onCheckedChange={(checked) => handleFreeFilterChange(checked ? false : null)}
-                    />
-                    <Label htmlFor="paid-only" className="text-sm font-normal cursor-pointer">
-                      Paid only
-                    </Label>
-                  </div>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Duration Filter */}
-          <AccordionItem value="duration">
-            <AccordionTrigger className="text-base font-medium">
-              Duration
-              {filters.duration.length > 0 && (
-                <span className="ml-2 bg-primary/10 text-primary text-xs px-2 py-1 rounded-full">
-                  {filters.duration.length}
-                </span>
-              )}
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-3">
-                {DURATION_OPTIONS.map((duration) => (
-                  <div key={duration.value} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`duration-${duration.value}`}
-                      checked={filters.duration.includes(duration.value)}
-                      onCheckedChange={(checked) => handleDurationChange(duration.value, checked as boolean)}
-                    />
-                    <Label htmlFor={`duration-${duration.value}`} className="text-sm font-normal cursor-pointer">
-                      {duration.label}
+                    <Label htmlFor={`duration-${d.value}`} className="text-sm font-normal cursor-pointer">
+                      {d.label}
                     </Label>
                   </div>
                 ))}
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            </PopoverContent>
+          </Popover>
+
+          {/* Price */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                Price
+                {(filters.priceRange[0] > 0 || filters.priceRange[1] < 10000 || filters.isFree !== null) && (
+                  <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">•</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-4 w-72" align="start">
+              <div className="space-y-3">
+                <Slider value={filters.priceRange} onValueChange={handlePriceRangeChange} max={10000} min={0} step={100} />
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                  <span>₹{filters.priceRange[0]}</span>
+                  <span>₹{filters.priceRange[1]}</span>
+                </div>
+                <div className="flex items-center gap-4 pt-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="free-only" checked={filters.isFree === true} onCheckedChange={(c) => handleFreeFilterChange(c ? true : null)} />
+                    <Label htmlFor="free-only" className="text-sm">Free only</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="paid-only" checked={filters.isFree === false} onCheckedChange={(c) => handleFreeFilterChange(c ? false : null)} />
+                    <Label htmlFor="paid-only" className="text-sm">Paid only</Label>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Clear */}
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-muted-foreground">
+              <X className="h-4 w-4 mr-1" /> Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Right: Sort */}
+        <div className="ml-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <ArrowUpDown className="h-4 w-4 mr-2" /> Sort
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuRadioGroup value={filters.sortBy} onValueChange={handleSortChange}>
+                {SORT_OPTIONS.map((option) => (
+                  <DropdownMenuRadioItem key={option.value} value={option.value}>
+                    {option.label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </div>
   )

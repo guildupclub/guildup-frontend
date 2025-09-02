@@ -15,7 +15,7 @@ import React, {
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import Hero from "@/components/heroSection/HeroSection";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
@@ -26,11 +26,12 @@ import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
 import { Brain, Dumbbell, ArrowRight } from "lucide-react";
-
+import SearchBar from "@/components/SearchBar";
+import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
+import { useCommunityRecommendations } from "@/hook/queries/useCommunityRecommendations";
 
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
-import { on } from "events";
 
 import { HiSparkles } from "react-icons/hi2";
 
@@ -81,6 +82,44 @@ function Page() {
   const stickyTriggerRef = useRef<HTMLDivElement>(null);
   const userId = session?.user._id;
   const tracking = useTracking();
+  const [promoVisible, setPromoVisible] = useState(true);
+
+  // Track top promotional banner visibility (mirrors CouponBanner behavior)
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setPromoVisible(y < 40);
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll();
+      return () => window.removeEventListener("scroll", onScroll);
+    }
+  }, []);
+
+  // Featured experts (communities) via recommendations
+  const { data: recommendations, isLoading: isFeaturedLoading } =
+    useCommunityRecommendations({ userId: userId as string | undefined, topN: 6 });
+
+  // Trending categories for suggestions and popular categories
+  const [trendingCategories, setTrendingCategories] = useState<
+    { _id: string; name: string; num_communities?: number }[]
+  >([]);
+  useEffect(() => {
+    const fetchTrendingCategories = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/trending`
+        );
+        if (res?.data?.r === "s" && Array.isArray(res.data.data)) {
+          setTrendingCategories(res.data.data);
+        }
+      } catch (e) {
+        console.error("Failed to load trending categories", e);
+      }
+    };
+    fetchTrendingCategories();
+  }, []);
 
   useEffect(() => {
     setIsMounted(true);
@@ -197,7 +236,7 @@ function Page() {
       if (shouldOpen === "true") {
         localStorage.removeItem("openCreatorModal");
 
-        tracking.trackUserAction("creator_form_opened_post_signin", {
+        tracking.trackCustomEvent("creator_form_opened_post_signin", {
           user_id: session.user._id,
           triggered_from: "post_signin",
         });
@@ -218,7 +257,7 @@ function Page() {
       // Store intent to open modal after sign-in
       localStorage.setItem("openCreatorModal", "true");
 
-      tracking.trackUserAction("signup_prompt_shown", {
+      tracking.trackCustomEvent("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
       });
@@ -234,7 +273,7 @@ function Page() {
       return;
     }
 
-    tracking.trackUserAction("creator_form_opened", {
+    tracking.trackCustomEvent("creator_form_opened", {
       source: "header_button",
       user_id: session.user._id,
     });
@@ -356,192 +395,299 @@ function Page() {
             <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
           </Dialog>
 
-          <div className="relative z-10">
+          {/* 2. Main Navbar - Using existing Hero component */}
+          {/* <div className="relative z-10">
             <div ref={heroRef}>
               <Hero />
             </div>
+          </div> */}
 
-            {/* Guildup Mind & Body Section */}
-            <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-24">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-12">
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                    Discover Your <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Perfect Expert</span>
-                  </h2>
-                  <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-                    Get specialised guidance and support for your mind and body wellness journey
-                  </p>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                  {/* Guildup Mind Card */}
-                  <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 sm:p-10 border border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-xl">
-                    <div className="absolute top-4 right-4">
-                      <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
-                        <Brain className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                        Guildup Mind
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed">
-                        Connect with mental health professionals, life coaches, and wellness experts. 
-                        Find communities focused on mindfulness, personal growth, and emotional well-being.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 mb-6">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                        Mental Health & Therapy
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                        Life Coaching & Personal Development
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                        Mindfulness & Meditation
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={() => router.push('/mind')}
-                      className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
-                    >
-                      Explore Experts
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
-                  </div>
-
-                  {/* Guildup Body Card */}
-                  <div className="group relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-10 border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
-                    <div className="absolute top-4 right-4">
-                      <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full">
-                        <Dumbbell className="h-6 w-6 text-white" />
-                      </div>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                        Guildup Body
-                      </h3>
-                      <p className="text-gray-600 leading-relaxed">
-                        Join fitness communities led by certified trainers, nutritionists, and health experts. 
-                        Transform your physical health with personalized guidance and support.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4 mb-6">
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                        Fitness Training & Workouts
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                        Nutrition & Diet Planning
-                      </div>
-                      <div className="flex items-center text-sm text-gray-600">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                        Health & Wellness Coaching
-                      </div>
-                    </div>
-
-                    <Button
-                      onClick={() => router.push('/body')}
-                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
-                    >
-                      Explore Experts
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
-                  </div>
+          {/* 3. Category Bar (sticky under main navbar) */}
+          <div
+            className="w-full sticky z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100 shadow-sm transition-all duration-300"
+            style={{ top: promoVisible ? 112 : 64 }}
+          >
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="overflow-x-auto scrollbar-hide">
+                <div className="min-w-max">
+                  <CategoryBar
+                    categorys={category}
+                    selectCategory={handleCategorySelect}
+                    selectedCategoryId={selectedCategoryId}
+                  />
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Free Discovery Call Promotional Banner */}
-            <div className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-6 sm:py-12 lg:py-16">
-              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-                <div className="text-center">
-                  <div className="flex justify-center mb-3 sm:mb-6">
-                    <div className="p-2 sm:p-4 bg-white/20 rounded-full backdrop-blur-sm animate-pulse">
-                      <svg className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 sm:mb-4">
-                    🎯 Free Discovery Call!
-                  </h2>
-                  <p className="text-sm sm:text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto mb-4 sm:mb-8 leading-relaxed">
-                    <span className="hidden sm:inline">Not sure which expert is right for you? Book a complimentary 15-minute consultation with our specialists to discuss your goals and find your perfect match.</span>
-                    <span className="sm:hidden">Book a 15-minute consultation with our top experts.</span>
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
-                    <Button
-                      onClick={() => router.push('/mind')}
-                      className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base lg:text-lg w-full sm:w-auto"
-                    >
-                      🧠 Mind & Wellness Call
-                    </Button>
-                    <Button
-                      onClick={() => router.push('/body')}
-                      className="bg-white text-green-700 hover:bg-green-50 font-bold px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-sm sm:text-base lg:text-lg w-full sm:w-auto"
-                    >
-                      💪 Body & Fitness Call
-                    </Button>
-                  </div>
-                  
-                  <p className="text-xs sm:text-sm text-blue-200 mt-3 sm:mt-6">
-                    No commitment required • Expert guidance • Personalized recommendations
-                  </p>
+          {/* 4. Hero Section with Search */}
+          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                  Explore <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">GuildUp</span>
+                </h1>
+                <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                  Discover expert communities and connect with professionals who can guide your journey
+                </p>
+                
+                {/* Search Bar */}
+                <div className="max-w-2xl mx-auto mb-8">
+                  <SearchBar />
                 </div>
+
+                {/* Search Suggestions - dynamic from trending categories */}
+                {trendingCategories.length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-2 mb-8">
+                    <span className="text-sm text-gray-500">Popular searches:</span>
+                    {trendingCategories.slice(0, 8).map((c) => (
+                      <Button
+                        key={c._id}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs px-3 py-1 h-auto"
+                        onClick={() => router.push(`/api/search?q=${encodeURIComponent(c.name)}`)}
+                      >
+                        {c.name}
+                      </Button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Featured Experts Section - dynamic */}
+              <div className="mb-16">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
+                  Featured Experts
+                </h2>
+                {isFeaturedLoading ? (
+                  <div className="flex justify-center"><Loader /></div>
+                ) : (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(recommendations || []).map((item: any, index: number) => {
+                      const community = item?.community || item;
+                      const id = community?._id || community?.community?._id;
+                      const name = community?.name || community?.community?.name || "";
+                      const cleanedName = name
+                        .replace(/\s+/g, "-")
+                        .replace(/\|/g, "-")
+                        .replace(/-+/g, "-");
+                      const href = id
+                        ? `/community/${encodeURIComponent(cleanedName)}-${id}/profile`
+                        : "/community";
+                      return (
+                        <div key={id || index}>
+                          <MemoizedCommunityCard
+                            community={community}
+                            onClick={() => router.push(href)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
+          </div>
 
-            <div className="w-full max-w-[1920px] mx-auto">
-              <div className="sticky top-16 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100/30 py-6">
-                <div className="px-4 sm:px-6 lg:px-8">
-                  <div className="flex flex-col gap-6">
-                    <h2 className="text-xl font-medium text-gray-800 md:hidden">
-                      Browse by Category
-                    </h2>
-                    <h2 className="hidden md:block text-3xl lg:text-4xl font-light text-gray-900 tracking-tight">
-                      Browse <span className="font-medium bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Categories</span>
-                    </h2>
-                    <div className="overflow-x-auto scrollbar-hide">
-                      <div className="min-w-max">
-                        <CategoryBar
-                          categorys={category}
-                          selectCategory={handleCategorySelect}
-                          selectedCategoryId={selectedCategory}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          {/* 5. Popular Categories - dynamic */}
+          <div className="w-full bg-white py-16 sm:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                  Popular Categories
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Explore our most sought-after expert categories and find the perfect match for your needs
+                </p>
               </div>
-
-              {/* Main Content with Enhanced Filtering */}
-              <div className="pt-3 sm:pt-6 px-4 sm:px-6 lg:px-8">
-                <div className="flex-1 min-w-0" ref={targetRef}>
-                  <div className="rounded-xl sm:rounded-2xl">
+              {trendingCategories.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+                  {trendingCategories.slice(0, 6).map((cat) => (
                     <div
-                      id="scroll-target-border"
-                      className="w-full h-1 mb-4 sm:mb-8"
-                    ></div>
-                    {isLoading ? (
-                      <Loader />
-                    ) : (
-                      <EnhancedCommunitySection
-                        activeCategory={selectedCategoryId}
-                      />
-                    )}
+                      key={cat._id}
+                      className="group cursor-pointer"
+                      onClick={() => handleCategorySelect(cat._id)}
+                    >
+                      <div className="bg-white border border-gray-200 p-6 rounded-xl text-center transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
+                        <h3 className="font-semibold text-sm sm:text-base text-gray-800">{cat.name}</h3>
+                        {typeof cat.num_communities === 'number' && (
+                          <p className="text-xs text-gray-500 mt-1">{cat.num_communities} Guilds</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* 6. CTA Banner for Discovery Calls */}
+          <div className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-12 sm:py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center">
+                <div className="flex justify-center mb-6">
+                  <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
+                    <svg className="w-8 h-8 lg:w-10 lg:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
+                </div>
+                
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                  🎯 Free Discovery Call!
+                </h2>
+                <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto mb-8 leading-relaxed">
+                  Not sure which expert is right for you? Book a complimentary 15-minute consultation with our specialists to discuss your goals and find your perfect match.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button
+                    onClick={() => router.push('/mind')}
+                    className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg w-full sm:w-auto"
+                  >
+                    🧠 Mind & Wellness Call
+                  </Button>
+                  <Button
+                    onClick={() => router.push('/body')}
+                    className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg w-full sm:w-auto"
+                  >
+                    💪 Body & Fitness Call
+                  </Button>
+                </div>
+                
+                <p className="text-sm text-blue-200 mt-6">
+                  No commitment required • Expert guidance • Personalized recommendations
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 7. Guildup Mind and Body Sub Categories */}
+          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                  Discover Your <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Perfect Expert</span>
+                </h2>
+                <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+                  Get specialised guidance and support for your mind and body wellness journey
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+                {/* Guildup Mind Card */}
+                <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 sm:p-10 border border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-xl">
+                  <div className="absolute top-4 right-4">
+                    <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
+                      <Brain className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                      Guildup Mind
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Connect with mental health professionals, life coaches, and wellness experts. 
+                      Find communities focused on mindfulness, personal growth, and emotional well-being.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                      Mental Health & Therapy
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                      Life Coaching & Personal Development
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
+                      Mindfulness & Meditation
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => router.push('/mind')}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
+                  >
+                    Explore Experts
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                </div>
+
+                {/* Guildup Body Card */}
+                <div className="group relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-10 border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
+                  <div className="absolute top-4 right-4">
+                    <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full">
+                      <Dumbbell className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                      Guildup Body
+                    </h3>
+                    <p className="text-gray-600 leading-relaxed">
+                      Join fitness communities led by certified trainers, nutritionists, and health experts. 
+                      Transform your physical health with personalized guidance and support.
+                    </p>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Fitness Training & Workouts
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Nutrition & Diet Planning
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                      Health & Wellness Coaching
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={() => router.push('/body')}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
+                  >
+                    Explore Experts
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 8. All Experts Listing */}
+          <div className="w-full bg-white py-16 sm:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                  All Experts
+                </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Browse through our complete collection of expert communities and find the perfect match for your journey
+                </p>
+              </div>
+
+              <div className="flex-1 min-w-0" ref={targetRef}>
+                <div className="rounded-xl sm:rounded-2xl">
+                  <div
+                    id="scroll-target-border"
+                    className="w-full h-1 mb-8"
+                  ></div>
+                  {isLoading ? (
+                    <Loader />
+                  ) : (
+                    <EnhancedCommunitySection
+                      activeCategory={selectedCategoryId}
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -206,8 +206,8 @@ export default async function RootLayout({
         <CookieConsentProvider>
           <PostHogProviderWrapper>
             <Providers>
-              <NavbarClient />
               <CouponBanner />
+              <NavbarClient />
               <RouteChangeTracker />
               <GlobalInteractionTracker />
               {children}
