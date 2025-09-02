@@ -254,6 +254,17 @@ export default function Hero() {
                   ))}
                 </div>
               </div>
+
+              {/* Start with a quick check-in CTA */}
+              <div className="pt-2">
+                <button
+                  onClick={() => router.push("/diagnostic")}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 transition-colors"
+                >
+                  Take a 60‑sec Check‑in
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </motion.div>
           </div>
 

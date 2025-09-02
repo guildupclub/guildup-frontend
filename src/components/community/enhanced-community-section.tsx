@@ -134,7 +134,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
   }, [page, loadingMore, hasMore, fetchCommunities]);
 
   const handleClickCommunity = useCallback(
-    (community: Community) => {
+    (community: any) => {
       if (!community || !community._id) {
         console.error("Invalid community data:", community);
         return;
@@ -229,17 +229,23 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
               className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
             >
               {filteredAndSortedCommunities.length > 0 ? (
-                filteredAndSortedCommunities.map((community, index) => (
-                  <div
-                    key={community._id}
-                    className={index === 0 ? "first-expert-card" : ""}
-                  >
-                    <MemoizedCommunityCard
-                      community={community}
-                      onClick={() => handleClickCommunity(community)}
-                    />
-                  </div>
-                ))
+                filteredAndSortedCommunities.map((community, index) => {
+                  const stableKey =
+                    (community as any)._id ||
+                    (community as any).community?._id ||
+                    `${(community as any).name || (community as any).community?.name || "community"}-${index}`;
+                  return (
+                    <div
+                      key={stableKey}
+                      className={index === 0 ? "first-expert-card" : ""}
+                    >
+                      <MemoizedCommunityCard
+                        community={community}
+                        onClick={() => handleClickCommunity(community)}
+                      />
+                    </div>
+                  );
+                })
               ) : (
                 <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
                   <Users className="h-16 w-16 text-gray-300 mb-4" />

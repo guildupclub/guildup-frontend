@@ -1,4 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>https://www.guildup.club/sitemap-0.xml</loc></sitemap>
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://guildup.club/blogs</loc></url>
+<url><loc>https://guildup.club/ashlesha-design</loc></url>
+<url><loc>https://guildup.club/booking-confirmation</loc></url>
+<url><loc>https://guildup.club/booking</loc></url>
+<url><loc>https://guildup.club/chat</loc></url>
+<url><loc>https://guildup.club/contact-us</loc></url>
+<url><loc>https://guildup.club/creator-studio</loc></url>
+<url><loc>https://guildup.club/hiring</loc></url>
+<url><loc>https://guildup.club/no-community</loc></url>
+<url><loc>https://guildup.club/feeds</loc></url>
+<url><loc>https://guildup.club</loc></url>
+<url><loc>https://guildup.club/payments</loc></url>
+<url><loc>https://guildup.club/privacy-policy</loc></url>
+<url><loc>https://guildup.club/profile</loc></url>
+<url><loc>https://guildup.club/terms-conditions</loc></url>
+<url><loc>https://guildup.club/api/auth/signin</loc></url>
+<url><loc>https://guildup.club/community/feed</loc></url>
+<url><loc>https://guildup.club/community</loc></url>
+<url><loc>https://guildup.club/api/auth/signup</loc></url>
+<url><loc>https://guildup.club/api/search</loc></url>
+<url><loc>https://guildup.club/api/auth/signin</loc></url>
+<url><loc>https://guildup.club/api/search</loc></url>
+<url><loc>https://guildup.club/ashlesha-design</loc></url>
+<url><loc>https://guildup.club/blogs</loc></url>
+<url><loc>https://guildup.club/booking-confirmation</loc></url>
+<url><loc>https://guildup.club/booking</loc></url>
+<url><loc>https://guildup.club/sitemap.xml</loc></url>
+<url><loc>https://guildup.club/contact-us</loc></url>
+<url><loc>https://guildup.club/chat</loc></url>
+<url><loc>https://guildup.club/hiring</loc></url>
+<url><loc>https://guildup.club/no-community</loc></url>
+<url><loc>https://guildup.club/feeds</loc></url>
+<url><loc>https://guildup.club/api/auth/signup</loc></url>
+<url><loc>https://guildup.club/payments</loc></url>
+<url><loc>https://guildup.club/profile</loc></url>
+<url><loc>https://guildup.club</loc></url>
+<url><loc>https://guildup.club/privacy-policy</loc></url>
+<url><loc>https://guildup.club/terms-conditions</loc></url>
+<url><loc>https://guildup.club/creator-studio</loc></url>
+<url><loc>https://guildup.club/community/feed</loc></url>
+<url><loc>https://guildup.club/community</loc></url>
+</urlset>

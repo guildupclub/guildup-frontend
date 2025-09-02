@@ -18,3 +18,4 @@ export default function AttributionInitializer() {
 	return null;
 }
 
+
