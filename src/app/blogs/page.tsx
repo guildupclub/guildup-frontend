@@ -39,11 +39,11 @@ export default async function BlogsPage() {
             "@type": "Blog",
             "name": "GuildUp Insights & Stories",
             "description": "Expert articles and insights on community building, networking, and digital growth",
-            "url": "https://guildup.com/blogs",
+            "url": "https://guildup.club/blogs",
             "publisher": {
               "@type": "Organization",
               "name": "GuildUp",
-              "url": "https://guildup.com"
+              "url": "https://guildup.club"
             },
             "blogPost": blogPosts.slice(0, 10).map(post => ({
               "@type": "BlogPosting",
@@ -54,7 +54,7 @@ export default async function BlogsPage() {
                 "name": post.author
               },
               "datePublished": post.date,
-              "url": `https://guildup.com/blogs/${post.slug}`,
+              "url": `https://guildup.club/blogs/${post.slug}`,
               "image": post.image,
               "keywords": post.tags.join(", ")
             }))

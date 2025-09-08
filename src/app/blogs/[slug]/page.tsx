@@ -154,7 +154,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
               "publisher": {
                 "@type": "Organization",
                 "name": "GuildUp",
-                "url": "https://guildup.com"
+                "url": "https://guildup.club"
               },
               "datePublished": post.date,
               "dateModified": post.date,
