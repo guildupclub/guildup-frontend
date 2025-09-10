@@ -234,8 +234,10 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
     return (
       <Card 
-        maxW="full" 
-        h="280px"
+        maxW="100vw" 
+        w="100%"
+        h={{ base: "auto", md: "280px" }}
+        minH={{ base: "360px", md: "280px" }}
         cursor="pointer"
         onClick={handleCardClick}
         _hover={{ 
@@ -258,12 +260,13 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         data-community-name={communityDetails?.name || ""}
       >
         <CardBody p={0} flex="1" display="flex" flexDirection="column">
-          {/* Main Content - Image Left, Details Right */}
+          {/* Main Content - Image Top on Mobile, Left on Desktop */}
           <Flex direction={{ base: "column", md: "row" }} flex="1" minH="0">
-            {/* Left Side - Profile Image */}
+            {/* Profile Image - Full Width on Mobile, Left Side on Desktop */}
             <Box 
               w={{ base: "100%", md: "120px" }} 
-              h="100%"
+              h={{ base: "200px", md: "100%" }}
+              maxW="100%"
               position="relative"
               overflow="hidden"
               bg="gray.50"
@@ -274,20 +277,20 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                 alt={communityDetails?.name || "Expert"}
                 w="100%"
                 h="100%"
-                objectFit="cover"
-                objectPosition="center 20%"
+                objectFit="contain"
+                objectPosition="center"
               />
             </Box>
 
-            {/* Right Side - Expert Details */}
-            <Box flex="1" p={4} display="flex" flexDirection="column" justifyContent="space-between" minH="0">
-              <VStack spacing={4} align="stretch" flex="1" minH="0">
+            {/* Expert Details - Below Image on Mobile, Right Side on Desktop */}
+            <Box flex="1" p={{ base: 3, md: 4 }} display="flex" flexDirection="column" justifyContent="space-between" minH="0">
+              <VStack spacing={{ base: 3, md: 4 }} align="stretch" flex="1" minH="0">
                 {/* Name and Title */}
                 <Box>
-                  <Text fontSize="lg" fontWeight="bold" color={textColor} mb={1}>
+                  <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color={textColor} mb={1}>
                     {communityDetails?.name || "Expert Name"}
                   </Text>
-                  <Text fontSize="sm" color={subTextColor} fontWeight="medium">
+                  <Text fontSize={{ base: "xs", md: "sm" }} color={subTextColor} fontWeight="medium">
                     Clinical Psychologist
                   </Text>
                 </Box>
@@ -295,29 +298,29 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                 {/* Rating */}
                 <Box>
                   <HStack spacing={1} align="center">
-                    <StarIcon color="yellow.400" boxSize={3} />
-                    <Text fontSize="sm" fontWeight="semibold" color={textColor}>4.8</Text>
-                    <Text fontSize="xs" color={subTextColor}>(30)</Text>
+                    <StarIcon color="yellow.400" boxSize={{ base: 2.5, md: 3 }} />
+                    <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={textColor}>4.8</Text>
+                    <Text fontSize={{ base: "2xs", md: "xs" }} color={subTextColor}>(30)</Text>
                   </HStack>
                 </Box>
 
                 {/* Experience */}
                 <Box>
                   <HStack spacing={1} align="center">
-                    <Icon viewBox="0 0 24 24" boxSize={3} color="blue.500">
+                    <Icon viewBox="0 0 24 24" boxSize={{ base: 2.5, md: 3 }} color="blue.500">
                       <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                     </Icon>
-                    <Text fontSize="xs" color={subTextColor}>11+ years</Text>
+                    <Text fontSize={{ base: "2xs", md: "xs" }} color={subTextColor}>11+ years</Text>
                   </HStack>
                 </Box>
 
                 {/* Pricing - Simplified */}
                 <Box>
                   <HStack spacing={2} align="baseline">
-                    <Text fontSize="sm" color="red.500" textDecoration="line-through">
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="red.500" textDecoration="line-through">
                       ₹800
                     </Text>
-                    <Text fontSize="sm" fontWeight="bold" color="blue.600">
+                    <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="blue.600">
                       Free for 30 min
                     </Text>
                   </HStack>
@@ -331,7 +334,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                   overflowY="hidden"
                   css={{
                     '&::-webkit-scrollbar': {
-                      height: '4px',
+                      height: '3px',
                     },
                     '&::-webkit-scrollbar-track': {
                       background: 'transparent',
@@ -350,18 +353,18 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     align="center" 
                     minW="max-content"
                     pb={1}
-                    gap={2}
+                    gap={{ base: 1.5, md: 2 }}
                   >
                     {tags && tags.length > 0 ? (
-                      tags.slice(0, 5).map((tag, index) => (
+                      tags.slice(0, 3).map((tag, index) => (
                         <Badge
                           key={index}
                           bg="gray.100"
                           color="gray.700"
-                          px={2}
-                          py={1}
+                          px={{ base: 1.5, md: 2 }}
+                          py={{ base: 0.5, md: 1 }}
                           borderRadius="md"
-                          fontSize="xs"
+                          fontSize={{ base: "2xs", md: "xs" }}
                           fontWeight="bold"
                           textTransform="uppercase"
                           whiteSpace="nowrap"
@@ -373,20 +376,14 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                       ))
                     ) : (
                       <>
-                        <Badge bg="gray.100" color="gray.700" px={2} py={1} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
+                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
                           PSYCHOLOGIST
                         </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={2} py={1} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
+                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
                           CLINICAL
                         </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={2} py={1} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
+                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
                           ADHD
-                        </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={2} py={1} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
-                          ANXIETY
-                        </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={2} py={1} borderRadius="md" fontSize="xs" fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
-                          TRAUMA
                         </Badge>
                       </>
                     )}
@@ -415,11 +412,11 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
               }}
               color="gray.700"
               fontWeight="semibold"
-              py={4}
+              py={{ base: 3, md: 4 }}
               borderRadius="0"
               transition="all 0.3s ease"
-              fontSize="sm"
-              leftIcon={<Icon viewBox="0 0 24 24" boxSize={4}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
+              fontSize={{ base: "xs", md: "sm" }}
+              leftIcon={<Icon viewBox="0 0 24 24" boxSize={{ base: 3, md: 4 }}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
               onClick={handleClaimFreeSession}
               data-analytics-type="community-cta"
               data-analytics-name="Quick Explore Call"
