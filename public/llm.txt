@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /profile/ /private/
+
+Attribution: https://guildup.club
+Contact: hello@guildup.club
+
+Summary: GuildUp is a comprehensive platform that connects users with licensed mental health professionals and wellness experts. Features include expert discovery, free consultations, booking, real-time chat, and evidence-based mental health content.
+
+Expert-Profiles: https://guildup.club/
+Crawl-Delay: 10
+
+Legal: All expert content is licensed under platform terms. HIPAA-compliant. Do not generate medical advice without referencing licensed profiles.

@@ -1,5 +1,4 @@
 "use client";
-import CategoryBar from "@/components/explore/CategoryBar";
 import EnhancedCommunitySection from "@/components/community/enhanced-community-section";
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,13 +13,13 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
-import Hero from "@/components/heroSection/HeroSection";
+ 
 import { Dialog } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
 import { toast } from "sonner";
 import { useSession, signIn } from "next-auth/react";
 import Loader from "@/components/Loader";
-import { motion, useScroll } from "framer-motion";
+ 
 import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
@@ -76,26 +75,10 @@ function Page() {
   const isCreator = user?.user?.is_creator ? true : false;
   const [isCreatorFormOpen, setIsCreatorFormOpen] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
-  const [isSticky, setIsSticky] = useState(false);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const stickyTriggerRef = useRef<HTMLDivElement>(null);
   const userId = session?.user._id;
   const tracking = useTracking();
-  const [promoVisible, setPromoVisible] = useState(true);
 
-  // Track top promotional banner visibility (mirrors CouponBanner behavior)
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY || document.documentElement.scrollTop;
-      setPromoVisible(y < 40);
-    };
-    if (typeof window !== "undefined") {
-      window.addEventListener("scroll", onScroll, { passive: true });
-      onScroll();
-      return () => window.removeEventListener("scroll", onScroll);
-    }
-  }, []);
+  
 
   // Featured experts (communities) via recommendations
   const { data: recommendations, isLoading: isFeaturedLoading } =
@@ -321,22 +304,7 @@ function Page() {
     setIsLoading(false);
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => {
-        setIsSticky(!e.isIntersecting);
-      },
-      { threshold: [1], rootMargin: "-200px 0px 0px 0px" }
-    );
-
-    if (stickyTriggerRef.current) {
-      observer.observe(stickyTriggerRef.current);
-    }
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  
 
   const handleCategoryFromUrl = useCallback(
     (categoryFromUrl: string | null) => {
@@ -402,26 +370,10 @@ function Page() {
             </div>
           </div> */}
 
-          {/* 3. Category Bar (sticky under main navbar) */}
-          <div
-            className="w-full sticky z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100 shadow-sm transition-all duration-300"
-            style={{ top: promoVisible ? 112 : 64 }}
-          >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="min-w-max">
-                  <CategoryBar
-                    categorys={category}
-                    selectCategory={handleCategorySelect}
-                    selectedCategoryId={selectedCategoryId}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           {/* 4. Hero Section with Search */}
-          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
+          <div className="w-full bg-white pb-16 sm:pb-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
@@ -509,11 +461,18 @@ function Page() {
                       className="group cursor-pointer"
                       onClick={() => handleCategorySelect(cat._id)}
                     >
-                      <div className="bg-white border border-gray-200 p-6 rounded-xl text-center transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
-                        <h3 className="font-semibold text-sm sm:text-base text-gray-800">{cat.name}</h3>
-                        {typeof cat.num_communities === 'number' && (
-                          <p className="text-xs text-gray-500 mt-1">{cat.num_communities} Guilds</p>
-                        )}
+                      <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-5 sm:p-6 h-28 sm:h-32 flex items-center justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+                        <div className="flex items-center gap-3 sm:gap-4">
+                          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white/70 text-gray-800 grid place-items-center font-bold text-base sm:text-lg shadow-inner">
+                            {cat.name?.charAt(0) ?? "?"}
+                          </div>
+                          <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2 text-left">
+                            {cat.name}
+                          </h3>
+                        </div>
+                        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-indigo-500/5 blur-2xl" />
+                        <div className="pointer-events-none absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-blue-500/5 blur-2xl" />
                       </div>
                     </div>
                   ))}

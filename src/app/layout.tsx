@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
+import { ChakraProvider } from '@chakra-ui/react';
 import NavbarClient from "@/components/layout/NavbarClient";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
@@ -28,6 +29,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 const guildup_logo_final = "/guildup_logo_final.png";
+
+// Feature flag to toggle CouponBanner visibility
+const ENABLE_COUPON_BANNER =
+  process.env.NEXT_PUBLIC_ENABLE_COUPON_BANNER !== "false";
+
 
 export const metadata: Metadata = {
   title: "GuildUp",
@@ -205,17 +211,19 @@ export default async function RootLayout({
         <AttributionInitializer />
         <CookieConsentProvider>
           <PostHogProviderWrapper>
-            <Providers>
-              <CouponBanner />
-              <NavbarClient />
-              <RouteChangeTracker />
-              <GlobalInteractionTracker />
-              {children}
-              {/* <GoogleOneTap /> */}
-              <Toaster richColors position="top-center" />
-              {/* <CookieConsent /> */}
-              {/* <WelcomeBanner /> */}
-            </Providers>
+            <ChakraProvider>
+              <Providers>
+                {ENABLE_COUPON_BANNER && <CouponBanner />}
+                <NavbarClient />
+                <RouteChangeTracker />
+                <GlobalInteractionTracker />
+                {children}
+                {/* <GoogleOneTap /> */}
+                <Toaster richColors position="top-center" />
+                {/* <CookieConsent /> */}
+                {/* <WelcomeBanner /> */}
+              </Providers>
+            </ChakraProvider>
           </PostHogProviderWrapper>
         </CookieConsentProvider>
       </body>
