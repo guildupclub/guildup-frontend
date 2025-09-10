@@ -259,11 +259,11 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       >
         <CardBody p={0} flex="1" display="flex" flexDirection="column">
           {/* Main Content - Image Left, Details Right */}
-          <Flex direction={{ base: "column", md: "row" }} flex="1">
+          <Flex direction={{ base: "column", md: "row" }} flex="1" minH="0">
             {/* Left Side - Profile Image */}
             <Box 
               w={{ base: "100%", md: "120px" }} 
-              h={{ base: "120px", md: "auto" }}
+              h="100%"
               position="relative"
               overflow="hidden"
               bg="gray.50"
@@ -280,8 +280,8 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
             </Box>
 
             {/* Right Side - Expert Details */}
-            <Box flex="1" p={4} display="flex" flexDirection="column" justifyContent="space-between">
-              <VStack spacing={4} align="stretch" flex="1">
+            <Box flex="1" p={4} display="flex" flexDirection="column" justifyContent="space-between" minH="0">
+              <VStack spacing={4} align="stretch" flex="1" minH="0">
                 {/* Name and Title */}
                 <Box>
                   <Text fontSize="lg" fontWeight="bold" color={textColor} mb={1}>

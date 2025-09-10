@@ -533,7 +533,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           callbackUrl: `${window.location.href}?hero=2`,
                         })
                       }
-                      className="px-6 border border-blue-500 transition-all duration-200"
+                      className="px-6 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
                       variant="outline"
                     >
                       Sign In
@@ -547,7 +547,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   onOpenChange={setIsDialogOpen}
                 >
                   <Button
-                    className="border border-gray-300 "
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 border-0"
                     onClick={handleCreatorButtonClick}
                   >
                     Join as Expert

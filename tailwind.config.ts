@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['Poppins', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+  		},
   		animation: {
   			pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
   			'accordion-down': 'accordion-down 0.2s ease-out',

@@ -24,7 +24,7 @@ import { setHeroVisible } from "@/redux/uiSlice";
 import { Button } from "@/components/ui/button";
 import { useTracking } from "@/hooks/useTracking";
 import { PageTracker } from "@/components/analytics/PageTracker";
-import { Brain, Dumbbell, ArrowRight } from "lucide-react";
+import { Brain, Dumbbell, ArrowRight, Heart, Briefcase, FileText, Video, CheckCircle, DollarSign, Globe, Shield } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import { useCommunityRecommendations } from "@/hook/queries/useCommunityRecommendations";
@@ -33,6 +33,21 @@ import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
 
 import { HiSparkles } from "react-icons/hi2";
+
+// Chakra UI imports
+import {
+  Box,
+  Container,
+  VStack,
+  HStack,
+  Heading,
+  Text,
+  SimpleGrid,
+  Grid,
+  Card,
+  CardBody,
+  Flex,
+} from '@chakra-ui/react';
 
 interface Category {
   _id: string;
@@ -77,6 +92,14 @@ function Page() {
   const heroRef = useRef<HTMLDivElement>(null);
   const userId = session?.user._id;
   const tracking = useTracking();
+  
+  // Testimonials state
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const testimonials = [
+    "I was 26 years old when I had my first panic attack. Just like any Indian family, my parents were not amused by the fact their son would be going for therapy. While I got care finally, I still see a significant level of stigma against mental health. I wish there was an easier way to access this.",
+    "I remember the first time I went for a routine checkup. The doctor asked me if I was married. Honestly, it took me a while to realise what she meant was if I was sexually active. GuildUp provides a safe space for these conversations.",
+    "I am subjected to intrusive questions about my mental health issues from everyone at the store - right from the person taking my order to everyone else working in the store. All of this makes it a very uncomfortable experience. GuildUp offers privacy and understanding."
+  ];
 
   
 
@@ -107,6 +130,15 @@ function Page() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Auto-swiping testimonials
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
 
   useEffect(() => {
     if (!isMounted || status === "loading") return;
@@ -347,6 +379,7 @@ function Page() {
   }, [dispatch, heroRef]);
 
   return (
+    <div className="bg-white">
     <Suspense
       fallback={
         <div className="min-h-[100vh] flex items-center justify-center">
@@ -372,46 +405,356 @@ function Page() {
 
           
 
-          {/* 4. Hero Section with Search */}
-          <div className="w-full bg-white pb-16 sm:pb-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                  Explore <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">GuildUp</span>
-                </h1>
-                <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                  Discover expert communities and connect with professionals who can guide your journey
-                </p>
-                
-                {/* Search Bar */}
-                <div className="max-w-2xl mx-auto mb-8">
-                  <SearchBar />
+          {/* 1. Hero Section with Video Background */}
+          <div className="relative w-full overflow-hidden min-h-screen flex items-center -mt-20 pt-20 pb-20">
+            {/* Video Background */}
+            <div className="absolute inset-0 w-full h-full">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              >
+                <source src="/videos/herosection.webm" type="video/webm" />
+              </video>
+              {/* Dark overlay for better text readability */}
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+
+            <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+              <div className="text-center">
+                {/* Minimalist Badge */}
+                <div className="inline-flex items-center px-4 py-2 mb-12 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 animate-fade-in">
+                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
+                  <span className="text-sm font-medium text-white/90" style={{fontFamily: 'Poppins, sans-serif'}}>Trusted by 10,000+ users</span>
                 </div>
 
-                {/* Search Suggestions - dynamic from trending categories */}
-                {trendingCategories.length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-2 mb-8">
-                    <span className="text-sm text-gray-500">Popular searches:</span>
-                    {trendingCategories.slice(0, 8).map((c) => (
-                      <Button
-                        key={c._id}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs px-3 py-1 h-auto"
-                        onClick={() => router.push(`/api/search?q=${encodeURIComponent(c.name)}`)}
-                      >
-                        {c.name}
-                      </Button>
-                    ))}
+                {/* Clean Typography */}
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight animate-fade-in-up" style={{animationDelay: '0.2s', fontFamily: 'Poppins, sans-serif'}}>
+                  Modern wellness
+                  <br />
+                  <span className="font-normal text-primary" style={{fontFamily: 'Poppins, sans-serif'}}>for everyone</span>
+                </h1>
+
+                {/* Refined Subtitle */}
+                <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up" style={{animationDelay: '0.4s', fontFamily: 'Poppins, sans-serif'}}>
+                  A judgement-free, inclusive space where you can seek guidance from licensed professionals and build a healthier, happier life.
+                </p>
+
+                {/* Clean CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{animationDelay: '0.6s'}}>
+                  <button 
+                    onClick={() => router.push('/mind')}
+                    className="px-8 py-4 text-white font-medium rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
+                    style={{fontFamily: 'Poppins, sans-serif', backgroundColor: '#3B47F9'}}
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2B37E9'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3B47F9'}
+                  >
+                    Start Your Journey
+                  </button>
+                  
+                  <button 
+                    onClick={() => window.open('https://wa.me/919220521385?text=Hi! I would like to learn more about GuildUp.', '_blank')}
+                    className="px-8 py-4 border border-white/30 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/10 hover:border-white/50 backdrop-blur-sm"
+                    style={{fontFamily: 'Poppins, sans-serif'}}
+                  >
+                    Learn More
+                  </button>
+                </div>
+
+                {/* Minimalist Stats */}
+                <div className="grid grid-cols-3 gap-8 mt-16 animate-fade-in-up" style={{animationDelay: '0.8s'}}>
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>500+</div>
+                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Licensed Experts</div>
                   </div>
-                )}
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>10K+</div>
+                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Happy Users</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>50K+</div>
+                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Sessions</div>
+                  </div>
+                </div>
               </div>
 
-              {/* Featured Experts Section - dynamic */}
-              <div className="mb-16">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
+              {/* Customer Testimonials - Minimalist */}
+              <div className="relative max-w-3xl mx-auto mt-20">
+                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-lg border border-white/10 min-h-[160px] flex items-center justify-center">
+                  <p className="text-white/90 text-lg text-center leading-relaxed" style={{fontFamily: 'Poppins, sans-serif'}}>
+                    &quot;{testimonials[currentTestimonial]}&quot;
+                  </p>
+                </div>
+                
+                {/* Clean Dots Navigation */}
+                <div className="flex justify-center mt-6 space-x-2 pb-20">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentTestimonial(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentTestimonial
+                          ? 'bg-teal-400'
+                          : 'bg-white/30 hover:bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Categories Section - Dark Theme */}
+          
+
+          {/* 3. How It Works - Light Timeline */}
+          <Box bg="gray.50" py={20}>
+            <Container maxW="7xl">
+              <VStack spacing={16} align="center">
+                <VStack spacing={4} textAlign="center">
+                  <Heading size="2xl" fontWeight="bold" color="gray.900">
+                    How it works?
+                  </Heading>
+                  <Text fontSize="lg" color="gray.600" maxW="2xl">
+                    Unlock your potential in three simple steps
+                  </Text>
+                </VStack>
+                <HStack spacing={8} align="stretch" w="full" justify="center" flexWrap="wrap">
+                  {[
+                    {
+                      title: "Online Assessment",
+                      desc: "Share your goals and challenges with our platform. We'll match you with the right expert for your needs.",
+                      icon: FileText,
+                      color: "#3B47F9"
+                    },
+                    {
+                      title: "Connect with Expert", 
+                      desc: "Start with a free 30-minute consultation via chat, phone, or video call based on your preference.",
+                      icon: Video,
+                      color: "#3B47F9"
+                    },
+                    {
+                      title: "Ongoing Support",
+                      desc: "Continue your journey with regular sessions, progress tracking, and 24/7 access to your expert.",
+                      icon: CheckCircle,
+                      color: "#3B47F9"
+                    }
+                  ].map((item, index) => (
+                    <Flex key={index} direction="column" align="center" flex="1" minW="300px" maxW="400px">
+                      <VStack spacing={6} align="center">
+                        <Box position="relative">
+                          <Box 
+                            w={20} 
+                            h={20} 
+                            bg={`${item.color}20`} 
+                            borderRadius="full" 
+                            display="flex" 
+                            alignItems="center" 
+                            justifyContent="center"
+                            border="4px"
+                            borderColor={item.color}
+                          >
+                            <item.icon size={40} color={item.color} />
+                          </Box>
+                          {index < 2 && (
+                            <Box 
+                              position="absolute" 
+                              top="50%" 
+                              left="full" 
+                              transform="translateY(-50%)" 
+                              w={8} 
+                              h={0.5} 
+                              bg={`${item.color}80`}
+                              display={{ base: "none", lg: "block" }}
+                            />
+                          )}
+                        </Box>
+                        <VStack spacing={3} textAlign="center">
+                          <Heading size="md" color="gray.900">{index + 1}. {item.title}</Heading>
+                          <Text color="gray.600" fontSize="sm">{item.desc}</Text>
+                        </VStack>
+                      </VStack>
+                    </Flex>
+                  ))}
+                </HStack>
+              </VStack>
+            </Container>
+          </Box>
+
+          <Box bg="gray.900" py={20} color="white">
+            <Container maxW="7xl">
+              <VStack spacing={12} align="center">
+                <VStack spacing={4} textAlign="center">
+                  <Heading size="2xl" fontWeight="bold" color="white">
+                    Your wellness in your control
+                  </Heading>
+                  <Text fontSize="lg" color="gray.300" maxW="2xl">
+                    Choose from our comprehensive range of wellness categories, each designed to address your specific needs
+                  </Text>
+                </VStack>
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8} w="full">
+                  {[
+                    {
+                      title: "Mental Health",
+                      desc: "Therapy, counseling, and mental wellness support from licensed professionals",
+                      icon: Brain,
+                      color: "#3B47F9",
+                      route: "/mind"
+                    },
+                    {
+                      title: "Physical Wellness", 
+                      desc: "Fitness training, nutrition guidance, and physical health optimization",
+                      icon: Dumbbell,
+                      color: "#3B47F9",
+                      route: "/body"
+                    },
+                    {
+                      title: "Relationships",
+                      desc: "Couples therapy, relationship counseling, and interpersonal skills", 
+                      icon: Heart,
+                      color: "#3B47F9",
+                      route: "/relationships"
+                    },
+                    {
+                      title: "Career Growth",
+                      desc: "Professional development, career coaching, and skill enhancement",
+                      icon: Briefcase,
+                      color: "#3B47F9", 
+                      route: "/career"
+                    }
+                  ].map((item, index) => (
+                    <Card 
+                      key={index} 
+                      bg="gray.800" 
+                      border="1px" 
+                      borderColor="gray.700"
+                      _hover={{ 
+                        transform: "translateY(-4px)", 
+                        shadow: "xl",
+                        borderColor: item.color
+                      }} 
+                      transition="all 0.3s"
+                      cursor="pointer"
+                      onClick={() => router.push(item.route)}
+                    >
+                      <CardBody textAlign="center" p={8}>
+                        <VStack spacing={4}>
+                          <Box 
+                            w={16} 
+                            h={16} 
+                            bg={item.color} 
+                            borderRadius="full" 
+                            display="flex" 
+                            alignItems="center" 
+                            justifyContent="center"
+                          >
+                            <item.icon size={32} color="white" />
+                          </Box>
+                          <Heading size="lg" color="white">{item.title}</Heading>
+                          <Text color="gray.300" fontSize="sm">{item.desc}</Text>
+                        </VStack>
+                      </CardBody>
+                    </Card>
+                  ))}
+                </SimpleGrid>
+              </VStack>
+            </Container>
+          </Box>
+
+          {/* 4. What Makes GuildUp Special - Gradient Diagonal Cards */}
+          <Box bgGradient="linear(to-br, blue.50, purple.50)" py={20} position="relative" overflow="hidden">
+            <Box position="absolute" top={0} left={0} w="full" h="full" bgGradient="radial(circle at 20% 80%, blue.100, transparent)" />
+            <Box position="absolute" top={0} right={0} w="full" h="full" bgGradient="radial(circle at 80% 20%, purple.100, transparent)" />
+            <Container maxW="7xl" position="relative" zIndex={1}>
+              <VStack spacing={16} align="center">
+                <VStack spacing={4} textAlign="center">
+                  <Heading size="2xl" fontWeight="bold" color="gray.900">
+                    What makes GuildUp different?
+                  </Heading>
+                </VStack>
+                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={8} w="full">
+                  {[
+                    {
+                      title: "Affordable",
+                      desc: "GuildUp saves travel costs and provides competitive pricing for quality wellness services",
+                      icon: DollarSign,
+                      color: "#3B47F9"
+                    },
+                    {
+                      title: "Whenever Wherever",
+                      desc: "Access wellness support on-demand, anytime according to your convenience",
+                      icon: Globe,
+                      color: "#3B47F9"
+                    },
+                    {
+                      title: "No stigma or judgement",
+                      desc: "Friendly, discreet services in a safe, judgment-free environment",
+                      icon: Shield,
+                      color: "#3B47F9"
+                    },
+                    {
+                      title: "Verified Experts",
+                      desc: "Connect with licensed professionals, no more reading endless reviews",
+                      icon: CheckCircle,
+                      color: "#3B47F9"
+                    }
+                  ].map((item, index) => (
+                    <Box 
+                      key={index} 
+                      transform={index % 2 === 0 ? "rotate(-1deg)" : "rotate(1deg)"}
+                      _hover={{ 
+                        transform: index % 2 === 0 ? "rotate(-1deg) scale(1.05)" : "rotate(1deg) scale(1.05)" 
+                      }}
+                      transition="all 0.3s"
+                    >
+                      <Card 
+                        bg="white" 
+                        shadow="xl" 
+                        borderRadius="2xl" 
+                        border="1px" 
+                        borderColor="gray.200"
+                        _hover={{ shadow: "2xl" }}
+                        transition="all 0.3s"
+                      >
+                        <CardBody p={8} textAlign="center">
+                          <VStack spacing={4}>
+                            <Box 
+                              w={16} 
+                              h={16} 
+                              bg={item.color} 
+                              borderRadius="full" 
+                              display="flex" 
+                              alignItems="center" 
+                              justifyContent="center"
+                              shadow="lg"
+                            >
+                              <item.icon size={28} color="white" />
+                            </Box>
+                            <Heading size="md" color="gray.900">{item.title}</Heading>
+                            <Text color="gray.600" fontSize="sm">{item.desc}</Text>
+                          </VStack>
+                        </CardBody>
+                      </Card>
+                    </Box>
+                  ))}
+                </Grid>
+              </VStack>
+            </Container>
+          </Box>
+
+          {/* 5. Featured Experts Section */}
+          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                   Featured Experts
                 </h2>
+                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                  Meet our licensed professionals who are ready to guide your wellness journey
+                </p>
+              </div>
                 {isFeaturedLoading ? (
                   <div className="flex justify-center"><Loader /></div>
                 ) : (
@@ -442,187 +785,49 @@ function Page() {
             </div>
           </div>
 
-          {/* 5. Popular Categories - dynamic */}
-          <div className="w-full bg-white py-16 sm:py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                  Popular Categories
-                </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                  Explore our most sought-after expert categories and find the perfect match for your needs
-                </p>
-              </div>
-              {trendingCategories.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
-                  {trendingCategories.slice(0, 6).map((cat) => (
-                    <div
-                      key={cat._id}
-                      className="group cursor-pointer"
-                      onClick={() => handleCategorySelect(cat._id)}
-                    >
-                      <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-gradient-to-br from-gray-50 to-white p-5 sm:p-6 h-28 sm:h-32 flex items-center justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
-                        <div className="flex items-center gap-3 sm:gap-4">
-                          <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white/70 text-gray-800 grid place-items-center font-bold text-base sm:text-lg shadow-inner">
-                            {cat.name?.charAt(0) ?? "?"}
-                          </div>
-                          <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2 text-left">
-                            {cat.name}
-                          </h3>
-                        </div>
-                        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-indigo-500/5 blur-2xl" />
-                        <div className="pointer-events-none absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-blue-500/5 blur-2xl" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
 
-          {/* 6. CTA Banner for Discovery Calls */}
-          <div className="w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-12 sm:py-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* 6. Discovery Call Banner - WhatsApp with Primary Background */}
+          <div className="relative w-full overflow-hidden py-16 sm:py-20 bg-primary">
+
+            {/* Content */}
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
               <div className="text-center">
                 <div className="flex justify-center mb-6">
                   <div className="p-4 bg-white/20 rounded-full backdrop-blur-sm">
-                    <svg className="w-8 h-8 lg:w-10 lg:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg className="w-8 h-8 lg:w-10 lg:h-10" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
                     </svg>
                   </div>
                 </div>
                 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white">
                   🎯 Free Discovery Call!
                 </h2>
-                <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto mb-8 leading-relaxed">
-                  Not sure which expert is right for you? Book a complimentary 15-minute consultation with our specialists to discuss your goals and find your perfect match.
+                <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto mb-8 leading-relaxed">
+                  Not sure which expert is right for you? Chat with us on WhatsApp for a complimentary consultation to discuss your goals and find your perfect match.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                {/* Centered WhatsApp Button */}
+                <div className="flex justify-center">
                   <Button
-                    onClick={() => router.push('/mind')}
-                    className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg w-full sm:w-auto"
+                    onClick={() => window.open('https://wa.me/919876543210?text=Hi! I would like to book a free discovery call to find the right expert for my wellness journey.', '_blank')}
+                    className="bg-green-500 hover:bg-green-600 text-white font-bold px-10 py-5 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg flex items-center gap-3"
                   >
-                    🧠 Mind & Wellness Call
-                  </Button>
-                  <Button
-                    onClick={() => router.push('/body')}
-                    className="bg-white text-green-700 hover:bg-green-50 font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg w-full sm:w-auto"
-                  >
-                    💪 Body & Fitness Call
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                    💬 Chat on WhatsApp
                   </Button>
                 </div>
                 
-                <p className="text-sm text-blue-200 mt-6">
+                <p className="text-sm text-white/80 mt-6">
                   No commitment required • Expert guidance • Personalized recommendations
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 7. Guildup Mind and Body Sub Categories */}
-          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  Discover Your <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Perfect Expert</span>
-                </h2>
-                <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-                  Get specialised guidance and support for your mind and body wellness journey
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                {/* Guildup Mind Card */}
-                <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-8 sm:p-10 border border-indigo-100 hover:border-indigo-200 transition-all duration-300 hover:shadow-xl">
-                  <div className="absolute top-4 right-4">
-                    <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
-                      <Brain className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                      Guildup Mind
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      Connect with mental health professionals, life coaches, and wellness experts. 
-                      Find communities focused on mindfulness, personal growth, and emotional well-being.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                      Mental Health & Therapy
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                      Life Coaching & Personal Development
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-indigo-500 rounded-full mr-3"></div>
-                      Mindfulness & Meditation
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => router.push('/mind')}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
-                  >
-                    Explore Experts
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </div>
-
-                {/* Guildup Body Card */}
-                <div className="group relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 sm:p-10 border border-green-100 hover:border-green-200 transition-all duration-300 hover:shadow-xl">
-                  <div className="absolute top-4 right-4">
-                    <div className="p-3 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full">
-                      <Dumbbell className="h-6 w-6 text-white" />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                      Guildup Body
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      Join fitness communities led by certified trainers, nutritionists, and health experts. 
-                      Transform your physical health with personalized guidance and support.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                      Fitness Training & Workouts
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                      Nutrition & Diet Planning
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                      Health & Wellness Coaching
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => router.push('/body')}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 group-hover:scale-105"
-                  >
-                    Explore Experts
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 8. All Experts Listing */}
+          {/* 7. All Experts Listing */}
           <div className="w-full bg-white py-16 sm:py-20">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
@@ -647,7 +852,6 @@ function Page() {
                       activeCategory={selectedCategoryId}
                     />
                   )}
-                </div>
               </div>
             </div>
           </div>
@@ -677,6 +881,7 @@ function Page() {
         trackClicks={true}
       />
     </Suspense>
+  </div>
   );
 }
 
