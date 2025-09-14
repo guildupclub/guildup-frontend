@@ -399,29 +399,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
-                    <Link
-                      href={getMySpaceLink()}
-                      className="flex flex-col items-center"
-                      onClick={handleMySpaceClick}
-                    >
-                      <Users
-                        className={`w-5 h-5 ${
-                          isActive("/community") ? "text-primary" : ""
-                        }`}
-                      />
-                      <span
-                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
-                          isActive("/community")
-                            ? "text-primary font-medium"
-                            : ""
-                        }`}
-                      >
-                        {StringConstants.MY_SPACE}
-                      </span>
-                    </Link>
-                  </li>
-
                   <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
                     <Link
                       href="/chat"

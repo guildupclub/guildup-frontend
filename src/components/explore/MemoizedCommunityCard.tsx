@@ -21,10 +21,13 @@ import {
   Icon,
   Divider,
   useColorModeValue,
+  Tooltip,
+  Avatar,
 } from '@chakra-ui/react';
 import { StarIcon } from '@chakra-ui/icons';
 import { IoVideocam } from "react-icons/io5";
 import { ImUsers } from "react-icons/im";
+import { FaCheckCircle, FaCrown, FaAward, FaCalendarAlt, FaUsers, FaClock } from "react-icons/fa";
 
 import { toast } from "sonner";
 import { GrInstagram } from "react-icons/gr";
@@ -35,6 +38,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "../../redux/communitySlice";
 import { setActiveCommunity } from "../../redux/channelSlice";
+import { primary } from "@/app/colours";
 
 interface MemoizedCommunityCardProps {
   community: any;
@@ -224,20 +228,110 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`;
     }, [communityDetails]);
 
+    // Get community type/specialty
+    const getCommunityType = useMemo(() => {
+      if (!communityDetails) return "Expert";
+      
+      // First try to get from category field
+      if (communityDetails.category) {
+        return communityDetails.category;
+      }
+      
+      // If no category, try to extract from tags
+      if (tags && tags.length > 0) {
+        // Look for common professional types in tags
+        const professionalTypes = [
+          'psychologist', 'therapist', 'counselor', 'coach', 'nutritionist', 
+          'trainer', 'doctor', 'specialist', 'consultant', 'advisor'
+        ];
+        
+        for (const tag of tags) {
+          const lowerTag = tag.toLowerCase();
+          for (const type of professionalTypes) {
+            if (lowerTag.includes(type)) {
+              return tag;
+            }
+          }
+        }
+        
+        // If no professional type found, return the first tag
+        return tags[0];
+      }
+      
+      // If no tags, try to extract from description
+      if (communityDetails.description) {
+        const desc = communityDetails.description.toLowerCase();
+        if (desc.includes('psychologist')) return 'Psychologist';
+        if (desc.includes('therapist')) return 'Therapist';
+        if (desc.includes('counselor')) return 'Counselor';
+        if (desc.includes('coach')) return 'Coach';
+        if (desc.includes('nutritionist')) return 'Nutritionist';
+        if (desc.includes('trainer')) return 'Trainer';
+        if (desc.includes('doctor')) return 'Doctor';
+        if (desc.includes('specialist')) return 'Specialist';
+        if (desc.includes('consultant')) return 'Consultant';
+        if (desc.includes('advisor')) return 'Advisor';
+      }
+      
+      // Default fallback
+      return "Wellness Expert";
+    }, [communityDetails, tags]);
+
+    // Add reviews state
+    const [reviews, setReviews] = useState<any[]>([]);
+    const [averageRating, setAverageRating] = useState<number>(0);
+    const [totalReviews, setTotalReviews] = useState<number>(0);
+
+    // Fetch reviews
+    useEffect(() => {
+      const fetchReviews = async () => {
+        if (!communityDetails?._id) return;
+        
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/feedback?community_id=${communityDetails._id}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            if (data.r === "s" && data.data?.feedbacks) {
+              setReviews(data.data.feedbacks);
+              
+              // Calculate average rating
+              const ratings = data.data.feedbacks.map((f: any) => f.rating).filter((r: number) => r > 0);
+              if (ratings.length > 0) {
+                const avg = ratings.reduce((sum: number, rating: number) => sum + rating, 0) / ratings.length;
+                setAverageRating(Math.round(avg * 10) / 10); // Round to 1 decimal
+              }
+              setTotalReviews(ratings.length);
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching reviews:", error);
+        }
+      };
+
+      fetchReviews();
+    }, [communityDetails?._id]);
+
     const cardBg = useColorModeValue('white', 'gray.800');
     const borderColor = useColorModeValue('gray.200', 'gray.600');
     const textColor = useColorModeValue('gray.900', 'white');
     const subTextColor = useColorModeValue('gray.600', 'gray.300');
-    const accentColor = useColorModeValue('blue.50', 'blue.900');
-    const trustBadgeBg = useColorModeValue('green.50', 'green.900');
-    const trustBadgeColor = useColorModeValue('green.700', 'green.300');
+    const accentColor = useColorModeValue(`${primary}15`, `${primary}20`);
+    const trustBadgeBg = useColorModeValue(`${primary}10`, `${primary}20`);
+    const trustBadgeColor = useColorModeValue(primary, `${primary}80`);
+    const primaryColor = primary;
+    const premiumGradient = useColorModeValue(
+      `linear-gradient(135deg, ${primary}08 0%, ${primary}15 50%, ${primary}08 100%)`,
+      `linear-gradient(135deg, ${primary}15 0%, ${primary}25 50%, ${primary}15 100%)`
+    );
 
     return (
       <Card 
         maxW="100vw" 
         w="100%"
-        h={{ base: "auto", md: "280px" }}
-        minH={{ base: "360px", md: "280px" }}
+        h="auto"
+        minH="auto"
         cursor="pointer"
         onClick={handleCardClick}
         _hover={{ 
@@ -247,185 +341,200 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         }}
         transition="all 0.3s ease"
         border="1px"
-        borderColor={borderColor}
+        borderColor="gray.200"
         overflow="hidden"
         borderRadius="2xl"
-        bg={cardBg}
-        boxShadow="md"
+        bg="white"
+        boxShadow="lg"
         display="flex"
         flexDirection="column"
+        position="relative"
         data-analytics-type="community-card"
         data-analytics-name={communityDetails?.name || "Expert"}
         data-community-id={communityDetails?._id || ""}
         data-community-name={communityDetails?.name || ""}
       >
-        <CardBody p={0} flex="1" display="flex" flexDirection="column">
-          {/* Main Content - Image Top on Mobile, Left on Desktop */}
-          <Flex direction={{ base: "column", md: "row" }} flex="1" minH="0">
-            {/* Profile Image - Full Width on Mobile, Left Side on Desktop */}
+        <CardBody p={6} flex="1" display="flex" flexDirection="column">
+          {/* Top Section - Profile and Key Info */}
+          <Flex direction={{ base: "column", md: "row" }} gap={6} mb={6}>
+            {/* Profile Image */}
             <Box 
-              w={{ base: "100%", md: "120px" }} 
-              h={{ base: "200px", md: "100%" }}
-              maxW="100%"
-              position="relative"
-              overflow="hidden"
-              bg="gray.50"
+              w={{ base: "120px", md: "140px" }} 
+              h={{ base: "120px", md: "140px" }}
               flexShrink={0}
+              position="relative"
             >
               <Image
                 src={avatarImgUrl || "/placeholder.svg"}
                 alt={communityDetails?.name || "Expert"}
                 w="100%"
                 h="100%"
-                objectFit="contain"
+                objectFit="cover"
                 objectPosition="center"
+                borderRadius="xl"
+                boxShadow="md"
               />
             </Box>
 
-            {/* Expert Details - Below Image on Mobile, Right Side on Desktop */}
-            <Box flex="1" p={{ base: 3, md: 4 }} display="flex" flexDirection="column" justifyContent="space-between" minH="0">
-              <VStack spacing={{ base: 3, md: 4 }} align="stretch" flex="1" minH="0">
+            {/* Name, Title, and Key Info */}
+            <Box flex="1">
+              <VStack spacing={4} align="stretch">
                 {/* Name and Title */}
                 <Box>
-                  <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color={textColor} mb={1}>
+                  <Text 
+                    fontSize={{ base: "xl", md: "2xl" }} 
+                    fontWeight="bold" 
+                    color="gray.900" 
+                    mb={1}
+                  >
                     {communityDetails?.name || "Expert Name"}
                   </Text>
-                  <Text fontSize={{ base: "xs", md: "sm" }} color={subTextColor} fontWeight="medium">
-                    Clinical Psychologist
+                  <Text 
+                    fontSize="md" 
+                    color="gray.600" 
+                    fontWeight="medium"
+                  >
+                    {getCommunityType}
                   </Text>
                 </Box>
 
-                {/* Rating */}
-                <Box>
-                  <HStack spacing={1} align="center">
-                    <StarIcon color="yellow.400" boxSize={{ base: 2.5, md: 3 }} />
-                    <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="semibold" color={textColor}>4.8</Text>
-                    <Text fontSize={{ base: "2xs", md: "xs" }} color={subTextColor}>(30)</Text>
-                  </HStack>
-                </Box>
-
-                {/* Experience */}
-                <Box>
-                  <HStack spacing={1} align="center">
-                    <Icon viewBox="0 0 24 24" boxSize={{ base: 2.5, md: 3 }} color="blue.500">
-                      <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </Icon>
-                    <Text fontSize={{ base: "2xs", md: "xs" }} color={subTextColor}>11+ years</Text>
-                  </HStack>
-                </Box>
-
-                {/* Pricing - Simplified */}
+                {/* Pricing */}
                 <Box>
                   <HStack spacing={2} align="baseline">
-                    <Text fontSize={{ base: "xs", md: "sm" }} color="red.500" textDecoration="line-through">
-                      ₹800
+                    <Text fontSize="lg" fontWeight="bold" color={primaryColor}>
+                      ₹ Free
                     </Text>
-                    <Text fontSize={{ base: "xs", md: "sm" }} fontWeight="bold" color="blue.600">
-                      Free for 30 min
+                    <Text fontSize="sm" color="red.500" textDecoration="line-through">
+                      800
+                    </Text>
+                    <Text fontSize="sm" color="gray.500">
+                      for 30 min consultation
                     </Text>
                   </HStack>
                 </Box>
 
-                {/* Expertise Tags */}
-                <Box 
-                  w="100%"
-                  maxW="100%"
-                  overflowX="auto" 
-                  overflowY="hidden"
-                  css={{
-                    '&::-webkit-scrollbar': {
-                      height: '3px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                      background: 'transparent',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: '#e2e8f0',
-                      borderRadius: '2px',
-                    },
-                    '&::-webkit-scrollbar-thumb:hover': {
-                      background: '#cbd5e0',
-                    },
-                  }}
-                >
-                  <Flex 
-                    direction="row" 
-                    align="center" 
-                    minW="max-content"
-                    pb={1}
-                    gap={{ base: 1.5, md: 2 }}
-                  >
-                    {tags && tags.length > 0 ? (
-                      tags.slice(0, 3).map((tag, index) => (
-                        <Badge
-                          key={index}
-                          bg="gray.100"
-                          color="gray.700"
-                          px={{ base: 1.5, md: 2 }}
-                          py={{ base: 0.5, md: 1 }}
-                          borderRadius="md"
-                          fontSize={{ base: "2xs", md: "xs" }}
-                          fontWeight="bold"
-                          textTransform="uppercase"
-                          whiteSpace="nowrap"
-                          flexShrink={0}
-                          minW="fit-content"
-                        >
-                          {tag}
-                        </Badge>
-                      ))
-                    ) : (
-                      <>
-                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
-                          PSYCHOLOGIST
-                        </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
-                          CLINICAL
-                        </Badge>
-                        <Badge bg="gray.100" color="gray.700" px={{ base: 1.5, md: 2 }} py={{ base: 0.5, md: 1 }} borderRadius="md" fontSize={{ base: "2xs", md: "xs" }} fontWeight="bold" textTransform="uppercase" whiteSpace="nowrap" flexShrink={0} minW="fit-content">
-                          ADHD
-                        </Badge>
-                      </>
-                    )}
-                  </Flex>
-                </Box>
+                {/* Languages */}
+                <HStack spacing={2} align="center">
+                  <Icon viewBox="0 0 24 24" boxSize={4} color={primaryColor}>
+                    <path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                  </Icon>
+                  <Text fontSize="sm" color="gray.600">
+                    {communityDetails?.user_languages?.length > 0 
+                      ? communityDetails.user_languages.join(", ") 
+                      : communityDetails?.languages?.length > 0 
+                      ? communityDetails.languages.join(", ") 
+                      : "Hindi, English, Gujarati, Urdu, French"}
+                  </Text>
+                </HStack>
 
+                {/* Rating */}
+                <HStack spacing={2} align="center">
+                  <StarIcon color="yellow.500" boxSize={4} />
+                  <Text fontSize="sm" fontWeight="medium" color="yellow.600">
+                    {averageRating > 0 
+                      ? `${averageRating} (${totalReviews} reviews)` 
+                      : "4.8 (30 reviews)"}
+                  </Text>
+                </HStack>
               </VStack>
             </Box>
           </Flex>
 
-          {/* Bottom Section - Booking Options */}
-          <Box 
-            p={0} 
-            borderTop="1px" 
-            borderColor="gray.200"
-            borderRadius="0 0 16px 16px"
-            overflow="hidden"
-          >
-            <Button
-              w="full"
-              bg="gray.100"
-              _hover={{
-                bg: "gray.200",
-                transform: "translateY(-1px)",
-                shadow: "md"
-              }}
-              color="gray.700"
-              fontWeight="semibold"
-              py={{ base: 3, md: 4 }}
-              borderRadius="0"
-              transition="all 0.3s ease"
-              fontSize={{ base: "xs", md: "sm" }}
-              leftIcon={<Icon viewBox="0 0 24 24" boxSize={{ base: 3, md: 4 }}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
-              onClick={handleClaimFreeSession}
-              data-analytics-type="community-cta"
-              data-analytics-name="Quick Explore Call"
-              data-community-id={communityDetails?._id || ""}
-              data-community-name={communityDetails?.name || ""}
+          {/* Specializations */}
+          <Box mb={6}>
+            <Flex 
+              direction="row" 
+              align="center" 
+              gap={2}
+              flexWrap="wrap"
             >
-              Quick Explore Call
-            </Button>
+              {tags && tags.length > 0 ? (
+                tags.slice(0, 7).map((tag, index) => (
+                  <Badge
+                    key={index}
+                    bg="gray.100"
+                    color="gray.700"
+                    px={3}
+                    py={1}
+                    borderRadius="md"
+                    fontSize="sm"
+                    fontWeight="medium"
+                    whiteSpace="nowrap"
+                  >
+                    {tag}
+                  </Badge>
+                ))
+              ) : (
+                <>
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                    Nutrition
+                  </Badge>
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                    Dieting
+                  </Badge>
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                    Weight Loss
+                  </Badge>
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                    Wellness
+                  </Badge>
+                </>
+              )}
+            </Flex>
           </Box>
+
+          {/* Metrics Section */}
+          <HStack spacing={6} mb={6} justify="space-between">
+            <HStack spacing={2} align="center">
+              <Icon as={FaAward} boxSize={4} color={primaryColor} />
+              <VStack spacing={0} align="start">
+                <Text fontSize="sm" color="gray.500">Years of Experience</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900">5+ years</Text>
+              </VStack>
+            </HStack>
+            
+            <HStack spacing={2} align="center">
+              <Icon as={FaUsers} boxSize={4} color={primaryColor} />
+              <VStack spacing={0} align="start">
+                <Text fontSize="sm" color="gray.500">Sessions Conducted</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900">100+ Sessions</Text>
+              </VStack>
+            </HStack>
+            
+            <HStack spacing={2} align="center">
+              <Icon as={FaCalendarAlt} boxSize={4} color={primaryColor} />
+              <VStack spacing={0} align="start">
+                <Text fontSize="sm" color="gray.500">Next available slot</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900">Today, 05:30 PM</Text>
+              </VStack>
+            </HStack>
+          </HStack>
+
+          {/* CTA Button */}
+          <Button
+            w="full"
+            bg={primaryColor}
+            _hover={{
+              bg: `${primaryColor}CC`,
+              transform: "translateY(-1px)",
+              shadow: "lg"
+            }}
+            color="white"
+            fontWeight="bold"
+            py={4}
+            borderRadius="xl"
+            transition="all 0.3s ease"
+            fontSize="lg"
+            leftIcon={<Icon viewBox="0 0 24 24" boxSize={5}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
+            onClick={handleClaimFreeSession}
+            data-analytics-type="community-cta"
+            data-analytics-name="Quick Explore Call"
+            data-community-id={communityDetails?._id || ""}
+            data-community-name={communityDetails?.name || ""}
+            boxShadow="md"
+          >
+            Quick Explore Call
+          </Button>
         </CardBody>
       </Card>
     );
@@ -435,3 +544,4 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 MemoizedCommunityCard.displayName = "MemoizedCommunityCard";
 
 export default MemoizedCommunityCard;
+ 

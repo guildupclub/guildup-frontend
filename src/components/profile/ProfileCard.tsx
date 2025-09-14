@@ -1210,6 +1210,30 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
         </div>
 
+        {/* Owner Stats Band */}
+        <div className="mt-6">
+          <div className="rounded-2xl border border-border/5 bg-gradient-to-r from-primary/5 via-background to-primary/5 p-5 sm:p-6 shadow-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-center">
+              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Years</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.user?.user_year_of_experience || 0}+</p>
+              </div>
+              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Sessions</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.user?.user_session_conducted || 0}+</p>
+              </div>
+              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Members</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.community?.num_member?.toLocaleString?.() || 0}</p>
+              </div>
+              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Posts</p>
+                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.community?.post_count || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {isOwner && (
           <div className="my-3">
             <WebinarOfferBanner
@@ -1221,7 +1245,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
         )}
         {/* Main Content Grid */}
-        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
+        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* About Section */}
           <div>
             <h2 className="mb-4 flex items-center text-2xl font-semibold text-foreground">
@@ -1550,14 +1574,19 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-xl shadow-sm">
-              <TestimonialsSection communityId={communityIdFromParam} />
+            <div className="rounded-2xl border border-border/5 bg-gradient-to-br from-primary/5 via-background to-primary/5 p-6 sm:p-8 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-2xl font-semibold text-foreground">What clients say</h2>
+              </div>
+              <div className="rounded-xl bg-card/60 p-2 sm:p-4">
+                <TestimonialsSection communityId={communityIdFromParam} />
+              </div>
             </div>
           </div>
 
-          {/* Testimonials Section */}
+          {/* Reviews Carousel */}
           <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-xl shadow-sm">
+            <div className="rounded-2xl border border-border/5 bg-card shadow-sm p-4 sm:p-6">
               {/* @ts-ignore */}
               <Testimonials communityId={activeCommunityId || undefined} />
             </div>

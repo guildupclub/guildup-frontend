@@ -85,6 +85,8 @@ function Page() {
   const dispatch = useDispatch();
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isMobileVideoLoaded, setIsMobileVideoLoaded] = useState(false);
+  const [mobileVideoError, setMobileVideoError] = useState(false);
   const targetRef = useRef<HTMLDivElement | null>(null);
   const user = useSelector((state: RootState) => state.user);
   const isCreator = user?.user?.is_creator ? true : false;
@@ -409,18 +411,89 @@ function Page() {
           <div className="relative w-full overflow-hidden min-h-screen flex items-center -mt-20 pt-20 pb-20">
             {/* Video Background */}
             <div className="absolute inset-0 w-full h-full">
+              {/* Mobile fallback background */}
+              <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 md:hidden transition-opacity duration-500 ${mobileVideoError || !isMobileVideoLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                {/* Animated gradient overlay for mobile */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-indigo-600/20 animate-pulse"></div>
+              </div>
+              
+              {/* Desktop video */}
               <video
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="w-full h-full object-cover"
+                preload="metadata"
+                className="hidden md:block w-full h-full object-cover"
+                onError={(e) => {
+                  console.log('Video failed to load, falling back to background');
+                  e.currentTarget.style.display = 'none';
+                }}
               >
                 <source src="/videos/herosection.webm" type="video/webm" />
+                <source src="/videos/herosection.mp4" type="video/mp4" />
               </video>
+              
+              {/* Mobile video with better mobile support */}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                webkit-playsinline="true"
+                x5-playsinline="true"
+                x5-video-player-type="h5"
+                x5-video-player-fullscreen="false"
+                className={`block md:hidden w-full h-full object-cover transition-opacity duration-500 ${isMobileVideoLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{
+                  objectPosition: 'center center',
+                  minHeight: '100vh',
+                  minWidth: '100vw',
+                  backgroundColor: 'transparent'
+                }}
+                onError={(e) => {
+                  console.log('Mobile video failed to load, using gradient background');
+                  setMobileVideoError(true);
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoadStart={() => {
+                  console.log('Mobile video started loading');
+                }}
+                onCanPlay={() => {
+                  console.log('Mobile video can play');
+                  setIsMobileVideoLoaded(true);
+                }}
+                onLoadedData={() => {
+                  console.log('Mobile video data loaded');
+                  setIsMobileVideoLoaded(true);
+                }}
+                onWaiting={() => {
+                  console.log('Mobile video waiting for data');
+                }}
+              >
+                <source src="/videos/herosection.webm" type="video/webm" />
+                <source src="/videos/herosection.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
               {/* Dark overlay for better text readability */}
               <div className="absolute inset-0 bg-black/40"></div>
             </div>
+            
+            {/* Mobile-specific CSS for video optimization */}
+            <style jsx>{`
+              @media (max-width: 768px) {
+                video {
+                  -webkit-transform: translateZ(0);
+                  transform: translateZ(0);
+                  -webkit-backface-visibility: hidden;
+                  backface-visibility: hidden;
+                  -webkit-perspective: 1000;
+                  perspective: 1000;
+                }
+              }
+            `}</style>
 
             <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
               <div className="text-center">
@@ -758,7 +831,7 @@ function Page() {
                 {isFeaturedLoading ? (
                   <div className="flex justify-center"><Loader /></div>
                 ) : (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {(recommendations || []).map((item: any, index: number) => {
                       const community = item?.community || item;
                       const id = community?._id || community?.community?._id;

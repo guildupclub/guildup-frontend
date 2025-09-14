@@ -286,7 +286,7 @@ export default function Hero() {
             {/* Enhanced Expert Cards Carousel with Larger Images */}
             <div className="relative w-full max-w-7xl mx-auto overflow-hidden group">
               <div
-                className="carousel-track flex items-stretch gap-5 group-hover:[animation-play-state:paused]"
+                className="carousel-track flex items-stretch gap-3 sm:gap-4 md:gap-5 group-hover:[animation-play-state:paused]"
                 style={{
                   animation: 'carousel-marquee 20s linear infinite',
                 }}
@@ -294,11 +294,11 @@ export default function Hero() {
                 {featuredExperts.concat(featuredExperts).map((expert, idx) => (
                   <div
                     key={expert.name + idx}
-                    className="flex flex-col items-center justify-between bg-white/90 bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-2xl shadow-xl border border-blue-200/50 p-3 w-[220px] sm:w-[240px] h-[300px] mx-1 transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-blue-300"
+                    className="flex flex-col items-center justify-between bg-white/90 bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-2xl shadow-xl border border-blue-200/50 p-2 sm:p-3 w-[180px] xs:w-[200px] sm:w-[220px] md:w-[240px] h-[280px] sm:h-[300px] mx-1 transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:border-blue-300"
                   >
                     <div className="flex flex-col items-center w-full h-full">
                       <div className="w-full flex flex-col items-center justify-start h-full">
-                        <div className="w-32 h-28 sm:w-36 sm:h-32 rounded-xl overflow-hidden border-3 border-white shadow-xl mx-auto bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center mb-2">
+                        <div className="w-24 h-20 xs:w-28 xs:h-24 sm:w-32 sm:h-28 md:w-36 md:h-32 rounded-xl overflow-hidden border-2 sm:border-3 border-white shadow-xl mx-auto bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center mb-1 sm:mb-2">
                           <Image
                             src={expert.avatar}
                             alt={expert.name}
@@ -307,27 +307,27 @@ export default function Hero() {
                             className="w-full h-full object-cover rounded-xl"
                           />
                         </div>
-                        <div className="flex flex-col items-center w-full flex-grow justify-start space-y-1 mt-2">
-                          <h3 className="font-bold text-gray-900 text-sm sm:text-base">
+                        <div className="flex flex-col items-center w-full flex-grow justify-start space-y-0.5 sm:space-y-1 mt-1 sm:mt-2">
+                          <h3 className="font-bold text-gray-900 text-xs xs:text-sm sm:text-base text-center px-1">
                             {expert.name}
                           </h3>
-                          <div className="flex flex-wrap gap-1 justify-center">
+                          <div className="flex flex-wrap gap-0.5 sm:gap-1 justify-center px-1">
                             {expert.specialty.split(',').slice(0, 2).map((specialty, tagIdx) => (
                               <span
                                 key={tagIdx}
-                                className="px-2 py-0.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 rounded-full text-xs font-medium max-w-[85px] truncate"
-                                style={{ minHeight: '20px' }}
+                                className="px-1.5 sm:px-2 py-0.5 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 rounded-full text-[10px] xs:text-xs font-medium max-w-[70px] sm:max-w-[85px] truncate"
+                                style={{ minHeight: '16px' }}
                               >
                                 {specialty}
                               </span>
                             ))}
                           </div>
-                          <div className="flex items-center gap-1 text-sm text-gray-700">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="font-semibold">{expert.rating}</span>
-                            <span className="text-gray-500">•</span>
-                            <span className="text-gray-500 flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="flex items-center gap-0.5 sm:gap-1 text-xs sm:text-sm text-gray-700 px-1">
+                            <Star className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400 fill-current" />
+                            <span className="font-semibold text-xs sm:text-sm">{expert.rating}</span>
+                            <span className="text-gray-500 text-xs">•</span>
+                            <span className="text-gray-500 flex items-center gap-0.5 sm:gap-1 text-xs">
+                              <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0 1 1 0 002 0zM16 11a4 4 0 00-4 4h2a2 2 0 012-2z" />
                               </svg>
                               {expert.sessions}+
@@ -335,7 +335,7 @@ export default function Hero() {
                           </div>
                           <div className="flex-grow max-h-2"></div>
                           <button
-                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-all duration-200 text-xs w-full transform hover:scale-105 mt-2"
+                            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-600 text-white rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition-all duration-200 text-[10px] xs:text-xs w-full transform hover:scale-105 mt-1 sm:mt-2"
                             onClick={() => window.open(expert.url, '_blank', 'noopener,noreferrer')}
                           >
                             View Profile
@@ -354,9 +354,14 @@ export default function Hero() {
                   0% { transform: translateX(-50%); }
                   100% { transform: translateX(0); }
                 }
-                @media (max-width: 1024px) {
+                @media (max-width: 640px) {
                   .carousel-track {
-                    gap: 1.25rem;
+                    gap: 0.75rem;
+                  }
+                }
+                @media (min-width: 641px) and (max-width: 1024px) {
+                  .carousel-track {
+                    gap: 1rem;
                   }
                 }
               `}</style>
