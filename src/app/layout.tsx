@@ -31,9 +31,7 @@ const geistMono = Geist_Mono({
 const guildup_logo_final = "/guildup_logo_final.png";
 
 // Feature flag to toggle CouponBanner visibility
-const ENABLE_COUPON_BANNER =
-  process.env.NEXT_PUBLIC_ENABLE_COUPON_BANNER !== "false";
-
+const ENABLE_COUPON_BANNER = false;
 
 export const metadata: Metadata = {
   title: "GuildUp",

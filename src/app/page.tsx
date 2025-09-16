@@ -13,6 +13,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { primary, black, white } from "./colours";
  
 import { Dialog } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
@@ -381,7 +382,7 @@ function Page() {
   }, [dispatch, heroRef]);
 
   return (
-    <div className="bg-white">
+    <div style={{backgroundColor: white}}>
     <Suspense
       fallback={
         <div className="min-h-[100vh] flex items-center justify-center">
@@ -391,7 +392,7 @@ function Page() {
     >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
 
-        <div className="min-h-screen bg-white relative">
+        <div className="min-h-screen relative" style={{backgroundColor: white}}>
 
           {/* Creator Form Dialog */}
           <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
@@ -407,175 +408,291 @@ function Page() {
 
           
 
-          {/* 1. Hero Section with Video Background */}
-          <div className="relative w-full overflow-hidden min-h-screen flex items-center -mt-20 pt-20 pb-20">
-            {/* Video Background */}
-            <div className="absolute inset-0 w-full h-full">
-              {/* Mobile fallback background */}
-              <div className={`absolute inset-0 w-full h-full bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 md:hidden transition-opacity duration-500 ${mobileVideoError || !isMobileVideoLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                {/* Animated gradient overlay for mobile */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-indigo-600/20 animate-pulse"></div>
+          {/* 1. Modern Clean Hero Section */}
+          <div className="relative min-h-screen flex items-center -mt-20 pt-20" style={{ backgroundColor: white }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                
+                {/* Left Content */}
+                <div className="space-y-8">
+                  {/* Trust Badge */}
+                  <div className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200" style={{ backgroundColor: `${primary}15` }}>
+                    <span className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: primary }}></span>
+                    <span className="text-sm font-medium" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '600' }}>
+                      Trusted by 10,000+ users across India
+                    </span>
+                  </div>
+
+                  {/* Main Headline */}
+                  <div className="space-y-4">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight" style={{ color: black, fontFamily: 'Garamond, serif', fontWeight: '700' }}>
+                      Your wellness journey
+                      <br />
+                      <span style={{ color: primary, fontWeight: '800' }}>starts here</span>
+                    </h1>
+                  </div>
+
+                  {/* Subtitle */}
+                  <p className="text-lg sm:text-xl leading-relaxed max-w-lg" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>
+                    Connect with licensed professionals in a judgment-free environment. Get personalized care for mental health, physical wellness, relationships, and career growth.
+                  </p>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button 
+                      onClick={() => router.push('/mind')}
+                      className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
+                      style={{ 
+                        backgroundColor: primary, 
+                        color: white,
+                        fontFamily: 'Garamond, serif',
+                        fontWeight: '600'
+                      }}
+                      onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#2B37E9'}
+                      onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = primary}
+                    >
+                      Get Started Today
+                    </button>
+                    
+                    <button 
+                      onClick={() => window.open('https://wa.me/919220521385?text=Hi! I would like to learn more about GuildUp.', '_blank')}
+                      className="px-8 py-4 border-2 rounded-lg font-semibold transition-all duration-300 hover:bg-gray-50"
+                      style={{ 
+                        borderColor: primary, 
+                        color: primary,
+                        fontFamily: 'Garamond, serif',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Schedule Free Call
+                    </button>
+                  </div>
+
+                  {/* Trust Indicators */}
+                  <div className="grid grid-cols-3 gap-8 pt-8">
+                    <div className="text-center">
+                      <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>500+</div>
+                      <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Licensed Experts</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>10K+</div>
+                      <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Happy Users</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl sm:text-3xl font-bold mb-1" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>50K+</div>
+                      <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Sessions</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Visual - Hero Images Grid */}
+                <div className="relative lg:h-[600px] flex items-center justify-center">
+                  <div className="relative w-full h-full max-w-lg mx-auto">
+                    
+                    {/* 2x2 Grid Layout */}
+                    <div className="grid grid-cols-2 gap-4 h-full">
+                      
+                      {/* Hero Image 1 - Top Left */}
+                      <div className="relative flex items-center justify-center animate-float-up">
+                        <div className="relative group w-full h-full max-w-[200px] max-h-[200px]">
+                          <div className="absolute -inset-1 rounded-2xl blur-sm transition-all duration-300 group-hover:blur-none" style={{ background: `linear-gradient(135deg, ${primary}30, transparent)` }}></div>
+                          <img 
+                            src="/hero/hero1.jpg" 
+                            alt="Physical Wellness"
+                            className="relative w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                            style={{ border: `3px solid ${primary}40` }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                        </div>
+                      </div>
+
+                      {/* Hero Image 2 - Top Right */}
+                      <div className="relative flex items-center justify-center animate-float-right">
+                        <div className="relative group w-full h-full max-w-[200px] max-h-[200px]">
+                          <div className="absolute -inset-1 rounded-2xl blur-sm transition-all duration-300 group-hover:blur-none" style={{ background: `linear-gradient(135deg, ${primary}30, transparent)` }}></div>
+                          <img 
+                            src="/hero/hero2.jpg" 
+                            alt="Mental Wellness"
+                            className="relative w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                            style={{ border: `3px solid ${primary}40` }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                        </div>
+                      </div>
+
+                      {/* Hero Image 3 - Bottom Left */}
+                      <div className="relative flex items-center justify-center animate-float-left">
+                        <div className="relative group w-full h-full max-w-[200px] max-h-[200px]">
+                          <div className="absolute -inset-1 rounded-2xl blur-sm transition-all duration-300 group-hover:blur-none" style={{ background: `linear-gradient(135deg, ${primary}30, transparent)` }}></div>
+                          <img 
+                            src="/hero/hero3.jpg" 
+                            alt="Professional Support"
+                            className="relative w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                            style={{ border: `3px solid ${primary}40` }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                        </div>
+                      </div>
+
+                      {/* Hero Image 4 - Bottom Right */}
+                      <div className="relative flex items-center justify-center animate-float-down">
+                        <div className="relative group w-full h-full max-w-[200px] max-h-[200px]">
+                          <div className="absolute -inset-1 rounded-2xl blur-sm transition-all duration-300 group-hover:blur-none" style={{ background: `linear-gradient(135deg, ${primary}30, transparent)` }}></div>
+                          <img 
+                            src="/hero/hero4.jpg" 
+                            alt="Holistic Care"
+                            className="relative w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
+                            style={{ border: `3px solid ${primary}40` }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Central Connecting Element */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="w-20 h-20 rounded-full animate-pulse-slow" style={{ background: `radial-gradient(circle, ${primary}15, transparent)` }}>
+                        <div className="w-full h-full rounded-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${primary}20, transparent)` }}>
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center animate-spin-slow" style={{ backgroundColor: primary }}>
+                            <HiSparkles size={16} color={white} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Corner Accent Lines */}
+                    <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 rounded-tl-lg" style={{ borderColor: primary }}></div>
+                    <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 rounded-tr-lg" style={{ borderColor: primary }}></div>
+                    <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 rounded-bl-lg" style={{ borderColor: primary }}></div>
+                    <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 rounded-br-lg" style={{ borderColor: primary }}></div>
+
+                    {/* Floating Particles */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                      <div className="absolute top-8 left-8 w-1.5 h-1.5 rounded-full animate-particle-1" style={{ backgroundColor: `${primary}60` }}></div>
+                      <div className="absolute top-12 right-12 w-1 h-1 rounded-full animate-particle-2" style={{ backgroundColor: `${primary}80` }}></div>
+                      <div className="absolute bottom-16 left-12 w-1.5 h-1.5 rounded-full animate-particle-3" style={{ backgroundColor: `${primary}70` }}></div>
+                      <div className="absolute bottom-8 right-8 w-1 h-1 rounded-full animate-particle-4" style={{ backgroundColor: `${primary}50` }}></div>
+                    </div>
+
+                  </div>
+                </div>
               </div>
-              
-              {/* Desktop video */}
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                className="hidden md:block w-full h-full object-cover"
-                onError={(e) => {
-                  console.log('Video failed to load, falling back to background');
-                  e.currentTarget.style.display = 'none';
-                }}
-              >
-                <source src="/videos/herosection.webm" type="video/webm" />
-                <source src="/videos/herosection.mp4" type="video/mp4" />
-              </video>
-              
-              {/* Mobile video with better mobile support */}
-              <video
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                webkit-playsinline="true"
-                x5-playsinline="true"
-                x5-video-player-type="h5"
-                x5-video-player-fullscreen="false"
-                className={`block md:hidden w-full h-full object-cover transition-opacity duration-500 ${isMobileVideoLoaded ? 'opacity-100' : 'opacity-0'}`}
-                style={{
-                  objectPosition: 'center center',
-                  minHeight: '100vh',
-                  minWidth: '100vw',
-                  backgroundColor: 'transparent'
-                }}
-                onError={(e) => {
-                  console.log('Mobile video failed to load, using gradient background');
-                  setMobileVideoError(true);
-                  e.currentTarget.style.display = 'none';
-                }}
-                onLoadStart={() => {
-                  console.log('Mobile video started loading');
-                }}
-                onCanPlay={() => {
-                  console.log('Mobile video can play');
-                  setIsMobileVideoLoaded(true);
-                }}
-                onLoadedData={() => {
-                  console.log('Mobile video data loaded');
-                  setIsMobileVideoLoaded(true);
-                }}
-                onWaiting={() => {
-                  console.log('Mobile video waiting for data');
-                }}
-              >
-                <source src="/videos/herosection.webm" type="video/webm" />
-                <source src="/videos/herosection.mp4" type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-              
-              {/* Dark overlay for better text readability */}
-              <div className="absolute inset-0 bg-black/40"></div>
+
             </div>
-            
-            {/* Mobile-specific CSS for video optimization */}
+
+            {/* Custom Animations */}
             <style jsx>{`
-              @media (max-width: 768px) {
-                video {
-                  -webkit-transform: translateZ(0);
-                  transform: translateZ(0);
-                  -webkit-backface-visibility: hidden;
-                  backface-visibility: hidden;
-                  -webkit-perspective: 1000;
-                  perspective: 1000;
+              @keyframes float-up {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-12px) rotate(1deg); }
+              }
+              
+              @keyframes float-right {
+                0%, 100% { transform: translateY(0px) translateX(0px); }
+                50% { transform: translateY(-8px) translateX(6px); }
+              }
+              
+              @keyframes float-left {
+                0%, 100% { transform: translateY(0px) translateX(0px); }
+                50% { transform: translateY(-10px) translateX(-4px); }
+              }
+              
+              @keyframes float-down {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-6px) rotate(-1deg); }
+              }
+              
+              @keyframes pulse-slow {
+                0%, 100% { opacity: 0.6; transform: scale(1); }
+                50% { opacity: 0.8; transform: scale(1.05); }
+              }
+              
+              @keyframes spin-slow {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+              
+              @keyframes particle-float-1 {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.7; }
+                25% { transform: translateY(-15px) translateX(10px); opacity: 1; }
+                50% { transform: translateY(-8px) translateX(-5px); opacity: 0.5; }
+                75% { transform: translateY(-20px) translateX(8px); opacity: 0.8; }
+              }
+              
+              @keyframes particle-float-2 {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.6; }
+                33% { transform: translateY(-12px) translateX(-8px); opacity: 1; }
+                66% { transform: translateY(-18px) translateX(12px); opacity: 0.4; }
+              }
+              
+              @keyframes particle-float-3 {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.8; }
+                40% { transform: translateY(-10px) translateX(6px); opacity: 0.3; }
+                80% { transform: translateY(-16px) translateX(-4px); opacity: 1; }
+              }
+              
+              @keyframes particle-float-4 {
+                0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.5; }
+                30% { transform: translateY(-14px) translateX(-6px); opacity: 0.9; }
+                70% { transform: translateY(-8px) translateX(10px); opacity: 0.6; }
+              }
+              
+              .animate-float-up {
+                animation: float-up 4s ease-in-out infinite;
+              }
+              
+              .animate-float-right {
+                animation: float-right 3.5s ease-in-out infinite 0.5s;
+              }
+              
+              .animate-float-left {
+                animation: float-left 4.5s ease-in-out infinite 1s;
+              }
+              
+              .animate-float-down {
+                animation: float-down 3.8s ease-in-out infinite 1.5s;
+              }
+              
+              .animate-pulse-slow {
+                animation: pulse-slow 3s ease-in-out infinite;
+              }
+              
+              .animate-spin-slow {
+                animation: spin-slow 20s linear infinite;
+              }
+              
+              .animate-particle-1 {
+                animation: particle-float-1 6s ease-in-out infinite;
+              }
+              
+              .animate-particle-2 {
+                animation: particle-float-2 7s ease-in-out infinite 1s;
+              }
+              
+              .animate-particle-3 {
+                animation: particle-float-3 5.5s ease-in-out infinite 2s;
+              }
+              
+              .animate-particle-4 {
+                animation: particle-float-4 6.5s ease-in-out infinite 0.5s;
+              }
+              
+              /* Responsive adjustments for mobile */
+              @media (max-width: 640px) {
+                .animate-float-up,
+                .animate-float-right,
+                .animate-float-left,
+                .animate-float-down {
+                  animation-duration: 2.5s;
                 }
               }
             `}</style>
+          </div>
 
-            <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-              <div className="text-center">
-                {/* Minimalist Badge */}
-                <div className="inline-flex items-center px-4 py-2 mb-12 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 animate-fade-in">
-                  <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
-                  <span className="text-sm font-medium text-white/90" style={{fontFamily: 'Poppins, sans-serif'}}>Trusted by 10,000+ users</span>
-                </div>
-
-                {/* Clean Typography */}
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-light text-white mb-8 leading-tight animate-fade-in-up" style={{animationDelay: '0.2s', fontFamily: 'Poppins, sans-serif'}}>
-                  Modern wellness
-                  <br />
-                  <span className="font-normal text-primary" style={{fontFamily: 'Poppins, sans-serif'}}>for everyone</span>
-                </h1>
-
-                {/* Refined Subtitle */}
-                <p className="text-lg sm:text-xl text-white/80 max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-up" style={{animationDelay: '0.4s', fontFamily: 'Poppins, sans-serif'}}>
-                  A judgement-free, inclusive space where you can seek guidance from licensed professionals and build a healthier, happier life.
-                </p>
-
-                {/* Clean CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in-up" style={{animationDelay: '0.6s'}}>
-                  <button 
-                    onClick={() => router.push('/mind')}
-                    className="px-8 py-4 text-white font-medium rounded-lg transition-all duration-300 hover:scale-105 shadow-lg"
-                    style={{fontFamily: 'Poppins, sans-serif', backgroundColor: '#3B47F9'}}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2B37E9'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3B47F9'}
-                  >
-                    Start Your Journey
-                  </button>
-                  
-                  <button 
-                    onClick={() => window.open('https://wa.me/919220521385?text=Hi! I would like to learn more about GuildUp.', '_blank')}
-                    className="px-8 py-4 border border-white/30 text-white font-medium rounded-lg transition-all duration-300 hover:bg-white/10 hover:border-white/50 backdrop-blur-sm"
-                    style={{fontFamily: 'Poppins, sans-serif'}}
-                  >
-                    Learn More
-                  </button>
-                </div>
-
-                {/* Minimalist Stats */}
-                <div className="grid grid-cols-3 gap-8 mt-16 animate-fade-in-up" style={{animationDelay: '0.8s'}}>
-                  <div className="text-center">
-                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>500+</div>
-                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Licensed Experts</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>10K+</div>
-                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Happy Users</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl sm:text-4xl font-light text-white mb-1" style={{fontFamily: 'Poppins, sans-serif'}}>50K+</div>
-                    <div className="text-sm text-white/60" style={{fontFamily: 'Poppins, sans-serif'}}>Sessions</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Customer Testimonials - Minimalist */}
-              <div className="relative max-w-3xl mx-auto mt-20">
-                <div className="bg-white/5 backdrop-blur-sm p-8 rounded-lg border border-white/10 min-h-[160px] flex items-center justify-center">
-                  <p className="text-white/90 text-lg text-center leading-relaxed" style={{fontFamily: 'Poppins, sans-serif'}}>
-                    &quot;{testimonials[currentTestimonial]}&quot;
-                  </p>
-                </div>
-                
-                {/* Clean Dots Navigation */}
-                <div className="flex justify-center mt-6 space-x-2 pb-20">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentTestimonial(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === currentTestimonial
-                          ? 'bg-teal-400'
-                          : 'bg-white/30 hover:bg-white/50'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
+          {/* Spacer Section */}
+          <div className="w-full py-12 sm:py-16" style={{ backgroundColor: white }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="h-8"></div>
             </div>
           </div>
 
@@ -600,19 +717,19 @@ function Page() {
                       title: "Online Assessment",
                       desc: "Share your goals and challenges with our platform. We'll match you with the right expert for your needs.",
                       icon: FileText,
-                      color: "#3B47F9"
+                      color: primary
                     },
                     {
                       title: "Connect with Expert", 
                       desc: "Start with a free 30-minute consultation via chat, phone, or video call based on your preference.",
                       icon: Video,
-                      color: "#3B47F9"
+                      color: primary
                     },
                     {
                       title: "Ongoing Support",
                       desc: "Continue your journey with regular sessions, progress tracking, and 24/7 access to your expert.",
                       icon: CheckCircle,
-                      color: "#3B47F9"
+                      color: primary
                     }
                   ].map((item, index) => (
                     <Flex key={index} direction="column" align="center" flex="1" minW="300px" maxW="400px">
@@ -627,9 +744,9 @@ function Page() {
                             alignItems="center" 
                             justifyContent="center"
                             border="4px"
-                            borderColor={item.color}
+                            borderColor={primary}
                           >
-                            <item.icon size={40} color={item.color} />
+                            <item.icon size={40} color={primary} />
                           </Box>
                           {index < 2 && (
                             <Box 
@@ -639,7 +756,7 @@ function Page() {
                               transform="translateY(-50%)" 
                               w={8} 
                               h={0.5} 
-                              bg={`${item.color}80`}
+                              bg={`${primary}80`}
                               display={{ base: "none", lg: "block" }}
                             />
                           )}
@@ -673,28 +790,28 @@ function Page() {
                       title: "Mental Health",
                       desc: "Therapy, counseling, and mental wellness support from licensed professionals",
                       icon: Brain,
-                      color: "#3B47F9",
+                      color: primary,
                       route: "/mind"
                     },
                     {
                       title: "Physical Wellness", 
                       desc: "Fitness training, nutrition guidance, and physical health optimization",
                       icon: Dumbbell,
-                      color: "#3B47F9",
+                      color: primary,
                       route: "/body"
                     },
                     {
                       title: "Relationships",
                       desc: "Couples therapy, relationship counseling, and interpersonal skills", 
                       icon: Heart,
-                      color: "#3B47F9",
+                      color: primary,
                       route: "/relationships"
                     },
                     {
                       title: "Career Growth",
                       desc: "Professional development, career coaching, and skill enhancement",
                       icon: Briefcase,
-                      color: "#3B47F9", 
+                      color: primary, 
                       route: "/career"
                     }
                   ].map((item, index) => (
@@ -723,7 +840,7 @@ function Page() {
                             alignItems="center" 
                             justifyContent="center"
                           >
-                            <item.icon size={32} color="white" />
+                            <item.icon size={32} color={white} />
                           </Box>
                           <Heading size="lg" color="white">{item.title}</Heading>
                           <Text color="gray.300" fontSize="sm">{item.desc}</Text>
@@ -753,25 +870,25 @@ function Page() {
                       title: "Affordable",
                       desc: "GuildUp saves travel costs and provides competitive pricing for quality wellness services",
                       icon: DollarSign,
-                      color: "#3B47F9"
+                      color: primary
                     },
                     {
                       title: "Whenever Wherever",
                       desc: "Access wellness support on-demand, anytime according to your convenience",
                       icon: Globe,
-                      color: "#3B47F9"
+                      color: primary
                     },
                     {
                       title: "No stigma or judgement",
                       desc: "Friendly, discreet services in a safe, judgment-free environment",
                       icon: Shield,
-                      color: "#3B47F9"
+                      color: primary
                     },
                     {
                       title: "Verified Experts",
                       desc: "Connect with licensed professionals, no more reading endless reviews",
                       icon: CheckCircle,
-                      color: "#3B47F9"
+                      color: primary
                     }
                   ].map((item, index) => (
                     <Box 
@@ -803,7 +920,7 @@ function Page() {
                               justifyContent="center"
                               shadow="lg"
                             >
-                              <item.icon size={28} color="white" />
+                              <item.icon size={28} color={white} />
                             </Box>
                             <Heading size="md" color="gray.900">{item.title}</Heading>
                             <Text color="gray.600" fontSize="sm">{item.desc}</Text>
@@ -817,14 +934,99 @@ function Page() {
             </Container>
           </Box>
 
-          {/* 5. Featured Experts Section */}
-          <div className="w-full bg-gradient-to-br from-gray-50 to-white py-16 sm:py-20">
+          {/* Spacer Section */}
+          <div className="w-full py-8 sm:py-12" style={{ backgroundColor: white }}>
+            <div className="h-4"></div>
+          </div>
+
+          {/* 5. Customer Testimonials Section */}
+          <div className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: black, fontFamily: 'Garamond, serif', fontWeight: '700' }}>
+                  What Our Users Say
+                </h2>
+                <p className="text-lg max-w-2xl mx-auto" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>
+                  Real stories from people who found their path to wellness with GuildUp
+                </p>
+              </div>
+
+              <div className="max-w-4xl mx-auto">
+                <div className="p-8 sm:p-12 rounded-2xl border shadow-lg" style={{ backgroundColor: '#F9FAFB', borderColor: `${primary}20` }}>
+                  <div className="text-center">
+                    <div className="mb-6">
+                      <svg className="w-8 h-8 mx-auto mb-4" style={{ color: primary }} fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
+                      </svg>
+                    </div>
+                    
+                    <blockquote className="text-lg sm:text-xl italic mb-8 leading-relaxed" style={{ color: '#374151', fontFamily: 'Garamond, serif', fontWeight: '400' }}>
+                      &quot;{testimonials[currentTestimonial]}&quot;
+                    </blockquote>
+                    
+                    <div className="flex justify-center space-x-3 mb-6">
+                      {testimonials.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentTestimonial(index)}
+                          className="w-3 h-3 rounded-full transition-all duration-300 hover:scale-110"
+                          style={{
+                            backgroundColor: index === currentTestimonial 
+                              ? primary 
+                              : '#D1D5DB'
+                          }}
+                          onMouseEnter={(e) => {
+                            if (index !== currentTestimonial) {
+                              (e.target as HTMLElement).style.backgroundColor = '#9CA3AF';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (index !== currentTestimonial) {
+                              (e.target as HTMLElement).style.backgroundColor = '#D1D5DB';
+                            }
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>
+                      Anonymous User • Verified Review
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Trust Indicators */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12">
+                  <div className="text-center p-6 rounded-xl" style={{ backgroundColor: `${primary}05` }}>
+                    <div className="text-2xl font-bold mb-2" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>4.8/5</div>
+                    <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Average Rating</div>
+                  </div>
+                  <div className="text-center p-6 rounded-xl" style={{ backgroundColor: `${primary}05` }}>
+                    <div className="text-2xl font-bold mb-2" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>95%</div>
+                    <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Satisfaction Rate</div>
+                  </div>
+                  <div className="text-center p-6 rounded-xl" style={{ backgroundColor: `${primary}05` }}>
+                    <div className="text-2xl font-bold mb-2" style={{ color: primary, fontFamily: 'Garamond, serif', fontWeight: '700' }}>1000+</div>
+                    <div className="text-sm" style={{ color: '#6B7280', fontFamily: 'Garamond, serif', fontWeight: '400' }}>Success Stories</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Spacer Section */}
+          <div className="w-full py-6 sm:py-8" style={{ backgroundColor: white }}>
+            <div className="h-2"></div>
+          </div>
+
+          {/* 6. Featured Experts Section */}
+          <div className="w-full py-16 sm:py-20" style={{background: `linear-gradient(to bottom right, #f9fafb, ${white})`}}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{color: black}}>
                   Featured Experts
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p className="text-lg max-w-2xl mx-auto" style={{color: black}}>
                   Meet our licensed professionals who are ready to guide your wellness journey
                 </p>
               </div>
@@ -858,9 +1060,13 @@ function Page() {
             </div>
           </div>
 
+          {/* Spacer Section */}
+          <div className="w-full py-8 sm:py-10" style={{ backgroundColor: white }}>
+            <div className="h-4"></div>
+          </div>
 
-          {/* 6. Discovery Call Banner - WhatsApp with Primary Background */}
-          <div className="relative w-full overflow-hidden py-16 sm:py-20 bg-primary">
+          {/* 7. Discovery Call Banner - WhatsApp with Primary Background */}
+          <div className="relative w-full overflow-hidden py-16 sm:py-20" style={{backgroundColor: primary}}>
 
             {/* Content */}
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
@@ -873,10 +1079,10 @@ function Page() {
                   </div>
                 </div>
                 
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-white">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4" style={{color: white, fontFamily: 'Garamond, serif', fontWeight: '700'}}>
                   🎯 Free Discovery Call!
                 </h2>
-                <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto mb-8 leading-relaxed">
+                <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto mb-8 leading-relaxed" style={{fontFamily: 'Garamond, serif', fontWeight: '400'}}>
                   Not sure which expert is right for you? Chat with us on WhatsApp for a complimentary consultation to discuss your goals and find your perfect match.
                 </p>
                 
@@ -893,21 +1099,26 @@ function Page() {
                   </Button>
                 </div>
                 
-                <p className="text-sm text-white/80 mt-6">
+                <p className="text-sm text-white/80 mt-6" style={{fontFamily: 'Garamond, serif', fontWeight: '400'}}>
                   No commitment required • Expert guidance • Personalized recommendations
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 7. All Experts Listing */}
-          <div className="w-full bg-white py-16 sm:py-20">
+          {/* Spacer Section */}
+          <div className="w-full py-6 sm:py-8" style={{ backgroundColor: white }}>
+            <div className="h-2"></div>
+          </div>
+
+          {/* 8. All Experts Listing */}
+          <div className="w-full py-16 sm:py-20" style={{backgroundColor: white}}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{color: black}}>
                   All Experts
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p className="text-lg max-w-2xl mx-auto" style={{color: black}}>
                   Browse through our complete collection of expert communities and find the perfect match for your journey
                 </p>
               </div>
@@ -931,7 +1142,7 @@ function Page() {
         </div>
 
         {/* White spacing before footer */}
-        <div className="bg-white py-8"></div>
+        <div className="py-8" style={{backgroundColor: white}}></div>
 
         {/* Footer */}
         <Footer />
