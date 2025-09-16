@@ -8,6 +8,11 @@ import {
   Search,
   Plus,
   MessageCircle,
+  Brain,
+  Dumbbell,
+  Apple,
+  Heart,
+  Sparkles,
 } from "lucide-react";
 import { FaBars, FaSignInAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -301,12 +306,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 border-b border-gray-100 bg-white pt-2 lg:px-8 xl:px-12 w-full flex",
+          "fixed top-0 z-50 border-b border-gray-200/60 bg-white/95 backdrop-blur-md pt-3 lg:px-8 xl:px-12 w-full flex shadow-sm",
           props.className
         )}
+        style={{ fontFamily: 'Garamond, serif' }}
         {...props}
       >
-        <div className="container flex h-14 items-center px-3 md:px-4 lg:px-6 max-w-full">
+        <div className="container flex h-16 items-center px-4 md:px-6 lg:px-8 max-w-full">
           <div className="flex gap-3 md:gap-4 lg:gap-6 items-center">
             <button
               className="md:hidden flex items-center justify-center p-1"
@@ -329,8 +335,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
 
           <div className="flex grow items-center justify-between">
-            <div className="flex flex-1 items-center md:ml-4 lg:ml-8 xl:ml-12 ml-2">
-              <div className="relative w-full max-w-xs lg:max-w-sm xl:max-w-[400px]">
+            <div className="flex flex-1 items-center md:ml-6 lg:ml-10 xl:ml-16 ml-3">
+              <div className="relative w-full max-w-sm lg:max-w-md xl:max-w-[450px]">
                 <div className="flex">
                   <Input
                     type="search"
@@ -339,16 +345,17 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         ? "Search..."
                         : "Search creators, pages, or offerings..."
                     }
-                    className="w-full bg-white outline-1 rounded-full pl-3 md:pl-4 lg:pl-5 pr-8 md:pr-10 lg:pr-12 py-1.5 md:py-2 lg:py-2.5 text-xs md:text-sm text-gray-600 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/10 focus:outline-none"
+                    className="w-full bg-gray-50/80 backdrop-blur-sm border-gray-200 outline-1 rounded-2xl pl-4 md:pl-5 lg:pl-6 pr-10 md:pr-12 lg:pr-14 py-2 md:py-2.5 lg:py-3 text-sm md:text-base text-gray-700 placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 focus:bg-white transition-all duration-200"
+                    style={{ fontFamily: 'Garamond, serif', fontWeight: '400' }}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   />
                   <button
-                    className="absolute right-1 top-1/2 -translate-y-1/2 flex h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-full cursor-pointer"
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 flex h-7 w-7 md:h-8 md:w-8 lg:h-9 lg:w-9 items-center justify-center bg-primary hover:bg-primary/90 text-white rounded-xl cursor-pointer transition-all duration-200 shadow-md hover:shadow-lg"
                     onClick={handleSearch}
                   >
-                    <Search className="h-3 w-3 md:h-3.5 md:w-3.5 lg:h-4 lg:w-4" />
+                    <Search className="h-3.5 w-3.5 md:h-4 md:w-4 lg:h-4.5 lg:w-4.5" />
                   </button>
                 </div>
               </div>
@@ -362,62 +369,153 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </div>
             <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
               <div className="hidden md:flex items-center">
-                <ul className="flex items-center space-x-1 lg:space-x-2 text-gray-600">
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
-                    <Link href="/" className="flex flex-col items-center">
-                      <Compass
-                        className={`h-5 w-5 ${
-                          isActive("/") ? "text-primary" : ""
+                <ul className="flex items-center space-x-2 lg:space-x-4 text-gray-700">
+
+                  <li className="px-2 lg:px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-all duration-200 relative group">
+                    <div className="flex flex-col items-center cursor-pointer">
+                      <Users
+                        className={`h-5 w-5 transition-colors duration-200 ${
+                          isActive("/experts") ? "text-primary" : "group-hover:text-primary/70"
                         }`}
                       />
                       <span
-                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
-                          isActive("/") ? "text-primary font-medium" : ""
+                        className={`text-sm lg:text-base mt-1.5 hidden md:block transition-colors duration-200 ${
+                          isActive("/experts") ? "text-primary font-semibold" : "group-hover:text-primary/70 font-medium"
                         }`}
+                        style={{ fontFamily: 'Garamond, serif' }}
                       >
-                        {StringConstants.EXPLORE}
+                        Find Expert
                       </span>
-                    </Link>
+                    </div>
+                    
+                    {/* Dropdown Menu */}
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                      <div className="py-3">
+                        {/* Expert Categories */}
+                        {[
+                          {
+                            name: "Mental Health",
+                            icon: Brain,
+                            description: "Therapy, counseling & mental wellness",
+                            href: "/experts?category=mental-health"
+                          },
+                          {
+                            name: "Fitness",
+                            icon: Dumbbell,
+                            description: "Personal training & fitness coaching",
+                            href: "/experts?category=fitness"
+                          },
+                          {
+                            name: "Nutrition",
+                            icon: Apple,
+                            description: "Diet planning & nutritional guidance",
+                            href: "/experts?category=nutrition"
+                          },
+                          {
+                            name: "Relationship",
+                            icon: Heart,
+                            description: "Couples therapy & relationship counseling",
+                            href: "/experts?category=relationship"
+                          },
+                          {
+                            name: "Healing",
+                            icon: Sparkles,
+                            description: "Alternative & holistic healing practices",
+                            href: "/experts?category=healing"
+                          }
+                        ].map((category, index) => (
+                          <Link
+                            key={category.name}
+                            href={category.href}
+                            className="block px-5 py-3.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-xl mx-2"
+                            onClick={() => {
+                              tracking.trackClick("find_expert_category", {
+                                source: "navbar_dropdown",
+                                category_name: category.name,
+                                user_id: session?.user._id,
+                              });
+                            }}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                                <category.icon className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-base" style={{ fontFamily: 'Garamond, serif' }}>{category.name}</div>
+                                <div className="text-sm text-gray-500 truncate" style={{ fontFamily: 'Garamond, serif', fontWeight: '400' }}>
+                                  {category.description}
+                                </div>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                        
+                        {/* Divider */}
+                        <div className="border-t border-gray-100 my-2 mx-2"></div>
+                        
+                        {/* All Experts Option */}
+                        <Link
+                          href="/experts"
+                          className="block px-5 py-3.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-xl mx-2"
+                          onClick={() => {
+                            tracking.trackClick("find_expert_all", {
+                              source: "navbar_dropdown",
+                              user_id: session?.user._id,
+                            });
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                              <Users className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-base" style={{ fontFamily: 'Garamond, serif' }}>All Experts</div>
+                              <div className="text-sm text-gray-500" style={{ fontFamily: 'Garamond, serif', fontWeight: '400' }}>Browse all available experts</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
                   </li>
 
-                  
-
-                  <li className="px-1 lg:px-2  py-2 rounded-full transition-all duration-200">
-                    <Link href="/feeds" className="flex flex-col items-center">
+                  <li className="px-2 lg:px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-all duration-200">
+                    <Link href="/feeds" className="flex flex-col items-center group">
                       <MdOutlineRssFeed
-                        className={`h-5 w-5 ${
-                          isActive("/feeds") ? "text-primary" : ""
+                        className={`h-5 w-5 transition-colors duration-200 ${
+                          isActive("/feeds") ? "text-primary" : "group-hover:text-primary/70"
                         }`}
                       />
                       <span
-                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
-                          isActive("/feeds") ? "text-primary font-medium" : ""
+                        className={`text-sm lg:text-base mt-1.5 hidden md:block transition-colors duration-200 ${
+                          isActive("/feeds") ? "text-primary font-semibold" : "group-hover:text-primary/70 font-medium"
                         }`}
+                        style={{ fontFamily: 'Garamond, serif' }}
                       >
                         {StringConstants.FEED}
                       </span>
                     </Link>
                   </li>
 
-                  <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
+                  <li className="px-2 lg:px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-all duration-200">
                     <Link
                       href="/chat"
-                      className="flex flex-col items-center relative"
+                      className="flex flex-col items-center relative group"
                     >
                       <MessageCircle
-                        className={`h-5 w-5 ${
-                          isActive("/chat") ? "text-primary" : ""
+                        className={`h-5 w-5 transition-colors duration-200 ${
+                          isActive("/chat") ? "text-primary" : "group-hover:text-primary/70"
                         }`}
                       />
                       {user?._id && unreadCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-md">
                           {unreadCount > 9 ? "9+" : unreadCount}
                         </span>
                       )}
                       <span
-                        className={`text-xs lg:text-sm mt-1 hidden md:block ${
-                          isActive("/chat") ? "text-primary font-medium" : ""
+                        className={`text-sm lg:text-base mt-1.5 hidden md:block transition-colors duration-200 ${
+                          isActive("/chat") ? "text-primary font-semibold" : "group-hover:text-primary/70 font-medium"
                         }`}
+                        style={{ fontFamily: 'Garamond, serif' }}
                       >
                         Chat
                       </span>
@@ -425,20 +523,20 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </li>
 
                   {user?._id && (
-                    <li className="px-1 lg:px-2 py-2 rounded-full transition-all duration-200">
+                    <li className="px-2 lg:px-3 py-2.5 rounded-xl hover:bg-gray-50 transition-all duration-200">
                       <NotificationDropdown />
                     </li>
                   )}
                 </ul>
               </div>
 
-              <div className="hidden md:block ml-2 lg:ml-4 xl:ml-6">
+              <div className="hidden md:block ml-4 lg:ml-6 xl:ml-8">
                 {user?._id ? (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-gray-50 transition-all duration-200">
-                          <Avatar className="h-10 w-10">
+                        <button className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all duration-200 border border-gray-200/50">
+                          <Avatar className="h-11 w-11 ring-2 ring-gray-100">
                             {session?.user?.image ? (
                               <AvatarImage
                                 src={session?.user?.image || "/placeholder.svg"}
@@ -450,30 +548,31 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                               </AvatarFallback>
                             )}
                           </Avatar>
-                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                          <ChevronDown className="h-4 w-4 text-gray-500 transition-transform duration-200" />
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
-                        className="w-56 mt-2 bg-white border border-gray-100 rounded-lg shadow-lg"
+                        className="w-64 mt-3 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl"
                         align="end"
                       >
                         <DropdownMenuItem
                           asChild
-                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          className="px-5 py-3 text-base text-gray-700 hover:text-primary hover:bg-gray-50/80 rounded-xl mx-2 my-1"
                         >
-                          <Link href="/profile">Profile</Link>
+                          <Link href="/profile" style={{ fontFamily: 'Garamond, serif', fontWeight: '500' }}>Profile</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
-                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          className="px-5 py-3 text-base text-gray-700 hover:text-primary hover:bg-gray-50/80 rounded-xl mx-2 my-1"
                         >
                           <Link
                             href="/chat"
                             className="flex items-center justify-between"
+                            style={{ fontFamily: 'Garamond, serif', fontWeight: '500' }}
                           >
                             <span>Chat</span>
                             {user?._id && unreadCount > 0 && (
-                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                              <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-md">
                                 {unreadCount > 9 ? "9+" : unreadCount}
                               </span>
                             )}
@@ -481,20 +580,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
-                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          className="px-5 py-3 text-base text-gray-700 hover:text-primary hover:bg-gray-50/80 rounded-xl mx-2 my-1"
                         >
-                          <Link href="/booking">Bookings</Link>
+                          <Link href="/booking" style={{ fontFamily: 'Garamond, serif', fontWeight: '500' }}>Bookings</Link>
                         </DropdownMenuItem>
                         {isUser && (
                           <DropdownMenuItem
                             asChild
-                            className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                            className="px-5 py-3 text-base text-gray-700 hover:text-primary hover:bg-gray-50/80 rounded-xl mx-2 my-1"
                           >
-                            <Link href="/payments">Payments</Link>
+                            <Link href="/payments" style={{ fontFamily: 'Garamond, serif', fontWeight: '500' }}>Payments</Link>
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
-                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          className="px-5 py-3 text-base text-gray-700 hover:text-primary hover:bg-gray-50/80 rounded-xl mx-2 my-1"
+                          style={{ fontFamily: 'Garamond, serif', fontWeight: '500' }}
                           onClick={handleSignOut}
                         >
                           {StringConstants.SIGN_OUT}
@@ -510,7 +610,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           callbackUrl: `${window.location.href}?hero=2`,
                         })
                       }
-                      className="px-6 border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+                      className="px-8 py-2.5 border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 rounded-xl font-semibold"
+                      style={{ fontFamily: 'Garamond, serif' }}
                       variant="outline"
                     >
                       Sign In
@@ -524,7 +625,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   onOpenChange={setIsDialogOpen}
                 >
                   <Button
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 border-0"
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 border-0 px-8 py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                    style={{ fontFamily: 'Garamond, serif' }}
                     onClick={handleCreatorButtonClick}
                   >
                     Join as Expert
@@ -539,39 +641,62 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
         </div>
       </nav>
 
-      <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
+      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white/95 backdrop-blur-md border-t border-gray-200/60 md:hidden shadow-lg">
+        <div className="grid h-full max-w-lg grid-cols-6 mx-auto" style={{ fontFamily: 'Garamond, serif' }}>
           <Link
             href="/"
-            className="flex flex-col items-center justify-center gap-1"
+            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
           >
-            <div className="w-6 h-6 flex items-center justify-center">
+            <div className="w-7 h-7 flex items-center justify-center">
               <Compass
-                className={`w-5 h-5 ${isActive("/") ? "text-primary" : ""}`}
+                className={`w-5 h-5 transition-colors duration-200 ${isActive("/") ? "text-primary" : "text-gray-600"}`}
               />
             </div>
             <span
-              className={`text-[10px] ${isActive("/") ? "text-primary" : ""}`}
+              className={`text-xs font-medium ${isActive("/") ? "text-primary" : "text-gray-600"}`}
+              style={{ fontFamily: 'Garamond, serif' }}
             >
               {StringConstants.HOME}
             </span>
           </Link>
 
           <Link
-            href="/feeds"
-            className="flex flex-col items-center justify-center gap-1"
+            href="/experts"
+            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
           >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <MdOutlineRssFeed
-                className={`w-5 h-5 ${
-                  isActive("/feeds") ? "text-primary" : ""
+            <div className="w-7 h-7 flex items-center justify-center">
+              <Users
+                className={`w-5 h-5 transition-colors duration-200 ${
+                  isActive("/experts") ? "text-primary" : "text-gray-600"
                 }`}
               />
             </div>
             <span
-              className={`text-[10px] ${
-                isActive("/feeds") ? "text-primary" : ""
+              className={`text-xs font-medium ${
+                isActive("/experts") ? "text-primary" : "text-gray-600"
               }`}
+              style={{ fontFamily: 'Garamond, serif' }}
+            >
+              Experts
+            </span>
+          </Link>
+
+          <Link
+            href="/feeds"
+            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
+          >
+            <div className="w-7 h-7 flex items-center justify-center">
+              <MdOutlineRssFeed
+                className={`w-5 h-5 transition-colors duration-200 ${
+                  isActive("/feeds") ? "text-primary" : "text-gray-600"
+                }`}
+              />
+            </div>
+            <span
+              className={`text-xs font-medium ${
+                isActive("/feeds") ? "text-primary" : "text-gray-600"
+              }`}
+              style={{ fontFamily: 'Garamond, serif' }}
             >
               {StringConstants.FEED}
             </span>
@@ -579,22 +704,23 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
           <Link
             href="/chat"
-            className="flex flex-col items-center justify-center gap-1"
+            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
           >
-            <div className="w-6 h-6 flex items-center justify-center relative">
+            <div className="w-7 h-7 flex items-center justify-center relative">
               <MessageCircle
-                className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : ""}`}
+                className={`w-5 h-5 transition-colors duration-200 ${isActive("/chat") ? "text-primary" : "text-gray-600"}`}
               />
               {user?._id && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-md">
                   {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </div>
             <span
-              className={`text-[10px] ${
-                isActive("/chat") ? "text-primary" : ""
+              className={`text-xs font-medium ${
+                isActive("/chat") ? "text-primary" : "text-gray-600"
               }`}
+              style={{ fontFamily: 'Garamond, serif' }}
             >
               Chat
             </span>
@@ -602,20 +728,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
           <Link
             href={getMySpaceLink()}
-            className="flex flex-col items-center justify-center gap-1"
+            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
             onClick={handleMySpaceClick}
           >
-            <div className="w-6 h-6 flex items-center justify-center">
+            <div className="w-7 h-7 flex items-center justify-center">
               <Users
-                className={`w-5 h-5 ${
-                  isActive("/community") ? "text-primary" : ""
+                className={`w-5 h-5 transition-colors duration-200 ${
+                  isActive("/community") ? "text-primary" : "text-gray-600"
                 }`}
               />
             </div>
             <span
-              className={`text-[10px] ${
-                isActive("/community") ? "text-primary" : ""
+              className={`text-xs font-medium ${
+                isActive("/community") ? "text-primary" : "text-gray-600"
               }`}
+              style={{ fontFamily: 'Garamond, serif' }}
             >
               {StringConstants.MY_SPACE}
             </span>
@@ -624,9 +751,9 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           {user?._id ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
-                    <Avatar className="h-4 w-4">
+                <button className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200">
+                  <div className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                    <Avatar className="h-5 w-5">
                       <AvatarImage
                         src={session?.user?.image || ""}
                         alt="User"
@@ -636,32 +763,33 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <span className="text-[10px]">My Account</span>
+                  <span className="text-xs font-medium text-gray-600" style={{ fontFamily: 'Garamond, serif' }}>My Account</span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="bg-background/95 backdrop-blur border-gray-700"
+                className="bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl"
                 align="end"
                 side="top"
-                sideOffset={40}
+                sideOffset={50}
               >
                 <DropdownMenuItem
                   asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
                 >
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/profile" className="text-base font-medium" style={{ fontFamily: 'Garamond, serif' }}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
                 >
                   <Link
                     href="/chat"
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between text-base font-medium"
+                    style={{ fontFamily: 'Garamond, serif' }}
                   >
                     <span>Chat</span>
                     {user?._id && unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-md">
                         {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
                     )}
@@ -669,20 +797,21 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
+                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
                 >
-                  <Link href="/booking">Bookings</Link>
+                  <Link href="/booking" className="text-base font-medium" style={{ fontFamily: 'Garamond, serif' }}>Bookings</Link>
                 </DropdownMenuItem>
                 {isUser && (
                   <DropdownMenuItem
                     asChild
-                    className="hover:bg-primary-gradient border-b border-zinc-300"
+                    className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
                   >
-                    <Link href="/payments">Payments</Link>
+                    <Link href="/payments" className="text-base font-medium" style={{ fontFamily: 'Garamond, serif' }}>Payments</Link>
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem
-                  className="hover:bg-primary-gradient"
+                  className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 text-base font-medium"
+                  style={{ fontFamily: 'Garamond, serif' }}
                   onClick={handleSignOut}
                 >
                   {StringConstants.SIGN_OUT}
@@ -691,22 +820,22 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </DropdownMenu>
           ) : (
             <button
-              className="flex flex-col items-center justify-center gap-1"
+              className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
               onClick={() =>
                 signIn(undefined, {
                   callbackUrl: `${window.location.origin}?hero=2`,
                 })
               }
             >
-              <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
-                <Avatar className="h-4 w-4">
+              <div className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                <Avatar className="h-5 w-5">
                   <AvatarImage src="/placeholder.svg" alt="User" />
                   <AvatarFallback>
                     <FaSignInAlt />
                   </AvatarFallback>
                 </Avatar>
               </div>
-              <span className="text-[10px]">{StringConstants.SIGN_IN}</span>
+              <span className="text-xs font-medium text-gray-600" style={{ fontFamily: 'Garamond, serif' }}>{StringConstants.SIGN_IN}</span>
             </button>
           )}
         </div>
@@ -721,14 +850,15 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
 
       <div
         className={cn(
-          "fixed top-16 left-0 h-screen w-64 bg-white shadow-md z-50 p-4 flex flex-col",
-          "transform transition-transform duration-300 ease-in-out border border-solid border-t border-l border-r border-gray-200",
+          "fixed top-16 left-0 h-screen w-72 bg-white/95 backdrop-blur-md shadow-xl z-50 p-6 flex flex-col",
+          "transform transition-transform duration-300 ease-in-out border-r border-gray-200/60",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{ fontFamily: 'Garamond, serif' }}
       >
-        <div className="px-1 flex flex-col overflow-y-auto">
-          <div className="flex gap-2 px-2 justify-between w-full border-b border-gray-300 pb-2 mb-2">
-            <h4 className="text-base font-medium">
+        <div className="px-2 flex flex-col overflow-y-auto">
+          <div className="flex gap-3 px-3 justify-between w-full border-b border-gray-200 pb-4 mb-4">
+            <h4 className="text-lg font-semibold text-gray-800" style={{ fontFamily: 'Garamond, serif' }}>
               {StringConstants.CREATE_A_PAGE}
             </h4>
             <Dialog
@@ -739,16 +869,16 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="w-8 h-8 rounded-lg bg-primary hover:bg-blue-900 text-zinc-300"
+                  className="w-10 h-10 rounded-xl bg-primary hover:bg-primary/90 text-white shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={handleCreatorButtonClick}
                 >
-                  <Plus className="h-6 w-6" />
+                  <Plus className="h-5 w-5" />
                 </Button>
               </DialogTrigger>
               <CreatorForm onClose={() => setIsCreatorFormOpen(false)} />
             </Dialog>
           </div>
-          <div className="space-y-3 pb-16">
+          <div className="space-y-4 pb-20">
             {communities && communities.length > 0 ? (
               communities.map((community: any) => {
                 if (!community) return null;
@@ -757,31 +887,32 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   <button
                     key={community._id}
                     className={cn(
-                      "w-full flex items-center gap-3 rounded-lg py-2 justify-start bg-card",
-                      isActive ? "bg-blue-500/20" : "bg-card"
+                      "w-full flex items-center gap-4 rounded-xl py-3 px-3 justify-start transition-all duration-200 hover:shadow-md",
+                      isActive ? "bg-primary/10 border border-primary/20" : "bg-gray-50/80 hover:bg-gray-100/80"
                     )}
                     onClick={() => handleSelectCommunity(community)}
                   >
                     <Avatar
-                      className={`w-10 h-10 rounded-lg ${
-                        isActive ? "ring-2 ring-purple-500" : ""
+                      className={`w-12 h-12 rounded-xl shadow-md ${
+                        isActive ? "ring-2 ring-primary" : ""
                       }`}
                     >
                       <AvatarImage
                         src={community.image || "/placeholder.svg"}
                         alt={community.name}
-                        className="!rounded-lg"
+                        className="!rounded-xl"
                       />
-                      <AvatarFallback className="!rounded-lg">
+                      <AvatarFallback className="!rounded-xl" style={{ fontFamily: 'Garamond, serif' }}>
                         {getInitials(community.name)}
                       </AvatarFallback>
                     </Avatar>
 
                     <span
                       className={cn(
-                        "font-medium text-sm",
-                        isActive ? "text-blue-600" : "text-gray-800"
+                        "font-semibold text-base flex-1 text-left",
+                        isActive ? "text-primary" : "text-gray-800"
                       )}
+                      style={{ fontFamily: 'Garamond, serif' }}
                     >
                       {community.name}
                     </span>
@@ -795,10 +926,14 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                 );
               })
             ) : (
-              <div className="">
-                {StringConstants.NO_COMMUNITIES_AVAILABLE}
+              <div className="text-center py-8">
+                <p className="text-gray-600 text-base font-medium" style={{ fontFamily: 'Garamond, serif' }}>
+                  {StringConstants.NO_COMMUNITIES_AVAILABLE}
+                </p>
                 {!session && (
-                  <p className="mt-2">Sign in to create or join communities</p>
+                  <p className="mt-3 text-gray-500 text-sm" style={{ fontFamily: 'Garamond, serif' }}>
+                    Sign in to create or join communities
+                  </p>
                 )}
               </div>
             )}

@@ -386,6 +386,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontWeight="bold" 
                     color="gray.900" 
                     mb={1}
+                    fontFamily="Garamond, serif"
                   >
                     {communityDetails?.name || "Expert Name"}
                   </Text>
@@ -393,6 +394,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontSize="md" 
                     color="gray.600" 
                     fontWeight="medium"
+                    fontFamily="Garamond, serif"
                   >
                     {getCommunityType}
                   </Text>
@@ -401,13 +403,13 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                 {/* Pricing */}
                 <Box>
                   <HStack spacing={2} align="baseline">
-                    <Text fontSize="lg" fontWeight="bold" color={primaryColor}>
+                    <Text fontSize="lg" fontWeight="bold" color={primaryColor} fontFamily="Garamond, serif">
                       ₹ Free
                     </Text>
-                    <Text fontSize="sm" color="red.500" textDecoration="line-through">
+                    <Text fontSize="sm" color="red.500" textDecoration="line-through" fontFamily="Garamond, serif">
                       800
                     </Text>
-                    <Text fontSize="sm" color="gray.500">
+                    <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">
                       for 30 min consultation
                     </Text>
                   </HStack>
@@ -418,7 +420,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                   <Icon viewBox="0 0 24 24" boxSize={4} color={primaryColor}>
                     <path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
                   </Icon>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color="gray.600" fontFamily="Garamond, serif">
                     {communityDetails?.user_languages?.length > 0 
                       ? communityDetails.user_languages.join(", ") 
                       : communityDetails?.languages?.length > 0 
@@ -430,7 +432,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                 {/* Rating */}
                 <HStack spacing={2} align="center">
                   <StarIcon color="yellow.500" boxSize={4} />
-                  <Text fontSize="sm" fontWeight="medium" color="yellow.600">
+                  <Text fontSize="sm" fontWeight="medium" color="yellow.600" fontFamily="Garamond, serif">
                     {averageRating > 0 
                       ? `${averageRating} (${totalReviews} reviews)` 
                       : "4.8 (30 reviews)"}
@@ -460,22 +462,23 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontSize="sm"
                     fontWeight="medium"
                     whiteSpace="nowrap"
+                    fontFamily="Garamond, serif"
                   >
                     {tag}
                   </Badge>
                 ))
               ) : (
                 <>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
                     Nutrition
                   </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
                     Dieting
                   </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
                     Weight Loss
                   </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap">
+                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
                     Wellness
                   </Badge>
                 </>
@@ -488,24 +491,24 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
             <HStack spacing={2} align="center">
               <Icon as={FaAward} boxSize={4} color={primaryColor} />
               <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500">Years of Experience</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900">5+ years</Text>
+                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Years of Experience</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">5+ years</Text>
               </VStack>
             </HStack>
             
             <HStack spacing={2} align="center">
               <Icon as={FaUsers} boxSize={4} color={primaryColor} />
               <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500">Sessions Conducted</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900">100+ Sessions</Text>
+                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Sessions Conducted</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">100+ Sessions</Text>
               </VStack>
             </HStack>
             
             <HStack spacing={2} align="center">
               <Icon as={FaCalendarAlt} boxSize={4} color={primaryColor} />
               <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500">Next available slot</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900">Today, 05:30 PM</Text>
+                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Next available slot</Text>
+                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">Today, 05:30 PM</Text>
               </VStack>
             </HStack>
           </HStack>
@@ -525,6 +528,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
             borderRadius="xl"
             transition="all 0.3s ease"
             fontSize="lg"
+            fontFamily="Garamond, serif"
             leftIcon={<Icon viewBox="0 0 24 24" boxSize={5}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
             onClick={handleClaimFreeSession}
             data-analytics-type="community-cta"
