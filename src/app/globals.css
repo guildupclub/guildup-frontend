@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add spacing for coupon banner */
+/* Add spacing for navbar */
 body {
-  padding-top: 128px; /* navbar height (64px) + coupon banner height (~64px) */
+  padding-top: 64px; /* navbar height */
 }
 
 @media (max-width: 768px) {
   body {
-    padding-top: 148px; /* navbar height (64px) + coupon banner height (~84px) on mobile */
+    padding-top: 64px; /* navbar height on mobile */
   }
 }
 

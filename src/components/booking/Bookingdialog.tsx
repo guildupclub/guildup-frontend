@@ -102,6 +102,7 @@ export function BookingDialog({
   // OTP flow state
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
 
   const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
@@ -143,6 +144,15 @@ export function BookingDialog({
     }
   }, [isLoggedIn, reduxUser]);
 
+  // Reset OTP states when dialog is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setOtp("");
+      setOtpSent(false);
+      setOtpVerified(false);
+    }
+  }, [isOpen]);
+
   const handleSendOtp = async () => {
     if (!phone || !name || !email) {
       toast.error("Please fill in your name, email, and phone number.");
@@ -167,32 +177,8 @@ export function BookingDialog({
   const handleVerifyOtp = async () => {
     setIsVerifying(true);
     try {
-      // If user is already logged in, we need to update their profile with the new phone number
-      if (isLoggedIn && reduxUser) {
-        // Update user profile with new phone number
-        const response = await axios.patch(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/edit`,
-          {
-            updateData: { phone: phone },
-            userId: reduxUser._id,
-          }
-        );
-        
-        if (response.data.r === "s") {
-          toast.success("Phone number updated successfully!");
-          // Update the redux state with new phone number
-          dispatch(
-            setUser({
-              user: { ...reduxUser, phone: phone },
-              token: reduxUser.token || "",
-            })
-          );
-          setOtp("");
-          setOtpSent(false);
-        } else {
-          toast.error(response.data.message || "Failed to update phone number");
-        }
-      } else {
+      // OTP verification is only for guest users (not logged in)
+      if (!isLoggedIn) {
         // Original flow for non-logged in users
         const response = await axios.post(
           `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`,
@@ -228,9 +214,13 @@ export function BookingDialog({
           }
           setOtp("");
           setOtpSent(false);
+          setOtpVerified(true);
         } else {
           toast.error(response.data.message || "Failed to verify OTP");
         }
+      } else {
+        // This should never happen as logged-in users don't go through OTP flow
+        toast.error("Invalid operation");
       }
     } catch (error) {
       toast.error("Failed to verify OTP");
@@ -599,29 +589,6 @@ export function BookingDialog({
                   <BiSolidOffer className="h-5 w-5 text-green-600" />
                   {offering?.type.toUpperCase()}
                 </p>
-                
-                {/* Promotional Coupon Message */}
-                <div className="mt-3 p-2 sm:p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg shadow-sm">
-                  <div className="flex items-center justify-center gap-1 sm:gap-2">
-                    <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5">
-                      <span className="text-xs sm:text-sm font-medium text-blue-700">
-                        Apply coupon
-                      </span>
-                      <span className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-bold text-xs shadow-sm border border-yellow-300">
-                        GUILD100
-                      </span>
-                      <span className="text-xs sm:text-sm font-medium text-blue-700">
-                        to get
-                      </span>
-                      <span className="bg-green-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-bold text-xs">
-                        100% OFF
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-blue-600 mt-1 font-medium text-center">
-                    on your first 3 discovery sessions
-                  </p>
-                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 w-full mt-4 px-4 py-5 bg-gray-50 rounded-xl border border-gray-200 shadow-sm">
@@ -830,71 +797,86 @@ export function BookingDialog({
                         <Label htmlFor="phone">
                           Phone Number <span className="text-red-500">*</span>
                         </Label>
-                        <div className="flex flex-wrap items-center gap-2">
+                        {isLoggedIn ? (
+                          // For logged-in users: just show editable phone input (no OTP flow)
                           <PhoneInput
                             international
                             defaultCountry="IN"
                             value={phone}
                             onChange={(value) => setPhone(value || "")}
-                            className="w-full flex-1 min-w-0 p-2 shadow-md border border-border/30 rounded-md"
+                            className="w-full p-2 shadow-md border border-border/30 rounded-md"
                             required
                             placeholder="Enter your phone number"
-                            disabled={otpSent}
                           />
-                          {!otpSent && (
-                            <Button
-                              onClick={handleSendOtp}
-                              disabled={!phone || !name || !email}
-                              className="w-full md:w-auto"
-                            >
-                              Send OTP
-                            </Button>
-                          )}
-                        </div>
+                        ) : (
+                          // For guest users: show phone input with Send OTP button
+                          <>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <PhoneInput
+                                international
+                                defaultCountry="IN"
+                                value={phone}
+                                onChange={(value) => setPhone(value || "")}
+                                className="w-full flex-1 min-w-0 p-2 shadow-md border border-border/30 rounded-md"
+                                required
+                                placeholder="Enter your phone number"
+                                disabled={otpSent || otpVerified}
+                              />
+                              {!otpSent && !otpVerified && (
+                                <Button
+                                  onClick={handleSendOtp}
+                                  disabled={!phone || !name || !email}
+                                  className="w-full md:w-auto"
+                                >
+                                  Send OTP
+                                </Button>
+                              )}
+                              {otpVerified && (
+                                <Button
+                                  disabled
+                                  className="w-full md:w-auto bg-green-600 hover:bg-green-600"
+                                >
+                                  Verified ✓
+                                </Button>
+                              )}
+                            </div>
+
+                            {otpSent && !otpVerified && (
+                              <div className="space-y-2 rounded-lg bg-primary/5 p-4 mt-2">
+                                <Label htmlFor="otp">
+                                  Enter OTP <span className="text-red-500">*</span>
+                                </Label>
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    id="otp"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    placeholder="6-digit OTP"
+                                    required
+                                    className="flex-1"
+                                  />
+                                  <Button
+                                    onClick={handleVerifyOtp}
+                                    className="bg-primary"
+                                    disabled={isVerifying || !otp}
+                                  >
+                                    {isVerifying ? "Verifying..." : "Verify & Login"}
+                                  </Button>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  Didn&apos;t receive it?{" "}
+                                  <button
+                                    onClick={handleSendOtp}
+                                    className="text-primary hover:underline"
+                                  >
+                                    Resend OTP
+                                  </button>
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        )}
                       </div>
-
-                      {otpSent && (
-                        <div className="space-y-2 rounded-lg bg-primary/5 p-4">
-                          <Label htmlFor="otp">
-                            Enter OTP <span className="text-red-500">*</span>
-                          </Label>
-                          <div className="flex items-center gap-2">
-                            <Input
-                              id="otp"
-                              value={otp}
-                              onChange={(e) => setOtp(e.target.value)}
-                              placeholder="6-digit OTP"
-                              required
-                              className="flex-1"
-                            />
-                            <Button
-                              onClick={handleVerifyOtp}
-                              className="bg-primary"
-                              disabled={isVerifying}
-                            >
-                              {isVerifying ? "Verifying..." : (isLoggedIn ? "Verify & Update" : "Verify & Login")}
-                            </Button>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            Didn&apos;t receive it?{" "}
-                            <button
-                              onClick={handleSendOtp}
-                              className="text-primary hover:underline"
-                            >
-                              Resend OTP
-                            </button>
-                          </p>
-                        </div>
-                      )}
-
-                      {isLoggedIn && (
-                        <p className="text-xs text-muted-foreground">
-                          {reduxUser?.phone 
-                            ? "Your WhatsApp number is required for booking confirmation & reminders."
-                            : "Please add your phone number to proceed with the booking. We'll send you a verification OTP."
-                          }
-                        </p>
-                      )}
 
                       <div className="space-y-2">
                         <Label
@@ -941,7 +923,10 @@ export function BookingDialog({
                     <Button
                       onClick={handleBookSlot}
                       className="bg-primary w-full hover:bg-primary/90 transition-all duration-200 flex items-center gap-2"
-                      disabled={isProcessing || !(isLoggedIn || (typeof window !== 'undefined' && window.sessionStorage.getItem('token')))}
+                      disabled={
+                        isProcessing || 
+                        !(isLoggedIn || (typeof window !== 'undefined' && window.sessionStorage.getItem('token')))
+                      }
                     >
                       {isProcessing ? (
                         <>

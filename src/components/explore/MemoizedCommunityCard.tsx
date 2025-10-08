@@ -145,16 +145,31 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
     const handleClaimFreeSession = useCallback((e: React.MouseEvent) => {
       e.stopPropagation();
       
-      if (!communityDetails?.min_offering_id) {
-        console.error("No minimum offering ID available:", communityDetails);
-        // toast.error("Session booking unavailable", {
-        //   description: "Please try again later or contact support",
-        // });
+      // If min_offering_id is available, go directly to the offering
+      if (communityDetails?.min_offering_id) {
+        router.push(`/offering/${communityDetails.min_offering_id}`);
         return;
       }
 
-      // Navigate to the offering page
-      router.push(`/offering/${communityDetails.min_offering_id}`);
+      // Otherwise, navigate to the community profile page where users can see all offerings
+      if (!communityDetails?._id) {
+        console.error("No community ID available:", communityDetails);
+        toast.error("Unable to book session", {
+          description: "Please try again later",
+        });
+        return;
+      }
+
+      // Create URL-friendly community name
+      const cleanedCommunityName = communityDetails.name
+        .replace(/\s+/g, "-")
+        .replace(/\|/g, "-")
+        .replace(/-+/g, "-");
+      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+      const communityParams = `${encodedCommunityName}-${communityDetails._id}`;
+
+      // Navigate to community profile page
+      router.push(`/community/${communityParams}/profile`);
     }, [communityDetails, router]);
 
     const formatNumber = (num: number) => {
@@ -301,26 +316,26 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
             </div>
 
             {/* Expertise Tags */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 min-h-[80px] content-start">
               {tags && tags.length > 0 ? (
                 tags.slice(0, 3).map((tag, index) => (
                   <Badge
                     key={index}
                     variant="secondary"
-                    className={`text-xs px-2 py-1 ${getTagColor(index)}`}
+                    className={`text-xs px-3 py-2 ${getTagColor(index)}`}
                   >
                     {tag}
                   </Badge>
                 ))
               ) : (
                 <>
-                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-blue-50 text-blue-700 border border-blue-200">
+                  <Badge variant="secondary" className="text-xs px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200">
                     Wellness
                   </Badge>
-                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-green-50 text-green-700 border border-green-200">
+                  <Badge variant="secondary" className="text-xs px-3 py-2 bg-green-50 text-green-700 border border-green-200">
                     Nutrition
                   </Badge>
-                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-purple-50 text-purple-700 border border-purple-200">
+                  <Badge variant="secondary" className="text-xs px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200">
                     Fitness
                   </Badge>
                 </>
@@ -328,29 +343,16 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
             </div>
           </div>
 
-          {/* Pricing & Offer Section */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500 line-through">₹1,000 / session</span>
-                <span className="text-lg font-bold text-green-600">FREE Today</span>
-              </div>
-            </div>
-            <p className="text-sm font-medium text-indigo-600 bg-indigo-50 px-3 py-2 rounded-lg border border-indigo-200">
-              💎 Use coupon <span className="font-bold text-indigo-700">GUILD100</span> to claim your free session
-            </p>
-          </div>
-
           {/* CTA Button */}
           <Button
             className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
             onClick={handleClaimFreeSession}
             data-analytics-type="community-cta"
-            data-analytics-name="Claim Free Session"
+            data-analytics-name="Book discovery session"
             data-community-id={communityDetails?._id || ""}
             data-community-name={communityDetails?.name || ""}
           >
-            🎁 Claim Free Session →
+            Book discovery session →
           </Button>
         </div>
       </Card>

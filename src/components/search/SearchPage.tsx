@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
 import PostCard from "./PostCard";
-import CommunityCard from "./CommunityCard";
+import MemoizedCommunityCard from "../explore/MemoizedCommunityCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { API_BASE_URL } from "@/config/constants";
 import { StringConstants } from "../common/CommonText";
@@ -91,40 +91,41 @@ function SearchPageContent() {
 
   // Handle community click with Redux
   const handleClickCommunity = useCallback(
-    (communityData: { community: Community }) => {
-      if (!communityData.community || !communityData.community._id) {
+    (communityData: any) => {
+      // Handle both formats: { community: Community } and Community directly
+      const community = communityData.community || communityData;
+      
+      if (!community || !community._id) {
         console.error("Invalid community data:", communityData);
         return;
       }
 
-      setLoading(true);
-
       dispatch(
         setCommunityData({
-          communityId: communityData.community._id,
-          userId: communityData.community.user_id,
+          communityId: community._id,
+          userId: community.user_id,
         })
       );
 
-      // @ts-ignore - Ignoring type mismatch as the action only needs id and name
       dispatch(
         setActiveCommunity({
-          id: communityData.community._id,
-          name: communityData.community.name,
+          id: community._id,
+          name: community.name,
           image: "",
           background_image: "",
           user_isBankDetailsAdded: false,
           user_iscalendarConnected: false
         })
       );
-      const cleanedCommunityName = communityData.community.name
-        ? communityData.community.name
+      
+      const cleanedCommunityName = community.name
+        ? community.name
             .replace(/\s+/g, "-")
             .replace(/\|/g, "-")
             .replace(/-+/g, "-")
         : "";
       const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-      const communityParams = `${encodedCommunityName}-${communityData.community._id}`;
+      const communityParams = `${encodedCommunityName}-${community._id}`;
       router.push(`/community/${communityParams}/profile`);
     },
     [dispatch, router]
@@ -176,7 +177,7 @@ function SearchPageContent() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {results.map((result) => (
-                  <CommunityCard
+                  <MemoizedCommunityCard
                     key={result._id}
                     community={result}
                     onClick={() => handleClickCommunity(result)}
