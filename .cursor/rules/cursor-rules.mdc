@@ -1,0 +1,24 @@
+---
+alwaysApply: true
+---
+# Project Rules
+
+## Data Fetching
+- Always fetch community data from the backend API
+- Never use hardcoded community data or mock data
+- Use proper error handling for API calls
+- Implement loading states while fetching data
+- Cache API responses appropriately using React Query or similar
+
+## Typography
+- Use Poppins font family throughout the entire project
+- Apply Poppins to all text elements, components, and UI elements
+- Ensure consistent font usage across all pages and components
+- Example: `fontFamily="'Poppins', sans-serif"`
+
+## Code Standards
+- Avoid hardcoding values unless explicitly required
+- Use environment variables for API endpoints and configuration
+- Extract constants to separate files or configuration objects
+- Use dynamic values from props, state, or API responses
+- Make components reusable and configurable through props

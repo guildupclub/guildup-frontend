@@ -386,7 +386,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontWeight="bold" 
                     color="gray.900" 
                     mb={1}
-                    fontFamily="Garamond, serif"
+                    fontFamily="'Poppins', sans-serif"
                   >
                     {communityDetails?.name || "Expert Name"}
                   </Text>
@@ -394,64 +394,59 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontSize="md" 
                     color="gray.600" 
                     fontWeight="medium"
-                    fontFamily="Garamond, serif"
+                    fontFamily="'Poppins', sans-serif"
                   >
                     {getCommunityType}
                   </Text>
                 </Box>
 
-                {/* Pricing */}
-                <Box>
-                  <HStack spacing={2} align="baseline">
-                    <Text fontSize="lg" fontWeight="bold" color={primaryColor} fontFamily="Garamond, serif">
-                      ₹ Free
-                    </Text>
-                    <Text fontSize="sm" color="red.500" textDecoration="line-through" fontFamily="Garamond, serif">
-                      800
-                    </Text>
-                    <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">
-                      for 30 min consultation
-                    </Text>
-                  </HStack>
-                </Box>
 
                 {/* Languages */}
-                <HStack spacing={2} align="center">
-                  <Icon viewBox="0 0 24 24" boxSize={4} color={primaryColor}>
-                    <path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-                  </Icon>
-                  <Text fontSize="sm" color="gray.600" fontFamily="Garamond, serif">
-                    {communityDetails?.user_languages?.length > 0 
-                      ? communityDetails.user_languages.join(", ") 
-                      : communityDetails?.languages?.length > 0 
-                      ? communityDetails.languages.join(", ") 
-                      : "Hindi, English, Gujarati, Urdu, French"}
-                  </Text>
-                </HStack>
+                {(() => {
+                  const languages = communityDetails?.user_languages || 
+                                  communityDetails?.languages || 
+                                  communityDetails?.user?.languages ||
+                                  [];
+                  
+                  if (languages.length === 0) return null;
+                  
+                  return (
+                    <HStack spacing={2} align="center">
+                      <Icon viewBox="0 0 24 24" boxSize={4} color={primaryColor}>
+                        <path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                      </Icon>
+                      <Text fontSize="sm" color="gray.600" fontFamily="Garamond, serif">
+                        {Array.isArray(languages) ? languages.join(", ") : languages}
+                      </Text>
+                    </HStack>
+                  );
+                })()}
 
                 {/* Rating */}
-                <HStack spacing={2} align="center">
-                  <StarIcon color="yellow.500" boxSize={4} />
-                  <Text fontSize="sm" fontWeight="medium" color="yellow.600" fontFamily="Garamond, serif">
-                    {averageRating > 0 
-                      ? `${averageRating} (${totalReviews} reviews)` 
-                      : "4.8 (30 reviews)"}
-                  </Text>
-                </HStack>
+                {(averageRating > 0 || totalReviews > 0) && (
+                  <HStack spacing={2} align="center">
+                    <StarIcon color="yellow.500" boxSize={4} />
+                    <Text fontSize="sm" fontWeight="medium" color="yellow.600" fontFamily="Garamond, serif">
+                      {averageRating > 0 
+                        ? `${averageRating} (${totalReviews} reviews)` 
+                        : `${totalReviews} reviews`}
+                    </Text>
+                  </HStack>
+                )}
               </VStack>
             </Box>
           </Flex>
 
           {/* Specializations */}
-          <Box mb={6}>
-            <Flex 
-              direction="row" 
-              align="center" 
-              gap={2}
-              flexWrap="wrap"
-            >
-              {tags && tags.length > 0 ? (
-                tags.slice(0, 7).map((tag, index) => (
+          {tags && tags.length > 0 && (
+            <Box mb={6}>
+              <Flex 
+                direction="row" 
+                align="center" 
+                gap={2}
+                flexWrap="wrap"
+              >
+                {tags.slice(0, 7).map((tag, index) => (
                   <Badge
                     key={index}
                     bg="gray.100"
@@ -462,55 +457,76 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                     fontSize="sm"
                     fontWeight="medium"
                     whiteSpace="nowrap"
-                    fontFamily="Garamond, serif"
+                    fontFamily="'Poppins', sans-serif"
                   >
                     {tag}
                   </Badge>
-                ))
-              ) : (
-                <>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
-                    Nutrition
-                  </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
-                    Dieting
-                  </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
-                    Weight Loss
-                  </Badge>
-                  <Badge bg="gray.100" color="gray.700" px={3} py={1} borderRadius="md" fontSize="sm" fontWeight="medium" whiteSpace="nowrap" fontFamily="Garamond, serif">
-                    Wellness
-                  </Badge>
-                </>
-              )}
-            </Flex>
-          </Box>
+                ))}
+              </Flex>
+            </Box>
+          )}
 
           {/* Metrics Section */}
           <HStack spacing={6} mb={6} justify="space-between">
-            <HStack spacing={2} align="center">
-              <Icon as={FaAward} boxSize={4} color={primaryColor} />
-              <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Years of Experience</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">5+ years</Text>
-              </VStack>
-            </HStack>
-            
-            <HStack spacing={2} align="center">
-              <Icon as={FaUsers} boxSize={4} color={primaryColor} />
-              <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Sessions Conducted</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">100+ Sessions</Text>
-              </VStack>
-            </HStack>
-            
-            <HStack spacing={2} align="center">
-              <Icon as={FaCalendarAlt} boxSize={4} color={primaryColor} />
-              <VStack spacing={0} align="start">
-                <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Next available slot</Text>
-                <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">Today, 05:30 PM</Text>
-              </VStack>
-            </HStack>
+            {(() => {
+              const experience = communityDetails?.owner_experience || 
+                               communityDetails?.user_year_of_experience || 
+                               communityDetails?.user?.year_of_experience || 0;
+              const sessions = communityDetails?.owner_sessions || 
+                             communityDetails?.user_session_conducted || 
+                             communityDetails?.user?.session_conducted || 0;
+              
+              const metrics = [];
+              
+              // Only show experience if available
+              if (experience > 0) {
+                metrics.push(
+                  <HStack key="experience" spacing={2} align="center">
+                    <Icon as={FaAward} boxSize={4} color={primaryColor} />
+                    <VStack spacing={0} align="start">
+                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Years of Experience</Text>
+                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{Math.floor(experience)}+ years</Text>
+                    </VStack>
+                  </HStack>
+                );
+              }
+              
+              // Only show sessions if available
+              if (sessions > 0) {
+                metrics.push(
+                  <HStack key="sessions" spacing={2} align="center">
+                    <Icon as={FaUsers} boxSize={4} color={primaryColor} />
+                    <VStack spacing={0} align="start">
+                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Sessions Conducted</Text>
+                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{Math.floor(sessions)} Sessions</Text>
+                    </VStack>
+                  </HStack>
+                );
+              }
+              
+              // Check for availability data
+              const nextSlot = communityDetails?.next_available_slot || 
+                             communityDetails?.availability?.next_slot;
+              if (nextSlot) {
+                const slotTime = new Date(nextSlot).toLocaleString('en-US', {
+                  weekday: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+                
+                metrics.push(
+                  <HStack key="availability" spacing={2} align="center">
+                    <Icon as={FaCalendarAlt} boxSize={4} color={primaryColor} />
+                    <VStack spacing={0} align="start">
+                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Next available slot</Text>
+                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{slotTime}</Text>
+                    </VStack>
+                  </HStack>
+                );
+              }
+              
+              return metrics.length > 0 ? metrics : null;
+            })()}
           </HStack>
 
           {/* CTA Button */}

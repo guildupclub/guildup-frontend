@@ -194,6 +194,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const [BookingCount, setBookingCount] = useState(0);
 
   const activeCommunityId = communityId || community?.communityId;
+  
+  console.log("ProfileCard Debug:");
+  console.log("- communityId prop:", communityId);
+  console.log("- community?.communityId:", community?.communityId);
+  console.log("- activeCommunityId:", activeCommunityId);
 
   // Add this ref and effect for the infinite scroll animation
   const testimonialRef = useRef<HTMLDivElement>(null);
@@ -361,7 +366,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
 
   // Fetch offerings for the community
   const fetchOfferings = useCallback(async () => {
-    if (!activeCommunityId) return;
+    console.log("fetchOfferings called with activeCommunityId:", activeCommunityId);
+    if (!activeCommunityId) {
+      console.log("No activeCommunityId, returning early");
+      return;
+    }
 
     try {
       const response = await axios.get(
@@ -369,11 +378,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       );
 
       if (response.data.r === "s") {
-        setOfferings(
-          Array.isArray(response.data.data)
-            ? response.data.data
-            : [response.data.data]
-        );
+        const fetchedOfferings = Array.isArray(response.data.data)
+          ? response.data.data
+          : [response.data.data];
+        
+        console.log("API Response:", response.data);
+        console.log("Fetched offerings:", fetchedOfferings);
+        console.log("Number of offerings:", fetchedOfferings.length);
+        
+        setOfferings(fetchedOfferings);
       }
     } catch (error) {
       console.error("Error fetching offerings:", error);
@@ -419,9 +432,6 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     },
   });
 
-  useEffect(() => {
-    fetchOfferings();
-  }, [community.communityId, fetchOfferings]);
 
   const followMutation = useMutation({
     mutationFn: async () => {
@@ -825,354 +835,60 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       )}
 
       <div className="mx-auto max-w-6xl px-3 py-2 md:px-0">
-        {/* Profile Header Card */}
+        {/* Section 1: Profile Header */}
         <div className="overflow-hidden rounded-xl border border-border/5 bg-card shadow-lg">
-          {/* Banner Image */}
-          <div className="relative">
-            <div className="h-44 lg:h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
-              <Image
-                src={
-                  profile?.community.background_image ||
-                  bgImgUrl ||
-                  "/guildup-logo.png"
-                }
-                alt="Profile banner"
-                width={1200}
-                height={250}
-                className="h-full w-full object-cover opacity-90 transition-transform duration-500 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              {isOwner && (
-                <button
-                  onClick={() => backgroundInputRef.current?.click()}
-                  disabled={isUploadingBackground}
-                  className="absolute top-4 right-4 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70 disabled:opacity-50"
-                  title="Change background image"
-                >
-                  {isUploadingBackground ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  ) : (
-                    <Pencil className="h-4 w-4" />
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row">
-            {/* Left Column - Profile Image and Key Actions */}
-            <div className="w-full md:w-1/3 px-2 lg:px-6 pt-0 pb-6 relative">
-              {/* Profile Avatar - Half on background, half below */}
-              <div className="absolute -top-20 left-4 lg:left-10">
-                <div className="relative">
-                  <Image
-                    src={
-                      profile?.community?.image ||
-                      avatarImgUrl ||
-                      "/guildup-logo.png"
-                    }
-                    alt={profile?.community?.name || "Community Avatar"}
-                    width={200}
-                    height={200}
-                    className="h-44 lg:h-60 w-44 lg:w-56 rounded-xl border-4 border-background bg-primary/5 object-cover transition-transform duration-300 hover:scale-105 shadow-lg"
-                    unoptimized
-                  />
-                  {isOwner && (
-                    <button
-                      onClick={() => avatarInputRef.current?.click()}
-                      disabled={isUploadingAvatar}
-                      className="absolute bottom-2 right-2 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70 disabled:opacity-50"
-                      title="Change profile image"
-                    >
-                      {isUploadingAvatar ? (
-                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      ) : (
-                        <Pencil className="h-3 w-3" />
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-              <div className="mt-20 hidden md:block">
-                <div className="flex flex-col gap-2 pt-8 lg:pt-24 w-56 lg:ml-4">
-                  {/* <h1 className="flex items-center  text-lg font-semibold text-muted">
-                    {profile?.community?.name} - {profile.user.user_name}
-                  </h1> */}
-                  {isOwner ? (
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleShareClick}
-                      title="Share Profile"
-                    >
-                      Share Profile
-                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
-                    </Button>
-                  ) : (
-                    <>
-                      {isCommunityFollowed ? (
-                        <Button
-                          variant="default"
-                          size="lg"
-                          className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                          onClick={handleLeaveCommunity}
-                        >
-                          {StringConstants.FOLLOWING}
-                          <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="default"
-                          size="lg"
-                          className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                          onClick={handleJoinCommunity}
-                        >
-                          <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                          {StringConstants.FOLLOW}
-                        </Button>
-                      )}
-
-                      {/* Chat Support Button - Only for verified experts */}
-                      {activeCommunityId && (
-                        <ChatSupportButton
-                          expertEmail={profile.user.user_email || ""}
-                          expertDetails={{
-                            name: profile.user.user_name || "Expert",
-                            email: profile.user.user_email || "",
-                            image: profile.user.user_avatar || "",
-                          }}
-                          isBankConnected={isBankConnected}
-                          className="w-full mt-2"
-                        />
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column - Community Details */}
-            <div className="w-full md:w-2/3 p-6 border-t md:border-t-0 md:border-l border-border/10 pt-20 lg:pt-4 ">
-              <div className="space-y-2">
-                <div className="flex items-center  justify-between">
-                  <div className="flex items-center space-x-2">
-                    <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight text-foreground">
-                      {profile?.community?.name}
-                      {/* {isOwner && (
-                        <button
-                          className="rounded-md p-1 transition hover:bg-background"
-                          onClick={() => setIsEditOpen(true)}
-                          aria-label="Edit community"
-                        >
-                          <Pencil
-                            size={18}
-                            className="text-muted hover:text-primary"
-                          />
-                        </button>
-                      )} */}
-                    </h1>{" "}
-                    {isBankConnected && (
-                      <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+            {/* Column 1: Community Image with Chat Button */}
+            <div className="flex flex-col items-center">
+              <div className="relative">
+                <Image
+                  src={
+                    profile?.community?.image ||
+                    avatarImgUrl ||
+                    "/guildup-logo.png"
+                  }
+                  alt={profile?.community?.name || "Community Avatar"}
+                  width={300}
+                  height={300}
+                  className="w-64 h-64 rounded-xl border-4 border-background bg-primary/5 object-cover shadow-lg"
+                  unoptimized
+                />
+                {isOwner && (
+                  <button
+                    onClick={() => avatarInputRef.current?.click()}
+                    disabled={isUploadingAvatar}
+                    className="absolute bottom-2 right-2 rounded-full bg-black/50 p-2 text-white transition-all hover:bg-black/70 disabled:opacity-50"
+                    title="Change profile image"
+                  >
+                    {isUploadingAvatar ? (
+                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      <Pencil className="h-3 w-3" />
                     )}
-                  </div>
-                  {isOwner && (
-                    <div>
-                      <Button
-                        className="border border-blue-600 px-6 hidden md:block"
-                        variant="outline"
-                        onClick={() => setIsEditOpen(true)}
-                      >
-                        Edit Profile
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                {/* Creator Info */}
-                <p className="text-md text-muted-foreground mt-1 mb-4">
-                  {StringConstants.CREATED_BY}{" "}
-                  <span className="text-foreground">
-                    {profile.user.user_name}
-                  </span>
-                </p>
-                {/* Years of Experience */}
-                {profile.user?.user_year_of_experience > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-5 w-5 text-amber-500"
-                    >
-                      <circle cx="12" cy="8" r="7" />
-                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                    </svg>
-                    <span className="font-medium text-foreground">
-                      {profile.user.user_year_of_experience}+
-                    </span>
-                    <span>Years of experience</span>
-                  </div>
+                  </button>
                 )}
-                {/* Sessions Conducted */}
-                {profile.user?.user_session_conducted > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-5 w-5 text-violet-500"
-                    >
-                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                    </svg>
-                    <span className="font-medium text-foreground">
-                      {profile.user.user_session_conducted}+
-                    </span>
-                    <span>Sessions Conducted</span>
-                  </div>
-                )}
-                {/* Languages */}
-                {profile.user?.user_languages?.length > 0 && (
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-5 w-5 text-teal-500"
-                    >
-                      <path d="m5 8 6 6" />
-                      <path d="m4 14 6-6 2-3" />
-                      <path d="M2 5h12" />
-                      <path d="M7 2h1" />
-                      <path d="m22 22-5-10-5 10" />
-                      <path d="M14 18h6" />
-                    </svg>
-                    <div className="flex flex-wrap gap-1">
-                      {profile.user.user_languages.map(
-                        (lang: string, index: number) => (
-                          <Badge
-                            key={index}
-                            variant="outline"
-                            className="bg-teal-50 text-teal-700 border-teal-200"
-                          >
-                            {lang}
-                          </Badge>
-                        )
-                      )}
-                    </div>
-                  </div>
-                )}
-                {/* Community Stats */}
-                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-2">
-                  {/* Members */}
-                  <div className="flex items-center gap-1.5">
-                    <MdPeopleAlt className="h-5 w-5 text-green-500" />
-                    <span className="font-medium text-foreground">
-                      {profile.community.num_member.toLocaleString()}
-                    </span>
-                    {StringConstants.MEMBER}
-                  </div>
-
-                  <div className="h-1 w-1 rounded-full bg-border" />
-
-                  {/* Posts */}
-                  <div className="flex items-center gap-1.5">
-                    <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
-                    <span className="font-medium text-foreground">
-                      {profile?.community?.post_count}
-                    </span>
-                    {StringConstants.POSTS}
-                  </div>
-
-                  {/* Instagram Followers */}
-                  {profile.community?.instagram_followers > 0 && (
-                    <>
-                      <div className="h-1 w-1 rounded-full bg-border" />
-                      <div className="flex items-center gap-1.5">
-                        <GrInstagram className="h-5 w-5 text-pink-500" />
-                        <span className="font-medium text-foreground">
-                          {formatNumber(profile.community?.instagram_followers)}
-                        </span>
-                        {StringConstants.FOLLOWERS}
-                      </div>
-                    </>
-                  )}
-
-                  {/* YouTube Subscribers */}
-                  {profile.community?.youtube_followers > 0 && (
-                    <>
-                      <div className="h-1 w-1 rounded-full bg-border" />
-                      <div className="flex items-center gap-1.5">
-                        <BsYoutube className="h-5 w-5 text-red-500" />
-                        <span className="font-medium text-foreground">
-                          {formatNumber(profile.community?.youtube_followers)}
-                        </span>
-                        {StringConstants.SUBSCRIBERS}
-                      </div>
-                    </>
-                  )}
-
-                  {/* LinkedIn Followers */}
-                  {profile.community?.linkedin_followers > 0 && (
-                    <>
-                      <div className="h-1 w-1 rounded-full bg-border" />
-                      <div className="flex items-center gap-1.5">
-                        <FaLinkedinIn className="h-5 w-5 text-blue-800" />
-                        <span className="font-medium text-foreground">
-                          {formatNumber(profile.community?.linkedin_followers)}
-                        </span>
-                        {StringConstants.FOLLOWERS}
-                      </div>
-                    </>
-                  )}
-                </div>
               </div>
-            </div>
-
-            <div className=" block md:hidden mt-4 px-4">
-              <div className="flex flex-col gap-2 w-full lg:ml-4">
-                {/* <h1 className="flex items-center  text-lg font-semibold text-muted">
-                    {profile?.community?.name} - {profile.user.user_name}
-                  </h1> */}
+              
+              {/* Chat Button at bottom of image */}
+              <div className="mt-4 w-full max-w-64">
                 {isOwner ? (
-                  <div>
-                    <Button
-                      className="border border-blue-300 px-6 w-full my-2"
-                      variant="outline"
-                      onClick={() => setIsEditOpen(true)}
-                    >
-                      Edit Profile <FaEdit className="ml-2 h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="default"
-                      size="lg"
-                      className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                      onClick={handleShareClick}
-                      title="Share Profile"
-                    >
-                      Share Profile
-                      <FaRegShareFromSquare className="ml-2 h-5 w-5" />
-                    </Button>
-                  </div>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                    onClick={handleShareClick}
+                    title="Share Profile"
+                  >
+                    Share Profile
+                    <FaRegShareFromSquare className="ml-2 h-5 w-5" />
+                  </Button>
                 ) : (
                   <>
                     {isCommunityFollowed ? (
                       <Button
                         variant="default"
                         size="lg"
-                        className="w-full transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        className="w-full mb-2 transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
                         onClick={handleLeaveCommunity}
                       >
                         {StringConstants.FOLLOWING}
@@ -1182,7 +898,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       <Button
                         variant="default"
                         size="lg"
-                        className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
+                        className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
                         onClick={handleJoinCommunity}
                       >
                         <HiMiniUserGroup className="mr-2 h-5 w-5" />
@@ -1190,7 +906,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       </Button>
                     )}
 
-                    {/* Chat Support Button - Mobile Version */}
+                    {/* Chat Support Button */}
                     {activeCommunityId && (
                       <ChatSupportButton
                         expertEmail={profile.user.user_email || ""}
@@ -1200,42 +916,176 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                           image: profile.user.user_avatar || "",
                         }}
                         isBankConnected={isBankConnected}
-                        className="w-full mt-2"
+                        className="w-full"
                       />
                     )}
                   </>
                 )}
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Owner Stats Band */}
-        <div className="mt-6">
-          <div className="rounded-2xl border border-border/5 bg-gradient-to-r from-primary/5 via-background to-primary/5 p-5 sm:p-6 shadow-sm">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-center">
-              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Years</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.user?.user_year_of_experience || 0}+</p>
+            {/* Column 2: Community Details */}
+            <div className="space-y-4">
+              {/* Row 1: Community Name */}
+              <div className="flex items-center justify-between">
+                <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground">
+                  {profile?.community?.name}
+                  {isBankConnected && (
+                    <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
+                  )}
+                </h1>
+                {isOwner && (
+                  <Button
+                    className="border border-blue-600 px-6"
+                    variant="outline"
+                    onClick={() => setIsEditOpen(true)}
+                  >
+                    Edit Profile
+                  </Button>
+                )}
               </div>
-              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Sessions</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.user?.user_session_conducted || 0}+</p>
+
+              {/* Row 2: Name of the owner */}
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-semibold text-foreground">
+                  {profile.user.user_name}
+                </span>
               </div>
-              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Members</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.community?.num_member?.toLocaleString?.() || 0}</p>
+
+              {/* Row 3: Years of experience */}
+              {profile.user?.user_year_of_experience > 0 && (
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-amber-500"
+                  >
+                    <circle cx="12" cy="8" r="7" />
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                  </svg>
+                  <span className="text-lg font-semibold text-foreground">
+                    {Math.floor(profile.user.user_year_of_experience)}+ years of experience
+                  </span>
+                </div>
+              )}
+
+              {/* Row 4: Sessions conducted */}
+              {profile.user?.user_session_conducted > 0 && (
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-violet-500"
+                  >
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                  </svg>
+                  <span className="text-lg font-semibold text-foreground">
+                    {Math.floor(profile.user.user_session_conducted)}+ sessions conducted
+                  </span>
+                </div>
+              )}
+
+              {/* Row 5: Socials */}
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                {/* Members */}
+                <div className="flex items-center gap-2">
+                  <MdPeopleAlt className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-foreground">
+                    {profile.community.num_member.toLocaleString()} members
+                  </span>
+                </div>
+
+                {/* Posts */}
+                <div className="flex items-center gap-2">
+                  <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
+                  <span className="font-medium text-foreground">
+                    {profile?.community?.post_count} posts
+                  </span>
+                </div>
+
+                {/* Instagram Followers */}
+                {profile.community?.instagram_followers > 0 && (
+                  <div className="flex items-center gap-2">
+                    <GrInstagram className="h-5 w-5 text-pink-500" />
+                    <span className="font-medium text-foreground">
+                      {formatNumber(profile.community?.instagram_followers)} followers
+                    </span>
+                  </div>
+                )}
+
+                {/* YouTube Subscribers */}
+                {profile.community?.youtube_followers > 0 && (
+                  <div className="flex items-center gap-2">
+                    <BsYoutube className="h-5 w-5 text-red-500" />
+                    <span className="font-medium text-foreground">
+                      {formatNumber(profile.community?.youtube_followers)} subscribers
+                    </span>
+                  </div>
+                )}
+
+                {/* LinkedIn Followers */}
+                {profile.community?.linkedin_followers > 0 && (
+                  <div className="flex items-center gap-2">
+                    <FaLinkedinIn className="h-5 w-5 text-blue-800" />
+                    <span className="font-medium text-foreground">
+                      {formatNumber(profile.community?.linkedin_followers)} followers
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="rounded-xl bg-white/60 backdrop-blur p-4 border border-border/40">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">Posts</p>
-                <p className="mt-1 text-2xl font-semibold text-foreground">{profile.community?.post_count || 0}</p>
-              </div>
+
+              {/* Languages */}
+              {profile.user?.user_languages?.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-teal-500"
+                  >
+                    <path d="m5 8 6 6" />
+                    <path d="m4 14 6-6 2-3" />
+                    <path d="M2 5h12" />
+                    <path d="M7 2h1" />
+                    <path d="m22 22-5-10-5 10" />
+                    <path d="M14 18h6" />
+                  </svg>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.user.user_languages.map(
+                      (lang: string, index: number) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="bg-teal-50 text-teal-700 border-teal-200"
+                        >
+                          {lang}
+                        </Badge>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {isOwner && (
-          <div className="my-3">
+          <div className="my-6">
             <WebinarOfferBanner
               isBankAdded={isBankConnected}
               isCalendarConnected={isCalendarConnected}
@@ -1244,373 +1094,383 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             />
           </div>
         )}
-        {/* Main Content Grid */}
-        <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {/* About Section */}
-          <div>
-            <h2 className="mb-4 flex items-center text-2xl font-semibold text-foreground">
-              {StringConstants.ABOUT}
-              {isOwner && (
-                <button
-                  className="mx-2 rounded-md p-1 transition hover:bg-background"
-                  onClick={() => setIsEditOpen(true)}
-                  aria-label="Edit about section"
-                >
-                  <FaEdit className="text-muted hover:text-primary h-5 w-5" />
-                </button>
-              )}
-            </h2>
-            <div className="h-auto rounded-xl border border-border/5 bg-card p-8 shadow-sm">
-              <p className="whitespace-pre-line text-muted-foreground">
+
+        {/* Section 2: About Section */}
+        <div className="mt-8">
+          <div className="rounded-xl border border-border/5 bg-card shadow-sm">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-semibold text-foreground">About</h2>
+                {isOwner && (
+                  <button
+                    className="rounded-md p-2 transition hover:bg-background"
+                    onClick={() => setIsEditOpen(true)}
+                    aria-label="Edit about section"
+                  >
+                    <FaEdit className="text-muted hover:text-primary h-5 w-5" />
+                  </button>
+                )}
+              </div>
+              <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
                 {profile.community.description}
               </p>
-              <div className="my-2 flex flex-wrap gap-2">
-                {profile.community.tags.map((tag: any) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-full bg-primary/5 px-3 py-1 text-sm font-medium text-primary-foreground transition-colors duration-200 hover:bg-primary/10"
-                  >
-                    {tag}
-                  </span>
-                ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Speciality */}
+        {profile.community.tags && profile.community.tags.length > 0 && (
+          <div className="mt-8">
+            <div className="rounded-xl border border-border/5 bg-card shadow-sm">
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-foreground mb-4">Speciality</h2>
+                <div className="flex flex-wrap gap-3">
+                  {profile.community.tags.map((tag: any, index: number) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors duration-200 hover:bg-primary/20"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Offerings Section */}
-          <div className="rounded-xl border border-border/5 transition-all duration-300">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-foreground">
-                {StringConstants.OFFERINGS}
-              </h2>
-              {isOwner && (
-                <AddOfferingDialog onOfferingAdded={fetchOfferings} />
-              )}
-            </div>
-
-            {offerings.length === 0 ? (
-              <div className="rounded-xl border border-border/5 bg-card py-16 text-center">
-                <p className="text-lg text-muted-foreground">
-                  {StringConstants.NO_OFFERINGS}
-                </p>
+        {/* Section 4: Offerings */}
+        <div className="mt-8">
+          <div className="rounded-xl border border-border/5 bg-card shadow-sm">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-semibold text-foreground">Offerings</h2>
+      
               </div>
-            ) : (
-              <div className="flex flex-col gap-5">
-                {offerings.map(
-                  (offering, index) =>
-                    // Show the card only if it's not a webinar with a past date
-                    offering.type !== "webinar" ||
-                    (offering.when && new Date(offering.when) > new Date()) ? (
-                      <div
-                        key={offering._id || `${offering.title}-${index}`}
-                        className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
-                      >
-                        {/* Top gradient accent */}
-                        <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
 
-                        <div className="flex gap-4 items-start">
-                          {/* Icon and Meet badge */}
-                          <div className="flex flex-col items-center gap-2">
-                            <div className="rounded-lg border border-blue-100 bg-blue-50 p-2.5 transition-colors group-hover:bg-blue-100">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                x="0px"
-                                y="0px"
-                                width="36"
-                                height="36"
-                                viewBox="0 0 48 48"
-                              >
-                                <rect
-                                  width="10"
-                                  height="10"
-                                  x="12"
-                                  y="16"
-                                  fill="#fff"
-                                  transform="rotate(-90 20 24)"
-                                ></rect>
-                                <polygon
-                                  fill="#1e88e5"
-                                  points="3,17 3,31 8,32 13,31 13,17 8,16"
-                                ></polygon>
-                                <path
-                                  fill="#4caf50"
-                                  d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
-                                ></path>
-                                <path
-                                  fill="#fbc02d"
-                                  d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
-                                ></path>
-                                <path
-                                  fill="#1565c0"
-                                  d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z"
-                                ></path>
-                                <polygon
-                                  fill="#e53935"
-                                  points="13,7 13,17 3,17"
-                                ></polygon>
-                                <polygon
-                                  fill="#2e7d32"
-                                  points="38,24 37,32.45 27,24 37,15.55"
-                                ></polygon>
-                                <path
-                                  fill="#4caf50"
-                                  d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
-                                ></path>
-                              </svg>
+              {offerings.length === 0 ? (
+                <div className="py-16 text-center">
+                  <p className="text-lg text-muted-foreground">
+                    {StringConstants.NO_OFFERINGS}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {(() => {
+                    console.log("Rendering offerings:", offerings);
+                    console.log("Offerings length in render:", offerings.length);
+                    return offerings.map((offering, index) => {
+                    // Hide webinars with past dates, show everything else
+                    const shouldShow = offering.type !== "webinar" || 
+                                     !offering.when || 
+                                     new Date(offering.when) > new Date();
+                    
+                    if (!shouldShow) return null;
+                    
+                    return (
+                        <div
+                          key={offering._id || `${offering.title}-${index}`}
+                          className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
+                        >
+                          {/* Top gradient accent */}
+                          <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
+
+                          <div className="flex gap-4 items-start">
+                            {/* Icon */}
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="rounded-lg border border-blue-100 bg-blue-50 p-2.5 transition-colors group-hover:bg-blue-100">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  x="0px"
+                                  y="0px"
+                                  width="36"
+                                  height="36"
+                                  viewBox="0 0 48 48"
+                                >
+                                  <rect
+                                    width="10"
+                                    height="10"
+                                    x="12"
+                                    y="16"
+                                    fill="#fff"
+                                    transform="rotate(-90 20 24)"
+                                  ></rect>
+                                  <polygon
+                                    fill="#1e88e5"
+                                    points="3,17 3,31 8,32 13,31 13,17 8,16"
+                                  ></polygon>
+                                  <path
+                                    fill="#4caf50"
+                                    d="M37,24v14c0,1.657-1.343,3-3,3H13l-1-5l1-5h14v-7l5-1L37,24z"
+                                  ></path>
+                                  <path
+                                    fill="#fbc02d"
+                                    d="M37,10v14H27v-7H13l-1-5l1-5h21C35.657,7,37,8.343,37,10z"
+                                  ></path>
+                                  <path
+                                    fill="#1565c0"
+                                    d="M13,31v10H6c-1.657,0-3-1.343-3-3v-7H13z"
+                                  ></path>
+                                  <polygon
+                                    fill="#e53935"
+                                    points="13,7 13,17 3,17"
+                                  ></polygon>
+                                  <polygon
+                                    fill="#2e7d32"
+                                    points="38,24 37,32.45 27,24 37,15.55"
+                                  ></polygon>
+                                  <path
+                                    fill="#4caf50"
+                                    d="M46,10.11v27.78c0,0.84-0.98,1.31-1.63,0.78L37,32.45v-16.9l7.37-6.22C45.02,8.8,46,9.27,46,10.11z"
+                                  ></path>
+                                </svg>
+                              </div>
+                            </div>
+
+                            {/* Title, Price, Description */}
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
+                                  {offering.title}
+                                </h3>
+
+                                {offering.is_free ||
+                                Number(offering.price?.amount) === 0 ? (
+                                  <Badge
+                                    variant="outline"
+                                    className="border-green-200 bg-green-50 text-green-700"
+                                  >
+                                    Free
+                                  </Badge>
+                                ) : (
+                                  <span className="font-semibold text-gray-900">
+                                    ₹{offering.price?.amount}
+                                  </span>
+                                )}
+                              </div>
+
+                              <p className="mt-2 whitespace-pre-line text-sm text-gray-600">
+                                {offering.description}
+                              </p>
                             </div>
                           </div>
 
-                          {/* Title, Price, Description */}
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between">
-                              <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
-                                {offering.title}
-                              </h3>
-
-                              {offering.is_free ||
-                              Number(offering.price?.amount) === 0 ? (
-                                <Badge
-                                  variant="outline"
-                                  className="border-green-200 bg-green-50 text-green-700"
-                                >
-                                  Free
-                                </Badge>
-                              ) : (
-                                <span className="font-semibold text-gray-900">
-                                  ₹{offering.price?.amount}
+                          <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm">
+                            <div className="flex items-center gap-2">
+                              <FcClock
+                                size={28}
+                                className="text-primary-foreground"
+                              />
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                                <span className="text-base font-semibold text-gray-700">
+                                  Duration:
                                 </span>
+                                <span className="text-base text-gray-600">
+                                  {offering.duration} min
+                                </span>
+                              </div>
+                            </div>
+                            <div>
+                              {offering?.type && typeToIcon[offering.type] && (
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                  {typeToIcon[offering.type].icon}
+                                  <span>{typeToIcon[offering.type].label}</span>
+                                </div>
                               )}
                             </div>
+                          </div>
 
-                            <p className="mt-2 max-w-xl whitespace-pre-line text-sm text-gray-600">
-                              {offering.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center mt-4 space-x-3 w-full bg-gray-100 px-4 py-2 rounded-md shadow-sm ml-0">
-                          <div className="flex items-center gap-2">
-                            <FcClock
-                              size={28}
-                              className="text-primary-foreground"
-                            />
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                              <span className="text-base font-semibold text-gray-700">
-                                Duration:
-                              </span>
-                              <span className="text-base text-gray-600">
-                                {offering.duration} min
-                              </span>
-                            </div>
-                          </div>
-                          <div>
-                            {offering?.type && typeToIcon[offering.type] && (
-                              <div className="mt-3 flex items-center gap-2 text-sm text-gray-700">
-                                {typeToIcon[offering.type].icon}
-                                <span>{typeToIcon[offering.type].label}</span>
+                          {offering.type === "webinar" &&
+                            offering.when &&
+                            new Date(offering.when) > new Date() && (
+                              <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
+                                {/* Date */}
+                                <div className="flex items-center gap-2 text-sm text-gray-700">
+                                  <BsCalendarCheck className="h-5 w-5 text-blue-500" />
+                                  <span>
+                                    {new Date(offering.when).toLocaleDateString(
+                                      "en-US",
+                                      {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                      }
+                                    )}
+                                  </span>
+                                </div>
+
+                                {/* Time */}
+                                <div className="text-sm text-gray-700">
+                                  {new Date(offering.when).toLocaleTimeString(
+                                    "en-US",
+                                    {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    }
+                                  )}
+                                </div>
                               </div>
+                            )}
+
+                          {/* Buttons */}
+                          <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                            {isOwner ? (
+                              <div className="mr-auto flex justify-between w-full gap-2">
+                                <div className="flex items-center gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+                                    onClick={() => handleEditClick(offering)}
+                                  >
+                                    <Edit className="h-3.5 w-3.5" />
+                                    <span>{StringConstants.EDIT}</span>
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
+                                    onClick={() =>
+                                      handleDeleteOffering(offering._id)
+                                    }
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <span>{StringConstants.DELETE}</span>
+                                  </Button>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                                  onClick={() =>
+                                    handleOfferingShareClick(offering._id)
+                                  }
+                                  title="Share Offering"
+                                >
+                                  <Share className="h-3.5 w-3.5" />
+                                  <span>{StringConstants.SHARE}</span>
+                                </Button>
+                              </div>
+                            ) : (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <div className="w-full">
+                                      <Button
+                                        disabled={
+                                          !offering.is_free &&
+                                          !isBankConnected &&
+                                          !isCalendarConnected
+                                        }
+                                        className={`flex items-center w-full gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
+                                          !isOwner
+                                            ? "cursor-pointer"
+                                            : "cursor-not-allowed opacity-50"
+                                        }`}
+                                        onClick={() => {
+                                          if (!isOwner)
+                                            setSelectedOffering(offering);
+                                        }}
+                                      >
+                                        <span>Book Now</span>
+                                        <ArrowRight className="h-4 w-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="flex w-full my-2 items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                                        onClick={() =>
+                                          handleOfferingShareClick(offering._id)
+                                        }
+                                        title="Share Offering"
+                                      >
+                                        <Share className="h-3.5 w-3.5" />
+                                        <span>{StringConstants.SHARE}</span>
+                                      </Button>
+                                    </div>
+                                  </TooltipTrigger>
+                                  {!offering.is_free && !isBankConnected && (
+                                    <TooltipContent className="flex items-center gap-2 rounded border border-gray-200 bg-white px-3 py-2 text-black shadow-lg">
+                                      <svg
+                                        className="h-4 w-4 text-blue-500"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth={2}
+                                        viewBox="0 0 24 24"
+                                      >
+                                        <circle
+                                          cx="12"
+                                          cy="12"
+                                          r="10"
+                                          fill="white"
+                                        />
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="M12 16v-4m0-4h.01"
+                                        />
+                                      </svg>
+                                      <span>
+                                        The expert is not accepting bookings at
+                                        the moment
+                                      </span>
+                                    </TooltipContent>
+                                  )}
+                                </Tooltip>
+                              </TooltipProvider>
                             )}
                           </div>
                         </div>
+                    );
+                    });
+                  })()}
+                </div>
+              )}
 
-                        {offering.type === "webinar" &&
-                          offering.when &&
-                          new Date(offering.when) > new Date() && (
-                            <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
-                              {/* Date */}
-                              <div className="flex items-center gap-2 text-sm text-gray-700">
-                                <BsCalendarCheck className="h-5 w-5 text-blue-500" />
-                                <span>
-                                  {new Date(offering.when).toLocaleDateString(
-                                    "en-US",
-                                    {
-                                      year: "numeric",
-                                      month: "long",
-                                      day: "numeric",
-                                    }
-                                  )}
-                                </span>
-                              </div>
-
-                              {/* Time */}
-                              <div className="text-sm text-gray-700">
-                                {new Date(offering.when).toLocaleTimeString(
-                                  "en-US",
-                                  {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  }
-                                )}
-                              </div>
-                            </div>
-                          )}
-
-                        {/* Buttons */}
-                        <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
-                          {isOwner ? (
-                            <div className="mr-auto flex justify-between w-full gap-2">
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex items-center gap-1.5 rounded-lg border-gray-200 px-3 py-1.5 text-gray-700 hover:bg-gray-50"
-                                  onClick={() => handleEditClick(offering)}
-                                >
-                                  <Edit className="h-3.5 w-3.5" />
-                                  <span>{StringConstants.EDIT}</span>
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="flex items-center gap-1.5 rounded-lg border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 hover:text-red-700"
-                                  onClick={() =>
-                                    handleDeleteOffering(offering._id)
-                                  }
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                  <span>{StringConstants.DELETE}</span>
-                                </Button>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
-                                onClick={() =>
-                                  handleOfferingShareClick(offering._id)
-                                }
-                                title="Share Offering"
-                              >
-                                <Share className="h-3.5 w-3.5" />
-                                <span>{StringConstants.SHARE}</span>
-                              </Button>
-                            </div>
-                          ) : (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <div className="w-full">
-                                    <Button
-                                      disabled={
-                                        !offering.is_free &&
-                                        !isBankConnected &&
-                                        !isCalendarConnected
-                                      }
-                                      className={`flex items-center w-full gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-400 ${
-                                        !isOwner
-                                          ? "cursor-pointer"
-                                          : "cursor-not-allowed opacity-50"
-                                      }`}
-                                      onClick={() => {
-                                        if (!isOwner)
-                                          setSelectedOffering(offering);
-                                      }}
-                                    >
-                                      <span>Book Now</span>
-                                      <ArrowRight className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="flex w-full my-2 items-center gap-1.5 rounded-lg border-blue-200 px-3 py-1.5 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
-                                      onClick={() =>
-                                        handleOfferingShareClick(offering._id)
-                                      }
-                                      title="Share Offering"
-                                    >
-                                      <Share className="h-3.5 w-3.5" />
-                                      <span>{StringConstants.SHARE}</span>
-                                    </Button>
-                                  </div>
-                                </TooltipTrigger>
-                                {!offering.is_free && !isBankConnected && (
-                                  <TooltipContent className="flex items-center gap-2 rounded border border-gray-200 bg-white px-3 py-2 text-black shadow-lg">
-                                    <svg
-                                      className="h-4 w-4 text-blue-500"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      strokeWidth={2}
-                                      viewBox="0 0 24 24"
-                                    >
-                                      <circle
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        fill="white"
-                                      />
-                                      <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M12 16v-4m0-4h.01"
-                                      />
-                                    </svg>
-                                    <span>
-                                      The expert is not accepting bookings at
-                                      the moment
-                                    </span>
-                                  </TooltipContent>
-                                )}
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </div>
-                      </div>
-                    ) : null // Hide the entire card if it's a webinar with a past date
-                )}
-
-                {selectedOffering && (
-                  <BookingDialog
-                    offering={{
-                      ...selectedOffering,
-                      discounted_price: selectedOffering.discounted_price
-                        ? Number(selectedOffering.discounted_price)
-                        : 0,
-                    }}
-                    isOpen={!!selectedOffering}
-                    onClose={() => setSelectedOffering(null)}
-                  />
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Testimonials Section */}
-          <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-2xl border border-border/5 bg-gradient-to-br from-primary/5 via-background to-primary/5 p-6 sm:p-8 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-2xl font-semibold text-foreground">What clients say</h2>
-              </div>
-              <div className="rounded-xl bg-card/60 p-2 sm:p-4">
-                <TestimonialsSection communityId={communityIdFromParam} />
-              </div>
+              {selectedOffering && (
+                <BookingDialog
+                  offering={{
+                    ...selectedOffering,
+                    discounted_price: selectedOffering.discounted_price
+                      ? Number(selectedOffering.discounted_price)
+                      : 0,
+                  }}
+                  isOpen={!!selectedOffering}
+                  onClose={() => setSelectedOffering(null)}
+                />
+              )}
             </div>
           </div>
-
-          {/* Reviews Carousel */}
-          <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-2xl border border-border/5 bg-card shadow-sm p-4 sm:p-6">
-              {/* @ts-ignore */}
-              <Testimonials communityId={activeCommunityId || undefined} />
-            </div>
-          </div>
-
-          {/* Modals */}
-          {isEditOpen && (
-            <EditCommunityModal
-              profile={profile}
-              isOpen={isEditOpen}
-              onClose={() => setIsEditOpen(false)}
-            />
-          )}
-          {isEditModalOpen && selectedOfferingModal && (
-            <EditOfferingModal
-              offering={selectedOfferingModal}
-              userId={user?._id}
-              communityId={activeCommunityId}
-              onClose={() => setIsEditModalOpen(false)}
-              onUpdate={fetchOfferings}
-            />
-          )}
         </div>
+
+
+        {/* Additional Reviews Section */}
+        <div className="mt-8">
+          <div className="rounded-xl border border-border/5 bg-card shadow-sm p-6">
+            {/* @ts-ignore */}
+            <Testimonials communityId={activeCommunityId || undefined} />
+          </div>
+        </div>
+
+        {/* Modals */}
+        {isEditOpen && (
+          <EditCommunityModal
+            profile={profile}
+            isOpen={isEditOpen}
+            onClose={() => setIsEditOpen(false)}
+          />
+        )}
+        {isEditModalOpen && selectedOfferingModal && (
+          <EditOfferingModal
+            offering={selectedOfferingModal}
+            userId={user?._id}
+            communityId={activeCommunityId}
+            onClose={() => setIsEditModalOpen(false)}
+            onUpdate={fetchOfferings}
+          />
+        )}
       </div>
+
       {/* Hidden file inputs */}
       <input
         ref={avatarInputRef}
