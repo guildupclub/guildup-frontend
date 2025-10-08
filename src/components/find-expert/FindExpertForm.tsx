@@ -370,9 +370,9 @@ export default function FindExpertForm() {
                   </div>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  Let's get to know you
+                  Let&apos;s get to know you
                 </h2>
-                <p className="text-gray-600">We'll use this to match you with the right expert</p>
+                <p className="text-gray-600">We&apos;ll use this to match you with the right expert</p>
               </div>
 
               <div className="space-y-6 mb-8">
@@ -477,7 +477,7 @@ export default function FindExpertForm() {
                   Thank You! 🎉
                 </h2>
                 <p className="text-lg text-gray-700 mb-2">
-                  We've received your request
+                  We&apos;ve received your request
                 </p>
                 <p className="text-gray-600 max-w-md mx-auto">
                   Our team will reach out to you within 24 hours to schedule your complimentary clarity call with the most relevant expert for your needs.
