@@ -51,20 +51,14 @@ const NotificationDropdown = () => {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="flex flex-col items-center">
-            <div className="relative rounded-full text-gray-600 hover:bg-gray-50 transition-colors p-1">
-              <Bell className="h-5 w-5 mb-0 pb-0" />
-              {unreadCount > 0 && (
-                <Badge
-                  variant="destructive"
-                  className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-xs"
-                >
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </Badge>
-              )}
-            </div>
-            <span className="text-gray-600 text-xs lg:text-sm hidden md:block">
+          <button className="group">
+            <span className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors duration-200">
               Notifications
+              {unreadCount > 0 && (
+                <span className="ml-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 inline-flex items-center justify-center shadow-sm">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </span>
           </button>
         </DropdownMenuTrigger>
@@ -145,20 +139,16 @@ const NotificationDropdown = () => {
   } catch (error) {
     console.error("Error rendering notification dropdown:", error);
     return (
-      <div className="flex flex-col items-center justify-center ">
-        <div className="relative flex items-center justify-center h-4 w-4 text-gray-600 hover:bg-gray-50">
-          <Bell className=" " />
+      <button className="group">
+        <span className="text-sm font-medium text-gray-700 group-hover:text-primary transition-colors duration-200">
+          Notifications
           {unreadCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-2 -right-2 p-0 text-[6px] h-4 w-4 flex items-center justify-center"
-            >
+            <span className="ml-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 inline-flex items-center justify-center shadow-sm">
               {unreadCount > 9 ? "9+" : unreadCount}
-            </Badge>
+            </span>
           )}
-        </div>
-        <span className="text-xs lg:text-sm hidden md:block">Notifications</span>
-      </div>
+        </span>
+      </button>
     );
   }
 };
