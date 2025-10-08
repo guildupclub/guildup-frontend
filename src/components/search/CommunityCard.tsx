@@ -12,8 +12,10 @@ import { GrInstagram } from "react-icons/gr";
 import { BsYoutube } from "react-icons/bs";
 import numbro from "numbro";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface Offering {
+  _id?: string;
   type: string;
   duration: number;
   price?: {
@@ -50,6 +52,7 @@ interface CommunityCardProps {
 
 function CommunityCard({ community, onClick }: CommunityCardProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const [selectedOffering, setSelectedOffering] = useState<Offering | null>(
     null
   );
@@ -77,21 +80,19 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
   const handleOfferingClick = React.useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (!session) {
-        toast("Please sign in to book the offering", {
-          action: {
-            label: "Sign In",
-            onClick: () =>
-              signIn(undefined, {
-                callbackUrl: `${window.location.origin}?hero=1`,
-              }),
-          },
+      
+      if (!firstOffering?._id) {
+        console.error("No offering ID available:", firstOffering);
+        toast.error("Session booking unavailable", {
+          description: "Please try again later or contact support",
         });
         return;
       }
-      setSelectedOffering(firstOffering);
+
+      // Navigate to the offering page
+      router.push(`/offering/${firstOffering._id}`);
     },
-    [session, firstOffering]
+    [firstOffering, router]
   );
   return (
     <Card
@@ -271,11 +272,11 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                   className="bg-gradient-to-r from-indigo-600 to-indigo-400"
                   onClick={handleOfferingClick}
                   data-analytics-type="community-cta"
-                  data-analytics-name="Book Now"
+                  data-analytics-name="Book discovery session"
                   data-community-id={communityDetails._id}
                   data-community-name={communityDetails.name}
                 >
-                  Book Now
+                  Book discovery session
                 </Button>
               </div>
             </div>

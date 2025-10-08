@@ -297,7 +297,7 @@ export default function BodyPage() {
               {/* Step 2 */}
               <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 shadow-md">
                 <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold text-xs">2</div>
-                <span className="text-xs font-medium text-gray-800">Apply GUILD100</span>
+                <span className="text-xs font-medium text-gray-800">Select time</span>
               </div>
 
               {/* Arrow */}

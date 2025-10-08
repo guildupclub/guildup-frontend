@@ -161,7 +161,7 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative min-h-[100vh] lg:h-[calc(100vh-80px)] w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
+    <div className="relative min-h-[100vh] lg:h-[calc(100vh-64px)] w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
       {/* Sophisticated Background Elements with Original Blue Theme */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Enhanced gradient meshes with blue theme */}
@@ -277,7 +277,7 @@ export default function Hero() {
               <div
                 className="carousel-track flex items-stretch gap-5 group-hover:[animation-play-state:paused]"
                 style={{
-                  animation: 'carousel-marquee 20s linear infinite',
+                  animation: 'carousel-marquee 40s linear infinite',
                 }}
               >
                 {featuredExperts.concat(featuredExperts).map((expert, idx) => (

@@ -8,7 +8,6 @@ import NavbarClient from "@/components/layout/NavbarClient";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
-import CouponBanner from "@/components/banner/CouponBanner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import AnalyticsWrapper from "@/components/analytics/AnalyticsWrapper";
 import AttributionInitializer from "@/components/analytics/AttributionInitializer";
@@ -207,7 +206,6 @@ export default async function RootLayout({
           <PostHogProviderWrapper>
             <Providers>
               <NavbarClient />
-              <CouponBanner />
               <RouteChangeTracker />
               <GlobalInteractionTracker />
               {children}
