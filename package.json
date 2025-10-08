@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "fetch-communities": "node scripts/fetch-communities.js",
+    "fetch-communities:prod": "NODE_ENV=production node scripts/fetch-communities.js"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",

@@ -68,14 +68,46 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
             `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE}`
           );
         } else {
-          response = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
-            {
-              categoryId: activeCategory,
-              page: pageNum,
-              limit: COMMUNITIES_PER_PAGE,
-            }
-          );
+          // Map tag names to category IDs where available
+          const tagToCategoryId: { [key: string]: string } = {
+            'Nutrition': '67a74cee462d78176d244792',
+            'Anxiety': '67a74cd9462d78176d244798',
+            'Stress': '67a74cd9462d78176d244798',
+          };
+
+          const categoryId = tagToCategoryId[activeCategory];
+          
+          if (categoryId) {
+            // Use category ID if available
+            response = await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
+              {
+                categoryId: categoryId,
+                page: pageNum,
+                limit: COMMUNITIES_PER_PAGE,
+              }
+            );
+          } else if (['PCOS', 'Relationship'].includes(activeCategory)) {
+            // Use search query for tags without specific category IDs
+            response = await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
+              {
+                query: activeCategory,
+                page: pageNum,
+                limit: COMMUNITIES_PER_PAGE,
+              }
+            );
+          } else {
+            // Default behavior for existing category IDs
+            response = await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
+              {
+                categoryId: activeCategory,
+                page: pageNum,
+                limit: COMMUNITIES_PER_PAGE,
+              }
+            );
+          }
         }
 
         if (

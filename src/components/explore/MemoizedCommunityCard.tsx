@@ -234,7 +234,12 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       
       // First try to get from category field
       if (communityDetails.category) {
-        return communityDetails.category;
+        // Handle both string and object category formats
+        if (typeof communityDetails.category === 'string') {
+          return communityDetails.category;
+        } else if (communityDetails.category.name) {
+          return communityDetails.category.name;
+        }
       }
       
       // If no category, try to extract from tags

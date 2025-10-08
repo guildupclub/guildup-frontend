@@ -28,7 +28,8 @@ import { PageTracker } from "@/components/analytics/PageTracker";
 import { Brain, Dumbbell, ArrowRight, Heart, Briefcase, FileText, Video, CheckCircle, DollarSign, Globe, Shield } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
-import { useCommunityRecommendations } from "@/hook/queries/useCommunityRecommendations";
+import { useCachedCommunities } from "@/hooks/useCachedCommunities";
+import CachedCommunitySection from "@/components/community/CachedCommunitySection";
 
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
@@ -106,9 +107,82 @@ function Page() {
 
   
 
-  // Featured experts (communities) via recommendations
-  const { data: recommendations, isLoading: isFeaturedLoading } =
-    useCommunityRecommendations({ userId: userId as string | undefined, topN: 6 });
+
+  // Cached communities data
+  const { data: cachedData, loading: isCachedLoading } = useCachedCommunities({
+    fallbackToAPI: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    autoRefresh: false
+  });
+
+  // Filtered communities based on selected tab
+  const [filteredCommunities, setFilteredCommunities] = useState<any[]>([]);
+  
+  // Pagination state for All Experts section
+  const [displayedCommunities, setDisplayedCommunities] = useState<any[]>([]);
+  const [showAllCommunities, setShowAllCommunities] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const communitiesPerPage = 15;
+
+  // Function to filter communities based on selected tab
+  const filterCommunitiesByTab = useCallback((tabTag: string) => {
+    if (!cachedData?.communities) {
+      setFilteredCommunities([]);
+      return;
+    }
+
+    if (tabTag === 'all' || !tabTag) {
+      setFilteredCommunities(cachedData.communities);
+      return;
+    }
+
+    const filtered = cachedData.communities.filter((item) => {
+      const community = item.community || item;
+      if (!community.tags || !Array.isArray(community.tags)) return false;
+      
+      return community.tags.some((tag: string) => 
+        tag.toLowerCase().includes(tabTag.toLowerCase()) ||
+        tabTag.toLowerCase().includes(tag.toLowerCase())
+      );
+    });
+
+    setFilteredCommunities(filtered);
+  }, [cachedData]);
+
+  // Initialize filtered communities when cached data loads
+  useEffect(() => {
+    if (cachedData?.communities) {
+      filterCommunitiesByTab(selectedCategoryId === 'all' ? 'all' : selectedCategory);
+    }
+  }, [cachedData, selectedCategoryId, selectedCategory, filterCommunitiesByTab]);
+
+  // Update displayed communities when filtered communities change
+  useEffect(() => {
+    if (filteredCommunities.length > 0) {
+      const initialDisplay = filteredCommunities.slice(0, communitiesPerPage);
+      setDisplayedCommunities(initialDisplay);
+      setShowAllCommunities(false);
+      setCurrentPage(1);
+    } else {
+      setDisplayedCommunities([]);
+    }
+  }, [filteredCommunities]);
+
+  // Function to show more communities
+  const handleShowMore = () => {
+    const nextPage = currentPage + 1;
+    const startIndex = 0;
+    const endIndex = nextPage * communitiesPerPage;
+    const newDisplay = filteredCommunities.slice(startIndex, endIndex);
+    
+    setDisplayedCommunities(newDisplay);
+    setCurrentPage(nextPage);
+    
+    // If we've shown all communities, hide the button
+    if (endIndex >= filteredCommunities.length) {
+      setShowAllCommunities(true);
+    }
+  };
 
   // Trending categories for suggestions and popular categories
   const [trendingCategories, setTrendingCategories] = useState<
@@ -305,24 +379,33 @@ function Page() {
       (cat: Category) => cat._id === categoryId
     );
 
+    // Handle tag-based filtering for the new tabs
+    const isTagFilter = !selectedCat && categoryId !== 'all';
+    const categoryName = isTagFilter ? categoryId : (selectedCat?.name || "All Category");
+
     tracking.trackClick("category_filter", {
       category_id: categoryId,
-      category_name: selectedCat?.name || "All Category",
+      category_name: categoryName,
       previous_category: selectedCategory,
       user_id: session?.user._id,
+      is_tag_filter: isTagFilter,
     });
 
-    // Start loading immediately to clear current content
-    setIsLoading(true);
-
     // Update category state
-
     if (selectedCat) {
       setSelectedCategory(selectedCat.name);
       setSelectedCategoryId(categoryId);
+    } else if (isTagFilter) {
+      setSelectedCategory(categoryId); // Use the tag as the category name
+      setSelectedCategoryId(categoryId); // Use the tag as the category ID
     } else {
       setSelectedCategory("All Category");
       setSelectedCategoryId("all");
+    }
+
+    // Filter communities using cached data
+    if (cachedData?.communities) {
+      filterCommunitiesByTab(categoryId === 'all' ? 'all' : categoryId);
     }
 
     if (targetRef.current) {
@@ -335,8 +418,6 @@ function Page() {
         behavior: "smooth",
       });
     }
-
-    setIsLoading(false);
   };
 
   
@@ -696,10 +777,7 @@ function Page() {
             </div>
           </div>
 
-          {/* 2. Categories Section - Dark Theme */}
-          
-
-          {/* 3. How It Works - Light Timeline */}
+          {/* 2. How It Works - Light Timeline */}
           <Box bg="gray.50" py={20}>
             <Container maxW="7xl">
               <VStack spacing={16} align="center">
@@ -773,173 +851,161 @@ function Page() {
             </Container>
           </Box>
 
-          <Box bg="gray.900" py={20} color="white">
-            <Container maxW="7xl">
-              <VStack spacing={12} align="center">
-                <VStack spacing={4} textAlign="center">
-                  <Heading size="2xl" fontWeight="bold" color="white">
-                    Your wellness in your control
-                  </Heading>
-                  <Text fontSize="lg" color="gray.300" maxW="2xl">
-                    Choose from our comprehensive range of wellness categories, each designed to address your specific needs
-                  </Text>
-                </VStack>
-                <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8} w="full">
-                  {[
-                    {
-                      title: "Mental Health",
-                      desc: "Therapy, counseling, and mental wellness support from licensed professionals",
-                      icon: Brain,
-                      color: primary,
-                      route: "/mind"
-                    },
-                    {
-                      title: "Physical Wellness", 
-                      desc: "Fitness training, nutrition guidance, and physical health optimization",
-                      icon: Dumbbell,
-                      color: primary,
-                      route: "/body"
-                    },
-                    {
-                      title: "Relationships",
-                      desc: "Couples therapy, relationship counseling, and interpersonal skills", 
-                      icon: Heart,
-                      color: primary,
-                      route: "/relationships"
-                    },
-                    {
-                      title: "Career Growth",
-                      desc: "Professional development, career coaching, and skill enhancement",
-                      icon: Briefcase,
-                      color: primary, 
-                      route: "/career"
-                    }
-                  ].map((item, index) => (
-                    <Card 
-                      key={index} 
-                      bg="gray.800" 
-                      border="1px" 
-                      borderColor="gray.700"
-                      _hover={{ 
-                        transform: "translateY(-4px)", 
-                        shadow: "xl",
-                        borderColor: item.color
-                      }} 
-                      transition="all 0.3s"
-                      cursor="pointer"
-                      onClick={() => router.push(item.route)}
-                    >
-                      <CardBody textAlign="center" p={8}>
-                        <VStack spacing={4}>
-                          <Box 
-                            w={16} 
-                            h={16} 
-                            bg={item.color} 
-                            borderRadius="full" 
-                            display="flex" 
-                            alignItems="center" 
-                            justifyContent="center"
-                          >
-                            <item.icon size={32} color={white} />
-                          </Box>
-                          <Heading size="lg" color="white">{item.title}</Heading>
-                          <Text color="gray.300" fontSize="sm">{item.desc}</Text>
-                        </VStack>
-                      </CardBody>
-                    </Card>
-                  ))}
-                </SimpleGrid>
-              </VStack>
-            </Container>
-          </Box>
+          {/* 3. All Experts Listing */}
+          <div className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: black }}>
+                  All Experts
+                </h2>
+                <p className="text-lg max-w-2xl mx-auto" style={{ color: black }}>
+                  Browse through our complete collection of experts and find the perfect match for your journey
+                </p>
+              </div>
 
-          {/* 4. What Makes GuildUp Special - Gradient Diagonal Cards */}
-          <Box bgGradient="linear(to-br, blue.50, purple.50)" py={20} position="relative" overflow="hidden">
-            <Box position="absolute" top={0} left={0} w="full" h="full" bgGradient="radial(circle at 20% 80%, blue.100, transparent)" />
-            <Box position="absolute" top={0} right={0} w="full" h="full" bgGradient="radial(circle at 80% 20%, purple.100, transparent)" />
-            <Container maxW="7xl" position="relative" zIndex={1}>
-              <VStack spacing={16} align="center">
-                <VStack spacing={4} textAlign="center">
-                  <Heading size="2xl" fontWeight="bold" color="gray.900">
-                    What makes GuildUp different?
-                  </Heading>
-                </VStack>
-                <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }} gap={8} w="full">
+              {/* Community Category Tabs */}
+              <div className="flex justify-center mb-8">
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 p-4 rounded-2xl shadow-lg border" style={{ 
+                  backgroundColor: `${primary}08`, 
+                  borderColor: `${primary}20`,
+                  backdropFilter: 'blur(10px)'
+                }}>
                   {[
-                    {
-                      title: "Affordable",
-                      desc: "GuildUp saves travel costs and provides competitive pricing for quality wellness services",
-                      icon: DollarSign,
-                      color: primary
-                    },
-                    {
-                      title: "Whenever Wherever",
-                      desc: "Access wellness support on-demand, anytime according to your convenience",
-                      icon: Globe,
-                      color: primary
-                    },
-                    {
-                      title: "No stigma or judgement",
-                      desc: "Friendly, discreet services in a safe, judgment-free environment",
-                      icon: Shield,
-                      color: primary
-                    },
-                    {
-                      title: "Verified Experts",
-                      desc: "Connect with licensed professionals, no more reading endless reviews",
-                      icon: CheckCircle,
-                      color: primary
-                    }
-                  ].map((item, index) => (
-                    <Box 
-                      key={index} 
-                      transform={index % 2 === 0 ? "rotate(-1deg)" : "rotate(1deg)"}
-                      _hover={{ 
-                        transform: index % 2 === 0 ? "rotate(-1deg) scale(1.05)" : "rotate(1deg) scale(1.05)" 
+                    { id: 'all', label: 'All Experts', tag: '' },
+                    { id: 'nutrition', label: 'Nutrition', tag: 'Nutrition' },
+                    { id: 'pcos', label: 'PCOS', tag: 'PCOS' },
+                    { id: 'anxiety', label: 'Anxiety', tag: 'Anxiety' },
+                    { id: 'stress', label: 'Stress', tag: 'Stress' },
+                    { id: 'relationship', label: 'Relationship', tag: 'Relationship' }
+                  ].map((tab) => {
+                    // Calculate count for this tab
+                    const getTabCount = () => {
+                      if (!cachedData?.communities) return 0;
+                      if (tab.id === 'all') return cachedData.communities.length;
+                      
+                      return cachedData.communities.filter((item) => {
+                        const community = item.community || item;
+                        if (!community.tags || !Array.isArray(community.tags)) return false;
+                        return community.tags.some((tag: string) => 
+                          tag.toLowerCase().includes(tab.tag.toLowerCase()) ||
+                          tab.tag.toLowerCase().includes(tag.toLowerCase())
+                        );
+                      }).length;
+                    };
+
+                    const tabCount = getTabCount();
+                    const isActive = (tab.id === 'all' && selectedCategoryId === 'all') || 
+                                   (tab.id !== 'all' && selectedCategory === tab.tag);
+                    
+                    return (
+                    <button
+                      key={tab.id}
+                      onClick={() => handleCategorySelect(tab.id === 'all' ? 'all' : tab.tag)}
+                      className={`relative px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center gap-2.5 group overflow-hidden ${
+                        isActive
+                          ? 'text-white shadow-xl transform scale-105' 
+                          : 'text-gray-700 hover:text-gray-900 bg-white/90 hover:bg-white shadow-md hover:shadow-lg hover:scale-105'
+                      }`}
+                      style={{
+                        backgroundColor: isActive ? primary : undefined,
+                        fontFamily: "'Poppins', sans-serif",
+                        border: isActive ? `2px solid ${primary}` : '2px solid transparent'
                       }}
-                      transition="all 0.3s"
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          (e.target as HTMLElement).style.backgroundColor = 'white';
+                          (e.target as HTMLElement).style.transform = 'scale(1.05)';
+                          (e.target as HTMLElement).style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          (e.target as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.9)';
+                          (e.target as HTMLElement).style.transform = 'scale(1)';
+                          (e.target as HTMLElement).style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+                        }
+                      }}
                     >
-                      <Card 
-                        bg="white" 
-                        shadow="xl" 
-                        borderRadius="2xl" 
-                        border="1px" 
-                        borderColor="gray.200"
-                        _hover={{ shadow: "2xl" }}
-                        transition="all 0.3s"
-                      >
-                        <CardBody p={8} textAlign="center">
-                          <VStack spacing={4}>
-                            <Box 
-                              w={16} 
-                              h={16} 
-                              bg={item.color} 
-                              borderRadius="full" 
-                              display="flex" 
-                              alignItems="center" 
-                              justifyContent="center"
-                              shadow="lg"
-                            >
-                              <item.icon size={28} color={white} />
-                            </Box>
-                            <Heading size="md" color="gray.900">{item.title}</Heading>
-                            <Text color="gray.600" fontSize="sm">{item.desc}</Text>
-                          </VStack>
-                        </CardBody>
-                      </Card>
-                    </Box>
-                  ))}
-                </Grid>
-              </VStack>
-            </Container>
-          </Box>
+                      {/* Active tab glow effect */}
+                      {isActive && (
+                        <div 
+                          className="absolute inset-0 rounded-xl opacity-20"
+                          style={{ 
+                            background: `linear-gradient(135deg, ${primary}, ${primary}80)`,
+                            filter: 'blur(8px)'
+                          }}
+                        />
+                      )}
+                      
+                      <span className="relative z-10">{tab.label}</span>
+                      {tabCount > 0 && (
+                        <span className={`relative z-10 text-xs px-2.5 py-1 rounded-full font-bold transition-all duration-300 ${
+                          isActive
+                            ? 'bg-white/25 text-white shadow-inner' 
+                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+                        }`}>
+                          {tabCount}
+                        </span>
+                      )}
+                      
+                      {/* Subtle shine effect on hover */}
+                      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white to-transparent transform -skew-x-12 translate-x-full group-hover:translate-x-[-100%]" />
+                    </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          {/* Spacer Section */}
-          <div className="w-full py-8 sm:py-12" style={{ backgroundColor: white }}>
-            <div className="h-4"></div>
+              <div className="flex-1 min-w-0" ref={targetRef}>
+                <div className="rounded-xl sm:rounded-2xl">
+                  <div
+                    id="scroll-target-border"
+                    className="w-full h-1 mb-4"
+                  ></div>
+                  {isCachedLoading ? (
+                    <Loader />
+                  ) : (
+                    <>
+                      <CachedCommunitySection
+                        communities={displayedCommunities}
+                        loading={isCachedLoading}
+                      />
+                      
+                      {/* Show More Button */}
+                      {filteredCommunities.length > communitiesPerPage && !showAllCommunities && (
+                        <div className="flex justify-center mt-8">
+                          <button
+                            onClick={handleShowMore}
+                            className="px-8 py-3 rounded-lg font-medium text-base transition-all duration-300 hover:scale-105 shadow-lg flex items-center gap-2"
+                            style={{
+                              backgroundColor: primary,
+                              color: white,
+                              fontFamily: "'Poppins', sans-serif"
+                            }}
+                            onMouseEnter={(e) => (e.target as HTMLElement).style.backgroundColor = '#2B37E9'}
+                            onMouseLeave={(e) => (e.target as HTMLElement).style.backgroundColor = primary}
+                          >
+                            <span>Show More Experts</span>
+                            <ArrowRight size={20} />
+                          </button>
+                        </div>
+                      )}
+                      
+                      {/* Show All Communities Message */}
+                      {showAllCommunities && filteredCommunities.length > communitiesPerPage && (
+                        <div className="text-center mt-6">
+                          <p className="text-sm text-gray-500" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                            Showing all {filteredCommunities.length} communities
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+              </div>
+            </div>
           </div>
 
-          {/* 5. Customer Testimonials Section */}
+          {/* 4. Customer Testimonials Section */}
           <div className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
@@ -1019,53 +1085,13 @@ function Page() {
             <div className="h-2"></div>
           </div>
 
-          {/* 6. Featured Experts Section */}
-          <div className="w-full py-16 sm:py-20" style={{background: `linear-gradient(to bottom right, #f9fafb, ${white})`}}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{color: black}}>
-                  Featured Experts
-                </h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{color: black}}>
-                  Meet our licensed professionals who are ready to guide your wellness journey
-                </p>
-              </div>
-                {isFeaturedLoading ? (
-                  <div className="flex justify-center"><Loader /></div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    {(recommendations || []).map((item: any, index: number) => {
-                      const community = item?.community || item;
-                      const id = community?._id || community?.community?._id;
-                      const name = community?.name || community?.community?.name || "";
-                      const cleanedName = name
-                        .replace(/\s+/g, "-")
-                        .replace(/\|/g, "-")
-                        .replace(/-+/g, "-");
-                      const href = id
-                        ? `/community/${encodeURIComponent(cleanedName)}-${id}/profile`
-                        : "/community";
-                      return (
-                        <div key={id || index}>
-                          <MemoizedCommunityCard
-                            community={community}
-                            onClick={() => router.push(href)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
 
           {/* Spacer Section */}
           <div className="w-full py-8 sm:py-10" style={{ backgroundColor: white }}>
             <div className="h-4"></div>
           </div>
 
-          {/* 7. Discovery Call Banner - WhatsApp with Primary Background */}
+          {/* 5. Discovery Call Banner - WhatsApp with Primary Background */}
           <div className="relative w-full overflow-hidden py-16 sm:py-20" style={{backgroundColor: primary}}>
 
             {/* Content */}
@@ -1111,34 +1137,6 @@ function Page() {
             <div className="h-2"></div>
           </div>
 
-          {/* 8. All Experts Listing */}
-          <div className="w-full py-16 sm:py-20" style={{backgroundColor: white}}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{color: black}}>
-                  All Experts
-                </h2>
-                <p className="text-lg max-w-2xl mx-auto" style={{color: black}}>
-                  Browse through our complete collection of expert communities and find the perfect match for your journey
-                </p>
-              </div>
-
-              <div className="flex-1 min-w-0" ref={targetRef}>
-                <div className="rounded-xl sm:rounded-2xl">
-                  <div
-                    id="scroll-target-border"
-                    className="w-full h-1 mb-8"
-                  ></div>
-                  {isLoading ? (
-                    <Loader />
-                  ) : (
-                    <EnhancedCommunitySection
-                      activeCategory={selectedCategoryId}
-                    />
-                  )}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* White spacing before footer */}
@@ -1146,6 +1144,7 @@ function Page() {
 
         {/* Footer */}
         <Footer />
+        </div>
       </SearchParamsProvider>
       <PageTracker
         pageName="Home"
