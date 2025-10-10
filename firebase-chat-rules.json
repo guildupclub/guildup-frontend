@@ -1,5 +1,14 @@
 {
   "rules": {
+    "programLeads": {
+      "$program": {
+        "$leadId": {
+          ".read": false,
+          ".write": true,
+          ".validate": "newData.hasChildren(['program','name','phone','createdAt']) && newData.child('program').isString() && newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 120 && newData.child('phone').isString() && newData.child('phone').val().length > 5 && newData.child('phone').val().length <= 20 && (!newData.child('email').exists() || newData.child('email').isString() && newData.child('email').val().length <= 200) && (!newData.child('message').exists() || newData.child('message').isString() && newData.child('message').val().length <= 1000) && newData.child('createdAt').isNumber()"
+        }
+      }
+    },
     "conversations": {
       "$chatId": {
         ".read": "auth != null && (auth.uid != null)",

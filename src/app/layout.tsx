@@ -17,6 +17,7 @@ import AttributionInitializer from "@/components/analytics/AttributionInitialize
 
 import RouteChangeTracker from "@/components/RouteChangeTracker";
 import GlobalInteractionTracker from "@/components/analytics/GlobalInteractionTracker";
+import FloatingNeedHelpButton from "@/components/needHelp/FloatingNeedHelpButton";
 import dynamic from "next/dynamic";
 import Script from "next/script";
 const geistSans = Geist({
@@ -216,6 +217,7 @@ export default async function RootLayout({
                 <RouteChangeTracker />
                 <GlobalInteractionTracker />
                 {children}
+                <FloatingNeedHelpButton />
                 {/* <GoogleOneTap /> */}
                 <Toaster richColors position="top-center" />
                 {/* <CookieConsent /> */}

@@ -118,6 +118,51 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
     
 
+    // Cursor-follow edge highlight state
+    const [mousePosPct, setMousePosPct] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
+    const [isHover, setIsHover] = useState(false);
+
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+      setMousePosPct({ x, y });
+    }, []);
+
+    const edgeOverlayStyle: React.CSSProperties = {
+      // custom properties used in the gradient backgrounds below
+      ["--mx" as any]: `${mousePosPct.x}%`,
+      ["--my" as any]: `${mousePosPct.y}%`,
+      pointerEvents: "none",
+      borderRadius: "16px",
+      opacity: isHover ? 1 : 0,
+      transition: "opacity 0.2s ease",
+      // Four edge gradients that peak near the cursor position
+      background:
+        `
+        linear-gradient(to right,
+          rgba(59,71,249,0) calc(var(--mx) - 18%),
+          rgba(59,71,249,0.45) var(--mx),
+          rgba(59,71,249,0) calc(var(--mx) + 18%)
+        ) top/100% 2px no-repeat,
+        linear-gradient(to bottom,
+          rgba(59,71,249,0) calc(var(--my) - 18%),
+          rgba(59,71,249,0.45) var(--my),
+          rgba(59,71,249,0) calc(var(--my) + 18%)
+        ) right/2px 100% no-repeat,
+        linear-gradient(to right,
+          rgba(59,71,249,0) calc(var(--mx) - 18%),
+          rgba(59,71,249,0.45) var(--mx),
+          rgba(59,71,249,0) calc(var(--mx) + 18%)
+        ) bottom/100% 2px no-repeat,
+        linear-gradient(to bottom,
+          rgba(59,71,249,0) calc(var(--my) - 18%),
+          rgba(59,71,249,0.45) var(--my),
+          rgba(59,71,249,0) calc(var(--my) + 18%)
+        ) left/2px 100% no-repeat
+      `,
+    };
+
     return (
       <Card 
         maxW="100vw" 
@@ -126,6 +171,9 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         minH={{ base: "360px", md: "380px" }}
         cursor="pointer"
         onClick={handleCardClick}
+        onMouseEnter={() => setIsHover(true)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => { setMousePosPct({ x: 50, y: 50 }); setIsHover(false); }}
         _hover={{ 
           shadow: 'lg',
           transform: 'translateY(-2px) scale(1.01)',
@@ -146,6 +194,8 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         data-community-id={communityDetails?._id || ""}
         data-community-name={communityDetails?.name || ""}
       >
+        {/* Edge-follow overlay (only visible on hover) */}
+        <Box position="absolute" inset={0} style={edgeOverlayStyle} />
         <CardBody p={6} flex="1" display="flex" flexDirection="column">
           {/* Image - seamless circular avatar (no borders or backdrop) */}
           <Box w="100%" display="flex" justifyContent="center" mb={3}>

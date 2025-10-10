@@ -396,99 +396,28 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <div className="cursor-pointer">
                       <span
                         className={`text-sm font-medium transition-colors duration-200 ${
-                          isActive("/experts") ? "text-primary" : "text-gray-700 group-hover:text-primary"
+                          pathname?.startsWith("/programs") ? "text-primary" : "text-gray-700 group-hover:text-primary"
                         }`}
                       >
-                        Find Expert
+                        Programs
                       </span>
                     </div>
-                    
-                    {/* Dropdown Menu */}
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-72 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+
+                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-56 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                       <div className="py-3">
-                        {/* Expert Categories */}
                         {[
-                          {
-                            name: "Mental Health",
-                            icon: Brain,
-                            description: "Therapy, counseling & mental wellness",
-                            href: "/experts?category=mental-health"
-                          },
-                          {
-                            name: "Fitness",
-                            icon: Dumbbell,
-                            description: "Personal training & fitness coaching",
-                            href: "/experts?category=fitness"
-                          },
-                          {
-                            name: "Nutrition",
-                            icon: Apple,
-                            description: "Diet planning & nutritional guidance",
-                            href: "/experts?category=nutrition"
-                          },
-                          {
-                            name: "Relationship",
-                            icon: Heart,
-                            description: "Couples therapy & relationship counseling",
-                            href: "/experts?category=relationship"
-                          },
-                          {
-                            name: "Healing",
-                            icon: Sparkles,
-                            description: "Alternative & holistic healing practices",
-                            href: "/experts?category=healing"
-                          }
-                        ].map((category, index) => (
+                          { name: "PCOS", href: "/programs/pcos" },
+                          { name: "Stress & Anxiety", href: "/programs/stress-anxiety" },
+                          { name: "Relationship", href: "/programs/relationship" },
+                        ].map((item) => (
                           <Link
-                            key={category.name}
-                            href={category.href}
-                            className="block px-5 py-3.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-xl mx-2"
-                            onClick={() => {
-                              tracking.trackClick("find_expert_category", {
-                                source: "navbar_dropdown",
-                                category_name: category.name,
-                                user_id: session?.user._id,
-                              });
-                            }}
+                            key={item.name}
+                            href={item.href}
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg mx-2"
                           >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                                <category.icon className="w-5 h-5 text-primary" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-base">{category.name}</div>
-                                <div className="text-sm text-gray-500 truncate">
-                                  {category.description}
-                                </div>
-                              </div>
-                            </div>
+                            <span className="font-medium text-base">{item.name}</span>
                           </Link>
                         ))}
-                        
-                        {/* Divider */}
-                        <div className="border-t border-gray-100 my-2 mx-2"></div>
-                        
-                        {/* All Experts Option */}
-                        <Link
-                          href="/experts"
-                          className="block px-5 py-3.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-xl mx-2"
-                          onClick={() => {
-                            tracking.trackClick("find_expert_all", {
-                              source: "navbar_dropdown",
-                              user_id: session?.user._id,
-                            });
-                          }}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                              <Users className="w-5 h-5 text-primary" />
-                            </div>
-                            <div>
-                              <div className="font-semibold text-base">All Experts</div>
-                              <div className="text-sm text-gray-500">Browse all available experts</div>
-                            </div>
-                          </div>
-                        </Link>
                       </div>
                     </div>
                   </li>
@@ -504,32 +433,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </span>
                     </Link>
                   </li>
-
-                  <li className="px-3 lg:px-4 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                    <Link
-                      href="/chat"
-                      className="relative group"
-                    >
-                      <span
-                        className={`text-sm font-medium transition-colors duration-200 ${
-                          isActive("/chat") ? "text-primary" : "text-gray-700 group-hover:text-primary"
-                        }`}
-                      >
-                        Chat
-                        {user?._id && unreadCount > 0 && (
-                          <span className="ml-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 inline-flex items-center justify-center shadow-sm">
-                            {unreadCount > 9 ? "9+" : unreadCount}
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  </li>
-
-                  {user?._id && (
-                    <li className="px-3 lg:px-4 py-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                      <NotificationDropdown />
-                    </li>
-                  )}
                 </ul>
               </div>
 
@@ -658,25 +561,32 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             </span>
           </Link>
 
-          <Link
-            href="/experts"
-            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-          >
-            <div className="w-7 h-7 flex items-center justify-center">
-              <Users
-                className={`w-5 h-5 transition-colors duration-200 ${
-                  isActive("/experts") ? "text-primary" : "text-gray-600"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-xs font-medium ${
-                isActive("/experts") ? "text-primary" : "text-gray-600"
-              }`}
-            >
-              Experts
-            </span>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200">
+                <div className="w-7 h-7 flex items-center justify-center">
+                  <Users className={`w-5 h-5 transition-colors duration-200 ${isActive("/programs") ? "text-primary" : "text-gray-600"}`} />
+                </div>
+                <span className={`text-xs font-medium ${isActive("/programs") ? "text-primary" : "text-gray-600"}`}>
+                  Programs
+                </span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center">
+              <DropdownMenuItem asChild>
+                <Link href="/programs/pcos">PCOS</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/programs/stress-anxiety">Stress & Anxiety</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/programs/relationship">Relationship</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/experts">All Experts</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Link
             href="/feeds"
