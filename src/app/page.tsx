@@ -184,25 +184,30 @@ function Page() {
     }
   };
 
-  // Trending categories for suggestions and popular categories
+  // Trending categories computed from communities.json (no API)
   const [trendingCategories, setTrendingCategories] = useState<
     { _id: string; name: string; num_communities?: number }[]
   >([]);
   useEffect(() => {
-    const fetchTrendingCategories = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category/trending`
-        );
-        if (res?.data?.r === "s" && Array.isArray(res.data.data)) {
-          setTrendingCategories(res.data.data);
-        }
-      } catch (e) {
-        console.error("Failed to load trending categories", e);
-      }
-    };
-    fetchTrendingCategories();
-  }, []);
+    if (!cachedData?.communities) return;
+    // Build counts by category name
+    const counts = new Map<string, number>();
+    for (const item of cachedData.communities) {
+      const c = item.community || item;
+      const rawCat = c?.category;
+      let name: string | null = null;
+      if (typeof rawCat === "string") name = rawCat;
+      else if (rawCat?.name) name = rawCat.name;
+      if (!name) continue;
+      const key = name.trim();
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    const ranked = Array.from(counts.entries())
+      .map(([name, n]) => ({ _id: name.replace(/\s+/g, "-"), name, num_communities: n }))
+      .sort((a, b) => (b.num_communities || 0) - (a.num_communities || 0))
+      .slice(0, 8);
+    setTrendingCategories(ranked);
+  }, [cachedData?.communities]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -290,24 +295,19 @@ function Page() {
     return url.replace(/-/g, " ");
   };
 
+  // Categories derived from communities.json (no API)
   useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
-        );
-
-        const categories = [
-          { _id: "all", name: "All Category" },
-          ...response.data.data,
-        ];
-        setCategory(categories);
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-      }
-    };
-    fetchCategory();
-  }, []);
+    if (!cachedData?.communities) return;
+    const names = new Set<string>();
+    for (const item of cachedData.communities) {
+      const c = item.community || item;
+      const rawCat = c?.category;
+      if (typeof rawCat === "string" && rawCat.trim()) names.add(rawCat.trim());
+      else if (rawCat?.name && String(rawCat.name).trim()) names.add(String(rawCat.name).trim());
+    }
+    const list = [{ _id: "all", name: "All Category" }, ...Array.from(names).map((n) => ({ _id: n.replace(/\s+/g, "-"), name: n }))];
+    setCategory(list);
+  }, [cachedData?.communities]);
 
   useEffect(() => {
     if (!category.length) return;
