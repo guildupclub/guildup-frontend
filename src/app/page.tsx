@@ -865,11 +865,7 @@ function Page() {
 
               {/* Community Category Tabs */}
               <div className="flex justify-center mb-8">
-                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 p-4 rounded-2xl shadow-lg border" style={{ 
-                  backgroundColor: `${primary}08`, 
-                  borderColor: `${primary}20`,
-                  backdropFilter: 'blur(10px)'
-                }}>
+                <div className="flex flex-wrap justify-center gap-6 w-full max-w-4xl border-b border-gray-200">
                   {[
                     { id: 'all', label: 'All Experts', tag: '' },
                     { id: 'nutrition', label: 'Nutrition', tag: 'Nutrition' },
@@ -901,55 +897,25 @@ function Page() {
                     <button
                       key={tab.id}
                       onClick={() => handleCategorySelect(tab.id === 'all' ? 'all' : tab.tag)}
-                      className={`relative px-5 py-3 sm:px-6 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-300 flex items-center gap-2.5 group overflow-hidden ${
-                        isActive
-                          ? 'text-white shadow-xl transform scale-105' 
-                          : 'text-gray-700 hover:text-gray-900 bg-white/90 hover:bg-white shadow-md hover:shadow-lg hover:scale-105'
+                      className={`relative px-2 sm:px-3 py-2 font-medium text-sm sm:text-base bg-transparent shadow-none rounded-none ${
+                        isActive ? 'text-gray-900' : 'text-gray-600'
                       }`}
                       style={{
-                        backgroundColor: isActive ? primary : undefined,
                         fontFamily: "'Poppins', sans-serif",
-                        border: isActive ? `2px solid ${primary}` : '2px solid transparent'
+                        borderBottom: isActive ? `2px solid ${primary}` : '2px solid transparent',
+                        backgroundColor: 'transparent',
+                        boxShadow: 'none',
+                        borderRadius: 0,
+                        outline: 'none'
                       }}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          (e.target as HTMLElement).style.backgroundColor = 'white';
-                          (e.target as HTMLElement).style.transform = 'scale(1.05)';
-                          (e.target as HTMLElement).style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          (e.target as HTMLElement).style.backgroundColor = 'rgba(255,255,255,0.9)';
-                          (e.target as HTMLElement).style.transform = 'scale(1)';
-                          (e.target as HTMLElement).style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-                        }
-                      }}
+                      onMouseEnter={(e) => { (e.currentTarget.style.backgroundColor = 'transparent'); e.currentTarget.style.boxShadow = 'none'; }}
+                      onMouseLeave={(e) => { (e.currentTarget.style.backgroundColor = 'transparent'); e.currentTarget.style.boxShadow = 'none'; }}
+                      onFocus={(e) => { e.currentTarget.style.outline = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+                      onBlur={(e) => { e.currentTarget.style.outline = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
+                      role="tab"
+                      aria-selected={isActive}
                     >
-                      {/* Active tab glow effect */}
-                      {isActive && (
-                        <div 
-                          className="absolute inset-0 rounded-xl opacity-20"
-                          style={{ 
-                            background: `linear-gradient(135deg, ${primary}, ${primary}80)`,
-                            filter: 'blur(8px)'
-                          }}
-                        />
-                      )}
-                      
                       <span className="relative z-10">{tab.label}</span>
-                      {tabCount > 0 && (
-                        <span className={`relative z-10 text-xs px-2.5 py-1 rounded-full font-bold transition-all duration-300 ${
-                          isActive
-                            ? 'bg-white/25 text-white shadow-inner' 
-                            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
-                        }`}>
-                          {tabCount}
-                        </span>
-                      )}
-                      
-                      {/* Subtle shine effect on hover */}
-                      <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white to-transparent transform -skew-x-12 translate-x-full group-hover:translate-x-[-100%]" />
                     </button>
                     );
                   })}

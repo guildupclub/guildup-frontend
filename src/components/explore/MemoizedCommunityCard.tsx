@@ -1,39 +1,7 @@
 "use client";
 
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from "react";
-import {
-  Box,
-  Card,
-  CardBody,
-  Image,
-  Text,
-  Badge,
-  Button,
-  HStack,
-  VStack,
-  Flex,
-  Icon,
-  Divider,
-  useColorModeValue,
-  Tooltip,
-  Avatar,
-} from '@chakra-ui/react';
-import { StarIcon } from '@chakra-ui/icons';
-import { IoVideocam } from "react-icons/io5";
-import { ImUsers } from "react-icons/im";
-import { FaCheckCircle, FaCrown, FaAward, FaCalendarAlt, FaUsers, FaClock } from "react-icons/fa";
-
-import { toast } from "sonner";
-import { GrInstagram } from "react-icons/gr";
-import { BsYoutube } from "react-icons/bs";
-import { FaLinkedinIn, FaBriefcase, FaBullseye } from "react-icons/fa";
-import numbro from "numbro";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Box, Card, CardBody, Image, Text, Badge, HStack, Divider } from '@chakra-ui/react';
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "../../redux/communitySlice";
@@ -51,131 +19,13 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
     const dispatch = useDispatch();
     const communityDetails = community?.community || community;
 
+    const [showDescription, setShowDescription] = useState<boolean>(false);
+
     const handleCardClick = useCallback(() => {
-      if (!communityDetails || !communityDetails._id) {
-        console.error("Invalid community data:", communityDetails);
-        return;
-      }
-
-      // Create URL-friendly community name
-      const cleanedCommunityName = communityDetails.name
-        .replace(/\s+/g, "-")
-        .replace(/\|/g, "-")
-        .replace(/-+/g, "-");
-      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-      const communityParams = `${encodedCommunityName}-${communityDetails._id}`;
-
-      // Update Redux state
-      dispatch(
-        setCommunityData({
-          communityId: communityDetails._id,
-          userId: communityDetails.user_id,
-        })
-      );
-
-      dispatch(
-        setActiveCommunity({
-          id: communityDetails._id,
-          name: communityDetails.name,
-          image: "",
-          background_image: "",
-          user_isBankDetailsAdded: false,
-          user_iscalendarConnected: false,
-        })
-      );
-
-      // Navigate to community profile page
-      router.push(`/community/${communityParams}/profile`);
-    }, [communityDetails, dispatch, router]);
-
-    const handleViewProfile = useCallback((e: React.MouseEvent) => {
-      e.stopPropagation();
-      
-      if (!communityDetails || !communityDetails._id) {
-        console.error("Invalid community data:", communityDetails);
-        return;
-      }
-
-      // Create URL-friendly community name
-      const cleanedCommunityName = communityDetails.name
-        .replace(/\s+/g, "-")
-        .replace(/\|/g, "-")
-        .replace(/-+/g, "-");
-      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-      const communityParams = `${encodedCommunityName}-${communityDetails._id}`;
-
-      // Update Redux state
-      dispatch(
-        setCommunityData({
-          communityId: communityDetails._id,
-          userId: communityDetails.user_id,
-        })
-      );
-
-      dispatch(
-        setActiveCommunity({
-          id: communityDetails._id,
-          name: communityDetails.name,
-          image: "",
-          background_image: "",
-          user_isBankDetailsAdded: false,
-          user_iscalendarConnected: false,
-        })
-      );
-
-      // Navigate to community profile page
-      router.push(`/community/${communityParams}/profile`);
-    }, [communityDetails, dispatch, router]);
-
-    const handleShare = useCallback((e: React.MouseEvent) => {
-      e.stopPropagation();
-      
-      if (!communityDetails || !communityDetails._id) {
-        console.error("Invalid community data:", communityDetails);
-        return;
-      }
-
-      // Create URL-friendly community name
-      const cleanedCommunityName = communityDetails.name
-        .replace(/\s+/g, "-")
-        .replace(/\|/g, "-")
-        .replace(/-+/g, "-");
-      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-      const communityParams = `${encodedCommunityName}-${communityDetails._id}`;
-
-      // Create the full URL
-      const communityUrl = `${window.location.origin}/community/${communityParams}/profile`;
-
-      // Copy to clipboard
-      navigator.clipboard.writeText(communityUrl).then(() => {
-        toast.success("Link copied to clipboard!", {
-          description: "Share this link with others to invite them",
-        });
-      }).catch(() => {
-        toast.error("Failed to copy link", {
-          description: "Please try again or copy the link manually",
-        });
-      });
-    }, [communityDetails]);
-
-    const handleClaimFreeSession = useCallback((e: React.MouseEvent) => {
-      e.stopPropagation();
-      
-      if (!communityDetails?.min_offering_id) {
-        console.error("No minimum offering ID available:", communityDetails);
-        // toast.error("Session booking unavailable", {
-        //   description: "Please try again later or contact support",
-        // });
-        return;
-      }
-
-      // Navigate to the offering page
-      router.push(`/offering/${communityDetails.min_offering_id}`);
-    }, [communityDetails, router]);
-
-    const formatNumber = (num: number) => {
-      return numbro(num).format({ average: true, mantissa: 1 });
-    };
+      // Toggle description visibility on card click
+      setShowDescription((prev) => !prev);
+    }, []);
+    
 
     const getTagColor = (index: number) => {
       const colors = [
@@ -228,59 +78,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`;
     }, [communityDetails]);
 
-    // Get community type/specialty
-    const getCommunityType = useMemo(() => {
-      if (!communityDetails) return "Expert";
-      
-      // First try to get from category field
-      if (communityDetails.category) {
-        // Handle both string and object category formats
-        if (typeof communityDetails.category === 'string') {
-          return communityDetails.category;
-        } else if (communityDetails.category.name) {
-          return communityDetails.category.name;
-        }
-      }
-      
-      // If no category, try to extract from tags
-      if (tags && tags.length > 0) {
-        // Look for common professional types in tags
-        const professionalTypes = [
-          'psychologist', 'therapist', 'counselor', 'coach', 'nutritionist', 
-          'trainer', 'doctor', 'specialist', 'consultant', 'advisor'
-        ];
-        
-        for (const tag of tags) {
-          const lowerTag = tag.toLowerCase();
-          for (const type of professionalTypes) {
-            if (lowerTag.includes(type)) {
-              return tag;
-            }
-          }
-        }
-        
-        // If no professional type found, return the first tag
-        return tags[0];
-      }
-      
-      // If no tags, try to extract from description
-      if (communityDetails.description) {
-        const desc = communityDetails.description.toLowerCase();
-        if (desc.includes('psychologist')) return 'Psychologist';
-        if (desc.includes('therapist')) return 'Therapist';
-        if (desc.includes('counselor')) return 'Counselor';
-        if (desc.includes('coach')) return 'Coach';
-        if (desc.includes('nutritionist')) return 'Nutritionist';
-        if (desc.includes('trainer')) return 'Trainer';
-        if (desc.includes('doctor')) return 'Doctor';
-        if (desc.includes('specialist')) return 'Specialist';
-        if (desc.includes('consultant')) return 'Consultant';
-        if (desc.includes('advisor')) return 'Advisor';
-      }
-      
-      // Default fallback
-      return "Wellness Expert";
-    }, [communityDetails, tags]);
+    // Simplified type: use first tag as a single tag line
 
     // Add reviews state
     const [reviews, setReviews] = useState<any[]>([]);
@@ -318,30 +116,19 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       fetchReviews();
     }, [communityDetails?._id]);
 
-    const cardBg = useColorModeValue('white', 'gray.800');
-    const borderColor = useColorModeValue('gray.200', 'gray.600');
-    const textColor = useColorModeValue('gray.900', 'white');
-    const subTextColor = useColorModeValue('gray.600', 'gray.300');
-    const accentColor = useColorModeValue(`${primary}15`, `${primary}20`);
-    const trustBadgeBg = useColorModeValue(`${primary}10`, `${primary}20`);
-    const trustBadgeColor = useColorModeValue(primary, `${primary}80`);
-    const primaryColor = primary;
-    const premiumGradient = useColorModeValue(
-      `linear-gradient(135deg, ${primary}08 0%, ${primary}15 50%, ${primary}08 100%)`,
-      `linear-gradient(135deg, ${primary}15 0%, ${primary}25 50%, ${primary}15 100%)`
-    );
+    
 
     return (
       <Card 
         maxW="100vw" 
         w="100%"
-        h="auto"
-        minH="auto"
+        h={{ base: "360px", md: "380px" }}
+        minH={{ base: "360px", md: "380px" }}
         cursor="pointer"
         onClick={handleCardClick}
         _hover={{ 
-          shadow: 'xl',
-          transform: 'translateY(-2px)',
+          shadow: 'lg',
+          transform: 'translateY(-2px) scale(1.01)',
           transition: 'all 0.3s ease'
         }}
         transition="all 0.3s ease"
@@ -350,7 +137,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         overflow="hidden"
         borderRadius="2xl"
         bg="white"
-        boxShadow="lg"
+        boxShadow="sm"
         display="flex"
         flexDirection="column"
         position="relative"
@@ -360,206 +147,107 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         data-community-name={communityDetails?.name || ""}
       >
         <CardBody p={6} flex="1" display="flex" flexDirection="column">
-          {/* Top Section - Profile and Key Info */}
-          <Flex direction={{ base: "column", md: "row" }} gap={6} mb={6}>
-            {/* Profile Image */}
-            <Box 
-              w={{ base: "120px", md: "140px" }} 
-              h={{ base: "120px", md: "140px" }}
-              flexShrink={0}
+          {/* Image - seamless circular avatar (no borders or backdrop) */}
+          <Box w="100%" display="flex" justifyContent="center" mb={3}>
+            <Box
               position="relative"
+              w={{ base: "180px", md: "200px" }}
+              h={{ base: "180px", md: "200px" }}
+              borderRadius="full"
+              overflow="hidden"
             >
-              <Image
-                src={avatarImgUrl || "/placeholder.svg"}
-                alt={communityDetails?.name || "Expert"}
+          <Image
+            src={avatarImgUrl || "/placeholder.svg"}
+            alt={communityDetails?.name || "Expert"}
                 w="100%"
                 h="100%"
                 objectFit="cover"
-                objectPosition="center"
-                borderRadius="xl"
-                boxShadow="md"
               />
             </Box>
+          </Box>
 
-            {/* Name, Title, and Key Info */}
-            <Box flex="1">
-              <VStack spacing={4} align="stretch">
-                {/* Name and Title */}
-                <Box>
-                  <Text 
-                    fontSize={{ base: "xl", md: "2xl" }} 
-                    fontWeight="bold" 
-                    color="gray.900" 
-                    mb={1}
-                    fontFamily="'Poppins', sans-serif"
-                  >
-                    {communityDetails?.name || "Expert Name"}
-                  </Text>
-                  <Text 
-                    fontSize="md" 
-                    color="gray.600" 
-                    fontWeight="medium"
-                    fontFamily="'Poppins', sans-serif"
-                  >
-                    {getCommunityType}
-                  </Text>
-                </Box>
+          {/* Horizontal line immediately after the profile image (thicker) */}
+          <Box w="100%" h="3px" bg={primary} opacity={0.6} borderRadius="full" mb={3} />
 
+          {/* Owner name with faint meta under it (experience • sessions) */}
+          <Box mb={2}>
+            <Text 
+              fontSize={{ base: "lg", md: "xl" }} 
+              fontWeight="bold" 
+              color="gray.900" 
+              fontFamily="'Poppins', sans-serif"
+            >
+              {communityDetails?.owner_name 
+                || communityDetails?.user_name 
+                || communityDetails?.user?.name 
+                || communityDetails?.name 
+                || "Expert Name"}
+            </Text>
+            {(() => {
+              const experience = communityDetails?.owner_experience 
+                || communityDetails?.user_year_of_experience 
+                || communityDetails?.user?.year_of_experience 
+                || 0;
+              const sessions = communityDetails?.owner_sessions 
+                || communityDetails?.user_session_conducted 
+                || communityDetails?.user?.session_conducted 
+                || 0;
+              const parts: string[] = [];
+              if (experience > 0) parts.push(`${Math.floor(experience)} yrs`);
+              if (sessions > 0) parts.push(`${Math.floor(sessions)} sessions`);
+              if (parts.length === 0) return null;
+              return (
+                <Text fontSize={{ base: 'xs', md: 'sm' }} color="gray.500" fontFamily="'Poppins', sans-serif" mt={1}>
+                  {parts.join(' • ')}
+                </Text>
+              );
+            })()}
+          </Box>
 
-                {/* Languages */}
-                {(() => {
-                  const languages = communityDetails?.user_languages || 
-                                  communityDetails?.languages || 
-                                  communityDetails?.user?.languages ||
-                                  [];
-                  
-                  if (languages.length === 0) return null;
-                  
-                  return (
-                    <HStack spacing={2} align="center">
-                      <Icon viewBox="0 0 24 24" boxSize={4} color={primaryColor}>
-                        <path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-                      </Icon>
-                      <Text fontSize="sm" color="gray.600" fontFamily="Garamond, serif">
-                        {Array.isArray(languages) ? languages.join(", ") : languages}
-                      </Text>
-                    </HStack>
-                  );
-                })()}
-
-                {/* Rating */}
-                {(averageRating > 0 || totalReviews > 0) && (
-                  <HStack spacing={2} align="center">
-                    <StarIcon color="yellow.500" boxSize={4} />
-                    <Text fontSize="sm" fontWeight="medium" color="yellow.600" fontFamily="Garamond, serif">
-                      {averageRating > 0 
-                        ? `${averageRating} (${totalReviews} reviews)` 
-                        : `${totalReviews} reviews`}
-                    </Text>
-                  </HStack>
-                )}
-              </VStack>
-            </Box>
-          </Flex>
-
-          {/* Specializations */}
+          {/* Tags as single line separated by dot */}
           {tags && tags.length > 0 && (
-            <Box mb={6}>
-              <Flex 
-                direction="row" 
-                align="center" 
-                gap={2}
-                flexWrap="wrap"
+            <Box mb={3} maxW="100%" overflow="hidden">
+              <Text
+                fontSize="sm"
+                color="gray.600"
+                fontFamily="'Poppins', sans-serif"
+                noOfLines={2}
               >
-                {tags.slice(0, 7).map((tag, index) => (
-                  <Badge
-                    key={index}
-                    bg="gray.100"
-                    color="gray.700"
-                    px={3}
-                    py={1}
-                    borderRadius="md"
-                    fontSize="sm"
-                    fontWeight="medium"
-                    whiteSpace="nowrap"
-                    fontFamily="'Poppins', sans-serif"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </Flex>
+                {tags.join(' • ')}
+              </Text>
             </Box>
           )}
 
-          {/* Metrics Section */}
-          <HStack spacing={6} mb={6} justify="space-between">
-            {(() => {
-              const experience = communityDetails?.owner_experience || 
-                               communityDetails?.user_year_of_experience || 
-                               communityDetails?.user?.year_of_experience || 0;
-              const sessions = communityDetails?.owner_sessions || 
-                             communityDetails?.user_session_conducted || 
-                             communityDetails?.user?.session_conducted || 0;
-              
-              const metrics = [];
-              
-              // Only show experience if available
-              if (experience > 0) {
-                metrics.push(
-                  <HStack key="experience" spacing={2} align="center">
-                    <Icon as={FaAward} boxSize={4} color={primaryColor} />
-                    <VStack spacing={0} align="start">
-                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Years of Experience</Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{Math.floor(experience)}+ years</Text>
-                    </VStack>
-                  </HStack>
+          {/* Languages (rating removed) */}
+          {(communityDetails?.languages && communityDetails.languages.length > 0) && (
+            <HStack spacing={3} align="center" mb={3} flexWrap="wrap">
+              {(() => {
+                const languages = communityDetails?.languages 
+                  || communityDetails?.user_languages 
+                  || communityDetails?.user?.languages 
+                  || [];
+                if (!languages || languages.length === 0) return null;
+                return (
+                  <Text fontSize="sm" color="gray.600" fontFamily="'Poppins', sans-serif">
+                    {Array.isArray(languages) ? languages.join(', ') : languages}
+                  </Text>
                 );
-              }
-              
-              // Only show sessions if available
-              if (sessions > 0) {
-                metrics.push(
-                  <HStack key="sessions" spacing={2} align="center">
-                    <Icon as={FaUsers} boxSize={4} color={primaryColor} />
-                    <VStack spacing={0} align="start">
-                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Sessions Conducted</Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{Math.floor(sessions)} Sessions</Text>
-                    </VStack>
-                  </HStack>
-                );
-              }
-              
-              // Check for availability data
-              const nextSlot = communityDetails?.next_available_slot || 
-                             communityDetails?.availability?.next_slot;
-              if (nextSlot) {
-                const slotTime = new Date(nextSlot).toLocaleString('en-US', {
-                  weekday: 'short',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                });
-                
-                metrics.push(
-                  <HStack key="availability" spacing={2} align="center">
-                    <Icon as={FaCalendarAlt} boxSize={4} color={primaryColor} />
-                    <VStack spacing={0} align="start">
-                      <Text fontSize="sm" color="gray.500" fontFamily="Garamond, serif">Next available slot</Text>
-                      <Text fontSize="lg" fontWeight="bold" color="gray.900" fontFamily="Garamond, serif">{slotTime}</Text>
-                    </VStack>
-                  </HStack>
-                );
-              }
-              
-              return metrics.length > 0 ? metrics : null;
-            })()}
-          </HStack>
+              })()}
+            </HStack>
+          )}
 
-          {/* CTA Button */}
-          <Button
-            w="full"
-            bg={primaryColor}
-            _hover={{
-              bg: `${primaryColor}CC`,
-              transform: "translateY(-1px)",
-              shadow: "lg"
-            }}
-            color="white"
-            fontWeight="bold"
-            py={4}
-            borderRadius="xl"
-            transition="all 0.3s ease"
-            fontSize="lg"
-            fontFamily="Garamond, serif"
-            leftIcon={<Icon viewBox="0 0 24 24" boxSize={5}><path fill="currentColor" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></Icon>}
-            onClick={handleClaimFreeSession}
-            data-analytics-type="community-cta"
-            data-analytics-name="Quick Explore Call"
-            data-community-id={communityDetails?._id || ""}
-            data-community-name={communityDetails?.name || ""}
-            boxShadow="md"
-          >
-            Quick Explore Call
-          </Button>
+          {/* Bottom row no longer needed since meta moved under name */}
+
+          {/* Expandable description on card click */}
+          {showDescription && communityDetails?.description && (
+            <Box mt={2}>
+              <Text fontSize="sm" color="gray.700" fontFamily="'Poppins', sans-serif">
+                {communityDetails.description}
+              </Text>
+            </Box>
+          )}
+
+          {/* CTA removed as requested */}
         </CardBody>
       </Card>
     );
@@ -569,4 +257,3 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 MemoizedCommunityCard.displayName = "MemoizedCommunityCard";
 
 export default MemoizedCommunityCard;
- 
