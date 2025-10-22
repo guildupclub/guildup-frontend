@@ -1,32 +1,14 @@
-# *
+# robots.txt for https://guildup.club/
 User-agent: *
 Allow: /
 
-# Disallow admin and private routes
-Disallow: /api/
-Disallow: /admin/
-Disallow: /_next/
-Disallow: /no-community/
 
-# Allow specific API routes that are public
-Allow: /api/search
-Allow: /api/sitemap
+
+
+# Disallow private/auth pages
+Disallow: /api/auth/
+Disallow: /api/private/
+Disallow: /dashboard/private/
 
 # Sitemap location
 Sitemap: https://guildup.club/sitemap.xml
-
-# Crawl delay (optional)
-Crawl-delay: 1
-
-# Specific rules for major search engines
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 1
-
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-User-agent: Slurp
-Allow: /
-Crawl-delay: 2
