@@ -167,8 +167,9 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       <Card 
         maxW="100vw" 
         w="100%"
-        h={{ base: "360px", md: "380px" }}
-        minH={{ base: "360px", md: "380px" }}
+        h="420px"
+        minH="420px"
+        maxH="420px"
         cursor="pointer"
         onClick={handleCardClick}
         onMouseEnter={() => setIsHover(true)}
@@ -196,108 +197,126 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       >
         {/* Edge-follow overlay (only visible on hover) */}
         <Box position="absolute" inset={0} style={edgeOverlayStyle} />
-        <CardBody p={6} flex="1" display="flex" flexDirection="column">
-          {/* Image - seamless circular avatar (no borders or backdrop) */}
-          <Box w="100%" display="flex" justifyContent="center" mb={3}>
-            <Box
-              position="relative"
-              w={{ base: "180px", md: "200px" }}
-              h={{ base: "180px", md: "200px" }}
-              borderRadius="full"
+        <CardBody p={0} flex="1" display="flex" flexDirection="column" h="100%" overflow="hidden">
+          {/* Image and name section - extends to divider */}
+          <Box 
+            flex="1"
+            display="flex"
+            flexDirection="column"
+            overflow="hidden"
+            position="relative"
+          >
+            {/* Image - takes most of the space */}
+            <Box 
+              w="100%" 
+              flex="1"
+              minH="0"
               overflow="hidden"
+              position="relative"
+              bg="gray.50"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
             >
-          <Image
-            src={avatarImgUrl || "/placeholder.svg"}
-            alt={communityDetails?.name || "Expert"}
+              <Image
+                src={avatarImgUrl || "/placeholder.svg"}
+                alt={communityDetails?.name || "Expert"}
                 w="100%"
                 h="100%"
-                objectFit="cover"
+                objectFit="contain"
               />
             </Box>
-          </Box>
 
-          {/* Horizontal line immediately after the profile image (thicker) */}
-          <Box w="100%" h="3px" bg={primary} opacity={0.6} borderRadius="full" mb={3} />
-
-          {/* Owner name with faint meta under it (experience • sessions) */}
-          <Box mb={2}>
-            <Text 
-              fontSize={{ base: "lg", md: "xl" }} 
-              fontWeight="bold" 
-              color="gray.900" 
-              fontFamily="'Poppins', sans-serif"
-            >
-              {communityDetails?.owner_name 
-                || communityDetails?.user_name 
-                || communityDetails?.user?.name 
-                || communityDetails?.name 
-                || "Expert Name"}
-            </Text>
-            {(() => {
-              const experience = communityDetails?.owner_experience 
-                || communityDetails?.user_year_of_experience 
-                || communityDetails?.user?.year_of_experience 
-                || 0;
-              const sessions = communityDetails?.owner_sessions 
-                || communityDetails?.user_session_conducted 
-                || communityDetails?.user?.session_conducted 
-                || 0;
-              const parts: string[] = [];
-              if (experience > 0) parts.push(`${Math.floor(experience)} yrs`);
-              if (sessions > 0) parts.push(`${Math.floor(sessions)} sessions`);
-              if (parts.length === 0) return null;
-              return (
-                <Text fontSize={{ base: 'xs', md: 'sm' }} color="gray.500" fontFamily="'Poppins', sans-serif" mt={1}>
-                  {parts.join(' • ')}
-                </Text>
-              );
-            })()}
-          </Box>
-
-          {/* Tags as single line separated by dot */}
-          {tags && tags.length > 0 && (
-            <Box mb={3} maxW="100%" overflow="hidden">
-              <Text
-                fontSize="sm"
-                color="gray.600"
+            {/* Name section - below image, above divider */}
+            <Box px={4} pt={3} pb={2} flexShrink={0}>
+              <Text 
+                fontSize="lg"
+                fontWeight="bold" 
+                color="gray.900" 
                 fontFamily="'Poppins', sans-serif"
-                noOfLines={2}
+                textAlign="center"
+                noOfLines={1}
+                lineHeight="1.4"
               >
-                {tags.join(' • ')}
+                {communityDetails?.owner_name 
+                  || communityDetails?.user_name 
+                  || communityDetails?.user?.name 
+                  || communityDetails?.name 
+                  || "Expert Name"}
               </Text>
-            </Box>
-          )}
-
-          {/* Languages (rating removed) */}
-          {(communityDetails?.languages && communityDetails.languages.length > 0) && (
-            <HStack spacing={3} align="center" mb={3} flexWrap="wrap">
               {(() => {
-                const languages = communityDetails?.languages 
-                  || communityDetails?.user_languages 
-                  || communityDetails?.user?.languages 
-                  || [];
-                if (!languages || languages.length === 0) return null;
+                const experience = communityDetails?.owner_experience 
+                  || communityDetails?.user_year_of_experience 
+                  || communityDetails?.user?.year_of_experience 
+                  || 0;
+                const sessions = communityDetails?.owner_sessions 
+                  || communityDetails?.user_session_conducted 
+                  || communityDetails?.user?.session_conducted 
+                  || 0;
+                const parts: string[] = [];
+                if (experience > 0) parts.push(`${Math.floor(experience)} yrs`);
+                if (sessions > 0) parts.push(`${Math.floor(sessions)} sessions`);
+                if (parts.length === 0) return null;
                 return (
-                  <Text fontSize="sm" color="gray.600" fontFamily="'Poppins', sans-serif">
-                    {Array.isArray(languages) ? languages.join(', ') : languages}
+                  <Text fontSize="xs" color="gray.500" fontFamily="'Poppins', sans-serif" textAlign="center" mt={0.5} noOfLines={1}>
+                    {parts.join(' • ')}
                   </Text>
                 );
               })()}
-            </HStack>
-          )}
-
-          {/* Bottom row no longer needed since meta moved under name */}
-
-          {/* Expandable description on card click */}
-          {showDescription && communityDetails?.description && (
-            <Box mt={2}>
-              <Text fontSize="sm" color="gray.700" fontFamily="'Poppins', sans-serif">
-                {communityDetails.description}
-              </Text>
             </Box>
-          )}
 
-          {/* CTA removed as requested */}
+            {/* Horizontal divider */}
+            <Box w="100%" h="2px" bg={primary} opacity={0.6} borderRadius="full" flexShrink={0} />
+          </Box>
+
+          {/* Details section at bottom with padding */}
+          <Box px={4} pt={2} pb={4} flexShrink={0}>
+            {/* Tags */}
+            {tags && tags.length > 0 && (
+              <Box mb={2}>
+                <Text
+                  fontSize="xs"
+                  color="gray.600"
+                  fontFamily="'Poppins', sans-serif"
+                  noOfLines={2}
+                  lineHeight="1.4"
+                  textAlign="left"
+                >
+                  {tags.join(' • ')}
+                </Text>
+              </Box>
+            )}
+
+            {/* Languages */}
+            {(communityDetails?.languages && communityDetails.languages.length > 0) && (
+              <Box>
+                <HStack spacing={2} align="center" flexWrap="wrap">
+                  {(() => {
+                    const languages = communityDetails?.languages 
+                      || communityDetails?.user_languages 
+                      || communityDetails?.user?.languages 
+                      || [];
+                    if (!languages || languages.length === 0) return null;
+                    return (
+                      <Text fontSize="xs" color="gray.500" fontFamily="'Poppins', sans-serif" noOfLines={1}>
+                        {Array.isArray(languages) ? languages.slice(0, 2).join(', ') : languages}
+                        {Array.isArray(languages) && languages.length > 2 ? '...' : ''}
+                      </Text>
+                    );
+                  })()}
+                </HStack>
+              </Box>
+            )}
+
+            {/* Expandable description on card click */}
+            {showDescription && communityDetails?.description && (
+              <Box mt={2} pt={2} borderTop="1px" borderColor="gray.200">
+                <Text fontSize="xs" color="gray.700" fontFamily="'Poppins', sans-serif" noOfLines={3}>
+                  {communityDetails.description}
+                </Text>
+              </Box>
+            )}
+          </Box>
         </CardBody>
       </Card>
     );

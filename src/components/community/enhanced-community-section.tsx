@@ -232,7 +232,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           {/* Communities Grid */}
           <div
             id="card-container-top"
-            className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 pb-6"
+            className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 pb-6"
           >
             {filteredAndSortedCommunities.length > 0 ? (
               filteredAndSortedCommunities.map((community, index) => {
@@ -243,12 +243,14 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
                 return (
                   <div
                     key={stableKey}
-                    className={index === 0 ? "first-expert-card" : ""}
+                    className={`${index === 0 ? "first-expert-card" : ""} flex items-stretch`}
                   >
-                    <MemoizedCommunityCard
-                      community={community}
-                      onClick={() => handleClickCommunity(community)}
-                    />
+                    <div className="w-full">
+                      <MemoizedCommunityCard
+                        community={community}
+                        onClick={() => handleClickCommunity(community)}
+                      />
+                    </div>
                   </div>
                 );
               })

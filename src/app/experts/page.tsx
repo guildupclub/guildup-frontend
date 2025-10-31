@@ -278,7 +278,7 @@ function ExpertsContent() {
             <>
               
               {communities.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 lg:gap-8 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 sm:gap-6 w-full">
                   {communities.map((c, index) => {
                 const id = c?._id;
                 const cleanedName = (c?.name || "expert")
@@ -291,16 +291,18 @@ function ExpertsContent() {
                 return (
                       <div 
                         key={id} 
-                        className="transform transition-all duration-300 hover:scale-105"
+                        className="flex items-stretch"
                         style={{ 
                           animationDelay: `${index * 100}ms`,
                           animation: 'fadeInUp 0.6s ease-out forwards'
                         }}
                       >
-                  <MemoizedCommunityCard
-                    community={c as any}
-                    onClick={() => router.push(href)}
-                  />
+                        <div className="w-full">
+                          <MemoizedCommunityCard
+                            community={c as any}
+                            onClick={() => router.push(href)}
+                          />
+                        </div>
                       </div>
                 );
               })}
