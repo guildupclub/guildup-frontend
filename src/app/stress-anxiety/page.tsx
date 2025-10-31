@@ -21,6 +21,7 @@ import {
   Utensils,
 } from "lucide-react";
 import axios from "axios";
+import { API_BASE_URL } from "@/config/constants";
 
 
 function SectionWrapper({ children }: { children: React.ReactNode }) {
@@ -299,7 +300,7 @@ function Experts() {
       setLoading(true);
       try {
         const allResp = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=0&limit=500`
+          `${API_BASE_URL}/v1/community/all?page=0&limit=500`
         );
         const all = Array.isArray(allResp?.data?.data) ? allResp.data.data : [];
 
