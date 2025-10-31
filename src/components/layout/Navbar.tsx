@@ -114,6 +114,33 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return fetchedCommunities.find((community) => community && community._id);
   };
 
+  // Ensure active community is initialized outside of render
+  useEffect(() => {
+    if (activeCommunityId) return;
+    const firstCommunity = getFirstValidCommunity();
+    if (!firstCommunity) return;
+
+    dispatch(
+      setActiveCommunity({
+        id: firstCommunity._id,
+        name: firstCommunity.name,
+        image: firstCommunity.image || "",
+        background_image: firstCommunity.background_image || "",
+        user_isBankDetailsAdded: false,
+        user_iscalendarConnected: false,
+      })
+    );
+
+    if (user?._id) {
+      dispatch(
+        setCommunityData({
+          communityId: firstCommunity._id,
+          userId: user._id,
+        })
+      );
+    }
+  }, [activeCommunityId, fetchedCommunities, user?._id, dispatch]);
+
   const cleanedCommunityName = activeCommunityName
     ? activeCommunityName
         .replace(/\s+/g, "-")
@@ -125,32 +152,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const getMySpaceLink = () => {
     if (activeCommunityId) {
       return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
-    } else {
-      const firstCommunity = getFirstValidCommunity();
-      if (firstCommunity) {
-        // Set the first community as active
-        dispatch(
-          setActiveCommunity({
-            id: firstCommunity._id,
-            name: firstCommunity.name,
-            image: firstCommunity.image || "",
-            background_image: firstCommunity.background_image || "",
-            user_isBankDetailsAdded: false,
-            user_iscalendarConnected: false,
-          })
-        );
-        if (user?._id) {
-          dispatch(
-            setCommunityData({
-              communityId: firstCommunity._id,
-              userId: user._id,
-            })
-          );
-        }
-        return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
-      }
-      return NO_COMMUNITIES_AVAILABLE;
     }
+    const firstCommunity = getFirstValidCommunity();
+    return firstCommunity
+      ? `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`
+      : NO_COMMUNITIES_AVAILABLE;
   };
 
   const handleMySpaceClick = (e: React.MouseEvent) => {
