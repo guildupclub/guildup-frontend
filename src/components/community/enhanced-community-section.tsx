@@ -45,6 +45,7 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const COMMUNITIES_PER_PAGE = 12;
 
@@ -60,30 +61,33 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
         } else {
           setLoading(true);
           setCommunities([]);
+          setError(null); // Clear previous errors
         }
+
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
         let response;
         if (activeCategory === "all") {
-          response = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE}`
-          );
+          const url = `${apiUrl}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE}`;
+          response = await axios.get(url);
         } else {
-          response = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/look`,
-            {
-              categoryId: activeCategory,
-              page: pageNum,
-              limit: COMMUNITIES_PER_PAGE,
-            }
-          );
+          const url = `${apiUrl}/v1/community/look`;
+          const payload = {
+            categoryId: activeCategory,
+            page: pageNum,
+            limit: COMMUNITIES_PER_PAGE,
+          };
+          response = await axios.post(url, payload);
+        }
+        // Check if response has data
+        if (!response || !response.data) {
+          console.error("❌ No response data received");
+          setHasMore(false);
+          return;
         }
 
-        if (
-          response &&
-          response.data &&
-          response.data.r === "s" &&
-          Array.isArray(response.data.data)
-        ) {
+        // Handle different response formats
+        if (response.data.r === "s" && Array.isArray(response.data.data)) {
           const newCommunities = response.data.data;
           const meta = response.data.meta;
 
@@ -102,12 +106,57 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           } else {
             setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
           }
+        } else if (response.data.r === "e") {
+          // Error response from backend
+          setHasMore(false);
+        } else if (Array.isArray(response.data)) {
+          // Direct array response (some APIs might return this)
+          const newCommunities = response.data;
+          if (isLoadMore) {
+            setCommunities((prev) => [...prev, ...newCommunities]);
+          } else {
+            setCommunities(newCommunities);
+          }
+          setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
+        } else if (Array.isArray(response.data.data)) {
+          // Data array without 'r' field
+          const newCommunities = response.data.data;
+          if (isLoadMore) {
+            setCommunities((prev) => [...prev, ...newCommunities]);
+          } else {
+            setCommunities(newCommunities);
+          }
+          setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
         } else {
-          console.error("Invalid response format:", response.data);
+          const errorMsg = "Invalid response format from API";
+          setError(errorMsg);
           setHasMore(false);
         }
-      } catch (error) {
-        console.error("Error fetching communities", error);
+      } catch (error: any) {
+        let errorMessage = "Failed to load communities";
+        
+        if (error.response) {
+          console.error("📛 Response error details:", {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data,
+          });
+          errorMessage = `API Error: ${error.response.status} ${error.response.statusText || ""}`;
+          if (error.response.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+        } else if (error.request) {
+          console.error("📛 No response received:", {
+            message: error.message,
+            url: error.config?.url,
+          });
+          errorMessage = "No response from server. Please check your connection.";
+        } else {
+          console.error("📛 Request setup error:", error.message);
+          errorMessage = `Request error: ${error.message}`;
+        }
+        
+        setError(errorMessage);
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -175,6 +224,31 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
       {loading ? (
         <div className="flex justify-center items-center py-8">
           <Loader />
+        </div>
+      ) : error ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="p-4 bg-red-50 rounded-full mb-4">
+            <Users className="h-16 w-16 text-red-500" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Error Loading Communities
+          </h3>
+          <p className="text-sm text-gray-600 mb-4 max-w-md">
+            {error}
+          </p>
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setError(null);
+              fetchCommunities(0, false);
+            }}
+          >
+            Try Again
+          </Button>
+          <div className="mt-4 text-xs text-gray-400">
+            <p>API URL: {process.env.NEXT_PUBLIC_BACKEND_BASE_URL || "Not configured"}</p>
+            <p>Category: {activeCategory}</p>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

@@ -81,17 +81,45 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-          {
-            userId: userId,
-          }
-        );
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+        const url = `${apiUrl}/v1/community/user/follow`;
+        const payload = { userId };
+
+        const res = await axios.post(url, payload);
+
+        // Handle different response formats
+        let communitiesData = [];
+        if (res.data.r === "s" && Array.isArray(res.data.data)) {
+          communitiesData = res.data.data;
+          console.log("✅ [Navbar] Success format, communities:", communitiesData.length);
+        } else if (Array.isArray(res.data.data)) {
+          communitiesData = res.data.data;
+          console.log("⚠️ [Navbar] Direct data array format, communities:", communitiesData.length);
+        } else if (Array.isArray(res.data)) {
+          communitiesData = res.data;
+          console.log("⚠️ [Navbar] Direct array format, communities:", communitiesData.length);
+        } else {
+          console.error("❌ [Navbar] Unexpected response format:", res.data);
+          return;
+        }
+
         // Store the API response in state
-        setFetchedCommunities(res.data.data);
-        dispatch(setUserFollowedCommunities(res.data.data));
-      } catch (error) {
-        console.error("Error fetching communities:", error);
+        setFetchedCommunities(communitiesData);
+        dispatch(setUserFollowedCommunities(communitiesData));
+      } catch (error: any) {
+        console.error("❌ [Navbar] Error fetching communities:", error);
+        if (error.response) {
+          console.error("📛 [Navbar] Response error details:", {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data,
+          });
+        } else if (error.request) {
+          console.error("📛 [Navbar] No response received:", {
+            message: error.message,
+            url: error.config?.url,
+          });
+        }
       }
     }
     if (userId) {

@@ -61,25 +61,63 @@ export function LeftmostSidebar() {
 
   // Fetch communities function
   const fetchCommunities = async (): Promise<Community[]> => {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      }
-    );
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+    const url = `${apiUrl}/v1/community/user/follow`;
+    const payload = { userId };
+
+    console.log("🔍 [LeftmostSidebar] Fetching user communities");
+    console.log("🌐 Request URL:", url);
+    console.log("👤 User ID:", userId);
+    console.log("📦 Request payload:", payload);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("✅ [LeftmostSidebar] Response status:", response.status);
+    console.log("✅ [LeftmostSidebar] Response ok:", response.ok);
 
     if (!response.ok) {
-      throw new Error("Failed to fetch communities");
+      const errorText = await response.text();
+      console.error("❌ [LeftmostSidebar] Response not ok:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
+      throw new Error(`Failed to fetch communities: ${response.status} ${response.statusText}`);
     }
+
     const result = await response.json();
-    console.log("comm", result);
-    const validCommunities = result?.data?.filter(
+    console.log("📥 [LeftmostSidebar] Response data:", result);
+    console.log("📊 [LeftmostSidebar] Response keys:", Object.keys(result || {}));
+    console.log("📊 [LeftmostSidebar] Result.data type:", typeof result?.data);
+    console.log("📊 [LeftmostSidebar] Result.data is array:", Array.isArray(result?.data));
+
+    // Handle different response formats
+    let communitiesData = [];
+    if (result.r === "s" && Array.isArray(result.data)) {
+      communitiesData = result.data;
+      console.log("✅ [LeftmostSidebar] Success format, communities:", communitiesData.length);
+    } else if (Array.isArray(result.data)) {
+      communitiesData = result.data;
+      console.log("⚠️ [LeftmostSidebar] Direct data array format, communities:", communitiesData.length);
+    } else if (Array.isArray(result)) {
+      communitiesData = result;
+      console.log("⚠️ [LeftmostSidebar] Direct array format, communities:", communitiesData.length);
+    } else {
+      console.error("❌ [LeftmostSidebar] Unexpected response format:", result);
+      return [];
+    }
+
+    const validCommunities = communitiesData.filter(
       (community: Community | null) => community !== null
     );
+
+    console.log("✅ [LeftmostSidebar] Valid communities:", validCommunities.length);
 
     dispatch(setUserFollowedCommunities(validCommunities));
 
@@ -95,9 +133,7 @@ export function LeftmostSidebar() {
         })
       );
     }
-    return result.data.filter(
-      (community: Community | null) => community !== null
-    );
+    return validCommunities;
   };
 
   // Use React Query for fetching communities
