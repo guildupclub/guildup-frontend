@@ -45,6 +45,8 @@ import { useParams } from "next/navigation";
 import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
 import TestimonialsSection from "../clientSays/ClientSays";
 import { WebinarOfferBanner } from "../webinarHolding/WebinarHoldingSection";
+import { primary, white, black } from "@/app/colours";
+import { useRouter } from "next/navigation";
 
 interface CommunityProfile {
   user: {
@@ -151,6 +153,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const queryClient = useQueryClient();
   const { data: session } = useSession();
   const params = useParams();
+  const router = useRouter();
   const communityParam = params?.["community-Id"] as string;
   const lastHyphenIndex = communityParam ? communityParam.lastIndexOf("-") : -1;
   const communityName =
@@ -192,6 +195,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const backgroundInputRef = useRef<HTMLInputElement>(null);
   const [BookingCount, setBookingCount] = useState(0);
+  const [hasTestimonials, setHasTestimonials] = useState(false);
 
   const activeCommunityId = communityId || community?.communityId;
   
@@ -396,6 +400,34 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   useEffect(() => {
     fetchOfferings();
   }, [activeCommunityId, fetchOfferings]);
+
+  // Check if testimonials exist
+  useEffect(() => {
+    const checkTestimonials = async () => {
+      if (!activeCommunityId) return;
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/testimonials/${activeCommunityId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          setHasTestimonials((data.data || []).length > 0);
+        }
+      } catch (error) {
+        console.error("Error checking testimonials:", error);
+        setHasTestimonials(false);
+      }
+    };
+
+    checkTestimonials();
+  }, [activeCommunityId]);
 
   // Mutation for unfollowing a community
   const unfollowMutation = useMutation({
@@ -796,8 +828,31 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       label: "Discovery Call",
     },
   };
+  // Get tagline from description (first line or first sentence)
+  const getTagline = () => {
+    if (!profile?.community?.description) return "";
+    const firstLine = profile.community.description.split("\n")[0];
+    const firstSentence = firstLine.split(".")[0];
+    return firstSentence || firstLine || "";
+  };
+
+  // Get role title from tags or use a default
+  const getRoleTitle = () => {
+    if (profile?.community?.tags && profile.community.tags.length > 0) {
+      return profile.community.tags.slice(0, 2).join(" / ");
+    }
+    return "Wellness Guide";
+  };
+
+  // Calculate average rating from testimonials (if available)
+  const getClientHappinessIndex = () => {
+    // This could be calculated from testimonials if available
+    // For now, returning a placeholder value
+    return "4.8"; // This should come from actual testimonials data
+  };
+
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ fontFamily: "'Poppins', sans-serif" }}>
       {/* Stepper for onboarding (only shown to owners) */}
       {isOwner && (!isCalendarConnected || !isBankConnected) && (
         <Stepper
@@ -834,25 +889,29 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         />
       )}
 
-      <div className="mx-auto max-w-6xl px-3 py-2 md:px-0">
+      <div className="w-full" style={{ fontFamily: "'Poppins', sans-serif" }}>
         {/* Section 1: Profile Header */}
-        <div className="overflow-hidden rounded-xl border border-border/5 bg-card shadow-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-            {/* Column 1: Community Image with Chat Button */}
+        <div 
+          className="rounded-xl p-8 mb-8 bg-white"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            {/* Left Side: Photo */}
             <div className="flex flex-col items-center">
               <div className="relative">
-                <Image
-                  src={
-                    profile?.community?.image ||
-                    avatarImgUrl ||
-                    "/guildup-logo.png"
-                  }
-                  alt={profile?.community?.name || "Community Avatar"}
-                  width={300}
-                  height={300}
-                  className="w-64 h-64 rounded-xl border-4 border-background bg-primary/5 object-cover shadow-lg"
-                  unoptimized
-                />
+                <div className="w-64 h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
+                  <Image
+                    src={
+                      profile?.community?.image ||
+                      avatarImgUrl ||
+                      "/guildup-logo.png"
+                    }
+                    alt={profile?.community?.name || "Community Avatar"}
+                    width={256}
+                    height={256}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                </div>
                 {isOwner && (
                   <button
                     onClick={() => avatarInputRef.current?.click()}
@@ -868,221 +927,72 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   </button>
                 )}
               </div>
-              
-              {/* Chat Button at bottom of image */}
-              <div className="mt-4 w-full max-w-64">
-                {isOwner ? (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                    onClick={handleShareClick}
-                    title="Share Profile"
-                  >
-                    Share Profile
-                    <FaRegShareFromSquare className="ml-2 h-5 w-5" />
-                  </Button>
-                ) : (
-                  <>
-                    {isCommunityFollowed ? (
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="w-full mb-2 transition-all duration-300 shadow-sm hover:shadow-md bg-gradient-to-r from-indigo-600 to-indigo-400"
-                        onClick={handleLeaveCommunity}
-                      >
-                        {StringConstants.FOLLOWING}
-                        <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="default"
-                        size="lg"
-                        className="w-full mb-2 transition-all duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-indigo-600 to-indigo-400"
-                        onClick={handleJoinCommunity}
-                      >
-                        <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                        {StringConstants.FOLLOW}
-                      </Button>
-                    )}
 
-                    {/* Chat Support Button */}
-                    {activeCommunityId && (
-                      <ChatSupportButton
-                        expertEmail={profile.user.user_email || ""}
-                        expertDetails={{
-                          name: profile.user.user_name || "Expert",
-                          email: profile.user.user_email || "",
-                          image: profile.user.user_avatar || "",
-                        }}
-                        isBankConnected={isBankConnected}
-                        className="w-full"
-                      />
-                    )}
-                  </>
-                )}
+              {/* Name under the image */}
+              <div className="mt-4 text-center w-full">
+                <div className="flex items-center justify-center gap-2">
+                  <h2 
+                    className="text-2xl md:text-3xl font-bold text-foreground"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    {profile?.community?.name || profile?.user?.user_name}
+                  </h2>
+                  {isBankConnected && (
+                    <RiVerifiedBadgeFill className="text-primary h-7 w-7" />
+                  )}
+                </div>
+                <p 
+                  className="text-lg text-muted-foreground mt-2"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {getRoleTitle()}
+                </p>
               </div>
             </div>
 
-            {/* Column 2: Community Details */}
-            <div className="space-y-4">
-              {/* Row 1: Community Name */}
-              <div className="flex items-center justify-between">
-                <h1 className="flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground">
-                  {profile?.community?.name}
-                  {isBankConnected && (
-                    <RiVerifiedBadgeFill className="text-primary h-8 w-8" />
-                  )}
-                </h1>
-                {isOwner && (
-                  <Button
-                    className="border border-blue-600 px-6"
-                    variant="outline"
-                    onClick={() => setIsEditOpen(true)}
-                  >
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
-
-              {/* Row 2: Name of the owner */}
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-semibold text-foreground">
-                  {profile.user.user_name}
+            {/* Right Side: Quote and Button */}
+            <div className="flex flex-col justify-between h-full">
+              <div className="flex items-start gap-4 mb-6">
+                <span className="text-6xl md:text-8xl font-bold text-gray-300 leading-none mt-2 flex-shrink-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                  "
                 </span>
+                <p 
+                  className="text-2xl md:text-3xl font-semibold text-foreground flex-1 pt-2"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {getTagline() || "Helping you find calm in chaos."}
+                </p>
               </div>
 
-              {/* Row 3: Years of experience */}
-              {profile.user?.user_year_of_experience > 0 && (
-                <div className="flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5 text-amber-500"
+              {/* Book a Session Button under quote - Right side */}
+              {!isOwner && (
+                <div className="flex justify-center mt-6">
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="w-full max-w-md transition-all duration-300 shadow-lg hover:shadow-xl"
+                    style={{ backgroundColor: primary, color: white, fontFamily: "'Poppins', sans-serif" }}
+                    onClick={() => {
+                      // Find first available offering or show booking dialog
+                      const availableOffering = offerings.find(
+                        (off) => off.type !== "webinar" || !off.when || new Date(off.when) > new Date()
+                      );
+                      if (availableOffering) {
+                        setSelectedOffering(availableOffering);
+                      }
+                    }}
                   >
-                    <circle cx="12" cy="8" r="7" />
-                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
-                  </svg>
-                  <span className="text-lg font-semibold text-foreground">
-                    {Math.floor(profile.user.user_year_of_experience)}+ years of experience
-                  </span>
-                </div>
-              )}
-
-              {/* Row 4: Sessions conducted */}
-              {profile.user?.user_session_conducted > 0 && (
-                <div className="flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5 text-violet-500"
-                  >
-                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                  </svg>
-                  <span className="text-lg font-semibold text-foreground">
-                    {Math.floor(profile.user.user_session_conducted)}+ sessions conducted
-                  </span>
-                </div>
-              )}
-
-              {/* Row 5: Socials */}
-              <div className="flex flex-wrap items-center gap-4 text-sm">
-                {/* Members */}
-                <div className="flex items-center gap-2">
-                  <MdPeopleAlt className="h-5 w-5 text-green-500" />
-                  <span className="font-medium text-foreground">
-                    {profile.community.num_member.toLocaleString()} members
-                  </span>
-                </div>
-
-                {/* Posts */}
-                <div className="flex items-center gap-2">
-                  <MdOutlineRssFeed className="h-5 w-5 text-blue-500" />
-                  <span className="font-medium text-foreground">
-                    {profile?.community?.post_count} posts
-                  </span>
-                </div>
-
-                {/* Instagram Followers */}
-                {profile.community?.instagram_followers > 0 && (
-                  <div className="flex items-center gap-2">
-                    <GrInstagram className="h-5 w-5 text-pink-500" />
-                    <span className="font-medium text-foreground">
-                      {formatNumber(profile.community?.instagram_followers)} followers
-                    </span>
-                  </div>
-                )}
-
-                {/* YouTube Subscribers */}
-                {profile.community?.youtube_followers > 0 && (
-                  <div className="flex items-center gap-2">
-                    <BsYoutube className="h-5 w-5 text-red-500" />
-                    <span className="font-medium text-foreground">
-                      {formatNumber(profile.community?.youtube_followers)} subscribers
-                    </span>
-                  </div>
-                )}
-
-                {/* LinkedIn Followers */}
-                {profile.community?.linkedin_followers > 0 && (
-                  <div className="flex items-center gap-2">
-                    <FaLinkedinIn className="h-5 w-5 text-blue-800" />
-                    <span className="font-medium text-foreground">
-                      {formatNumber(profile.community?.linkedin_followers)} followers
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Languages */}
-              {profile.user?.user_languages?.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5 text-teal-500"
-                  >
-                    <path d="m5 8 6 6" />
-                    <path d="m4 14 6-6 2-3" />
-                    <path d="M2 5h12" />
-                    <path d="M7 2h1" />
-                    <path d="m22 22-5-10-5 10" />
-                    <path d="M14 18h6" />
-                  </svg>
-                  <div className="flex flex-wrap gap-2">
-                    {profile.user.user_languages.map(
-                      (lang: string, index: number) => (
-                        <Badge
-                          key={index}
-                          variant="outline"
-                          className="bg-teal-50 text-teal-700 border-teal-200"
-                        >
-                          {lang}
-                        </Badge>
-                      )
-                    )}
-                  </div>
+                    Book a Session
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
                 </div>
               )}
             </div>
           </div>
         </div>
+
+        {/* Dashed Separator */}
+        <div className="border-t border-dashed border-gray-300 mb-8"></div>
 
         {isOwner && (
           <div className="my-6">
@@ -1095,83 +1005,194 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
         )}
 
-        {/* Section 2: About Section */}
-        <div className="mt-8">
-          <div className="rounded-xl border border-border/5 bg-card shadow-sm">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-semibold text-foreground">About</h2>
-                {isOwner && (
-                  <button
-                    className="rounded-md p-2 transition hover:bg-background"
-                    onClick={() => setIsEditOpen(true)}
-                    aria-label="Edit about section"
-                  >
-                    <FaEdit className="text-muted hover:text-primary h-5 w-5" />
-                  </button>
-                )}
+        {/* Section 2: Expertise and Know the Expert Combined */}
+        <div className="mt-8 mb-8 rounded-xl p-6 bg-white">
+              {/* Know the Expert Section */}
+              <div>
+                <h2 
+                  className="text-2xl font-semibold mb-4"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Know the Expert
+                </h2>
+                <p 
+                  className="whitespace-pre-line text-muted-foreground leading-relaxed mb-6"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  {profile.community.description || "Short Bio (2-3 lines) → I'm Aanya, a certified wellness guide helping individuals build mindful habits, reduce anxiety, and reconnect with their bodies."}
+                </p>
               </div>
-              <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
-                {profile.community.description}
-              </p>
-            </div>
-          </div>
+
+              {/* Horizontal Divider */}
+              <div className="border-t border-dashed border-gray-300 my-6"></div>
+
+              {/* Expertise Section */}
+              {(profile.community.tags && profile.community.tags.length > 0) && (
+                <>
+                  <h4 
+                    className="text-lg font-semibold text-left mb-6 tracking-wide"
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    Expertise
+                  </h4>
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    {profile.community.tags.map((tag: any, index: number) => (
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="px-4 py-2 text-base"
+                        style={{ fontFamily: "'Poppins', sans-serif" }}
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* Languages Spoken */}
+              {profile.user?.user_languages && profile.user.user_languages.length > 0 && (
+                <>
+                  <div className="border-t border-gray-300 border-dashed my-6"></div>
+                  
+                  <div>
+                    <h4 
+                      className="text-lg font-semibold mb-4"
+                      style={{ fontFamily: "'Poppins', sans-serif" }}
+                    >
+                      Languages Spoken
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {profile.user.user_languages.map((lang: string, index: number) => (
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="px-4 py-2 text-base"
+                          style={{ fontFamily: "'Poppins', sans-serif" }}
+                        >
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Chat and Follow Button at the end of the section */}
+              {!isOwner && (
+                <div className="mt-6 pt-6 flex gap-3">
+                  {isCommunityFollowed ? (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex-1 transition-all duration-300 border-black"
+                      style={{ 
+                        backgroundColor: black, 
+                        color: white, 
+                        fontFamily: "'Poppins', sans-serif",
+                        borderColor: black
+                      }}
+                      onClick={handleLeaveCommunity}
+                    >
+                      {StringConstants.FOLLOWING}
+                      <HiMiniUserGroup className="ml-2 h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      className="flex-1 transition-all duration-300 border-black"
+                      style={{ 
+                        backgroundColor: black, 
+                        color: white, 
+                        fontFamily: "'Poppins', sans-serif",
+                        borderColor: black
+                      }}
+                      onClick={handleJoinCommunity}
+                    >
+                      <HiMiniUserGroup className="mr-2 h-5 w-5" />
+                      {StringConstants.FOLLOW}
+                    </Button>
+                  )}
+
+                  {/* Chat Support Button */}
+                  {activeCommunityId && isBankConnected && profile.user.user_email !== user?.email && (
+                    <div className="flex-1">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full transition-all duration-300 border-black"
+                        style={{ 
+                          backgroundColor: white, 
+                          color: black, 
+                          fontFamily: "'Poppins', sans-serif",
+                          borderColor: black
+                        }}
+                        onClick={() => {
+                          const searchParams = new URLSearchParams({
+                            expertEmail: profile.user.user_email || "",
+                            expertName: profile.user.user_name || "Expert",
+                            expertImage: profile.user.user_avatar || "",
+                          });
+                          router.push(`/chat?${searchParams.toString()}`);
+                        }}
+                      >
+                        <svg
+                          className="mr-2 h-5 w-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
+                        Chat with Expert
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
         </div>
 
-        {/* Section 3: Speciality */}
-        {profile.community.tags && profile.community.tags.length > 0 && (
-          <div className="mt-8">
-            <div className="rounded-xl border border-border/5 bg-card shadow-sm">
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold text-foreground mb-4">Speciality</h2>
-                <div className="flex flex-wrap gap-3">
-                  {profile.community.tags.map((tag: any, index: number) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors duration-200 hover:bg-primary/20"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Section 4: Offerings */}
-        <div className="mt-8">
-          <div className="rounded-xl border border-border/5 bg-card shadow-sm">
-            <div className="p-6">
+        <div className="mt-8 rounded-xl p-6 bg-white">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-foreground">Offerings</h2>
-      
+                <h2 
+                  className="text-2xl font-semibold text-foreground"
+                  style={{ fontFamily: "'Poppins', sans-serif" }}
+                >
+                  Offerings
+                </h2>
               </div>
 
-              {offerings.length === 0 ? (
-                <div className="py-16 text-center">
-                  <p className="text-lg text-muted-foreground">
-                    {StringConstants.NO_OFFERINGS}
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {(() => {
-                    console.log("Rendering offerings:", offerings);
-                    console.log("Offerings length in render:", offerings.length);
-                    return offerings.map((offering, index) => {
-                    // Hide webinars with past dates, show everything else
-                    const shouldShow = offering.type !== "webinar" || 
-                                     !offering.when || 
-                                     new Date(offering.when) > new Date();
-                    
-                    if (!shouldShow) return null;
-                    
-                    return (
-                        <div
-                          key={offering._id || `${offering.title}-${index}`}
-                          className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
-                        >
+          {offerings.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-lg text-muted-foreground">
+                {StringConstants.NO_OFFERINGS}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {(() => {
+                console.log("Rendering offerings:", offerings);
+                console.log("Offerings length in render:", offerings.length);
+                return offerings.map((offering, index) => {
+                // Hide webinars with past dates, show everything else
+                const shouldShow = offering.type !== "webinar" || 
+                                 !offering.when || 
+                                 new Date(offering.when) > new Date();
+                
+                if (!shouldShow) return null;
+                
+                return (
+                    <div
+                      key={offering._id || `${offering.title}-${index}`}
+                      className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
+                    >
                           {/* Top gradient accent */}
                           <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
 
@@ -1427,30 +1448,39 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 </div>
               )}
 
-              {selectedOffering && (
-                <BookingDialog
-                  offering={{
-                    ...selectedOffering,
-                    discounted_price: selectedOffering.discounted_price
-                      ? Number(selectedOffering.discounted_price)
-                      : 0,
-                  }}
-                  isOpen={!!selectedOffering}
-                  onClose={() => setSelectedOffering(null)}
-                />
-              )}
-            </div>
-          </div>
+          {selectedOffering && (
+            <BookingDialog
+              offering={{
+                ...selectedOffering,
+                discounted_price: selectedOffering.discounted_price
+                  ? Number(selectedOffering.discounted_price)
+                  : 0,
+              }}
+              isOpen={!!selectedOffering}
+              onClose={() => setSelectedOffering(null)}
+            />
+          )}
         </div>
 
 
-        {/* Additional Reviews Section */}
-        <div className="mt-8">
-          <div className="rounded-xl border border-border/5 bg-card shadow-sm p-6">
+        {/* Section 5: Stories of Change - Only show if testimonials exist */}
+        {hasTestimonials && (
+          <div className="mt-8 mb-8 rounded-xl p-6 bg-white">
+            <h2 
+              className="text-2xl font-semibold mb-6"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Stories of Change
+            </h2>
             {/* @ts-ignore */}
             <Testimonials communityId={activeCommunityId || undefined} />
           </div>
-        </div>
+        )}
+
+        {/* Dashed Separator at Bottom */}
+        {hasTestimonials && (
+          <div className="border-t border-dashed border-gray-300 mb-8"></div>
+        )}
 
         {/* Modals */}
         {isEditOpen && (

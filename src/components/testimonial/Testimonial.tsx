@@ -2,7 +2,6 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import Marquee from "react-fast-marquee";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -55,8 +54,10 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
     useState<Testimonial | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const fetchTestimonials = async () => {
@@ -109,6 +110,46 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
       setIsLoading(false);
     }
   }, [communityId]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const checkScroll = () => {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+      );
+    };
+
+    checkScroll();
+    container.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+
+    // Also check after a short delay to handle async loading
+    const timeoutId = setTimeout(checkScroll, 100);
+
+    return () => {
+      container.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [testimonials]);
+
+  const scroll = (direction: "left" | "right") => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const scrollAmount = container.clientWidth * 0.8;
+    const scrollTo = direction === "left" 
+      ? container.scrollLeft - scrollAmount 
+      : container.scrollLeft + scrollAmount;
+
+    container.scrollTo({
+      left: scrollTo,
+      behavior: "smooth",
+    });
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (
@@ -215,7 +256,6 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
   return (
     <div className="py-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Testimonials</h2>
         <div className="relative">
           {isAdmin && (
             <Button
@@ -247,41 +287,78 @@ export default function Testimonials({ communityId: propCommunityId }: Testimoni
       </div>
 
       {testimonials.length > 0 ? (
-        <div className="rounded-xl py-2 shadow-sm">
-          <Marquee
-            className="overflow-hidden relative testimonial-blur"
-            direction="right"
-            pauseOnHover={isHovered}
+        <div className="rounded-xl py-2 relative">
+          {/* Scroll Buttons */}
+          {canScrollLeft && (
+            <Button
+              onClick={() => scroll("left")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 h-10 w-10"
+              variant="ghost"
+            >
+              <ChevronLeft className="h-5 w-5 text-gray-700" />
+            </Button>
+          )}
+          {canScrollRight && (
+            <Button
+              onClick={() => scroll("right")}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-2 h-10 w-10"
+              variant="ghost"
+            >
+              <ChevronRight className="h-5 w-5 text-gray-700" />
+            </Button>
+          )}
+
+          {/* Horizontal Scroll Container */}
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 scroll-smooth"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+            onScroll={() => {
+              const container = scrollContainerRef.current;
+              if (!container) return;
+              setCanScrollLeft(container.scrollLeft > 0);
+              setCanScrollRight(
+                container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+              );
+            }}
           >
-            <div className="flex gap-6 relative z-0">
-              {testimonials?.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="w-full min-w-0 cursor-pointer mx-4 "
-                  onClick={() => openTestimonialModal(testimonial)}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                >
-                  <div className="bg-white p-4 rounded-2xl h-auto flex flex-col shadow-sm w-72">
+            {testimonials?.map((testimonial, index) => (
+              <div
+                key={index}
+                className="cursor-pointer group flex-shrink-0"
+                onClick={() => openTestimonialModal(testimonial)}
+              >
+                <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <div className="w-64 h-64 md:w-72 md:h-72">
                     {testimonial.mediaType === "video" ? (
                       <video
                         src={testimonial.imageUrl || "/placeholder.svg"}
-                        className="w-auto h-48 object-cover"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         controls={false}
+                        muted
                       />
                     ) : (
                       <img
                         src={testimonial.imageUrl || "/placeholder.svg"}
                         alt="Testimonial"
-                        className="w-auto h-48 object-cover"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       />
                     )}
                   </div>
                 </div>
-              )) || []}{" "}
-              {/* If undefined, use empty array */}
-            </div>
-          </Marquee>
+              </div>
+            )) || []}
+          </div>
+
+          {/* Hide scrollbar for webkit browsers */}
+          <style jsx>{`
+            .scrollbar-hide::-webkit-scrollbar {
+              display: none;
+            }
+          `}</style>
         </div>
       ) : (
         <div className="text-center py-10 bg-gray-50 rounded-xl">

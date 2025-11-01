@@ -21,9 +21,14 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
 
     const [showDescription, setShowDescription] = useState<boolean>(false);
 
-    const handleCardClick = useCallback(() => {
-      // Toggle description visibility on card click
-      setShowDescription((prev) => !prev);
+    const handleMouseEnter = useCallback(() => {
+      // Show description on hover
+      setShowDescription(true);
+    }, []);
+
+    const handleMouseLeave = useCallback(() => {
+      // Hide description when mouse leaves
+      setShowDescription(false);
     }, []);
     
 
@@ -171,10 +176,17 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
         minH="420px"
         maxH="420px"
         cursor="pointer"
-        onClick={handleCardClick}
-        onMouseEnter={() => setIsHover(true)}
+        onClick={onClick}
+        onMouseEnter={(e) => {
+          setIsHover(true);
+          handleMouseEnter();
+        }}
         onMouseMove={handleMouseMove}
-        onMouseLeave={() => { setMousePosPct({ x: 50, y: 50 }); setIsHover(false); }}
+        onMouseLeave={(e) => {
+          setMousePosPct({ x: 50, y: 50 });
+          setIsHover(false);
+          handleMouseLeave();
+        }}
         _hover={{ 
           shadow: 'lg',
           transform: 'translateY(-2px) scale(1.01)',
@@ -308,9 +320,9 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
               </Box>
             )}
 
-            {/* Expandable description on card click */}
+            {/* Description shown on hover */}
             {showDescription && communityDetails?.description && (
-              <Box mt={2} pt={2} borderTop="1px" borderColor="gray.200">
+              <Box mt={2} pt={2} borderTop="1px" borderColor="gray.200" flexShrink={0}>
                 <Text fontSize="xs" color="gray.700" fontFamily="'Poppins', sans-serif" noOfLines={3}>
                   {communityDetails.description}
                 </Text>
