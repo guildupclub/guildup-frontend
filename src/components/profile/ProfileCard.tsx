@@ -77,6 +77,8 @@ interface CommunityProfile {
 
 interface ProfileCardProps {
   communityId: string;
+  initialProfile?: CommunityProfile | null;
+  initialOfferings?: Offering[];
 }
 
 interface Offering {
@@ -148,7 +150,7 @@ function Card({ item }: CardProps) {
   );
 }
 
-export function ProfileCard({ communityId }: ProfileCardProps) {
+export function ProfileCard({ communityId, initialProfile: serverProfile, initialOfferings: serverOfferings }: ProfileCardProps) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const { data: session } = useSession();
@@ -242,7 +244,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     memberDetails.community_id === communityIdFromParam;
   console.log(">>>>>>>>>>>>>>>isOwner", isOwner);
 
-  // Fetch community profile data
+  // Fetch community profile data - use server-rendered data as initial data
   const { data: profile, isLoading } = useQuery({
     queryKey: ["communityProfile", activeCommunityId],
     queryFn: async () => {
@@ -299,6 +301,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       throw new Error("Failed to fetch community profile");
     },
     enabled: !!activeCommunityId,
+    initialData: serverProfile || undefined, // Use server-rendered data as initial data
   });
 
   // Fetch user's followed communities
@@ -327,19 +330,20 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     return userFollowedCommunities.some((c) => c?._id === activeCommunityId);
   }, [followedCommunitiesData, userFollowedCommunities, activeCommunityId]);
 
-  // Update profile data when it changes
+  // Update profile data when it changes (use displayProfile to include server-rendered data)
   useEffect(() => {
-    if (profile?.community) {
+    const currentProfile = profile || serverProfile;
+    if (currentProfile?.community) {
       setAvatarImgUrl(
-        profile.community.image ||
-          `https://api.dicebear.com/7.x/avataaars/svg?seed=${profile.user?.user_name}`
+        currentProfile.community.image ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentProfile.user?.user_name}`
       );
       setBgImgUrl(
-        profile.community.background_image ||
+        currentProfile.community.background_image ||
           "https://random-image-pepebigotes.vercel.app/api/random-image"
       );
     }
-  }, [profile?.community]);
+  }, [profile?.community, serverProfile?.community]);
 
   useEffect(() => {
     const fetchBookingCount = async () => {
@@ -367,6 +371,13 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       dispatch(setIsCalendarConnected(profile.user.user_iscalendarConnected));
     }
   }, [profile?.user, dispatch]);
+
+  // Initialize offerings with server-rendered data
+  useEffect(() => {
+    if (serverOfferings && serverOfferings.length > 0) {
+      setOfferings(serverOfferings);
+    }
+  }, [serverOfferings]);
 
   // Fetch offerings for the community
   const fetchOfferings = useCallback(async () => {
@@ -398,8 +409,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   }, [activeCommunityId]);
 
   useEffect(() => {
-    fetchOfferings();
-  }, [activeCommunityId, fetchOfferings]);
+    // Only fetch if we don't have server-rendered data
+    if (!serverOfferings || serverOfferings.length === 0) {
+      fetchOfferings();
+    }
+  }, [activeCommunityId, fetchOfferings, serverOfferings]);
 
   // Check if testimonials exist
   useEffect(() => {
@@ -783,8 +797,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
       ));
   };
 
-  // Loading state
-  if (isLoading) {
+  // Use server-rendered profile if available, otherwise use client-fetched profile
+  const displayProfile = profile || serverProfile;
+
+  // Loading state - only show loader if we have no data at all (neither server nor client)
+  if (isLoading && !serverProfile && !profile) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader />
@@ -793,15 +810,15 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   }
 
   // No profile data
-  if (!profile)
+  if (!displayProfile)
     return (
       <div className="flex h-screen items-center justify-center text-2xl font-semibold">
         {StringConstants.NO_PROFILE_DATA}
       </div>
     );
 
-  const isBankConnected = profile?.user?.user_isBankDetailsAdded;
-  const isCalendarConnected = profile?.user?.user_iscalendarConnected;
+  const isBankConnected = displayProfile?.user?.user_isBankDetailsAdded;
+  const isCalendarConnected = displayProfile?.user?.user_iscalendarConnected;
 
   const typeToIcon: Record<
     string,
@@ -830,16 +847,16 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   };
   // Get tagline from description (first line or first sentence)
   const getTagline = () => {
-    if (!profile?.community?.description) return "";
-    const firstLine = profile.community.description.split("\n")[0];
+    if (!displayProfile?.community?.description) return "";
+    const firstLine = displayProfile.community.description.split("\n")[0];
     const firstSentence = firstLine.split(".")[0];
     return firstSentence || firstLine || "";
   };
 
   // Get role title from tags or use a default
   const getRoleTitle = () => {
-    if (profile?.community?.tags && profile.community.tags.length > 0) {
-      return profile.community.tags.slice(0, 2).join(" / ");
+    if (displayProfile?.community?.tags && displayProfile.community.tags.length > 0) {
+      return displayProfile.community.tags.slice(0, 2).join(" / ");
     }
     return "Wellness Guide";
   };
@@ -901,11 +918,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 <div className="w-64 h-64 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden">
                   <Image
                     src={
-                      profile?.community?.image ||
+                      displayProfile?.community?.image ||
                       avatarImgUrl ||
                       "/guildup-logo.png"
                     }
-                    alt={profile?.community?.name || "Community Avatar"}
+                    alt={displayProfile?.community?.name || "Community Avatar"}
                     width={256}
                     height={256}
                     className="w-full h-full object-cover"
@@ -931,11 +948,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               {/* Name under the image */}
               <div className="mt-4 text-center w-full">
                 <div className="flex items-center justify-center gap-2">
-                  <h2 
+                    <h2 
                     className="text-2xl md:text-3xl font-bold text-foreground"
                     style={{ fontFamily: "'Poppins', sans-serif" }}
                   >
-                    {profile?.community?.name || profile?.user?.user_name}
+                    {displayProfile?.community?.name || displayProfile?.user?.user_name}
                   </h2>
                   {isBankConnected && (
                     <RiVerifiedBadgeFill className="text-primary h-7 w-7" />
@@ -1015,11 +1032,11 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 >
                   Know the Expert
                 </h2>
-                <p 
+                  <p 
                   className="whitespace-pre-line text-muted-foreground leading-relaxed mb-6"
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
-                  {profile.community.description || "Short Bio (2-3 lines) → I'm Aanya, a certified wellness guide helping individuals build mindful habits, reduce anxiety, and reconnect with their bodies."}
+                  {displayProfile?.community?.description || "Short Bio (2-3 lines) → I'm Aanya, a certified wellness guide helping individuals build mindful habits, reduce anxiety, and reconnect with their bodies."}
                 </p>
               </div>
 
@@ -1027,7 +1044,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               <div className="border-t border-dashed border-gray-300 my-6"></div>
 
               {/* Expertise Section */}
-              {(profile.community.tags && profile.community.tags.length > 0) && (
+              {(displayProfile?.community?.tags && displayProfile.community.tags.length > 0) && (
                 <>
                   <h4 
                     className="text-lg font-semibold text-left mb-6 tracking-wide"
@@ -1036,7 +1053,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     Expertise
                   </h4>
                   <div className="flex flex-wrap gap-3 mb-6">
-                    {profile.community.tags.map((tag: any, index: number) => (
+                    {displayProfile.community.tags.map((tag: any, index: number) => (
                       <Badge
                         key={index}
                         variant="outline"
@@ -1051,7 +1068,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
               )}
 
               {/* Languages Spoken */}
-              {profile.user?.user_languages && profile.user.user_languages.length > 0 && (
+              {displayProfile?.user?.user_languages && displayProfile.user.user_languages.length > 0 && (
                 <>
                   <div className="border-t border-gray-300 border-dashed my-6"></div>
                   
@@ -1063,7 +1080,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                       Languages Spoken
                     </h4>
                     <div className="flex flex-wrap gap-3">
-                      {profile.user.user_languages.map((lang: string, index: number) => (
+                      {displayProfile.user.user_languages.map((lang: string, index: number) => (
                         <Badge
                           key={index}
                           variant="outline"
@@ -1116,7 +1133,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                   )}
 
                   {/* Chat Support Button */}
-                  {activeCommunityId && isBankConnected && profile.user.user_email !== user?.email && (
+                  {activeCommunityId && isBankConnected && displayProfile?.user?.user_email !== user?.email && (
                     <div className="flex-1">
                       <Button
                         variant="outline"
@@ -1130,9 +1147,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                         }}
                         onClick={() => {
                           const searchParams = new URLSearchParams({
-                            expertEmail: profile.user.user_email || "",
-                            expertName: profile.user.user_name || "Expert",
-                            expertImage: profile.user.user_avatar || "",
+                            expertEmail: displayProfile?.user?.user_email || "",
+                            expertName: displayProfile?.user?.user_name || "Expert",
+                            expertImage: displayProfile?.user?.user_avatar || "",
                           });
                           router.push(`/chat?${searchParams.toString()}`);
                         }}
@@ -1483,9 +1500,9 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
         )}
 
         {/* Modals */}
-        {isEditOpen && (
+        {isEditOpen && displayProfile && (
           <EditCommunityModal
-            profile={profile}
+            profile={displayProfile}
             isOpen={isEditOpen}
             onClose={() => setIsEditOpen(false)}
           />
