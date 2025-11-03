@@ -142,43 +142,113 @@ const {
         offeringTypes: ["discovery-call", "consultation"]
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/filter-by-offerings`,
-        filterPayload
-      );
+      let transformedCommunities: Community[] = [];
 
-      if (
-        response &&
-        response.data &&
-        response.data.r === "s" &&
-        Array.isArray(response.data.data)
-      ) {
-        // Transform the response data to match our Community interface
-        const transformedCommunities = response.data.data.map((community: any) => ({
-          _id: community._id,
-          user_id: community.user_id,
-          name: community.name,
-          description: community.description,
-          image: community.image,
-          owner_experience: community.owner_experience || 0,
-          owner_sessions: community.owner_sessions || 0,
-          num_member: community.num_member || 0,
-          linkedin_followers: community.linkedin_followers || 0,
-          instagram_followers: community.instagram_followers || 0,
-          youtube_followers: community.youtube_followers || 0,
-          tags: community.tags || [],
-          min_offering_id: community.min_offering_id,
+      try {
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/filter-by-offerings`,
+          filterPayload
+        );
 
-        }));
+        if (
+          response &&
+          response.data &&
+          response.data.r === "s" &&
+          Array.isArray(response.data.data)
+        ) {
+          transformedCommunities = response.data.data.map((community: any) => ({
+            _id: community._id,
+            user_id: community.user_id,
+            name: community.name,
+            description: community.description,
+            image: community.image,
+            owner_experience: community.owner_experience || 0,
+            owner_sessions: community.owner_sessions || 0,
+            num_member: community.num_member || 0,
+            linkedin_followers: community.linkedin_followers || 0,
+            instagram_followers: community.instagram_followers || 0,
+            youtube_followers: community.youtube_followers || 0,
+            tags: community.tags || [],
+            min_offering_id: community.min_offering_id,
+          }));
+        }
+      } catch (apiErr) {
+        // Fallback: fetch from JSON route
+        try {
+          const resp = await fetch("/api/communities", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            const all: any[] = Array.isArray(data) ? data : [];
+            // Basic mapping from JSON structure
+            const mapped = all.map((c: any) => ({
+              _id: c._id,
+              user_id: typeof c.user_id === "string" ? c.user_id : (c.user_id?._id || c._id),
+              name: c.name,
+              description: c.description || "",
+              image: c.image,
+              owner_experience: c.owner_experience || 0,
+              owner_sessions: c.owner_sessions || 0,
+              num_member: c.num_member || 0,
+              linkedin_followers: c.linkedin_followers || 0,
+              instagram_followers: c.instagram_followers || 0,
+              youtube_followers: c.youtube_followers || 0,
+              tags: c.tags || [],
+              min_offering_id: c.min_offering_id,
+            }));
 
+            // Local filter for Mind categories (by category fields or tags/name keywords)
+            const nameById: Record<string, string> = {
+              "67cab23e9b3cd869f1d3ee97": "relationship",
+              "67cab2669b3cd869f1d3ee98": "mental",
+              "67cab2809b3cd869f1d3ee99": "self",
+            };
+            const desiredIds = new Set(MIND_CATEGORY_IDS);
+            const desiredNameTokens = new Set([
+              "mental",
+              "counsel",
+              "therapy",
+              "relationship",
+              "parent",
+              "self",
+              "growth",
+              "mind",
+              "anxiety",
+              "stress",
+            ]);
+
+            const matchesCategory = (raw: any): boolean => {
+              const cid = raw.category_id || raw.categoryId || raw.category?._id || raw.category?.id;
+              if (cid && desiredIds.has(String(cid))) return true;
+              const cname = String(raw.category_name || raw.categoryName || raw.category?.name || "").toLowerCase();
+              if (cname) {
+                for (const token of desiredNameTokens) if (cname.includes(token)) return true;
+              }
+              const tgs: string[] = Array.isArray(raw.tags) ? raw.tags.flat().map((t: any) => String(t).toLowerCase()) : [];
+              return tgs.some((t) => Array.from(desiredNameTokens).some((tok) => t.includes(tok)));
+            };
+
+            transformedCommunities = mapped.filter((m, idx) => matchesCategory(all[idx]));
+          } else {
+            console.warn("/api/communities returned status", resp.status);
+          }
+        } catch (jsonErr) {
+          console.error("JSON fallback failed for mind communities:", jsonErr);
+        }
+      }
+
+      if (transformedCommunities.length > 0) {
         if (isLoadMore) {
-          setCommunities(prev => [...prev, ...transformedCommunities]);
+          setCommunities((prev) => [...prev, ...transformedCommunities]);
         } else {
           setCommunities(transformedCommunities);
         }
-        
         setHasMore(transformedCommunities.length === COMMUNITIES_PER_PAGE);
-        setTotalCount(response.data.meta?.totalCommunities || transformedCommunities.length);
+        setTotalCount((prev) => (prev > 0 ? prev : transformedCommunities.length));
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
       console.error("Error fetching mind communities:", error);

@@ -299,9 +299,23 @@ function Experts() {
     const fetchAllAndFilter = async () => {
       setLoading(true);
       try {
-        const allResp = await axios.get(
-          `${API_BASE_URL}/v1/community/all?page=0&limit=500`
-        );
+        let allResp;
+        try {
+          allResp = await axios.get(
+            `${API_BASE_URL}/v1/community/all?page=0&limit=500`
+          );
+        } catch (error) {
+          // If API fails, fetch from JSON fallback
+          console.log("API endpoint not available, fetching from JSON");
+          const response = await fetch("/api/communities", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const jsonData = await response.json();
+          allResp = { data: { data: jsonData } };
+        }
         const all = Array.isArray(allResp?.data?.data) ? allResp.data.data : [];
 
         const normalize = (s: string) =>
@@ -351,7 +365,7 @@ function Experts() {
             const seedValue = c._id || (c.name && `${c.name}-${c.user_id || Date.now()}`);
             // Handle both top-level and nested community structure (same as home page)
             const communityDetails = (c as any)?.community || c;
-            const avatarUrl = communityDetails.image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${seedValue}`;
+            const avatarUrl = communityDetails.image;
             const languages = c.languages?.join(", ") || "English, Hindi";
             const exp = c.owner_experience ? `${c.owner_experience}+ years` : "5+ years";
             const sessions = c.owner_sessions ? `${c.owner_sessions}` : "200+";
