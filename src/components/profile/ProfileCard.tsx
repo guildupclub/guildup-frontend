@@ -3,6 +3,7 @@
 import React, { use, useCallback, useEffect, useRef, useState } from "react";
 import type { RootState } from "@/redux/store";
 import axios from "axios";
+import { fetchUserCommunities, fetchCommunityProfile } from "@/lib/services/communities";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { useSession } from "next-auth/react";
@@ -45,6 +46,8 @@ import { useParams } from "next/navigation";
 import { HiOutlineUserGroup, HiOutlineVideoCamera } from "react-icons/hi";
 import TestimonialsSection from "../clientSays/ClientSays";
 import { WebinarOfferBanner } from "../webinarHolding/WebinarHoldingSection";
+import { Feed } from "../community/feed/Feed";
+import Footer from "../layout/Footer";
 
 interface CommunityProfile {
   user: {
@@ -237,57 +240,57 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["communityProfile", activeCommunityId],
     queryFn: async () => {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-        {
-          communityId: activeCommunityId,
-        }
-      );
-
-      if (response.data.r) {
+      try {
+        const profileData = await fetchCommunityProfile(activeCommunityId!);
+        
+        // Store user data in localStorage
         try {
           localStorage.setItem(
             "sessionConducted",
-            JSON.stringify(response?.data?.data?.user?.user_session_conducted)
+            JSON.stringify(profileData?.user?.user_session_conducted)
           );
           localStorage.setItem(
             "yearOfExperience",
-            JSON.stringify(response?.data?.data?.user?.user_year_of_experience)
+            JSON.stringify(profileData?.user?.user_year_of_experience)
           );
           localStorage.setItem(
             "isBankAdded",
-            JSON.stringify(response?.data?.data?.user?.user_isBankDetailsAdded)
+            JSON.stringify(profileData?.user?.user_isBankDetailsAdded)
           );
           localStorage.setItem(
             "isCalendarConnected",
-            JSON.stringify(response?.data?.data?.user?.user_iscalendarConnected)
+            JSON.stringify(profileData?.user?.user_iscalendarConnected)
           );
-          // localStorage.setItem("Date-Time",JSON.stringify(response?.data))
         } catch (error) {
           console.warn(
             "Failed to store communityProfile in localStorage",
             error
           );
         }
-        if (response?.data?.data?.community?.image) {
-          setAvatarImgUrl(response.data.data.community.image);
+        
+        // Set avatar image
+        if (profileData?.community?.image) {
+          setAvatarImgUrl(profileData.community.image);
         } else {
           setAvatarImgUrl(
-            `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.data.data.user.user_name}`
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${profileData?.user?.user_name || activeCommunityId}`
           );
         }
 
-        if (response.data.data.community.background_image) {
-          setBgImgUrl(response.data.data.community.background_image);
+        // Set background image
+        if (profileData?.community?.background_image) {
+          setBgImgUrl(profileData.community.background_image);
         } else {
           setBgImgUrl(
             "https://random-image-pepebigotes.vercel.app/api/random-image"
           );
         }
 
-        return response.data.data;
+        return profileData;
+      } catch (error: any) {
+        console.error("❌ [ProfileCard] Error fetching community profile:", error);
+        throw new Error(error.message || "Failed to fetch community profile");
       }
-      throw new Error("Failed to fetch community profile");
     },
     enabled: !!activeCommunityId,
   });
@@ -297,13 +300,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     queryKey: ["userFollowedCommunities"],
     queryFn: async () => {
       if (!user?._id) return [];
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-        {
-          userId: user._id,
-        }
-      );
-      return response.data.data;
+      return await fetchUserCommunities(user._id);
     },
     enabled: !!user?._id,
   });
@@ -790,43 +787,45 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
     <div className="w-full">
       {/* Stepper for onboarding (only shown to owners) */}
       {isOwner && (!isCalendarConnected || !isBankConnected) && (
-        <Stepper
-          steps={[
-            {
-              label: "Build Guild",
-              completed: true,
-            },
-            {
-              label: "Complete Profile",
-              completed: true,
-            },
-            {
-              label: "Create Offering",
-              completed: offerings && offerings.length > 0,
-              active: offerings && offerings.length === 0,
-            },
-            {
-              label: "Link Calendar",
-              completed: isCalendarConnected,
-              active: offerings && offerings.length > 0 && !isCalendarConnected,
-            },
-            {
-              label: "Add Bank",
-              completed: isBankConnected,
-              active:
-                offerings &&
-                offerings.length > 0 &&
-                isCalendarConnected &&
-                !isBankConnected,
-              href: "/payments",
-            },
-          ]}
-        />
+        <div className="max-w-6xl mx-auto px-0 md:px-0">
+          <Stepper
+            steps={[
+              {
+                label: "Build Guild",
+                completed: true,
+              },
+              {
+                label: "Complete Profile",
+                completed: true,
+              },
+              {
+                label: "Create Offering",
+                completed: offerings && offerings.length > 0,
+                active: offerings && offerings.length === 0,
+              },
+              {
+                label: "Link Calendar",
+                completed: isCalendarConnected,
+                active: offerings && offerings.length > 0 && !isCalendarConnected,
+              },
+              {
+                label: "Add Bank",
+                completed: isBankConnected,
+                active:
+                  offerings &&
+                  offerings.length > 0 &&
+                  isCalendarConnected &&
+                  !isBankConnected,
+                href: "/payments",
+              },
+            ]}
+          />
+        </div>
       )}
 
-      <div className="mx-auto max-w-6xl px-3 py-2 md:px-0">
+      <div className="mx-auto max-w-6xl px-0 md:px-6 py-0 md:py-2">
         {/* Profile Header Card */}
-        <div className="overflow-hidden rounded-xl border border-border/5 bg-card shadow-lg">
+        <div className="overflow-hidden rounded-none md:rounded-xl border-0 md:border border-border/5 bg-card md:shadow-lg">
           {/* Banner Image */}
           <div className="relative">
             <div className="h-44 lg:h-48 w-full overflow-hidden bg-gradient-to-r from-primary/10 via-primary/5 to-background">
@@ -1236,7 +1235,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                 </button>
               )}
             </h2>
-            <div className="h-auto rounded-xl border border-border/5 bg-card p-8 shadow-sm">
+            <div className="h-auto rounded-none md:rounded-xl border-0 md:border border-border/5 bg-card p-4 md:p-8 md:shadow-sm">
               <p className="whitespace-pre-line text-muted-foreground">
                 {profile.community.description}
               </p>
@@ -1254,7 +1253,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
 
           {/* Offerings Section */}
-          <div className="rounded-xl border border-border/5 transition-all duration-300">
+          <div className="rounded-none md:rounded-xl border-0 md:border border-border/5 transition-all duration-300">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-2xl font-semibold text-foreground">
                 {StringConstants.OFFERINGS}
@@ -1265,7 +1264,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
             </div>
 
             {offerings.length === 0 ? (
-              <div className="rounded-xl border border-border/5 bg-card py-16 text-center">
+              <div className="rounded-none md:rounded-xl border-0 md:border border-border/5 bg-card py-16 text-center">
                 <p className="text-lg text-muted-foreground">
                   {StringConstants.NO_OFFERINGS}
                 </p>
@@ -1279,7 +1278,7 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
                     (offering.when && new Date(offering.when) > new Date()) ? (
                       <div
                         key={offering._id || `${offering.title}-${index}`}
-                        className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
+                        className="group relative overflow-hidden rounded-none md:rounded-xl border-0 md:border border-gray-100 bg-white p-4 md:p-6 transition-all duration-300 hover:border-blue-100 md:hover:shadow-md"
                       >
                         {/* Top gradient accent */}
                         <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
@@ -1549,19 +1548,30 @@ export function ProfileCard({ communityId }: ProfileCardProps) {
           </div>
 
           {/* Testimonials Section */}
-          <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-xl shadow-sm">
-              <TestimonialsSection communityId={communityIdFromParam} />
+          {communityIdFromParam && (
+            <div className="col-span-1 mt-8 lg:col-span-2">
+              <div className="rounded-none md:rounded-xl md:shadow-sm">
+                <TestimonialsSection communityId={communityIdFromParam as string} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Testimonials Section */}
           <div className="col-span-1 mt-8 lg:col-span-2">
-            <div className="rounded-xl shadow-sm">
+            <div className="rounded-none md:rounded-xl md:shadow-sm">
               {/* @ts-ignore */}
               <Testimonials communityId={activeCommunityId || undefined} />
             </div>
           </div>
+
+          {/* Discovery/Feed Section */}
+          {activeCommunityId && (
+            <div className="col-span-1 mt-8 lg:col-span-2">
+              <div className="rounded-none md:rounded-xl md:shadow-sm">
+                <Feed communityId={activeCommunityId} />
+              </div>
+            </div>
+          )}
 
           {/* Modals */}
           {isEditOpen && (

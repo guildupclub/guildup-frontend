@@ -9,17 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { FileText, Plus, Settings } from "lucide-react";
 import { useCommunityPosts } from "@/hook/queries/useCommunityQueries";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { FaUsers } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import Loader from "@/components/Loader";
 import { StringConstants } from "@/components/common/CommonText";
-import { PostDialog } from "../Event/CreateEventDialouge";
 
 interface Post {
   _id: string;
@@ -88,26 +83,11 @@ export function Feed({ communityId }: FeedProps) {
   // }
 
   return (
-    <div className="min-h-screen grow py-2 md:py-24">
+    <div className="grow">
       <div className="max-w-5xl px-2 md:ps-6 flex flex-col gap-6">
         {/* Header */}
-        <div className="flex items-center justify-between rounded-xl border-b border-zinc-300 bg-card px-6 py-3">
-          <div className="flex items-center text-muted gap-2">
-            <FileText className="w-5 h-5" />
-            <h1 className="text-xl font-semibold">{StringConstants.FEED}</h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" className="hidden md:block">
-              <Settings className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden w-24 h-8 rounded-md bg-background hover:bg-zinc-300 text-zinc-300 flex justify-end px-2"
-            >
-              <PostDialog />
-            </Button>
-          </div>
+        <div className="px-4 md:px-6 py-4">
+          <h2 className="text-2xl font-semibold text-foreground">Expert Posts</h2>
         </div>
 
         {/* Filter Bar */}

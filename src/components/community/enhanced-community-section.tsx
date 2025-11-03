@@ -11,9 +11,8 @@ import { setCommunityData } from "@/redux/communitySlice";
 import Loader from "../Loader";
 import { setActiveCommunity } from "@/redux/channelSlice";
 import { Button } from "../ui/button";
-import { ArrowDown, Users, SlidersHorizontal } from "lucide-react";
-import { OfferingFilters } from "@/components/filter/offering-filters";
-import { useOfferingFilters } from "@/hooks/use-offering-filters";
+import { ArrowDown, Users } from "lucide-react";
+import { fetchFromJSON, fetchUserCommunities } from "@/lib/services/communities";
 
 interface Community {
   _id: string;
@@ -44,14 +43,9 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const COMMUNITIES_PER_PAGE = 12;
-
-  // Use the filtering hook
-  const { filters, setFilters, clearFilters, filteredAndSortedCommunities } =
-    useOfferingFilters(communities);
 
   const fetchCommunities = useCallback(
     async (pageNum: number, isLoadMore = false) => {
@@ -64,96 +58,52 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           setError(null); // Clear previous errors
         }
 
-        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
-
-        let response;
-        if (activeCategory === "all") {
-          const url = `${apiUrl}/v1/community/all?page=${pageNum}&limit=${COMMUNITIES_PER_PAGE}`;
-          response = await axios.get(url);
-        } else {
-          const url = `${apiUrl}/v1/community/look`;
-          const payload = {
-            categoryId: activeCategory,
-            page: pageNum,
-            limit: COMMUNITIES_PER_PAGE,
-          };
-          response = await axios.post(url, payload);
+        // Always fetch from JSON
+        console.log("📦 [Enhanced Community Section] Fetching communities from JSON");
+        const communities = await fetchFromJSON();
+        
+        if (!communities || communities.length === 0) {
+          console.warn("⚠️ [Enhanced Community Section] No communities found in JSON");
+          setHasMore(false);
+          setCommunities([]);
+          return;
         }
-        // Check if response has data
-        if (!response || !response.data) {
-          console.error("❌ No response data received");
+
+        if (!Array.isArray(communities)) {
+          console.error("❌ [Enhanced Community Section] Invalid response format:", typeof communities);
+          setError("Invalid response format from JSON");
           setHasMore(false);
           return;
         }
 
-        // Handle different response formats
-        if (response.data.r === "s" && Array.isArray(response.data.data)) {
-          const newCommunities = response.data.data;
-          const meta = response.data.meta;
+        // Map communities from service to component's Community interface
+        const newCommunities: Community[] = communities.map((comm: any) => ({
+          _id: comm._id || "",
+          user_id: comm.user_id || comm._id || "", // Use _id as fallback for user_id
+          name: comm.name || "",
+          description: comm.description || "",
+          imageUrl: comm.image || comm.imageUrl || comm.background_image || "",
+          community: comm.community || comm, // Wrap the entire community object
+          offerings: comm.offerings || [], // Empty array if not present
+        })).filter((comm: Community) => comm._id && comm.name); // Filter out invalid communities
 
-          if (isLoadMore) {
-            setCommunities((prev) => [...prev, ...newCommunities]);
-          } else {
-            setCommunities(newCommunities);
-          }
-
-          if (meta) {
-            setTotalCount(meta.total || 0);
-            setHasMore(
-              newCommunities.length === COMMUNITIES_PER_PAGE &&
-                (pageNum + 1) * COMMUNITIES_PER_PAGE < (meta.total || 0)
-            );
-          } else {
-            setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
-          }
-        } else if (response.data.r === "e") {
-          // Error response from backend
-          setHasMore(false);
-        } else if (Array.isArray(response.data)) {
-          // Direct array response (some APIs might return this)
-          const newCommunities = response.data;
-          if (isLoadMore) {
-            setCommunities((prev) => [...prev, ...newCommunities]);
-          } else {
-            setCommunities(newCommunities);
-          }
-          setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
-        } else if (Array.isArray(response.data.data)) {
-          // Data array without 'r' field
-          const newCommunities = response.data.data;
-          if (isLoadMore) {
-            setCommunities((prev) => [...prev, ...newCommunities]);
-          } else {
-            setCommunities(newCommunities);
-          }
-          setHasMore(newCommunities.length === COMMUNITIES_PER_PAGE);
-        } else {
-          const errorMsg = "Invalid response format from API";
-          setError(errorMsg);
-          setHasMore(false);
-        }
-      } catch (error: any) {
-        let errorMessage = "Failed to load communities";
+        console.log("✅ [Enhanced Community Section] Loaded", newCommunities.length, "communities from JSON");
         
-        if (error.response) {
-          console.error("📛 Response error details:", {
-            status: error.response.status,
-            statusText: error.response.statusText,
-            data: error.response.data,
-          });
-          errorMessage = `API Error: ${error.response.status} ${error.response.statusText || ""}`;
-          if (error.response.data?.message) {
-            errorMessage = error.response.data.message;
-          }
-        } else if (error.request) {
-          console.error("📛 No response received:", {
-            message: error.message,
-            url: error.config?.url,
-          });
-          errorMessage = "No response from server. Please check your connection.";
+        if (isLoadMore) {
+          setCommunities((prev: Community[]) => [...prev, ...newCommunities]);
         } else {
-          console.error("📛 Request setup error:", error.message);
-          errorMessage = `Request error: ${error.message}`;
+          setCommunities(newCommunities);
+          setTotalCount(newCommunities.length);
+        }
+        
+        // Check if there are more communities to load (simple check for now)
+        setHasMore(newCommunities.length >= COMMUNITIES_PER_PAGE);
+      } catch (error: any) {
+        console.error("❌ [Enhanced Community Section] Error fetching communities:", error);
+        let errorMessage = "Failed to load communities from JSON";
+        
+        if (error.message) {
+          errorMessage = error.message;
         }
         
         setError(errorMessage);
@@ -251,112 +201,72 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24">
-              {/* Mobile Filter Toggle */}
-              <div className="lg:hidden mb-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="w-full justify-between"
-                >
-                  <div className="flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    <span>Filters & Sort</span>
-                  </div>
-                </Button>
-              </div>
-
-              {/* Filter Component */}
-              <div className={`${showFilters ? "block" : "hidden"} lg:block`}>
-                <OfferingFilters
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  onClearFilters={clearFilters}
-                  className="bg-white border rounded-lg p-4"
-                />
-              </div>
+        <div className="w-full">
+          {/* Results Summary */}
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                {totalCount > 0 &&
+                  `Showing ${communities.length} of ${totalCount} total experts`}
+              </p>
             </div>
           </div>
 
           {/* Communities Grid */}
-          <div className="lg:col-span-3">
-            {/* Results Summary */}
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                {/* <h2 className="text-xl font-semibold">
-                  {filteredAndSortedCommunities.length} Expert
-                  {filteredAndSortedCommunities.length !== 1 ? "s" : ""} Found
-                </h2> */}
-                <p className="text-sm text-muted-foreground">
-                  {totalCount > 0 &&
-                    `Showing ${filteredAndSortedCommunities.length} of ${totalCount} total experts`}
+          <div
+            id="card-container-top"
+            className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
+          >
+            {communities.length > 0 ? (
+              communities.map((community, index) => (
+                <div
+                  key={community._id}
+                  className={index === 0 ? "first-expert-card" : ""}
+                >
+                  <MemoizedCommunityCard
+                    community={community}
+                    onClick={() => handleClickCommunity(community)}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                <Users className="h-16 w-16 text-gray-300 mb-4" />
+                <p className="text-lg font-medium text-gray-500 mb-2">
+                  No experts found
+                </p>
+                <p className="text-sm text-gray-400 mb-4">
+                  Try selecting a different category
                 </p>
               </div>
-            </div>
-
-            {/* Communities Grid */}
-            <div
-              id="card-container-top"
-              className="grid gap-6 grid-cols-1 md:grid-cols-2 pb-6"
-            >
-              {filteredAndSortedCommunities.length > 0 ? (
-                filteredAndSortedCommunities.map((community, index) => (
-                  <div
-                    key={community._id}
-                    className={index === 0 ? "first-expert-card" : ""}
-                  >
-                    <MemoizedCommunityCard
-                      community={community}
-                      onClick={() => handleClickCommunity(community)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                  <Users className="h-16 w-16 text-gray-300 mb-4" />
-                  <p className="text-lg font-medium text-gray-500 mb-2">
-                    No experts found
-                  </p>
-                  <p className="text-sm text-gray-400 mb-4">
-                    Try adjusting your filters or selecting a different category
-                  </p>
-                  <Button variant="outline" onClick={clearFilters}>
-                    Clear all filters
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Load More Button */}
-            {communities.length > 0 &&
-              hasMore &&
-              filteredAndSortedCommunities.length > 0 && (
-                <div className="flex justify-center py-8">
-                  <Button
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                    variant="outline"
-                    size="lg"
-                    className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all duration-300"
-                  >
-                    {loadingMore ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
-                        Loading more...
-                      </>
-                    ) : (
-                      <>
-                        <span className="mr-2">Load More Experts</span>
-                        <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
+            )}
           </div>
+
+          {/* Load More Button */}
+          {communities.length > 0 &&
+            hasMore && (
+              <div className="flex justify-center py-8">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  variant="outline"
+                  size="lg"
+                  className="group relative overflow-hidden border-primary/20 hover:border-primary/40 transition-all duration-300"
+                >
+                  {loadingMore ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
+                      Loading more...
+                    </>
+                  ) : (
+                    <>
+                      <span className="mr-2">Load More Experts</span>
+                      <ArrowDown className="h-4 w-4 group-hover:translate-y-1 transition-transform duration-300" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
         </div>
       )}
     </div>
@@ -364,3 +274,6 @@ const EnhancedCommunitySection: React.FC<EnhancedCommunitySectionProps> = ({
 };
 
 export default EnhancedCommunitySection;
+
+
+

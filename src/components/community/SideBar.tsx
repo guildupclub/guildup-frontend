@@ -114,24 +114,14 @@ export function Sidebar() {
     queryFn: async () => {
       if (!urlCommunityId) return null;
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            communityId: urlCommunityId,
-          }),
-        }
-      );
-
-      const result = await response.json();
-      if (result.r === "s" && result.data) {
-        return result.data;
+      try {
+        const { fetchCommunityProfile } = await import("@/lib/services/communities");
+        const profileData = await fetchCommunityProfile(urlCommunityId);
+        return profileData || null;
+      } catch (error: any) {
+        console.error("❌ [SideBar] Error fetching community profile:", error);
+        return null;
       }
-      return null;
     },
     enabled: !!urlCommunityId,
   });
@@ -580,41 +570,42 @@ export function Sidebar() {
         )}
       </div>
 
-      <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
-            pathname === COMMUNITY_PROFILE_PATH
-              ? "text-gradient underline underline-offset-4 decoration-blue-500"
-              : "hover:text-gradient"
-          }`}
-          onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
-        >
-          {StringConstants.PROFILE}
-        </button>
+      {!pathname?.includes("/profile") && (
+        <div className="flex md:hidden overflow-x-auto hide-scrollbar border-b p-2 mt-16 gap-2">
+          <button
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              pathname === COMMUNITY_PROFILE_PATH
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                : "hover:text-gradient"
+            }`}
+            onClick={() => handleNavigation(COMMUNITY_PROFILE_PATH)}
+          >
+            {StringConstants.PROFILE}
+          </button>
 
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
-            pathname === COMMUNITY_FEED_PATH
-              ? "text-gradient underline underline-offset-4 decoration-blue-500"
-              : "hover:text-gradient"
-          }`}
-          onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
-        >
-          {StringConstants.FEED}
-        </button>
+          <button
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              pathname === COMMUNITY_FEED_PATH
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                : "hover:text-gradient"
+            }`}
+            onClick={() => handleNavigation(COMMUNITY_FEED_PATH)}
+          >
+            {StringConstants.FEED}
+          </button>
 
-        <button
-          className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
-            pathname === COMMUNITY_MEMBERS_PATH
-              ? "text-gradient underline underline-offset-4 decoration-blue-500"
-              : "hover:text-gradient"
-          }`}
-          onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
-        >
-          {StringConstants.MEMBER}
-        </button>
+          <button
+            className={`bg-card py-1 px-2.5 rounded-lg text-md cursor-pointer font-semibold flex-shrink-0 ${
+              pathname === COMMUNITY_MEMBERS_PATH
+                ? "text-gradient underline underline-offset-4 decoration-blue-500"
+                : "hover:text-gradient"
+            }`}
+            onClick={() => handleNavigation(COMMUNITY_MEMBERS_PATH)}
+          >
+            {StringConstants.MEMBER}
+          </button>
 
-        {/* Scrollable Channels */}
+          {/* Scrollable Channels */}
 
         {channels.map((channel: any) => (
           <button
@@ -633,30 +624,31 @@ export function Sidebar() {
           </button>
         ))}
 
-        {/* Delete Confirmation Dialog */}
-        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Delete Channel</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this channel? You won&apos;t be
-                able to undo this action.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex justify-between sm:justify-between mt-6">
-              <Button
-                variant="outline"
-                onClick={() => setShowDeleteDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDeleteChannel}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+          {/* Delete Confirmation Dialog */}
+          <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Delete Channel</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to delete this channel? You won&apos;t be
+                  able to undo this action.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter className="flex justify-between sm:justify-between mt-6">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowDeleteDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button variant="destructive" onClick={handleDeleteChannel}>
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
     </>
   );
 }

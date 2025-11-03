@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/constants";
 import axios from "axios";
+import { fetchUserCommunities } from "@/lib/services/communities";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -144,21 +145,15 @@ export function LeftSidebar() {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-          {
-            userId: userId,
-          }
-        );
-
-        setMyCommunities(res.data.data);
-        console.log("Comm ======>>>>", res.data.data);
+        const communities = await fetchUserCommunities(userId);
+        setMyCommunities(communities);
+        console.log("Comm ======>>>>", communities);
       } catch (error) {
         console.error(error);
         setMyCommunities([]);
       }
     }
-    // fetchCommunities();
+    // fetchCommunities(); // Commented out - using Redux state instead
   }, []); // Ensure this runs when `userId` changes
 
   // ✅ Set active community AFTER myCommunities is updated

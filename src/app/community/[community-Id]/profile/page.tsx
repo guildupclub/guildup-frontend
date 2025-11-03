@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setCommunityData } from "@/redux/communitySlice";
+import Footer from "@/components/layout/Footer";
 
 export default function Page() {
   const params = useParams();
@@ -32,8 +33,13 @@ export default function Page() {
   }, [communityId, dispatch]);
 
   return (
-    <div className="min-h-screen bg-background grow max-w-screen w-full md:ml-6 md:py-24">
-      {communityId && <ProfileCard communityId={communityId} />}
+    <div className="flex flex-col w-full">
+      <div className="bg-background grow w-full md:pt-6 md:pb-24 md:flex md:justify-center">
+        {communityId && <ProfileCard communityId={communityId} />}
+      </div>
+      <div className="w-full">
+        <Footer />
+      </div>
     </div>
   );
 }

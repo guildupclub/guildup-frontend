@@ -4,6 +4,7 @@ import EnhancedCommunitySection from "@/components/community/enhanced-community-
 import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
+import { fetchUserCommunities } from "@/lib/services/communities";
 import { useDispatch } from "react-redux";
 import React, {
   useEffect,
@@ -30,7 +31,6 @@ import { Brain, Dumbbell, ArrowRight } from "lucide-react";
 
 import VideoPlaceholder from "@/components/VideoPlaceholder";
 import Footer from "@/components/layout/Footer";
-import { on } from "events";
 
 import { HiSparkles } from "react-icons/hi2";
 
@@ -113,18 +113,18 @@ function Page() {
 
       const fetchCommunities = async () => {
         try {
-          const res = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-            {
-              userId: session?.user._id,
-            }
-          );
-          dispatch(setUserFollowedCommunities(res.data.data));
+          const communities = await fetchUserCommunities(session?.user._id);
+          // Transform communities to include 'id' property for Redux
+          const transformedCommunities = communities.map((community: any) => ({
+            ...community,
+            id: community._id,
+          }));
+          dispatch(setUserFollowedCommunities(transformedCommunities as any));
 
           // Track communities loaded
           tracking.trackCustomEvent("user_communities_loaded", {
             user_id: session.user._id,
-            communities_count: res.data.data?.length || 0,
+            communities_count: transformedCommunities?.length || 0,
           });
         } catch (error) {
           console.error(error);
@@ -162,17 +162,29 @@ function Page() {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
-        );
-
+        // Fetch categories from JSON file only
+        const jsonResponse = await fetch("/api/categories");
+        
+        if (!jsonResponse.ok) {
+          if (jsonResponse.status === 404) {
+            console.warn("⚠️ Categories JSON file not found. Using default category.");
+            setCategory([{ _id: "all", name: "All Category" }]);
+            return;
+          }
+          throw new Error(`Failed to fetch categories: ${jsonResponse.status}`);
+        }
+        
+        const categoriesData = await jsonResponse.json();
         const categories = [
           { _id: "all", name: "All Category" },
-          ...response.data.data,
+          ...(Array.isArray(categoriesData) ? categoriesData : []),
         ];
         setCategory(categories);
+        console.log("✅ Loaded categories from JSON:", categories.length);
       } catch (error) {
-        console.error("Failed to fetch categories", error);
+        console.error("Failed to fetch categories from JSON", error);
+        // Set default category on error
+        setCategory([{ _id: "all", name: "All Category" }]);
       }
     };
     fetchCategory();
@@ -197,7 +209,7 @@ function Page() {
       if (shouldOpen === "true") {
         localStorage.removeItem("openCreatorModal");
 
-        tracking.trackUserAction("creator_form_opened_post_signin", {
+        tracking.trackCustomEvent("creator_form_opened_post_signin", {
           user_id: session.user._id,
           triggered_from: "post_signin",
         });
@@ -218,7 +230,7 @@ function Page() {
       // Store intent to open modal after sign-in
       localStorage.setItem("openCreatorModal", "true");
 
-      tracking.trackUserAction("signup_prompt_shown", {
+      tracking.trackCustomEvent("signup_prompt_shown", {
         trigger: "creator_button",
         location: "home_page",
       });
@@ -234,7 +246,7 @@ function Page() {
       return;
     }
 
-    tracking.trackUserAction("creator_form_opened", {
+    tracking.trackCustomEvent("creator_form_opened", {
       source: "header_button",
       user_id: session.user._id,
     });

@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "67cab2669b3cd869f1d3ee98",
+    "name": "Mental Health and Counselling",
+    "num_communities": 67
+  },
+  {
+    "_id": "67cab1fb9b3cd869f1d3ee95",
+    "name": "Fitness and Yoga",
+    "num_communities": 67
+  },
+  {
+    "_id": "67cab21f9b3cd869f1d3ee96",
+    "name": "Nutrition and Diet",
+    "num_communities": 37
+  },
+  {
+    "_id": "67cab23e9b3cd869f1d3ee97",
+    "name": "Relationship and Parenting",
+    "num_communities": 6
+  },
+  {
+    "_id": "67e4fb4efdb53634d7feca3f",
+    "name": "Others",
+    "num_communities": 34
+  },
+  {
+    "_id": "67cab2809b3cd869f1d3ee99",
+    "name": "Self Improvement & Growth",
+    "num_communities": 22
+  }
+]

@@ -8,8 +8,9 @@ import {
   Search,
   Plus,
   MessageCircle,
+  MoreVertical,
 } from "lucide-react";
-import { FaBars, FaSignInAlt } from "react-icons/fa";
+import { FaSignInAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,7 @@ import { Dialog, DialogTrigger } from "../ui/dialog";
 import CreatorForm from "../form/CreatorForm";
 import axios from "axios";
 import { setUserFollowedCommunities } from "@/redux/userSlice";
+import { fetchUserCommunities } from "@/lib/services/communities";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationDropdown from "../notifications/NotificationDropdown";
@@ -81,45 +83,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
-        const url = `${apiUrl}/v1/community/user/follow`;
-        const payload = { userId };
-
-        const res = await axios.post(url, payload);
-
-        // Handle different response formats
-        let communitiesData = [];
-        if (res.data.r === "s" && Array.isArray(res.data.data)) {
-          communitiesData = res.data.data;
-          console.log("✅ [Navbar] Success format, communities:", communitiesData.length);
-        } else if (Array.isArray(res.data.data)) {
-          communitiesData = res.data.data;
-          console.log("⚠️ [Navbar] Direct data array format, communities:", communitiesData.length);
-        } else if (Array.isArray(res.data)) {
-          communitiesData = res.data;
-          console.log("⚠️ [Navbar] Direct array format, communities:", communitiesData.length);
-        } else {
-          console.error("❌ [Navbar] Unexpected response format:", res.data);
-          return;
-        }
-
+        const communitiesData = await fetchUserCommunities(userId);
         // Store the API response in state
         setFetchedCommunities(communitiesData);
-        dispatch(setUserFollowedCommunities(communitiesData));
+        // Transform communities to include 'id' property for Redux
+        const transformedCommunities = communitiesData
+          .filter((community: any) => community && community._id)
+          .map((community: any) => ({
+            ...community,
+            id: community._id,
+          }));
+        dispatch(setUserFollowedCommunities(transformedCommunities as any));
       } catch (error: any) {
         console.error("❌ [Navbar] Error fetching communities:", error);
-        if (error.response) {
-          console.error("📛 [Navbar] Response error details:", {
-            status: error.response.status,
-            statusText: error.response.statusText,
-            data: error.response.data,
-          });
-        } else if (error.request) {
-          console.error("📛 [Navbar] No response received:", {
-            message: error.message,
-            url: error.config?.url,
-          });
-        }
       }
     }
     if (userId) {
@@ -342,12 +318,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       >
         <div className="container flex h-14 items-center px-3 md:px-4 lg:px-6 max-w-full">
           <div className="flex gap-3 md:gap-4 lg:gap-6 items-center">
-            <button
-              className="md:hidden flex items-center justify-center p-1"
-              onClick={() => setIsSidebarOpen((prev) => !prev)}
-            >
-              <FaBars className="h-5 w-5 text-gray-700" />
-            </button>
             <Link href="/" className="flex items-center">
               <Image
                 src={Guildup_logo_mobile || "/placeholder.svg"}
@@ -386,12 +356,112 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </button>
                 </div>
               </div>
-              <div
-                className="
-            md:hidden"
-              >
-                {" "}
+              <div className="md:hidden flex items-center gap-2">
                 {user?._id && <NotificationDropdown />}
+                {/* Three dots menu for mobile navigation */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-center p-1.5 rounded-full hover:bg-gray-100 transition-colors">
+                      <MoreVertical className="h-5 w-5 text-gray-700" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-56 bg-white border border-gray-100 rounded-lg shadow-lg"
+                    align="end"
+                  >
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                      >
+                        <Compass className="h-4 w-4" />
+                        <span>{StringConstants.HOME}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/feeds"
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                      >
+                        <MdOutlineRssFeed className="h-4 w-4" />
+                        <span>{StringConstants.FEED}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href="/chat"
+                        className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                      >
+                        <div className="flex items-center gap-2">
+                          <MessageCircle className="h-4 w-4" />
+                          <span>Chat</span>
+                        </div>
+                        {user?._id && unreadCount > 0 && (
+                          <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {unreadCount > 9 ? "9+" : unreadCount}
+                          </span>
+                        )}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={getMySpaceLink()}
+                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        onClick={handleMySpaceClick}
+                      >
+                        <Users className="h-4 w-4" />
+                        <span>{StringConstants.MY_SPACE}</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    {user?._id ? (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/profile"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          >
+                            <span>Profile</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href="/booking"
+                            className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          >
+                            <span>Bookings</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        {isUser && (
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href="/payments"
+                              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                            >
+                              <span>Payments</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                          onClick={handleSignOut}
+                        >
+                          {StringConstants.SIGN_OUT}
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <DropdownMenuItem
+                        className="px-4 py-2.5 text-sm text-gray-700 hover:text-primary hover:bg-gray-50"
+                        onClick={() =>
+                          signIn(undefined, {
+                            callbackUrl: `${window.location.origin}?hero=2`,
+                          })
+                        }
+                      >
+                        {StringConstants.SIGN_IN}
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <div className="hidden md:flex space-x-2 lg:space-x-4 xl:space-x-6 items-center">
@@ -593,179 +663,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
         </div>
       </nav>
-
-      <div className="fixed bottom-0 left-0 z-50 w-full h-14 bg-background border-t md:hidden">
-        <div className="grid h-full max-w-lg grid-cols-5 mx-auto">
-          <Link
-            href="/"
-            className="flex flex-col items-center justify-center gap-1"
-          >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Compass
-                className={`w-5 h-5 ${isActive("/") ? "text-primary" : ""}`}
-              />
-            </div>
-            <span
-              className={`text-[10px] ${isActive("/") ? "text-primary" : ""}`}
-            >
-              {StringConstants.HOME}
-            </span>
-          </Link>
-
-          <Link
-            href="/feeds"
-            className="flex flex-col items-center justify-center gap-1"
-          >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <MdOutlineRssFeed
-                className={`w-5 h-5 ${
-                  isActive("/feeds") ? "text-primary" : ""
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] ${
-                isActive("/feeds") ? "text-primary" : ""
-              }`}
-            >
-              {StringConstants.FEED}
-            </span>
-          </Link>
-
-          <Link
-            href="/chat"
-            className="flex flex-col items-center justify-center gap-1"
-          >
-            <div className="w-6 h-6 flex items-center justify-center relative">
-              <MessageCircle
-                className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : ""}`}
-              />
-              {user?._id && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </div>
-            <span
-              className={`text-[10px] ${
-                isActive("/chat") ? "text-primary" : ""
-              }`}
-            >
-              Chat
-            </span>
-          </Link>
-
-          <Link
-            href={getMySpaceLink()}
-            className="flex flex-col items-center justify-center gap-1"
-            onClick={handleMySpaceClick}
-          >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <Users
-                className={`w-5 h-5 ${
-                  isActive("/community") ? "text-primary" : ""
-                }`}
-              />
-            </div>
-            <span
-              className={`text-[10px] ${
-                isActive("/community") ? "text-primary" : ""
-              }`}
-            >
-              {StringConstants.MY_SPACE}
-            </span>
-          </Link>
-
-          {user?._id ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1">
-                  <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
-                    <Avatar className="h-4 w-4">
-                      <AvatarImage
-                        src={session?.user?.image || ""}
-                        alt="User"
-                      />
-                      <AvatarFallback>
-                        {session?.user?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <span className="text-[10px]">My Account</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="bg-background/95 backdrop-blur border-gray-700"
-                align="end"
-                side="top"
-                sideOffset={40}
-              >
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
-                >
-                  <Link href="/profile">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
-                >
-                  <Link
-                    href="/chat"
-                    className="flex items-center justify-between"
-                  >
-                    <span>Chat</span>
-                    {user?._id && unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-primary-gradient border-b border-zinc-300"
-                >
-                  <Link href="/booking">Bookings</Link>
-                </DropdownMenuItem>
-                {isUser && (
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:bg-primary-gradient border-b border-zinc-300"
-                  >
-                    <Link href="/payments">Payments</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  className="hover:bg-primary-gradient"
-                  onClick={handleSignOut}
-                >
-                  {StringConstants.SIGN_OUT}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <button
-              className="flex flex-col items-center justify-center gap-1"
-              onClick={() =>
-                signIn(undefined, {
-                  callbackUrl: `${window.location.origin}?hero=2`,
-                })
-              }
-            >
-              <div className="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center">
-                <Avatar className="h-4 w-4">
-                  <AvatarImage src="/placeholder.svg" alt="User" />
-                  <AvatarFallback>
-                    <FaSignInAlt />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <span className="text-[10px]">{StringConstants.SIGN_IN}</span>
-            </button>
-          )}
-        </div>
-      </div>
 
       {isSidebarOpen && (
         <div

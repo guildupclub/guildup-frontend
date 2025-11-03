@@ -33,6 +33,7 @@ import {
 import { StringConstants } from "../common/CommonText";
 import { useCreatePost } from "@/hook/queries/usePostMutations";
 import axios from "axios";
+import { fetchUserCommunities } from "@/lib/services/communities";
 
 interface MediaPreview {
   file: File;
@@ -79,14 +80,7 @@ export default function PostFromFeed() {
   useEffect(() => {
     async function fetchCommunities() {
       try {
-        const res = await axios.post(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/user/follow`,
-          {
-            userId: session?.user?._id || userID,
-          }
-        );
-
-        const communities = res.data.data || [];
+        const communities = await fetchUserCommunities(session?.user?._id || userID);
         setMyAllCommunities(communities);
 
         // Set default selected community to active community or first available
