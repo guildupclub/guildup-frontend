@@ -480,7 +480,7 @@ function Page() {
     >
       <SearchParamsProvider onCategoryFromUrl={handleCategoryFromUrl}>
 
-        <div className="min-h-screen relative" style={{backgroundColor: white}}>
+        <div className="relative overflow-x-hidden" style={{backgroundColor: white}}>
 
           {/* Creator Form Dialog */}
           <Dialog open={isCreatorFormOpen} onOpenChange={setIsCreatorFormOpen}>
@@ -497,7 +497,7 @@ function Page() {
           
 
           {/* Hero */}
-          <div className="relative -mt-20 pt-20" style={{ backgroundColor: white }}>
+          <div className="relative" style={{ backgroundColor: white }}>
             <Hero />
           </div>
 

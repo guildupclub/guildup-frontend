@@ -1,31 +1,35 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { primary, white } from "@/app/colours";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import LeadFormModal from "@/components/programs/LeadFormModal";
 
 const steps = [
   { 
     title: "Join a program", 
     desc: "Pick the program that fits your goals.",
-    image: "/how-it-works/step-1.svg"
+    image: "/how-it-works/step-1.svg",
+    gradient: "linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)"
   },
   { 
     title: "Find the right expert", 
     desc: "We match you to vetted professionals.",
-    image: "/how-it-works/step-2.svg"
+    image: "/how-it-works/step-2.svg",
+    gradient: "linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 50%, #a78bfa 100%)"
   },
   { 
     title: "Begin your journey", 
     desc: "Book and start guided sessions.",
-    image: "/how-it-works/step-3.svg"
+    image: "/how-it-works/step-3.svg",
+    gradient: "linear-gradient(135deg, #bfdbfe 0%, #93c5fd 50%, #60a5fa 100%)"
   },
 ];
 
 const HowItWorks: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
-  const [showPopup, setShowPopup] = useState(false);
+  const [showStickyButton, setShowStickyButton] = useState(false);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const step3Ref = useRef<HTMLDivElement>(null);
+  const programsSectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const observers = stepRefs.current.map((ref, index) => {
@@ -52,17 +56,79 @@ const HowItWorks: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!step3Ref.current) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting && entry.boundingClientRect.top < 0) {
-          setShowPopup(true);
+    // Function to check if Programs section is visible
+    const checkProgramsVisibility = () => {
+      const programsTitle = document.getElementById('programs-title');
+      if (!programsTitle) return;
+      
+      const programsSection = programsTitle.closest('section');
+      if (!programsSection) return;
+      
+      const rect = programsSection.getBoundingClientRect();
+      // Show button only when Programs section is completely scrolled past (bottom is above viewport)
+      // Hide button when Programs section is visible or partially visible in viewport
+      const shouldShow = rect.bottom < 0;
+      setShowStickyButton(shouldShow);
+    };
+
+    // Function to setup observer for Programs section
+    const setupObserver = () => {
+      const programsTitle = document.getElementById('programs-title');
+      if (!programsTitle) return null;
+      
+      const programsSection = programsTitle.closest('section');
+      if (!programsSection) return null;
+      
+      programsSectionRef.current = programsSection as HTMLElement;
+      
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          // Show button when Programs section is completely scrolled past (bottom is above viewport)
+          // Hide button when Programs section is visible in viewport
+          const shouldShow = entry.boundingClientRect.bottom < 0;
+          setShowStickyButton(shouldShow);
+        },
+        { threshold: 0, rootMargin: '0px' }
+      );
+      
+      obs.observe(programsSection);
+      return obs;
+    };
+
+    // Setup observer
+    let observer = setupObserver();
+    
+    // Also check on scroll for more reliable detection
+    const handleScroll = () => {
+      checkProgramsVisibility();
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check
+    checkProgramsVisibility();
+    
+    // If observer not found, retry after delay
+    if (!observer) {
+      const timeoutId = setTimeout(() => {
+        observer = setupObserver();
+      }, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('scroll', handleScroll);
+        if (observer) {
+          observer.disconnect();
         }
-      },
-      { threshold: 0 }
-    );
-    obs.observe(step3Ref.current);
-    return () => obs.disconnect();
+      };
+    }
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (observer) {
+        observer.disconnect();
+      }
+    };
   }, []);
 
   return (
@@ -99,8 +165,91 @@ const HowItWorks: React.FC = () => {
                       transition: 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 700ms ease-out',
                     }}
                   >
-                    <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden bg-white border" style={{ borderColor: `${primary}20` }}>
-                      <img src={s.image} alt={s.title} className="w-full h-full object-contain" />
+                    <div 
+                      className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden relative"
+                      style={{ 
+                        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)`,
+                        backdropFilter: 'blur(20px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                        border: `1px solid rgba(255, 255, 255, 0.3)`,
+                        boxShadow: isActive 
+                          ? `0 20px 60px -15px rgba(59, 71, 249, 0.3), 
+                             0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+                             0 1px 2px rgba(0, 0, 0, 0.1)`
+                          : `0 10px 30px -10px rgba(59, 71, 249, 0.2),
+                             0 0 0 1px rgba(255, 255, 255, 0.3) inset`,
+                        transition: 'box-shadow 700ms ease-out, transform 700ms cubic-bezier(0.22, 1, 0.36, 1), border-color 700ms ease-out',
+                        transform: isActive ? 'scale(1)' : 'scale(0.98)',
+                        borderColor: isActive ? `rgba(59, 71, 249, 0.3)` : `rgba(59, 71, 249, 0.2)`,
+                      }}
+                    >
+                      {/* Glass reflection overlay */}
+                      <div 
+                        className="absolute inset-0 opacity-60"
+                        style={{
+                          background: `linear-gradient(135deg, 
+                            rgba(255, 255, 255, 0.4) 0%, 
+                            transparent 40%,
+                            transparent 60%,
+                            rgba(59, 71, 249, 0.1) 100%)`,
+                          borderRadius: '1rem'
+                        }}
+                      />
+                      
+                      {/* Primary color accent gradient */}
+                      <div 
+                        className="absolute inset-0 opacity-30"
+                        style={{
+                          background: `linear-gradient(135deg, ${primary}20 0%, transparent 50%)`,
+                          borderRadius: '1rem'
+                        }}
+                      />
+                      
+                      {/* Decorative glass circles */}
+                      <div 
+                        className="absolute top-4 right-4 w-20 h-20 rounded-full opacity-40 blur-xl"
+                        style={{ 
+                          background: `radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, ${primary}20 100%)`,
+                        }}
+                      />
+                      <div 
+                        className="absolute bottom-4 left-4 w-16 h-16 rounded-full opacity-30 blur-lg"
+                        style={{ 
+                          background: `radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, ${primary}15 100%)`,
+                        }}
+                      />
+                      
+                      {/* Subtle border highlight */}
+                      <div 
+                        className="absolute inset-0 rounded-2xl"
+                        style={{
+                          border: `1px solid rgba(255, 255, 255, 0.5)`,
+                          borderRadius: '1rem',
+                          pointerEvents: 'none',
+                          boxShadow: `0 0 20px -5px ${primary}30 inset`
+                        }}
+                      />
+                      
+                      {/* Image container with padding */}
+                      <div className="relative w-full h-full p-6 sm:p-8 md:p-10 flex items-center justify-center z-10">
+                        <img 
+                          src={s.image} 
+                          alt={s.title} 
+                          className="w-full h-full object-contain relative drop-shadow-lg"
+                          style={{
+                            filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))',
+                          }}
+                        />
+                      </div>
+                      
+                      {/* Bottom shine effect */}
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-1/3 opacity-50"
+                        style={{
+                          background: `linear-gradient(to top, ${primary}20 0%, transparent 100%)`,
+                          borderRadius: '0 0 1rem 1rem'
+                        }}
+                      />
                     </div>
                   </div>
 
@@ -140,45 +289,27 @@ const HowItWorks: React.FC = () => {
         </div>
       </div>
 
-      {/* Popup after step 3 */}
-      <Dialog open={showPopup} onOpenChange={setShowPopup}>
-        <DialogContent className="sm:max-w-md">
-          <div className="text-center p-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: `${primary}10` }}>
-              <svg className="w-8 h-8" style={{ color: primary }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>Ready to begin?</h3>
-            <p className="text-gray-600 mb-6" style={{ fontFamily: "'Poppins', sans-serif" }}>
-              You&apos;ve seen how it works. Now let&apos;s find the right program for you.
-            </p>
-            <button
-              onClick={() => {
-                setShowPopup(false);
-                window.location.href = '/';
-              }}
-              className="px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg w-full"
-              style={{ backgroundColor: primary, color: white, fontFamily: "'Poppins', sans-serif" }}
-            >
-              Get Started
-            </button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Mobile sticky CTA after step 3 */}
-      {showPopup && (
-        <div className="fixed md:hidden bottom-3 left-0 right-0 z-40 px-4" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          <button
-            onClick={() => { setShowPopup(false); window.location.href = '/'; }}
-            className="w-full px-6 py-4 rounded-xl font-semibold shadow-xl"
-            style={{ backgroundColor: primary, color: white, fontFamily: "'Poppins', sans-serif" }}
-          >
-            Get Started
-          </button>
+      {/* Fixed floating button after step 3 */}
+      <div 
+        className="fixed bottom-4 left-0 right-0 z-40 px-4 md:px-6 pointer-events-none"
+        style={{ 
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          opacity: showStickyButton ? 1 : 0,
+          transform: showStickyButton ? 'translateY(0)' : 'translateY(100px)',
+          transition: 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+          pointerEvents: showStickyButton ? 'auto' : 'none'
+        }}
+      >
+        <div className="max-w-md mx-auto">
+          <LeadFormModal 
+            program="landing-page" 
+            triggerLabel="Get started today!"
+            variant="primary"
+            appearance="default"
+            triggerClassName="w-full py-4 rounded-xl shadow-xl font-semibold transition-all duration-300 hover:scale-105"
+          />
         </div>
-      )}
+      </div>
     </section>
   );
 };

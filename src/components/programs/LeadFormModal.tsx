@@ -12,9 +12,10 @@ interface LeadFormModalProps {
   triggerLabel?: string;
   variant?: "primary" | "outline";
   appearance?: "default" | "white"; // white button for dark/primary backgrounds
+  triggerClassName?: string; // Additional classes for the trigger button
 }
 
-export default function LeadFormModal({ program, triggerLabel = "Get Started", variant = "outline", appearance = "default" }: LeadFormModalProps) {
+export default function LeadFormModal({ program, triggerLabel = "Get Started", variant = "outline", appearance = "default", triggerClassName = "" }: LeadFormModalProps) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -60,7 +61,7 @@ export default function LeadFormModal({ program, triggerLabel = "Get Started", v
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button
-          className="px-5 py-3 rounded-lg"
+          className={`px-5 py-3 rounded-lg ${triggerClassName}`}
           style={{
             backgroundColor: appearance === "white" ? "#FFFFFF" : (variant === "primary" ? primary : "transparent"),
             color: appearance === "white" ? primary : (variant === "primary" ? white : primary),

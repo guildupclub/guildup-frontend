@@ -248,6 +248,90 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
   const { data: profile, isLoading } = useQuery({
     queryKey: ["communityProfile", activeCommunityId],
     queryFn: async () => {
+      // Check if NEXT_PUBLIC_BACKEND_BASE_URL is undefined
+      if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+        // Fallback to communities.json
+        try {
+          const jsonResponse = await fetch("/data/communities.json", { cache: "no-store" });
+          if (!jsonResponse.ok) {
+            throw new Error("Failed to fetch communities.json");
+          }
+          const jsonData = await jsonResponse.json();
+          
+          // Find the community by ID
+          const communityData = jsonData.communities?.find(
+            (item: any) => item.community?._id === activeCommunityId
+          );
+
+          if (!communityData) {
+            throw new Error(`Community not found in JSON: ${activeCommunityId}`);
+          }
+
+          // Transform JSON data to match API response format
+          const transformedData = {
+            community: communityData.community,
+            user: {
+              _id: communityData.community.user_id?._id || communityData.community.user_id,
+              user_name: communityData.community.user_id?.name || communityData.community.owner_name,
+              user_avatar: communityData.community.image,
+              user_session_conducted: communityData.community.user_id?.session_conducted || communityData.community.owner_sessions || 0,
+              user_year_of_experience: communityData.community.user_id?.year_of_experience || communityData.community.owner_experience || 0,
+              user_languages: communityData.community.user_id?.languages || communityData.community.owner_languages || [],
+              user_isBankDetailsAdded: false,
+              user_iscalendarConnected: false,
+            },
+          };
+
+          // Store in localStorage
+          try {
+            localStorage.setItem(
+              "sessionConducted",
+              JSON.stringify(transformedData.user.user_session_conducted)
+            );
+            localStorage.setItem(
+              "yearOfExperience",
+              JSON.stringify(transformedData.user.user_year_of_experience)
+            );
+            localStorage.setItem(
+              "isBankAdded",
+              JSON.stringify(transformedData.user.user_isBankDetailsAdded)
+            );
+            localStorage.setItem(
+              "isCalendarConnected",
+              JSON.stringify(transformedData.user.user_iscalendarConnected)
+            );
+          } catch (error) {
+            console.warn(
+              "Failed to store communityProfile in localStorage",
+              error
+            );
+          }
+
+          // Set avatar and background images
+          if (transformedData.community.image) {
+            setAvatarImgUrl(transformedData.community.image);
+          } else {
+            setAvatarImgUrl(
+              `https://api.dicebear.com/7.x/avataaars/svg?seed=${transformedData.user.user_name}`
+            );
+          }
+
+          if (transformedData.community.background_image) {
+            setBgImgUrl(transformedData.community.background_image);
+          } else {
+            setBgImgUrl(
+              "https://random-image-pepebigotes.vercel.app/api/random-image"
+            );
+          }
+
+          return transformedData;
+        } catch (error) {
+          console.error("Error fetching community from JSON:", error);
+          throw error;
+        }
+      }
+
+      // Use API if NEXT_PUBLIC_BACKEND_BASE_URL is defined
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
         {
@@ -388,6 +472,35 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
     }
 
     try {
+      // Check if NEXT_PUBLIC_BACKEND_BASE_URL is undefined
+      if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+        // Fallback to communities.json
+        try {
+          const jsonResponse = await fetch("/data/communities.json", { cache: "no-store" });
+          if (!jsonResponse.ok) {
+            throw new Error("Failed to fetch communities.json");
+          }
+          const jsonData = await jsonResponse.json();
+          
+          // Find the community by ID
+          const communityData = jsonData.communities?.find(
+            (item: any) => item.community?._id === activeCommunityId
+          );
+
+          if (communityData) {
+            const fetchedOfferings = communityData.offerings || [];
+            console.log("Fetched offerings from JSON:", fetchedOfferings);
+            console.log("Number of offerings:", fetchedOfferings.length);
+            setOfferings(fetchedOfferings);
+            return;
+          }
+        } catch (jsonError) {
+          console.error("Error fetching offerings from JSON:", jsonError);
+          // Continue to API call if JSON fetch fails
+        }
+      }
+
+      // Use API if NEXT_PUBLIC_BACKEND_BASE_URL is defined
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${activeCommunityId}`
       );

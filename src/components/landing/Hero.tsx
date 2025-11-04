@@ -1,55 +1,222 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { primary, black, white } from "@/app/colours";
 
 const Hero: React.FC = () => {
   const router = useRouter();
+  const [isVisible, setIsVisible] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
-    <section aria-labelledby="hero-title" className="relative min-h-[80vh] flex items-center">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="inline-flex items-center px-4 py-2 rounded-full border border-gray-200" style={{ backgroundColor: `${primary}15` }}>
-              <span className="w-2 h-2 rounded-full mr-3" style={{ backgroundColor: primary }}></span>
-              <span className="text-sm font-medium" style={{ color: primary, fontFamily: "'Poppins', sans-serif" }}>
+    <section 
+      ref={heroRef}
+      aria-labelledby="hero-title" 
+      className="relative min-h-[85vh] flex items-center overflow-hidden"
+      style={{
+        background: 'linear-gradient(to bottom, #ffffff 0%, #fafafa 100%)'
+      }}
+    >
+      {/* Subtle decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute top-20 right-10 w-96 h-96 rounded-full opacity-5 blur-3xl"
+          style={{ background: primary, transform: 'translate(30%, -30%)' }}
+        />
+        <div 
+          className="absolute bottom-20 left-10 w-96 h-96 rounded-full opacity-5 blur-3xl"
+          style={{ background: primary, transform: 'translate(-30%, 30%)' }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* Left Content */}
+          <div 
+            className="space-y-8"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+              transition: 'opacity 0.8s ease-out, transform 0.8s ease-out'
+            }}
+          >
+            {/* Badge */}
+            <div 
+              className="inline-flex items-center px-5 py-2.5 rounded-full border backdrop-blur-sm shadow-sm transition-all duration-300 hover:shadow-md"
+              style={{ 
+                backgroundColor: `${primary}08`,
+                borderColor: `${primary}20`,
+                transform: isVisible ? 'translateX(0)' : 'translateX(-20px)',
+                transition: 'transform 0.8s ease-out 0.2s, opacity 0.8s ease-out 0.2s',
+                opacity: isVisible ? 1 : 0
+              }}
+            >
+              <span 
+                className="w-2.5 h-2.5 rounded-full mr-3 animate-pulse"
+                style={{ backgroundColor: primary }}
+              />
+              <span 
+                className="text-sm font-semibold tracking-wide"
+                style={{ color: primary, fontFamily: "'Poppins', sans-serif" }}
+              >
                 Trusted by 10,000+ users across India
               </span>
             </div>
 
-            <div className="space-y-4">
-              <h1 id="hero-title" className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight" style={{ color: black, fontFamily: "'Poppins', sans-serif" }}>
-                Your wellness journey
-                <br />
-                <span style={{ color: primary }}>starts here</span>
+            {/* Heading */}
+            <div className="space-y-6">
+              <h1 
+                id="hero-title" 
+                className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight"
+                style={{ 
+                  color: black, 
+                  fontFamily: "'Poppins', sans-serif",
+                  textShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                }}
+              >
+                <span 
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s',
+                    display: 'block'
+                  }}
+                >
+                  Your wellness
+                </span>
+                <span 
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.8s ease-out 0.4s, transform 0.8s ease-out 0.4s',
+                    display: 'block'
+                  }}
+                >
+                  journey
+                </span>
+                <span 
+                  style={{ 
+                    color: primary,
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
+                    display: 'block',
+                    background: `linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}
+                >
+                  starts here
+                </span>
               </h1>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* CTA Button */}
+            <div 
+              className="flex flex-col sm:flex-row gap-4"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                transition: 'opacity 0.8s ease-out 0.6s, transform 0.8s ease-out 0.6s'
+              }}
+            >
               <button
                 onClick={() => router.push('/mind')}
-                className="px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg"
-                style={{ backgroundColor: primary, color: white, fontFamily: "'Poppins', sans-serif" }}
-                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#2B37E9'}
-                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = primary}
+                className="group relative px-10 py-4.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden"
+                style={{ 
+                  backgroundColor: primary, 
+                  color: white, 
+                  fontFamily: "'Poppins', sans-serif",
+                  boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset'
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px) scale(1.02)';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 15px 40px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0) scale(1)';
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 10px 30px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset';
+                }}
               >
-                Take the 1st step
+                <span className="relative z-10">Take the 1st step</span>
+                <div 
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%)'
+                  }}
+                />
               </button>
             </div>
           </div>
 
-          <div className="relative lg:h-[520px] flex items-center justify-center">
-            <div className="grid grid-cols-2 gap-4">
+          {/* Right Image Grid */}
+          <div 
+            className="relative lg:h-[580px] flex items-center justify-center"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translateX(0) scale(1)' : 'translateX(30px) scale(0.95)',
+              transition: 'opacity 1s ease-out 0.4s, transform 1s ease-out 0.4s'
+            }}
+          >
+            <div className="grid grid-cols-2 gap-5 lg:gap-6">
               {["/hero/hero1.jpg","/hero/hero2.jpg","/hero/hero3.jpg","/hero/hero4.jpg"].map((src, i) => (
-                <div key={src} className="relative group w-full h-full max-w-[200px] max-h-[200px]">
-                  <div className="absolute -inset-1 rounded-2xl blur-sm transition-all duration-300 group-hover:blur-none" style={{ background: `linear-gradient(135deg, ${primary}30, transparent)` }} />
+                <div 
+                  key={src} 
+                  className="relative group w-full h-full max-w-[220px] max-h-[220px] lg:max-w-[260px] lg:max-h-[260px]"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)',
+                    transition: `opacity 0.8s ease-out ${0.7 + i * 0.1}s, transform 0.8s ease-out ${0.7 + i * 0.1}s`
+                  }}
+                >
+                  {/* Layered shadow effect */}
+                  <div 
+                    className="absolute -inset-2 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"
+                    style={{ 
+                      background: `radial-gradient(circle, ${primary}20 0%, transparent 70%)`,
+                      transform: 'scale(1.1)'
+                    }}
+                  />
+                  <div 
+                    className="absolute -inset-1 rounded-2xl opacity-30 group-hover:opacity-60 transition-all duration-300 blur-sm"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${primary}40, transparent)`,
+                      transform: 'scale(1.05)'
+                    }}
+                  />
+                  
+                  {/* Image container */}
+                  <div className="relative overflow-hidden rounded-2xl">
                     <img
                       src={src}
                       alt="Wellness visual"
-                      className="relative w-full h-full object-cover rounded-2xl shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl"
-                      style={{ border: `3px solid ${primary}40` }}
+                      className="relative w-full h-full object-cover rounded-2xl transition-all duration-500 group-hover:scale-110"
+                      style={{ 
+                        border: `2px solid rgba(255, 255, 255, 0.8)`,
+                        boxShadow: '0 20px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05)',
+                        filter: 'brightness(1) saturate(1)'
+                      }}
                     />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
+                    
+                    {/* Subtle overlay gradient */}
+                    <div 
+                      className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    />
+                    
+                    {/* Shine effect on hover */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-all duration-500 -translate-x-full group-hover:translate-x-full"
+                      style={{
+                        background: 'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)'
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

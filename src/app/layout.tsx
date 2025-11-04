@@ -6,6 +6,7 @@ import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import { ChakraProvider } from '@chakra-ui/react';
 import NavbarClient from "@/components/layout/NavbarClient";
+import Breadcrumb from "@/components/layout/Breadcrumb";
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
@@ -200,30 +201,34 @@ export default async function RootLayout({
             height="1"
             width="1"
             style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=661403980198126&ev=
-            PageView&noscript=1"
+            src="https://www.facebook.com/tr?id=661403980198126&ev=PageView&noscript=1"
           />
         </noscript>
         <AnalyticsWrapper />
         <AttributionInitializer />
         <CookieConsentProvider>
-          <PostHogProviderWrapper>
+        <PostHogProviderWrapper>
             <ChakraProvider>
-              <Providers>
-                {ENABLE_COUPON_BANNER && <CouponBanner />}
-                <NavbarClient />
+              <div style={{ margin: 0, padding: 0 }}>
+                <Providers>
+                  {/* {ENABLE_COUPON_BANNER && <CouponBanner />} */}
+                  <div style={{ margin: 0, padding: 0 }}>
+                    <NavbarClient />
+                    <Breadcrumb />
+                  </div>
                 <RouteChangeTracker />
                 <GlobalInteractionTracker />
                 {children}
                 <ProgramCTABanner />
                 <FloatingNeedHelpButton />
                 {/* <GoogleOneTap /> */}
-                <Toaster richColors position="top-center" />
+                {/* <Toaster richColors position="top-center" />s */}
                 {/* <CookieConsent /> */}
                 {/* <WelcomeBanner /> */}
-              </Providers>
+                </Providers>
+              </div>
             </ChakraProvider>
-          </PostHogProviderWrapper>
+            </PostHogProviderWrapper>
         </CookieConsentProvider>
       </body>
     </html>

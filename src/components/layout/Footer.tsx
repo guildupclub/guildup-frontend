@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 import { primary } from "@/app/colours";
+import { API_ENDPOINTS } from "@/config/constants";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -132,6 +133,17 @@ const Footer = () => {
                       <Link href="/" className="text-white/70 hover:text-primary transition-colors duration-200 text-sm" style={{fontFamily: 'Poppins, sans-serif'}}>
                         About Us
                       </Link>
+                    </li>
+                    <li>
+                      <a 
+                        href={API_ENDPOINTS.expertUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-white/70 hover:text-primary transition-colors duration-200 text-sm" 
+                        style={{fontFamily: 'Poppins, sans-serif'}}
+                      >
+                        Join as Expert
+                      </a>
                     </li>
                   </ul>
                 </div>

@@ -48,7 +48,6 @@ import NotificationDropdown from "../notifications/NotificationDropdown";
 import { MdOutlineRssFeed } from "react-icons/md";
 import { useChatContext } from "@/contexts/ChatContext";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
-import { useTracking } from "@/hooks/useTracking";
 import { API_ENDPOINTS } from "@/config/constants";
 
 export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
@@ -69,7 +68,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showEditCommunity, setShowEditCommunity] = useState(false);
   const [showCommunityList, setShowCommunityList] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState<{
     _id: string;
     name: string;
@@ -83,7 +81,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isProgramsExpanded, setIsProgramsExpanded] = useState(false);
   const isCreator = user?.user?.is_creator ? true : false;
   console.log(isCreator);
-  const tracking = useTracking();
 
   // Add keyboard shortcut for search
   useEffect(() => {
@@ -286,21 +283,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return;
   };
 
-  useEffect(() => {
-    if (session && typeof window !== "undefined") {
-      const shouldOpen = localStorage.getItem("openCreatorModal");
-      if (shouldOpen === "true") {
-        localStorage.removeItem("openCreatorModal");
-
-        tracking.trackUserAction("creator_form_opened_post_signin", {
-          user_id: session.user._id,
-          triggered_from: "post_signin",
-        });
-
-        setIsDialogOpen(true);
-      }
-    }
-  }, [session]);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -324,7 +306,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     <>
       <nav
         className={cn(
-          "fixed top-0 z-50 border-b border-gray-200/60 bg-white/95 backdrop-blur-md pt-3 lg:px-8 xl:px-12 w-full flex shadow-sm",
+          "fixed top-0 z-50 border-b border-gray-200/60 bg-white/95 backdrop-blur-md pt-0 lg:px-8 xl:px-12 w-full flex shadow-sm",
           props.className
         )}
         {...props}
@@ -346,37 +328,37 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
 
           <div className="flex grow items-center justify-between">
-            <div className="flex flex-1 items-center justify-center md:ml-6 lg:ml-8 xl:ml-12 ml-3">
-              <div className="relative w-full max-w-sm lg:max-w-lg xl:max-w-[500px]">
+            <div className="flex flex-1 items-center justify-center md:ml-6 lg:ml-8 xl:ml-12 ml-2 gap-2">
+              <div className="relative w-full max-w-[200px] sm:max-w-sm lg:max-w-lg xl:max-w-[500px]">
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Search className="h-4 w-4 text-gray-400 group-focus-within:text-primary transition-colors duration-200" />
+                  <div className="absolute inset-y-0 left-0 pl-3 md:pl-4 flex items-center pointer-events-none">
+                    <Search className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 group-focus-within:text-primary transition-colors duration-200" />
                   </div>
                   <Input
                     type="search"
                     placeholder="I want to ..."
-                    className="w-full bg-white/90 backdrop-blur-sm border border-primary/60 rounded-full pl-11 pr-10 py-2.5 md:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg hover:border-primary/80"
+                    className="w-full bg-white/90 backdrop-blur-sm border border-primary/60 rounded-full pl-9 md:pl-11 pr-8 md:pr-10 py-2 md:py-2.5 lg:py-3 text-xs md:text-sm text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg hover:border-primary/80"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                   />
                   {searchQuery && (
                     <button
-                      className="absolute right-3 top-1/2 -translate-y-1/2 flex h-6 w-6 items-center justify-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                      className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center text-gray-400 hover:text-gray-600 transition-colors duration-200"
                       onClick={() => setSearchQuery("")}
                     >
-                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-3 w-3 md:h-4 md:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   )}
                 </div>
               </div>
-              <div className="md:hidden flex items-center gap-2">
+              <div className="md:hidden flex items-center gap-1">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                      <MoreVertical className="h-5 w-5 text-gray-700" />
+                    <button className="flex items-center justify-center p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-all duration-200">
+                      <MoreVertical className="h-6 w-6 text-gray-700" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -653,22 +635,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </div>
                 )}
               </div>
-              {!isCreator && (
-                <Dialog
-                  open={session ? isDialogOpen : false}
-                  onOpenChange={setIsDialogOpen}
-                >
-                  <Button
-                    className="bg-primary text-white hover:bg-primary/90 border-0 px-6 py-2 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all duration-200"
-                    onClick={handleCreatorButtonClick}
-                  >
-                    Join as Expert
-                  </Button>
-                  {session && (
-                    <CreatorForm onClose={() => setIsDialogOpen(false)} />
-                  )}
-                </Dialog>
-              )}
             </div>
           </div>
         </div>

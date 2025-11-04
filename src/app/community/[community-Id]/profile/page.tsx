@@ -19,18 +19,53 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id: communityId, namePart } = parseIdFromParam(params["community-Id"]);
   
   try {
-    // Fetch community data for metadata
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-      { communityId },
-      { 
-        timeout: 5000, // 5 second timeout
-        headers: { "Content-Type": "application/json" }
-      }
-    );
+    let profile: any = null;
 
-    if (response.data?.r === "s" && response.data?.data) {
-      const profile = response.data.data;
+    // Check if NEXT_PUBLIC_BACKEND_BASE_URL is undefined
+    if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+      // Fallback to communities.json
+      try {
+        const fs = require("fs");
+        const path = require("path");
+        const jsonPath = path.join(process.cwd(), "public", "data", "communities.json");
+        const jsonData = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+        
+        // Find the community by ID
+        const communityData = jsonData.communities?.find(
+          (item: any) => item.community?._id === communityId
+        );
+
+        if (communityData) {
+          // Transform JSON data to match API response format
+          profile = {
+            community: communityData.community,
+            user: {
+              _id: communityData.community.user_id?._id || communityData.community.user_id,
+              user_name: communityData.community.user_id?.name || communityData.community.owner_name,
+              user_avatar: communityData.community.image,
+            },
+          };
+        }
+      } catch (jsonError) {
+        console.error("Error fetching from communities.json for metadata:", jsonError);
+      }
+    } else {
+      // Fetch community data for metadata from API
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+        { communityId },
+        { 
+          timeout: 5000, // 5 second timeout
+          headers: { "Content-Type": "application/json" }
+        }
+      );
+
+      if (response.data?.r === "s" && response.data?.data) {
+        profile = response.data.data;
+      }
+    }
+
+    if (profile) {
       const communityName = profile.community?.name || namePart.replace(/-/g, " ");
       const description = profile.community?.description || 
         `Discover ${communityName} on GuildUp: expert wellness guidance, coaching, and community support.`;
@@ -95,26 +130,64 @@ export default async function Page({ params }: Props) {
   let initialOfferings = [];
   
   try {
-    const [profileResponse, offeringsResponse] = await Promise.all([
-      axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
-        { communityId },
-        { timeout: 10000 }
-      ).catch(() => null),
-      axios.get(
-        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${communityId}`,
-        { timeout: 10000 }
-      ).catch(() => null),
-    ]);
+    // Check if NEXT_PUBLIC_BACKEND_BASE_URL is undefined
+    if (!process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+      // Fallback to communities.json
+      try {
+        const fs = require("fs");
+        const path = require("path");
+        const jsonPath = path.join(process.cwd(), "public", "data", "communities.json");
+        const jsonData = JSON.parse(fs.readFileSync(jsonPath, "utf8"));
+        
+        // Find the community by ID
+        const communityData = jsonData.communities?.find(
+          (item: any) => item.community?._id === communityId
+        );
 
-    if (profileResponse?.data?.r === "s") {
-      initialProfile = profileResponse.data.data;
-    }
+        if (communityData) {
+          // Transform JSON data to match API response format
+          initialProfile = {
+            community: communityData.community,
+            user: {
+              _id: communityData.community.user_id?._id || communityData.community.user_id,
+              user_name: communityData.community.user_id?.name || communityData.community.owner_name,
+              user_avatar: communityData.community.image,
+              user_session_conducted: communityData.community.user_id?.session_conducted || communityData.community.owner_sessions || 0,
+              user_year_of_experience: communityData.community.user_id?.year_of_experience || communityData.community.owner_experience || 0,
+              user_languages: communityData.community.user_id?.languages || communityData.community.owner_languages || [],
+              user_isBankDetailsAdded: false,
+              user_iscalendarConnected: false,
+            },
+          };
+          initialOfferings = communityData.offerings || [];
+        }
+      } catch (jsonError) {
+        console.error("Error fetching from communities.json:", jsonError);
+        // Continue without initial data - client will fetch
+      }
+    } else {
+      // Use API if NEXT_PUBLIC_BACKEND_BASE_URL is defined
+      const [profileResponse, offeringsResponse] = await Promise.all([
+        axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/about`,
+          { communityId },
+          { timeout: 10000 }
+        ).catch(() => null),
+        axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${communityId}`,
+          { timeout: 10000 }
+        ).catch(() => null),
+      ]);
 
-    if (offeringsResponse?.data?.r === "s") {
-      initialOfferings = Array.isArray(offeringsResponse.data.data)
-        ? offeringsResponse.data.data
-        : [offeringsResponse.data.data];
+      if (profileResponse?.data?.r === "s") {
+        initialProfile = profileResponse.data.data;
+      }
+
+      if (offeringsResponse?.data?.r === "s") {
+        initialOfferings = Array.isArray(offeringsResponse.data.data)
+          ? offeringsResponse.data.data
+          : [offeringsResponse.data.data];
+      }
     }
   } catch (error) {
     console.error("Error fetching initial data:", error);
