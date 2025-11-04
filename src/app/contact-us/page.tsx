@@ -3,7 +3,7 @@
 import { FaPhone, FaEnvelope } from 'react-icons/fa';
 export default function ContactUs() {
     const handlePhoneClick = () => {
-        window.location.href = 'tel:9220521385';
+        window.location.href = 'tel:+91-9220521385';
     };
 
     const handleEmailClick = () => {

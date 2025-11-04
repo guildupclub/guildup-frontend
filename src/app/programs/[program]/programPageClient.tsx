@@ -59,7 +59,7 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
 
   // WhatsApp message for joining the program
   const whatsappMessage = encodeURIComponent(`Hi! I'd like to join the ${cfg.title} program.`);
-  const whatsappUrl = `https://wa.me/919876543210?text=${whatsappMessage}`;
+  const whatsappUrl = `https://wa.me/919220521385?text=${whatsappMessage}`;
 
   return (
     <div className="min-h-screen pb-20 md:pb-0" style={{ backgroundColor: white }}>
