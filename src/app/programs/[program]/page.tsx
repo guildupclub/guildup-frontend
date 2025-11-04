@@ -5,11 +5,12 @@ import ProgramPageClient from "./programPageClient";
 
 type Params = { program: string };
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const cfg = getProgramConfig(params.program);
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const cfg = getProgramConfig(resolvedParams.program);
   if (!cfg) return {};
 
-  const url = `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.guildup.in"}/programs/${cfg.slug}`;
+  const url = `${process.env.NEXTAUTH_URL}/programs/${cfg.slug}`;
   return {
     title: `${cfg.title} | GuildUp`,
     description: cfg.description,
@@ -28,8 +29,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default function Page({ params }: { params: Params }) {
-  const cfg = getProgramConfig(params.program);
+export default async function Page({ params }: { params: Promise<Params> }) {
+  const resolvedParams = await params;
+  const cfg = getProgramConfig(resolvedParams.program);
   if (!cfg) return notFound();
   return <ProgramPageClient programKey={cfg.slug} />;
 }

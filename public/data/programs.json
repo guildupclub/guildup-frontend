@@ -1,0 +1,7 @@
+[
+  { "id": "stress-anxiety", "title": "Stress", "subtitle": "Anxiety & stress management", "illustration": "/programs/stress.svg" },
+  { "id": "pcos", "title": "PCOS", "subtitle": "PCOS care & lifestyle", "illustration": "/programs/pcos.svg" },
+  { "id": "relationship", "title": "Relationships", "subtitle": "Healthy relationships & guidance", "illustration": "/programs/relationship.svg" }
+]
+
+

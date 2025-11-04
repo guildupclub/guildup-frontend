@@ -172,9 +172,9 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
       <Card 
         maxW="100vw" 
         w="100%"
-        h="420px"
-        minH="420px"
-        maxH="420px"
+        h="380px"
+        minH="380px"
+        maxH="380px"
         cursor="pointer"
         onClick={onClick}
         onMouseEnter={(e) => {
@@ -235,7 +235,7 @@ const MemoizedCommunityCard = React.memo<MemoizedCommunityCardProps>(
                 alt={communityDetails?.name || "Expert"}
                 w="100%"
                 h="100%"
-                objectFit="contain"
+                objectFit="cover"
               />
             </Box>
 

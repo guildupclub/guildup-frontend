@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../../provider";
 import { Toaster } from "sonner";
@@ -13,6 +13,7 @@ import CouponBanner from "@/components/banner/CouponBanner";
 import CookieConsent from "@/components/cookies/CookieConsent";
 import AnalyticsWrapper from "@/components/analytics/AnalyticsWrapper";
 import AttributionInitializer from "@/components/analytics/AttributionInitializer";
+import ProgramCTABanner from "@/components/programs/ProgramCTABanner";
 // import GoogleOneTap from "@/components/GoogleOneTap";
 
 import RouteChangeTracker from "@/components/RouteChangeTracker";
@@ -20,14 +21,11 @@ import GlobalInteractionTracker from "@/components/analytics/GlobalInteractionTr
 import FloatingNeedHelpButton from "@/components/needHelp/FloatingNeedHelpButton";
 import dynamic from "next/dynamic";
 import Script from "next/script";
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  weight: ["300", "400", "500", "600", "700"],
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-poppins",
+  display: "swap",
 });
 const guildup_logo_final = "/guildup_logo_final.png";
 
@@ -187,7 +185,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${poppins.variable} antialiased`}
       >
         <noscript>
           <iframe
@@ -217,6 +215,7 @@ export default async function RootLayout({
                 <RouteChangeTracker />
                 <GlobalInteractionTracker />
                 {children}
+                <ProgramCTABanner />
                 <FloatingNeedHelpButton />
                 {/* <GoogleOneTap /> */}
                 <Toaster richColors position="top-center" />

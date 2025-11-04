@@ -32,6 +32,7 @@ export function useCachedCommunities(options: UseCachedCommunitiesOptions = {}) 
   const [source, setSource] = useState<'cache' | 'api'>('cache');
 
   const loadCommunityData = useCallback(async () => {
+    let cachedData: CommunityData | null = null;
     try {
       setLoading(true);
       setError(null);
@@ -41,42 +42,60 @@ export function useCachedCommunities(options: UseCachedCommunitiesOptions = {}) 
         const response = await fetch('/data/communities.json', {
           cache: 'no-cache' // Always get fresh data
         });
-        
         if (response.ok) {
-          const cachedData: CommunityData = await response.json();
-          
-          // Check if data is fresh enough
+          cachedData = await response.json();
           const dataAge = Date.now() - cachedData.metadata.fetchedAt;
+          // If fresh enough, use immediately
           if (dataAge <= maxAge) {
             setData(cachedData);
             setSource('cache');
             setLoading(false);
             return;
           }
-          
-          console.log('Cached data is stale, falling back to API...');
         }
       } catch (cacheError) {
         console.log('Failed to load cached data:', cacheError);
       }
 
-      // Fallback to API if cache fails or is stale
-      if (fallbackToAPI) {
-        await loadFromAPI();
-      } else {
-        throw new Error('Cached data unavailable and API fallback disabled');
+      // Fallback to API if cache is stale and API usage allowed
+      if (fallbackToAPI && process.env.NEXT_PUBLIC_BACKEND_BASE_URL) {
+        try {
+          await loadFromAPI(setData, setLoading, setSource);
+          return;
+        } catch (apiErr) {
+          console.warn('API fallback failed, using stale cache if available');
+        }
       }
-      
+
+      // If we reach here: use cachedData even if stale per workspace rule
+      if (cachedData) {
+        setData({
+          ...cachedData,
+          metadata: {
+            ...cachedData.metadata,
+            source: 'stale-cache',
+          },
+        });
+        setSource('cache');
+      } else {
+        throw new Error('Cached data unavailable');
+      }
+
+      setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load community data');
       setLoading(false);
     }
   }, [fallbackToAPI, maxAge]);
 
-  const loadFromAPI = async () => {
-    setSource('api');
-    
-    const allCommunities = [];
+  const loadFromAPI = async (
+    setDataFn: (d: CommunityData) => void,
+    setLoadingFn: (b: boolean) => void,
+    setSourceFn: (s: 'cache' | 'api') => void,
+  ) => {
+    setSourceFn('api');
+
+    const allCommunities = [] as any[];
     let page = 0;
     const limit = 100;
     let hasMore = true;
@@ -85,21 +104,16 @@ export function useCachedCommunities(options: UseCachedCommunitiesOptions = {}) 
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?page=${page}&limit=${limit}`
       );
-      
       if (!response.ok) throw new Error('API request failed');
-      
       const result = await response.json();
-      
       if (result.r === 's' && Array.isArray(result.data)) {
         allCommunities.push(...result.data);
-        
         const meta = result.meta;
         if (meta && meta.total) {
           hasMore = (page + 1) * limit < meta.total;
         } else {
           hasMore = result.data.length === limit;
         }
-        
         page++;
       } else {
         break;
@@ -119,8 +133,8 @@ export function useCachedCommunities(options: UseCachedCommunitiesOptions = {}) 
       tags: []
     };
 
-    setData(apiData);
-    setLoading(false);
+    setDataFn(apiData);
+    setLoadingFn(false);
   };
 
   const refresh = () => {
@@ -134,14 +148,12 @@ export function useCachedCommunities(options: UseCachedCommunitiesOptions = {}) 
   // Auto-refresh functionality
   useEffect(() => {
     if (!autoRefresh || !data) return;
-    
     const refreshInterval = setInterval(() => {
       const dataAge = Date.now() - data.metadata.fetchedAt;
       if (dataAge > maxAge) {
         loadCommunityData();
       }
-    }, 60000); // Check every minute
-    
+    }, 60000);
     return () => clearInterval(refreshInterval);
   }, [autoRefresh, data, maxAge, loadCommunityData]);
 

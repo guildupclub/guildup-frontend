@@ -5,53 +5,51 @@ import { useRouter } from "next/navigation";
 import { PROGRAMS, type ProgramKey } from "../config";
 import { primary, white } from "@/app/colours";
 import ProgramCommunities from "@/components/community/ProgramCommunities";
-import Services from "@/components/programs/Services";
-import Transformations from "@/components/programs/Transformations";
 import LeadFormModal from "@/components/programs/LeadFormModal";
 import Footer from "@/components/layout/Footer";
-import Image from "next/image";
+import About from "@/components/programs/About";
+import Symptoms from "@/components/programs/Symptoms";
+import Approach from "@/components/programs/Approach";
+import FAQ from "@/components/programs/FAQ";
+import ProgramTestimonials from "@/components/programs/ProgramTestimonials";
 
 export default function ProgramPageClient({ programKey }: { programKey: ProgramKey }) {
   const cfg = useMemo(() => PROGRAMS[programKey], [programKey]);
   const router = useRouter();
-  const bgUmageName = `${cfg.slug}-banner.svg`;
+  // Map slug to GIF under public/programs. stress-anxiety -> stress.gif
+  const mappedSlug = cfg.slug === "stress-anxiety" ? "stress" : cfg.slug;
+  const gifPath = `programs/${mappedSlug}.gif`;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: white }}>
-      <section className="pt-4 sm:pt-12 pb-6 sm:pb-8">
-        <div className="max-w-6xl mx-auto pl-4 pr-0 sm:pl-6 sm:pr-0">
-          <div className="rounded-2xl shadow-sm border overflow-hidden" style={{ background: "linear-gradient(135deg, #fafbff, #ffffff)" }}>
-              {bgUmageName ? (
-                <div
-                  className="w-full h-[320px] rounded-2xl"
-                  style={{
-                    backgroundImage: `url(/${bgUmageName})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                  }}
-                />
-              ) : (
-              <div>
-                <h1 className="text-3xl sm:text-5xl font-bold" style={{ fontFamily: "'Poppins', sans-serif", color: "#0f172a" }}>{cfg.title}</h1>
-                <p className="mt-3 sm:mt-4 text-base sm:text-lg" style={{ fontFamily: "'Poppins', sans-serif", color: "#334155" }}>{cfg.subtitle}</p>
-                <p className="mt-2 text-sm sm:text-base" style={{ fontFamily: "'Poppins', sans-serif", color: "#475569" }}>{cfg.description}</p>
-                <div className="mt-6">
-                  <LeadFormModal program={cfg.slug} triggerLabel="Talk to a Program Advisor" />
-                </div>
-              </div>
-            )}
-          </div>
+    <div className="min-h-screen pb-20 md:pb-0" style={{ backgroundColor: white }}>
+      {/* 1. Hero section */}
+      <section className="pt-0 sm:pt-6 pb-4 sm:pb-6 w-full">
+        <div className="w-full overflow-visible sm:overflow-hidden px-0 sm:px-6" style={{ width: '100vw', maxWidth: '100vw' }}>
+          <img
+            src={`/${gifPath}`}
+            alt={`${cfg.title} banner`}
+            className="sm:h-[320px] md:h-[400px] lg:h-[480px] sm:object-cover sm:object-top sm:rounded-2xl"
+            style={{ 
+              height: '240px',
+              width: '100vw',
+              maxWidth: '100vw',
+              objectFit: 'contain',
+              display: 'block'
+            }}
+          />
         </div>
       </section>
 
-      <section className="py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto px-4">
-          <Services />
-        </div>
-      </section>
+      {/* 2. What is the Program about */}
+      <About config={cfg} />
 
-      {/* Lead banner moved after services */}
+      {/* 3. Symptoms (Images and illustrations) */}
+      <Symptoms programKey={cfg.slug} />
+
+      {/* 4. Our approach */}
+      <Approach config={cfg} />
+
+      {/* 5. CTA banner */}
       <section className="py-12 sm:py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="rounded-2xl p-10 sm:p-16 banner-animated" style={{ backgroundColor: primary, minHeight: 180 }}>
@@ -72,12 +70,23 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
         </div>
       </section>
 
+      {/* 6. Testimonials */}
+      <ProgramTestimonials programTag={cfg.tag} />
+
+      {/* 7. Our experts for this program */}
       <section className="py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-semibold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Experts for this program</h2>
+          <h2 className="text-2xl sm:text-3xl font-semibold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Our experts for this program</h2>
           <ProgramCommunities tag={cfg.tag} />
         </div>
       </section>
+
+      {/* 8. FAQ Section */}
+      {cfg.faqs && cfg.faqs.length > 0 && <FAQ faqs={cfg.faqs} />}
+
+      {/* 9. Footer */}
+      <Footer />
+
       <style jsx>{`
         @keyframes shiver {
           0% { transform: translateX(0); }
@@ -112,26 +121,6 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
           50% { box-shadow: 0 16px 60px rgba(59,71,249,0.28); }
         }
       `}</style>
-
-      <section className="py-8 sm:py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <Transformations />
-        </div>
-      </section>
-
-      <section className="py-12 sm:py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h3 className="text-xl sm:text-2xl font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>Ready to start?</h3>
-          <p className="text-sm sm:text-base mt-2" style={{ fontFamily: "'Poppins', sans-serif", color: "#475569" }}>
-            Speak with our team and get a customized roadmap for your journey.
-          </p>
-          <div className="mt-5">
-            <LeadFormModal program={cfg.slug} triggerLabel="Get Your Plan" variant="primary" />
-          </div>
-        </div>
-      </section>
-
-      <Footer />
     </div>
   );
 }

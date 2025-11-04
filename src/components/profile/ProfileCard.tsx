@@ -971,7 +971,7 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
             <div className="flex flex-col justify-between h-full">
               <div className="flex items-start gap-4 mb-6">
                 <span className="text-6xl md:text-8xl font-bold text-gray-300 leading-none mt-2 flex-shrink-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  "
+                  &apos;
                 </span>
                 <p 
                   className="text-2xl md:text-3xl font-semibold text-foreground flex-1 pt-2"

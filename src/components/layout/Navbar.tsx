@@ -13,6 +13,7 @@ import {
   Apple,
   Heart,
   Sparkles,
+  MoreVertical,
 } from "lucide-react";
 import { FaBars, FaSignInAlt } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -79,6 +80,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   // State to store fetchCommunities API response
   const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
+  const [isProgramsExpanded, setIsProgramsExpanded] = useState(false);
   const isCreator = user?.user?.is_creator ? true : false;
   console.log(isCreator);
   const tracking = useTracking();
@@ -329,17 +331,11 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
       >
         <div className="container flex h-16 items-center px-4 md:px-6 lg:px-8 max-w-full">
           <div className="flex gap-3 md:gap-4 lg:gap-6 items-center">
-            <button
-              className="md:hidden flex items-center justify-center p-1"
-              onClick={() => setIsSidebarOpen((prev) => !prev)}
-            >
-              <FaBars className="h-5 w-5 text-gray-700" />
-            </button>
             <Link href="/" className="flex items-center">
               <Image
                 src={Guildup_logo_mobile || "/placeholder.svg"}
                 alt="GuildUp logo"
-                className="h-6 w-auto md:hidden"
+                className="h-7 w-auto md:hidden"
               />
               <Image
                 src={guildup_logo || "/placeholder.svg"}
@@ -350,7 +346,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
 
           <div className="flex grow items-center justify-between">
-            <div className="flex flex-1 items-center md:ml-6 lg:ml-8 xl:ml-12 ml-3">
+            <div className="flex flex-1 items-center justify-center md:ml-6 lg:ml-8 xl:ml-12 ml-3">
               <div className="relative w-full max-w-sm lg:max-w-lg xl:max-w-[500px]">
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -358,11 +354,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </div>
                   <Input
                     type="search"
-                    placeholder={
-                      isSmallScreen
-                        ? "Search experts, communities..."
-                        : "Search for experts, communities, or services..."
-                    }
+                    placeholder="I want to ..."
                     className="w-full bg-white/90 backdrop-blur-sm border border-primary/60 rounded-full pl-11 pr-10 py-2.5 md:py-3 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white focus:outline-none transition-all duration-300 shadow-sm hover:shadow-md focus:shadow-lg hover:border-primary/80"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -380,12 +372,151 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   )}
                 </div>
               </div>
-              <div
-                className="
-            md:hidden"
-              >
-                {" "}
-                {user?._id && <NotificationDropdown />}
+              <div className="md:hidden flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                      <MoreVertical className="h-5 w-5 text-gray-700" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl w-56 z-50 max-h-[80vh] overflow-y-auto"
+                    align="end"
+                    side="bottom"
+                    sideOffset={10}
+                  >
+                    <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                      <Link href="/" className="flex items-center gap-3 text-base font-medium">
+                        <Compass className={`w-5 h-5 ${isActive("/") ? "text-primary" : "text-gray-600"}`} />
+                        <span className={isActive("/") ? "text-primary" : "text-gray-700"}>{StringConstants.HOME}</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <div className="w-full">
+                      <button
+                        onClick={() => setIsProgramsExpanded(!isProgramsExpanded)}
+                        className="w-full hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 flex items-center justify-between text-base font-medium"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Users className={`w-5 h-5 ${isActive("/programs") ? "text-primary" : "text-gray-600"}`} />
+                          <span className={isActive("/programs") ? "text-primary" : "text-gray-700"}>Programs</span>
+                        </div>
+                        <ChevronDown
+                          className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                            isProgramsExpanded ? "transform rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                          isProgramsExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div className="pl-4 pr-2 py-2 space-y-1">
+                          <Link
+                            href="/programs/pcos"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
+                            onClick={() => setIsProgramsExpanded(false)}
+                          >
+                            PCOS
+                          </Link>
+                          <Link
+                            href="/programs/stress-anxiety"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
+                            onClick={() => setIsProgramsExpanded(false)}
+                          >
+                            Stress &amp; Anxiety
+                          </Link>
+                          <Link
+                            href="/programs/relationship"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
+                            onClick={() => setIsProgramsExpanded(false)}
+                          >
+                            Relationship
+                          </Link>
+                          <Link
+                            href="/experts"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
+                            onClick={() => setIsProgramsExpanded(false)}
+                          >
+                            All Experts
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+
+                    <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                      <Link href="/feeds" className="flex items-center gap-3 text-base font-medium">
+                        <MdOutlineRssFeed className={`w-5 h-5 ${isActive("/feeds") ? "text-primary" : "text-gray-600"}`} />
+                        <span className={isActive("/feeds") ? "text-primary" : "text-gray-700"}>{StringConstants.FEED}</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                      <Link href="/chat" className="flex items-center justify-between text-base font-medium">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <MessageCircle className={`w-5 h-5 ${isActive("/chat") ? "text-primary" : "text-gray-600"}`} />
+                            {user?._id && unreadCount > 0 && (
+                              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-md">
+                                {unreadCount > 9 ? "9+" : unreadCount}
+                              </span>
+                            )}
+                          </div>
+                          <span className={isActive("/chat") ? "text-primary" : "text-gray-700"}>Chat</span>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                      <Link
+                        href={getMySpaceLink()}
+                        onClick={handleMySpaceClick}
+                        className="flex items-center gap-3 text-base font-medium"
+                      >
+                        <Users className={`w-5 h-5 ${isActive("/community") ? "text-primary" : "text-gray-600"}`} />
+                        <span className={isActive("/community") ? "text-primary" : "text-gray-700"}>{StringConstants.MY_SPACE}</span>
+                      </Link>
+                    </DropdownMenuItem>
+
+                    {user?._id ? (
+                      <>
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                          <Link href="/profile" className="text-base font-medium">Profile</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                          <Link href="/booking" className="text-base font-medium">Bookings</Link>
+                        </DropdownMenuItem>
+                        {isUser && (
+                          <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
+                            <Link href="/payments" className="text-base font-medium">Payments</Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem
+                          className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 text-base font-medium"
+                          onClick={handleSignOut}
+                        >
+                          {StringConstants.SIGN_OUT}
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <DropdownMenuItem
+                          className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 text-base font-medium"
+                          onClick={() =>
+                            signIn(undefined, {
+                              callbackUrl: `${window.location.origin}?hero=2`,
+                            })
+                          }
+                        >
+                          {StringConstants.SIGN_IN}
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <div className="hidden md:flex space-x-2 lg:space-x-3 xl:space-x-4 items-center">
@@ -542,206 +673,6 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
           </div>
         </div>
       </nav>
-
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-white/95 backdrop-blur-md border-t border-gray-200/60 md:hidden shadow-lg">
-        <div className="grid h-full max-w-lg grid-cols-6 mx-auto" >
-          <Link
-            href="/"
-            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-          >
-            <div className="w-7 h-7 flex items-center justify-center">
-              <Compass
-                className={`w-5 h-5 transition-colors duration-200 ${isActive("/") ? "text-primary" : "text-gray-600"}`}
-              />
-            </div>
-            <span
-              className={`text-xs font-medium ${isActive("/") ? "text-primary" : "text-gray-600"}`}
-            >
-              {StringConstants.HOME}
-            </span>
-          </Link>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200">
-                <div className="w-7 h-7 flex items-center justify-center">
-                  <Users className={`w-5 h-5 transition-colors duration-200 ${isActive("/programs") ? "text-primary" : "text-gray-600"}`} />
-                </div>
-                <span className={`text-xs font-medium ${isActive("/programs") ? "text-primary" : "text-gray-600"}`}>
-                  Programs
-                </span>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center">
-              <DropdownMenuItem asChild>
-                <Link href="/programs/pcos">PCOS</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/programs/stress-anxiety">Stress & Anxiety</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/programs/relationship">Relationship</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/experts">All Experts</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Link
-            href="/feeds"
-            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-          >
-            <div className="w-7 h-7 flex items-center justify-center">
-              <MdOutlineRssFeed
-                className={`w-5 h-5 transition-colors duration-200 ${
-                  isActive("/feeds") ? "text-primary" : "text-gray-600"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-xs font-medium ${
-                isActive("/feeds") ? "text-primary" : "text-gray-600"
-              }`}
-            >
-              {StringConstants.FEED}
-            </span>
-          </Link>
-
-          <Link
-            href="/chat"
-            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-          >
-            <div className="w-7 h-7 flex items-center justify-center relative">
-              <MessageCircle
-                className={`w-5 h-5 transition-colors duration-200 ${isActive("/chat") ? "text-primary" : "text-gray-600"}`}
-              />
-              {user?._id && unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center shadow-md">
-                  {unreadCount > 9 ? "9+" : unreadCount}
-                </span>
-              )}
-            </div>
-            <span
-              className={`text-xs font-medium ${
-                isActive("/chat") ? "text-primary" : "text-gray-600"
-              }`}
-            >
-              Chat
-            </span>
-          </Link>
-
-          <Link
-            href={getMySpaceLink()}
-            className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-            onClick={handleMySpaceClick}
-          >
-            <div className="w-7 h-7 flex items-center justify-center">
-              <Users
-                className={`w-5 h-5 transition-colors duration-200 ${
-                  isActive("/community") ? "text-primary" : "text-gray-600"
-                }`}
-              />
-            </div>
-            <span
-              className={`text-xs font-medium ${
-                isActive("/community") ? "text-primary" : "text-gray-600"
-              }`}
-            >
-              {StringConstants.MY_SPACE}
-            </span>
-          </Link>
-
-          {user?._id ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200">
-                  <div className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                    <Avatar className="h-5 w-5">
-                      <AvatarImage
-                        src={session?.user?.image || ""}
-                        alt="User"
-                      />
-                      <AvatarFallback>
-                        {session?.user?.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <span className="text-xs font-medium text-gray-600">My Account</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl"
-                align="end"
-                side="top"
-                sideOffset={50}
-              >
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
-                >
-                  <Link href="/profile" className="text-base font-medium">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
-                >
-                  <Link
-                    href="/chat"
-                    className="flex items-center justify-between text-base font-medium"
-                  >
-                    <span>Chat</span>
-                    {user?._id && unreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center shadow-md">
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </span>
-                    )}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  asChild
-                  className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
-                >
-                  <Link href="/booking" className="text-base font-medium">Bookings</Link>
-                </DropdownMenuItem>
-                {isUser && (
-                  <DropdownMenuItem
-                    asChild
-                    className="hover:bg-gray-50/80 border-b border-gray-100 px-4 py-3 rounded-xl mx-2 my-1"
-                  >
-                    <Link href="/payments" className="text-base font-medium">Payments</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem
-                  className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 text-base font-medium"
-                  onClick={handleSignOut}
-                >
-                  {StringConstants.SIGN_OUT}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <button
-              className="flex flex-col items-center justify-center gap-1.5 px-2 py-2 rounded-xl hover:bg-gray-50/80 transition-all duration-200"
-              onClick={() =>
-                signIn(undefined, {
-                  callbackUrl: `${window.location.origin}?hero=2`,
-                })
-              }
-            >
-              <div className="w-7 h-7 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                <Avatar className="h-5 w-5">
-                  <AvatarImage src="/placeholder.svg" alt="User" />
-                  <AvatarFallback>
-                    <FaSignInAlt />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <span className="text-xs font-medium text-gray-600">{StringConstants.SIGN_IN}</span>
-            </button>
-          )}
-        </div>
-      </div>
 
       {isSidebarOpen && (
         <div
