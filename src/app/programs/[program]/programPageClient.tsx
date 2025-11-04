@@ -4,6 +4,7 @@ import React, { useMemo, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PROGRAMS, type ProgramKey } from "../config";
 import { primary, white } from "@/app/colours";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
 import ProgramCommunities from "@/components/community/ProgramCommunities";
 import LeadFormModal from "@/components/programs/LeadFormModal";
 import Footer from "@/components/layout/Footer";
@@ -58,8 +59,8 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
   }, []);
 
   // WhatsApp message for joining the program
-  const whatsappMessage = encodeURIComponent(`Hi! I'd like to join the ${cfg.title} program.`);
-  const whatsappUrl = `https://wa.me/919220521385?text=${whatsappMessage}`;
+  const whatsappMessage = encodeURIComponent(`Hi! I'd like to join the ${cfg.title}.`);
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
 
   return (
     <div className="min-h-screen pb-20 md:pb-0" style={{ backgroundColor: white }}>

@@ -7,6 +7,7 @@ import Loader from "@/components/Loader";
 import MemoizedCommunityCard from "@/components/explore/MemoizedCommunityCard";
 import { Brain, Dumbbell, Apple, Heart, Sparkles, Users, Filter } from "lucide-react";
 import { primary, black, white } from "../colours";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
 
 interface Community {
   _id: string;
@@ -345,7 +346,7 @@ function ExpertsContent() {
                         View All Experts
                       </button>
                       <button
-                        onClick={() => window.open("https://wa.me/919220521385?text=Hi! I would like a recommendation for an expert on GuildUp.", "_blank")}
+                        onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=Hi! I would like a recommendation for an expert on GuildUp.`, "_blank")}
                         className="px-6 py-3 rounded-lg transition-all duration-200 hover:scale-105"
                         style={{
                           backgroundColor: primary,
@@ -420,7 +421,7 @@ function ExpertsContent() {
                       fontFamily: 'Garamond, serif', 
                       fontWeight: '600' 
                     }}
-              onClick={() => window.open("https://wa.me/919220521385?text=Hi! I would like a recommendation for an expert on GuildUp.", "_blank")}
+              onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=Hi! I would like a recommendation for an expert on GuildUp.`, "_blank")}
             >
                     💬 Get Expert Recommendations
             </button>

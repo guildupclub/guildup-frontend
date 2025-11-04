@@ -1,9 +1,11 @@
 'use client';
 
 import { FaPhone, FaEnvelope } from 'react-icons/fa';
+import { WHATSAPP_NUMBER } from '@/config/constants';
+
 export default function ContactUs() {
     const handlePhoneClick = () => {
-        window.location.href = 'tel:+91-9220521385';
+        window.location.href = `tel:${WHATSAPP_NUMBER}`;
     };
 
     const handleEmailClick = () => {

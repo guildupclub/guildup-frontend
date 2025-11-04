@@ -26,3 +26,7 @@ export const CATEGORY_IDS = {
 };
 
 export const API_FRONTEND_URL = process.env.NEXTAUTH_URL||"https://dev.guildup.club/"
+
+// Contact Information
+export const WHATSAPP_NUMBER = "+91-9211468001";
+export const WHATSAPP_NUMBER_DIGITS = "919211468001"; // For WhatsApp URLs (without dashes)

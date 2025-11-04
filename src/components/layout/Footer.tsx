@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Mail, Phone, ArrowRight } from "lucide-react";
 import { primary } from "@/app/colours";
-import { API_ENDPOINTS } from "@/config/constants";
+import { API_ENDPOINTS, WHATSAPP_NUMBER } from "@/config/constants";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -177,8 +177,8 @@ const Footer = () => {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Phone className="h-4 w-4 text-primary flex-shrink-0" />
-                      <Link href="tel:+91-9220521385" className="text-white/70 hover:text-primary transition-colors duration-200 text-sm" style={{fontFamily: 'Poppins, sans-serif'}}>
-                        +91-9220521385
+                      <Link href={`tel:${WHATSAPP_NUMBER}`} className="text-white/70 hover:text-primary transition-colors duration-200 text-sm" style={{fontFamily: 'Poppins, sans-serif'}}>
+                        {WHATSAPP_NUMBER}
                       </Link>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { primary, white } from "@/app/colours";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
 
 const CTABannerWhatsApp: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const CTABannerWhatsApp: React.FC = () => {
           Chat with us on WhatsApp for a quick, free consultation. We&apos;ll guide you to the right program and expert.
         </p>
         <button
-          onClick={() => window.open('https://wa.me/919220521385?text=Hi! I\'d like help choosing the right program.', '_blank')}
+          onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=Hi! I'd like help choosing the right program.`, '_blank')}
           className="bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
           style={{ fontFamily: "'Poppins', sans-serif" }}
         >
