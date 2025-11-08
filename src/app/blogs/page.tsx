@@ -21,12 +21,22 @@ export const metadata: Metadata = {
   }
 };
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 export default async function BlogsPage() {
   // Server-side data fetching
-  const [blogPosts, categories] = await Promise.all([
-    getAllBlogPostsMetadata(),
-    getAllCategories()
-  ]);
+  let blogPosts = [];
+  let categories = ['All'];
+  
+  try {
+    [blogPosts, categories] = await Promise.all([
+      getAllBlogPostsMetadata(),
+      getAllCategories()
+    ]);
+  } catch (error) {
+    console.error('Error fetching blog posts:', error);
+    // Continue with empty arrays if there's an error
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 pt-12">

@@ -1,10 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { remark } from 'remark';
-import remarkHtml from 'remark-html';
-import remarkGfm from 'remark-gfm';
-
 // Types
 export interface BlogPost {
   id: string;
@@ -28,129 +21,47 @@ export interface BlogPost {
 
 export interface BlogPostMetadata extends Omit<BlogPost, 'content'> {}
 
-// Constants
-const BLOG_DIRECTORY = path.join(process.cwd(), 'data', 'blog');
+// Import Notion functions
+import {
+  fetchAllBlogPostsFromNotion,
+  fetchBlogPostBySlugFromNotion,
+  getAllCategoriesFromNotion
+} from './notion';
 
-// Utility function to ensure blog directory exists
-function ensureBlogDirectory() {
-  if (!fs.existsSync(BLOG_DIRECTORY)) {
-    fs.mkdirSync(BLOG_DIRECTORY, { recursive: true });
-  }
-}
-
-// Read all markdown files from blog directory
-export function getBlogFileNames(): string[] {
-  ensureBlogDirectory();
-  
+// Get all blog posts from Notion
+export async function getAllBlogPosts(): Promise<BlogPost[]> {
   try {
-    return fs.readdirSync(BLOG_DIRECTORY)
-      .filter(fileName => fileName.endsWith('.md'))
-      .sort((a, b) => {
-        // Sort by filename (which should include dates)
-        return b.localeCompare(a);
-      });
+    return await fetchAllBlogPostsFromNotion();
   } catch (error) {
-    console.error('Error reading blog directory:', error);
+    console.error('Error fetching blog posts from Notion:', error);
     return [];
   }
 }
 
-// Parse markdown content and frontmatter
-export async function parseMarkdownFile(fileName: string): Promise<BlogPost | null> {
-  try {
-    const fullPath = path.join(BLOG_DIRECTORY, fileName);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
-
-    // Process markdown to HTML
-    const processedContent = await remark()
-      .use(remarkGfm) // GitHub Flavored Markdown
-      .use(remarkHtml, { sanitize: false })
-      .process(content);
-
-    let contentHtml = processedContent.toString();
-
-    // Add IDs to headings for table of contents
-    contentHtml = contentHtml.replace(
-      /<h([2-3])[^>]*>(.*?)<\/h[2-3]>/g,
-      (match, level, text) => {
-        const cleanText = text.replace(/<[^>]*>/g, '');
-        const id = cleanText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        return `<h${level} id="${id}">${text}</h${level}>`;
-      }
-    );
-
-    // Generate ID from filename
-    const id = fileName.replace(/\.md$/, '');
-
-    // Validate required frontmatter fields
-    const requiredFields = ['title', 'excerpt', 'author', 'date', 'category', 'slug'];
-    for (const field of requiredFields) {
-      if (!data[field]) {
-        console.warn(`Missing required field '${field}' in ${fileName}`);
-        return null;
-      }
-    }
-
-    return {
-      id,
-      title: data.title,
-      excerpt: data.excerpt,
-      author: data.author,
-      date: data.date,
-      readTime: data.readTime || '5 min',
-      category: data.category,
-      image: data.image || `https://picsum.photos/800/400?random=${Math.floor(Math.random() * 1000)}`,
-      slug: data.slug,
-      tags: data.tags || [],
-      featured: data.featured || false,
-      content: contentHtml,
-      seo: {
-        metaTitle: data.seo?.metaTitle || data.title,
-        metaDescription: data.seo?.metaDescription || data.excerpt,
-        keywords: data.seo?.keywords || data.tags || []
-      }
-    };
-  } catch (error) {
-    console.error(`Error parsing markdown file ${fileName}:`, error);
-    return null;
-  }
-}
-
-// Get all blog posts
-export async function getAllBlogPosts(): Promise<BlogPost[]> {
-  const fileNames = getBlogFileNames();
-  const posts: BlogPost[] = [];
-
-  for (const fileName of fileNames) {
-    const post = await parseMarkdownFile(fileName);
-    if (post) {
-      posts.push(post);
-    }
-  }
-
-  // Sort by date (newest first)
-  return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-}
-
 // Get blog post metadata only (without content)
 export async function getAllBlogPostsMetadata(): Promise<BlogPostMetadata[]> {
-  const posts = await getAllBlogPosts();
-  return posts.map(({ content, ...metadata }) => metadata);
+  try {
+    const posts = await getAllBlogPosts();
+    return posts.map(({ content, ...metadata }) => metadata);
+  } catch (error) {
+    console.error('Error fetching blog posts metadata:', error);
+    return [];
+  }
 }
 
 // Get a single blog post by slug
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  const fileNames = getBlogFileNames();
-  
-  for (const fileName of fileNames) {
-    const post = await parseMarkdownFile(fileName);
-    if (post && post.slug === slug) {
-      return post;
-    }
+  try {
+    return await fetchBlogPostBySlugFromNotion(slug);
+  } catch (error) {
+    console.error('Error fetching blog post by slug:', error);
+    return null;
   }
-  
-  return null;
+}
+
+// Legacy function for compatibility (returns empty array)
+export function getBlogFileNames(): string[] {
+  return [];
 }
 
 // Get related blog posts (same category, different slug)
@@ -199,9 +110,12 @@ export async function searchBlogPosts(query: string, category: string = 'All'): 
 
 // Get all unique categories
 export async function getAllCategories(): Promise<string[]> {
-  const allPosts = await getAllBlogPostsMetadata();
-  const categories = [...new Set(allPosts.map(post => post.category))];
-  return ['All', ...categories.sort()];
+  try {
+    return await getAllCategoriesFromNotion();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return ['All'];
+  }
 }
 
 // Get all unique tags

@@ -29,6 +29,8 @@ import {
 } from '@/lib/blog';
 import { WHATSAPP_NUMBER_DIGITS } from '@/config/constants';
 
+export const revalidate = 60; // Revalidate every 60 seconds
+
 // Generate static params for all blog posts
 export async function generateStaticParams() {
   try {
