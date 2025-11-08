@@ -98,11 +98,20 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
   try {
+    // Check if Notion is configured
+    if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
+      console.error('Notion API not configured. Missing NOTION_API_KEY or NOTION_DATABASE_ID');
+      notFound();
+    }
+    
     const post = await getBlogPostBySlug(params.slug);
     
     if (!post) {
+      console.log(`Blog post not found for slug: ${params.slug}`);
       notFound();
     }
+    
+    console.log(`Fetched blog post from Notion: ${post.title}`);
 
     const relatedPosts = await getRelatedBlogPosts(post.slug, post.category, 3);
 

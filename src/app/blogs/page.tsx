@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { getAllBlogPostsMetadata, getAllCategories } from "@/lib/blog";
+import { getAllBlogPostsMetadata, getAllCategories, BlogPostMetadata } from "@/lib/blog";
 import BlogsClient from "@/components/blogs/BlogsClient";
 
 // SEO metadata - now properly in server component
@@ -24,17 +24,27 @@ export const metadata: Metadata = {
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function BlogsPage() {
-  // Server-side data fetching
-  let blogPosts = [];
-  let categories = ['All'];
+  // Server-side data fetching from Notion
+  let blogPosts: BlogPostMetadata[] = [];
+  let categories: string[] = ['All'];
+  let error: string | null = null;
   
   try {
-    [blogPosts, categories] = await Promise.all([
-      getAllBlogPostsMetadata(),
-      getAllCategories()
-    ]);
-  } catch (error) {
-    console.error('Error fetching blog posts:', error);
+    // Check if Notion is configured
+    if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
+      console.warn('Notion API not configured. Missing NOTION_API_KEY or NOTION_DATABASE_ID');
+      error = 'Notion API not configured';
+    } else {
+      [blogPosts, categories] = await Promise.all([
+        getAllBlogPostsMetadata(),
+        getAllCategories()
+      ]);
+      
+      console.log(`Fetched ${blogPosts.length} blog posts from Notion`);
+    }
+  } catch (err) {
+    console.error('Error fetching blog posts from Notion:', err);
+    error = err instanceof Error ? err.message : 'Failed to fetch blog posts';
     // Continue with empty arrays if there's an error
   }
 
@@ -86,11 +96,35 @@ export default async function BlogsPage() {
         </div>
       </div>
 
+      {/* Error message */}
+      {error && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-yellow-800">
+              <strong>Note:</strong> {error}. Please check your Notion configuration.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!error && blogPosts.length === 0 && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="text-center">
+            <p className="text-gray-600 text-lg">
+              No blog posts found. Make sure you have published posts in your Notion database.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Client-side interactive content */}
-      <BlogsClient 
-        initialBlogPosts={blogPosts}
-        categories={categories}
-      />
+      {!error && blogPosts.length > 0 && (
+        <BlogsClient 
+          initialBlogPosts={blogPosts}
+          categories={categories}
+        />
+      )}
     </div>
   );
 } 
