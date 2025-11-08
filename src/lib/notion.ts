@@ -182,29 +182,30 @@ export async function fetchAllBlogPostsFromNotion(): Promise<any[]> {
       return [];
     }
     
-    if (!notionClient.databases) {
-      console.error('Notion client databases is not available', {
+    // In Notion API v5.3.0, query is on dataSources, not databases
+    if (!notionClient.dataSources) {
+      console.error('Notion client dataSources is not available', {
         clientType: typeof notionClient,
         clientKeys: Object.keys(notionClient)
       });
       return [];
     }
     
-    // Type assertion for databases.query - it exists in runtime but TypeScript types may be incomplete
-    const databases = notionClient.databases as any;
+    const dataSources = notionClient.dataSources as any;
     
-    if (typeof databases.query !== 'function') {
-      console.error('Notion client databases.query is not available', {
-        hasDatabases: !!notionClient.databases,
-        clientType: typeof notionClient
+    if (!dataSources.query || typeof dataSources.query !== 'function') {
+      console.error('Notion client dataSources.query is not available', {
+        hasDataSources: !!notionClient.dataSources,
+        availableMethods: Object.keys(dataSources)
       });
       return [];
     }
     
-    console.log('Querying Notion database:', databaseId);
+    console.log('Querying Notion database via dataSources:', databaseId);
     
-    const response = await databases.query({
-      database_id: databaseId,
+    // Use dataSources.query with data_source_id (database ID can be used as data source ID)
+    const response = await dataSources.query({
+      data_source_id: databaseId,
       filter: {
         property: 'Published',
         checkbox: {
@@ -269,28 +270,29 @@ export async function fetchBlogPostBySlugFromNotion(slug: string): Promise<any |
       return null;
     }
     
-    if (!notionClient.databases) {
-      console.error('Notion client databases is not available', {
+    // In Notion API v5.3.0, query is on dataSources, not databases
+    if (!notionClient.dataSources) {
+      console.error('Notion client dataSources is not available', {
         clientType: typeof notionClient
       });
       return null;
     }
     
-    // Type assertion for databases.query - it exists in runtime but TypeScript types may be incomplete
-    const databases = notionClient.databases as any;
+    const dataSources = notionClient.dataSources as any;
     
-    if (typeof databases.query !== 'function') {
-      console.error('Notion client databases.query is not available', {
-        hasDatabases: !!notionClient.databases,
-        clientType: typeof notionClient
+    if (!dataSources.query || typeof dataSources.query !== 'function') {
+      console.error('Notion client dataSources.query is not available', {
+        hasDataSources: !!notionClient.dataSources,
+        availableMethods: Object.keys(dataSources)
       });
       return null;
     }
     
     console.log('Querying Notion database for slug:', slug);
     
-    const response = await databases.query({
-      database_id: databaseId,
+    // Use dataSources.query with data_source_id (database ID can be used as data source ID)
+    const response = await dataSources.query({
+      data_source_id: databaseId,
       filter: {
         and: [
           {
