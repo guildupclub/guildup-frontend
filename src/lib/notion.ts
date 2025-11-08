@@ -191,6 +191,7 @@ export async function fetchAllBlogPostsFromNotion(): Promise<any[]> {
       return [];
     }
     
+    
     const dataSources = notionClient.dataSources as any;
     
     if (!dataSources.query || typeof dataSources.query !== 'function') {
