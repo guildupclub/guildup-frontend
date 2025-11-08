@@ -4,13 +4,23 @@ import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkHtml from 'remark-html';
 
-// Initialize Notion client
-const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
-});
+// Get Notion client instance
+function getNotionClient(): Client {
+  const apiKey = process.env.NOTION_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error('NOTION_API_KEY is not set in environment variables');
+  }
+  
+  return new Client({
+    auth: apiKey,
+  });
+}
 
-// Initialize Notion to Markdown converter
-const n2m = new NotionToMarkdown({ notionClient: notion });
+// Get Notion to Markdown converter instance
+function getNotionToMarkdownConverter(notionClient: Client): NotionToMarkdown {
+  return new NotionToMarkdown({ notionClient });
+}
 
 // Notion property types
 interface NotionPageProperties {
@@ -51,6 +61,9 @@ function extractDate(property: { date?: { start: string } | null } | undefined):
 // Convert Notion blocks to HTML
 async function convertNotionBlocksToHtml(pageId: string): Promise<string> {
   try {
+    const notionClient = getNotionClient();
+    const n2m = getNotionToMarkdownConverter(notionClient);
+    
     // Get markdown from Notion
     const mdBlocks = await n2m.pageToMarkdown(pageId);
     const mdString = n2m.toMarkdownString(mdBlocks);
@@ -156,7 +169,41 @@ export async function fetchAllBlogPostsFromNotion(): Promise<any[]> {
       return [];
     }
     
-    const response = await notion.databases.query({
+    const apiKey = process.env.NOTION_API_KEY;
+    if (!apiKey) {
+      console.error('NOTION_API_KEY is not set');
+      return [];
+    }
+    
+    const notionClient = getNotionClient();
+    
+    if (!notionClient) {
+      console.error('Failed to create Notion client');
+      return [];
+    }
+    
+    if (!notionClient.databases) {
+      console.error('Notion client databases is not available', {
+        clientType: typeof notionClient,
+        clientKeys: Object.keys(notionClient)
+      });
+      return [];
+    }
+    
+    // Type assertion for databases.query - it exists in runtime but TypeScript types may be incomplete
+    const databases = notionClient.databases as any;
+    
+    if (typeof databases.query !== 'function') {
+      console.error('Notion client databases.query is not available', {
+        hasDatabases: !!notionClient.databases,
+        clientType: typeof notionClient
+      });
+      return [];
+    }
+    
+    console.log('Querying Notion database:', databaseId);
+    
+    const response = await databases.query({
       database_id: databaseId,
       filter: {
         property: 'Published',
@@ -172,6 +219,8 @@ export async function fetchAllBlogPostsFromNotion(): Promise<any[]> {
       ]
     });
     
+    console.log(`Found ${response.results.length} published pages in Notion`);
+    
     const blogPosts: any[] = [];
     
     for (const page of response.results) {
@@ -181,9 +230,18 @@ export async function fetchAllBlogPostsFromNotion(): Promise<any[]> {
       }
     }
     
+    console.log(`Successfully mapped ${blogPosts.length} blog posts`);
+    
     return blogPosts;
   } catch (error) {
     console.error('Error fetching blog posts from Notion:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    }
     return [];
   }
 }
@@ -198,7 +256,40 @@ export async function fetchBlogPostBySlugFromNotion(slug: string): Promise<any |
       return null;
     }
     
-    const response = await notion.databases.query({
+    const apiKey = process.env.NOTION_API_KEY;
+    if (!apiKey) {
+      console.error('NOTION_API_KEY is not set');
+      return null;
+    }
+    
+    const notionClient = getNotionClient();
+    
+    if (!notionClient) {
+      console.error('Failed to create Notion client');
+      return null;
+    }
+    
+    if (!notionClient.databases) {
+      console.error('Notion client databases is not available', {
+        clientType: typeof notionClient
+      });
+      return null;
+    }
+    
+    // Type assertion for databases.query - it exists in runtime but TypeScript types may be incomplete
+    const databases = notionClient.databases as any;
+    
+    if (typeof databases.query !== 'function') {
+      console.error('Notion client databases.query is not available', {
+        hasDatabases: !!notionClient.databases,
+        clientType: typeof notionClient
+      });
+      return null;
+    }
+    
+    console.log('Querying Notion database for slug:', slug);
+    
+    const response = await databases.query({
       database_id: databaseId,
       filter: {
         and: [
@@ -219,12 +310,21 @@ export async function fetchBlogPostBySlugFromNotion(slug: string): Promise<any |
     });
     
     if (response.results.length === 0) {
+      console.log(`No blog post found with slug: ${slug}`);
       return null;
     }
     
+    console.log(`Found blog post with slug: ${slug}`);
     return await mapNotionPageToBlogPost(response.results[0]);
   } catch (error) {
     console.error('Error fetching blog post by slug from Notion:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+    }
     return null;
   }
 }
