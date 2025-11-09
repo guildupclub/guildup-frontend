@@ -100,7 +100,7 @@ export default function LeadFormModal({ program, triggerLabel = "Get Started", v
       <DialogContent className="sm:max-w-lg">
         <h3 className="text-xl font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>We will reach out to you soon</h3>
         <p className="text-sm mt-1 mb-4" style={{ fontFamily: "'Poppins', sans-serif", color: "#475569" }}>
-          Share your details and we'll reach out with next steps.
+          Share your details and we will reach out with next steps.
         </p>
         {error && <div className="text-red-600 text-sm mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{error}</div>}
         {success && <div className="text-green-700 text-sm mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{success}</div>}
