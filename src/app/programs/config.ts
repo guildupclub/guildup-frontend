@@ -5,6 +5,11 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface ApproachItem {
+  title: string;
+  description: string;
+}
+
 interface ProgramConfig {
   slug: ProgramKey;
   tag: string;
@@ -14,7 +19,11 @@ interface ProgramConfig {
   ogImage?: string;
   heroSvg?: string;
   about?: string; // Longer description for "What is the Program about" section
+  aboutTitle?: string; // Custom title for about section
   approach?: string; // Content for "Our approach" section
+  approachTitle?: string; // Custom title for approach section
+  approachItems?: ApproachItem[]; // Detailed approach items with titles and descriptions
+  outcomes?: string; // Content for "In Just X Days" section
   faqs?: FAQItem[]; // Frequently asked questions
 }
 
@@ -27,10 +36,27 @@ export const PROGRAMS: Record<ProgramKey, ProgramConfig> = {
     description:
       "Overcome PCOS challenges through structured support: expert consults, a tailored roadmap, and ongoing accountability.",
     ogImage: "/public/hero/hero1.jpg",
+    aboutTitle: "The Truth About PCOD and PCOS",
     about:
-      "Polycystic Ovary Syndrome (PCOS) affects millions of women worldwide, impacting hormonal balance, metabolism, and overall well-being. Our PCOS program is designed to address the root causes and symptoms through personalized nutrition guidance, lifestyle modifications, and expert support. We work with you to create a sustainable plan that addresses insulin resistance, hormonal imbalances, and the unique challenges you face with PCOS.",
+      "PCOD and PCOS aren't just physical conditions, They're an entire ecosystem of imbalance.\n\nWhen your hormones go off-track, so does everything else:\n\n- Weight fluctuates without reason\n\n- Sleep becomes restless\n\n- Anxiety creeps in\n\n- Relationships strain\n\n- You lose trust in your own body\n\nBut the truth is, your body isn't against you. It's asking for alignment, not punishment.",
     approach:
-      "Our holistic approach to PCOS management focuses on four key pillars: nutritional optimization to manage insulin resistance, lifestyle modifications for hormonal balance, stress management techniques, and ongoing accountability through regular check-ins with our expert team. We combine evidence-based strategies with personalized guidance to help you regain control of your health and well-being.",
+      "We don't offer temporary fixes. We guide you through a holistic system of healing, built to bring balance back to your body and mind.",
+    approachItems: [
+      {
+        title: "Personalized Healing Plans",
+        description: "Every body is unique. Our experts design a plan that matches your symptoms, routine, and lifestyle."
+      },
+      {
+        title: "Mind-Body Sync Sessions",
+        description: "Guided meditations, breathwork, and relaxation techniques help reduce cortisol, the stress hormone that silently triggers hormonal chaos."
+      },
+      {
+        title: "Cycle-Syncing & Habit Tracking",
+        description: "Learn how to align your lifestyle with your natural rhythm. We help you understand each phase of your menstrual cycle and build habits that support your energy, focus, and wellbeing."
+      }
+    ],
+    outcomes:
+      "In Just 60 Days\n\nYou'll begin to feel your body finding its balance again.\n\nThe fog will lift, your energy will rise, and the little things that once felt heavy will start to feel lighter.\n\nYour cycles will begin to stabilize, your mind will calm, and you'll start feeling connected to your body not at war with it.\n\nThis isn't a quick fix. It's the beginning of healing.",
     faqs: [
       {
         question: "What is PCOS and how does your program help?",
@@ -67,10 +93,27 @@ export const PROGRAMS: Record<ProgramKey, ProgramConfig> = {
     description:
       "Reduce stress and anxiety with top coaches and therapists through a guided, step-by-step plan and support.",
     ogImage: "/public/hero/hero2.jpg",
+    aboutTitle: "STRESS & ANXIETY",
     about:
-      "Chronic stress and anxiety can significantly impact your daily life, relationships, and overall health. Our Stress & Anxiety program provides comprehensive support to help you understand the root causes of your stress, develop effective coping strategies, and build resilience. Our team of therapists and coaches work together to create a personalized approach that addresses both the psychological and physiological aspects of stress and anxiety.",
+      "### You've been strong for too long, haven't you?\n\nYou tell everyone you're fine. You smile when you need to. You keep showing up : for work, for people, for life. But when it's quiet, and there's no one left to perform for, you can feel it. That tightness in your chest. The weight sitting in your stomach. The exhaustion that sleep doesn't fix.\n\nYou've forgotten what it's like to feel at ease. To wake up without dread. To fall asleep without replaying the day. To breathe without that invisible pressure on your chest.\n\nSomewhere along the way, \"doing your best\" turned into \"barely holding on.\"\n\nAnd no one noticed because you hide it so well.\n\nAt **GuildUp**, we do.\n\nWe notice. We understand that what you're carrying isn't weakness, it's weariness. The kind that comes from giving too much, feeling too much, thinking too much, for too long.\n\nWe're here to help you find your way\n\n## What's Really Happening Inside You\n\nStress and anxiety don't just live in your mind. They live in your body  in the racing heartbeat, the shallow breath, the sleepless nights that never seem to end.\n\nYour body isn't failing you; it's protecting you. The tension, the panic, the exhaustion : they're all signals that you've been in survival mode for too long.\n\nYou've simply forgotten what safety feels like. But healing is possible. You can teach your body to exhale again, to rest, and to move through life without fear constantly following behind.",
     approach:
-      "We take a multi-faceted approach to stress and anxiety management, combining cognitive-behavioral techniques, mindfulness practices, breathing exercises, and lifestyle modifications. Our program includes one-on-one therapy sessions, practical tools for daily stress management, and ongoing support to help you build lasting resilience. We focus on empowering you with skills that extend beyond the program, ensuring long-term well-being.",
+      "We don't promise instant calm. We promise real change, the kind that comes from understanding, not avoiding.",
+    approachItems: [
+      {
+        title: "Mind-Body Reset",
+        description: "We guide you through gentle yet powerful breathwork, meditation, and grounding practices designed to help your body release what it's been holding for too long. You'll begin to notice how your thoughts slow down as your body learns to feel safe again."
+      },
+      {
+        title: "Emotional Unblocking",
+        description: "Anxiety often hides what's really hurting underneath : fear, grief, guilt, or pressure to be enough. Through guided reflection and emotional processing sessions, we help you face what you've buried, understand it with compassion, and let it go piece by piece."
+      },
+      {
+        title: "Rebuilding Inner Balance",
+        description: "We help you create calm from the ground up. Through lifestyle shifts, mindful routines, and mental rewiring, you'll learn how to carry peace into your daily life even when things get chaotic. You won't just manage stress. You'll change your relationship with it."
+      }
+    ],
+    outcomes:
+      "### In Just 60 Days\n\nYou'll begin to feel your body exhale again.\n\nYour thoughts will start to slow down. The chaos will soften. The heaviness will lift.\n\nAnd for the first time in a long time, peace will begin to feel possible again.\n\nThis isn't a promise of perfection. It's a promise of progress ; real, visible, and lasting.",
     faqs: [
       {
         question: "How can therapy help with stress and anxiety?",
@@ -107,10 +150,28 @@ export const PROGRAMS: Record<ProgramKey, ProgramConfig> = {
     description:
       "Improve communication, resolve conflicts, and build deeper connections with end-to-end expert support.",
     ogImage: "/public/hero/hero3.jpg",
+    aboutTitle: "RELATIONSHIPS",
     about:
-      "Healthy relationships are fundamental to our happiness and well-being, yet they require skill, understanding, and consistent effort. Our Relationship Program helps individuals and couples navigate challenges, improve communication, resolve conflicts, and build deeper, more meaningful connections. Whether you're looking to strengthen an existing relationship or improve your relationship skills, our expert guidance provides the tools and support you need.",
+      "### You love deeply, but lately, it's been heavy, hasn't it?\n\nYou care, you try, you give, but somehow, it still hurts.\n\nYou overthink every word, every pause, every silence.\n\nYou replay moments in your head, wondering if you said too much, or maybe not enough.\n\nYou crave connection but you're scared of being misunderstood.\n\nYou want love but you're tired of the patterns, the same arguments, the same distance, the same ache of feeling unseen.\n\nSometimes it's not even about another person.\n\nIt's about how you've started losing yourself while trying to keep things together.\n\nAt **GuildUp**, we know relationships can both heal and hurt.\n\nBut we also know they can transform when you start healing from within.\n\n---\n\n## What's Really Happening Inside You\n\nWhen relationships become strained, it's not just about miscommunication. It's about disconnection.\n\nYou disconnect from your emotions, from your needs, and sometimes, from yourself.\n\nYou stop expressing to keep the peace. You start carrying what's not yours just to hold things together. You tell yourself you're okay even when something deep inside you knows you're not.\n\nThis constant emotional push and pull keeps your nervous system in overdrive. You're not broken for feeling too much. You've just been living in survival mode, even in love.\n\nBut it doesn't have to stay that way.\n\nYou can love without losing balance. You can be vulnerable without fear. You can rebuild connection starting with yourself.",
+    approachTitle: "How GuildUp Helps You Heal",
     approach:
-      "Our relationship approach is built on evidence-based methods including emotionally focused therapy, communication training, conflict resolution strategies, and emotional intelligence development. We work with you to identify patterns that may be hindering your relationships, teach effective communication techniques, and help you build stronger emotional connections. Our program supports both individual growth and relationship enhancement, creating lasting positive change.",
+      "We help you rebuild relationships not by changing others, but by returning you to yourself.",
+    approachItems: [
+      {
+        title: "Inner Healing and Awareness",
+        description: "We help you understand the emotional patterns that shape your relationships, where they come from, how they repeat, and how to break them gently. You'll begin to see how past hurt shows up in present love and how awareness becomes the first step toward change."
+      },
+      {
+        title: "Communication and Boundaries",
+        description: "You'll learn how to express yourself without guilt, listen without reacting, and set boundaries that protect your peace instead of building walls. We'll help you create safety both in how you speak and in how you're heard."
+      },
+      {
+        title: "Reconnecting with Love",
+        description: "Through guided reflections and mindful exercises, you'll rediscover what love feels like when it's not tied to fear or expectation. You'll learn to give from fullness, not emptiness, to connect without losing yourself."
+      }
+    ],
+    outcomes:
+      "### In Just 60 Days\n\nYou'll begin to see your relationships differently : softer, calmer, more honest.\n\nYou'll start setting boundaries without guilt, speaking your truth without fear, and loving without losing yourself.\n\nIn 60 days, the tension will begin to loosen.\n\nYou'll start to recognize peace where there used to be pressure.",
     faqs: [
       {
         question: "Can I join alone, or do I need my partner?",

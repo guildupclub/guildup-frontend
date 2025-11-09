@@ -99,7 +99,41 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
       {/* 4. Our approach */}
       <Approach config={cfg} />
 
-      {/* 5. CTA banner */}
+      {/* 5. Outcomes section (In Just X Days) */}
+      {cfg.outcomes && (
+        <section className="py-8 sm:py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-gray-700 space-y-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+              {cfg.outcomes.split('\n\n').filter(p => p.trim()).map((paragraph, index) => {
+                const trimmed = paragraph.trim();
+                // Check if it's a markdown header (###)
+                if (trimmed.startsWith('### ')) {
+                  return (
+                    <h3 key={index} className="text-xl sm:text-2xl font-semibold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {trimmed.replace(/^###\s+/, '')}
+                    </h3>
+                  );
+                }
+                // Check if it's the title (starts with "In Just")
+                if (trimmed.startsWith('In Just')) {
+                  return (
+                    <h2 key={index} className="text-2xl sm:text-3xl font-semibold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                      {trimmed}
+                    </h2>
+                  );
+                }
+                // Handle bold text (**text**)
+                const processedText = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                return (
+                  <p key={index} className="text-gray-700 text-base sm:text-lg" dangerouslySetInnerHTML={{ __html: processedText }} />
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 6. CTA banner */}
       <section className="py-12 sm:py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="rounded-2xl p-10 sm:p-16 banner-animated" style={{ backgroundColor: primary, minHeight: 180 }}>
@@ -120,10 +154,10 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
         </div>
       </section>
 
-      {/* 6. Testimonials */}
+      {/* 7. Testimonials */}
       <ProgramTestimonials programTag={cfg.tag} />
 
-      {/* 7. Our experts for this program */}
+      {/* 8. Our experts for this program */}
       <section className="py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl sm:text-3xl font-semibold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>Our experts for this program</h2>
@@ -131,10 +165,10 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
         </div>
       </section>
 
-      {/* 8. FAQ Section */}
+      {/* 9. FAQ Section */}
       {cfg.faqs && cfg.faqs.length > 0 && <FAQ faqs={cfg.faqs} />}
 
-      {/* 9. Footer */}
+      {/* 10. Footer */}
       <Footer />
 
       {/* Floating Join Program Button */}

@@ -9,6 +9,7 @@ export async function saveDiagnosticLead(data: DiagnosticLeadSubmission): Promis
       name: data.name,
       phone: data.phone,
       email: data.email || null, // Convert undefined to null
+      concerns: data.concerns || null, // Convert undefined to null
       responses: data.responses, // Now contains {value: number, text: string} for each question
       score: data.score,
       level: data.level,

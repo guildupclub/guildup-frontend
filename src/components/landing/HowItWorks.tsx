@@ -136,9 +136,9 @@ const HowItWorks: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 id="how-title" className="text-5xl sm:text-5xl font-extrabold tracking-tight" style={{ fontFamily: "'Poppins', sans-serif", color: "#111827" }}>
-            “<span style={{ color: primary }}>HEAL IN</span> Three”
+            &apos;<span style={{ color: primary }}>Start healing</span> Within &apos;
           </h2>
-          <p className="text-gray-600 mt-2 text-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>Three simple steps to get started</p>
+          <p className="text-gray-600 mt-2 text-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>Three simple steps to start your journey</p>
         </div>
 
         <div className="space-y-16 md:space-y-24">

@@ -13,6 +13,7 @@ export interface DiagnosticLeadSubmission {
   name: string;
   phone: string;
   email?: string;
+  concerns?: string;
   responses: { [questionId: string]: { value: number; text: string } };
   score: number;
   level: string;

@@ -20,7 +20,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import CTABannerWhatsApp from "@/components/landing/CTABannerWhatsApp";
 import Testimonials from "@/components/landing/Testimonials";
 import CTABannerLeadForm from "@/components/landing/CTABannerLeadForm";
-import BlogsGrid from "@/components/landing/BlogsGrid";
+// import BlogsGrid from "@/components/landing/BlogsGrid";
  
 import { Dialog } from "@/components/ui/dialog";
 import CreatorForm from "@/components/form/CreatorForm";
@@ -505,6 +505,111 @@ function Page() {
           <ProgramsGrid />
           <HowItWorks />
 
+          {/* Our Promise Section */}
+          <section className="w-full py-20 sm:py-28 relative overflow-hidden" style={{ backgroundColor: white }}>
+            {/* Subtle background decorative elements */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div 
+                className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-5 blur-3xl"
+                style={{ background: primary, transform: 'translate(30%, -30%)' }}
+              />
+              <div 
+                className="absolute bottom-0 left-0 w-96 h-96 rounded-full opacity-5 blur-3xl"
+                style={{ background: primary, transform: 'translate(-30%, 30%)' }}
+              />
+            </div>
+            
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="text-center mb-12">
+                <h2 
+                  className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight"
+                  style={{ 
+                    color: black, 
+                    fontFamily: "'Poppins', sans-serif",
+                    background: `linear-gradient(135deg, ${black} 0%, ${primary} 100%)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text'
+                  }}
+                >
+                  Our Promise
+                </h2>
+              </div>
+              
+              <div className="rounded-3xl p-8 sm:p-12 lg:p-16" style={{ 
+                backgroundColor: white,
+                border: `1px solid ${black}10`,
+                boxShadow: `0 20px 60px -15px ${black}10`
+              }}>
+                <div className="space-y-8 max-w-3xl mx-auto">
+                  <p 
+                    className="text-xl sm:text-2xl leading-relaxed" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif", 
+                      fontWeight: 500,
+                      color: black
+                    }}
+                  >
+                    GuildUp isn't here to fix you.
+                  </p>
+                  
+                  <div className="h-px" style={{ 
+                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
+                  }}></div>
+                  
+                  <p 
+                    className="text-xl sm:text-2xl leading-relaxed" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif", 
+                      fontWeight: 500,
+                      color: black
+                    }}
+                  >
+                    We're here to remind you that nothing about you is broken.
+                  </p>
+                  
+                  <div className="h-px" style={{ 
+                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
+                  }}></div>
+                  
+                  <p 
+                    className="text-lg sm:text-xl leading-relaxed" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: black
+                    }}
+                  >
+                    Your body has only been protecting you. Your mind has only been trying to keep you safe.
+                  </p>
+                  
+                  <p 
+                    className="text-lg sm:text-xl leading-relaxed" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: black
+                    }}
+                  >
+                    Now, it's time to teach both that it's okay to rest.
+                  </p>
+                  
+                  <div className="h-px" style={{ 
+                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
+                  }}></div>
+                  
+                  <p 
+                    className="text-2xl sm:text-3xl leading-relaxed font-semibold mt-8" 
+                    style={{ 
+                      fontFamily: "'Poppins', sans-serif",
+                      color: primary
+                    }}
+                  >
+                    Because calm isn't found. It's rebuilt, gently, intentionally, and together.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* 3. All Experts Listing */}
           <div className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -558,7 +663,7 @@ function Page() {
                       {showAllCommunities && filteredCommunities.length > communitiesPerPage && (
                         <div className="text-center mt-6">
                           <p className="text-sm text-gray-500" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                            Showing all {filteredCommunities.length} communities
+                            Showing all {filteredCommunities.length} Experts
                           </p>
                         </div>
                       )}
@@ -594,7 +699,7 @@ function Page() {
         {/* Testimonials, Lead Form CTA, Blogs */}
         <Testimonials />
         <CTABannerLeadForm />
-        <BlogsGrid />
+        {/* <BlogsGrid /> */}
         <Footer />
         </div>
       </SearchParamsProvider>
