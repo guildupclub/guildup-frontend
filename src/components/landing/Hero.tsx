@@ -126,7 +126,18 @@ const Hero: React.FC = () => {
               }}
             >
               <button
-                onClick={() => router.push('/mind')}
+                onClick={() => {
+                  const allExpertsSection = document.getElementById('all-experts');
+                  if (allExpertsSection) {
+                    const headerOffset = 145;
+                    const elementPosition = allExpertsSection.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.scrollY - headerOffset;
+                    window.scrollTo({
+                      top: offsetPosition,
+                      behavior: 'smooth'
+                    });
+                  }
+                }}
                 className="group relative px-10 py-4.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden"
                 style={{ 
                   backgroundColor: primary, 

@@ -611,7 +611,7 @@ function Page() {
           </section>
 
           {/* 3. All Experts Listing */}
-          <div className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
+          <div id="all-experts" className="w-full py-16 sm:py-20" style={{ backgroundColor: white }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: black }}>
