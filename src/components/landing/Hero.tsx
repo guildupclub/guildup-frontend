@@ -163,11 +163,21 @@ const Hero: React.FC = () => {
               transition: 'opacity 1s ease-out 0.4s, transform 1s ease-out 0.4s'
             }}
           >
-            <div className="grid grid-cols-2 gap-5 lg:gap-6">
-              {["/hero/hero1.jpg","/hero/hero2.jpg","/hero/hero3.jpg","/hero/hero4.jpg"].map((src, i) => (
+            <div className="grid grid-cols-2 gap-5 lg:gap-6 items-center justify-center">
+              {["/hero/1.svg","/hero/2.svg","/hero/3.svg","/hero/4.svg"].map((src, i) => {
+                // Different sizes for each image to create visual interest
+                // Image 1: Large, Image 2: Medium, Image 3: Medium, Image 4: Large
+                const sizeClasses = [
+                  'max-w-[200px] max-h-[200px] lg:max-w-[320px] lg:max-h-[320px]', // Image 1: Large
+                  'max-w-[160px] max-h-[160px] lg:max-w-[240px] lg:max-h-[240px]', // Image 2: Medium
+                  'max-w-[160px] max-h-[160px] lg:max-w-[240px] lg:max-h-[240px]', // Image 3: Medium
+                  'max-w-[200px] max-h-[200px] lg:max-w-[320px] lg:max-h-[320px]', // Image 4: Large
+                ];
+                
+                return (
                 <div 
                   key={src} 
-                  className="relative group w-full h-full max-w-[220px] max-h-[220px] lg:max-w-[260px] lg:max-h-[260px]"
+                  className={`relative group w-full h-full ${sizeClasses[i]}`}
                   style={{
                     animationDelay: `${i * 0.1}s`,
                     opacity: isVisible ? 1 : 0,
@@ -218,7 +228,8 @@ const Hero: React.FC = () => {
                     />
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
