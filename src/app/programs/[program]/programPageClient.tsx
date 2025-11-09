@@ -19,9 +19,13 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
   const router = useRouter();
   const [showFloatingButton, setShowFloatingButton] = useState(false);
   
-  // Map slug to GIF under public/programs. stress-anxiety -> stress.gif
-  const mappedSlug = cfg.slug === "stress-anxiety" ? "stress" : cfg.slug;
-  const gifPath = `programs/${mappedSlug}.gif`;
+  // Map slug to SVG banner under public/programs
+  const bannerMap: Record<ProgramKey, string> = {
+    "stress-anxiety": "stress-banner.svg",
+    "pcos": "pcos-banner.svg",
+    "relationship": "relationship-banner.svg",
+  };
+  const bannerPath = `programs/${bannerMap[cfg.slug]}`;
 
   // Show floating button after scrolling past symptoms section
   useEffect(() => {
@@ -68,7 +72,7 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
       <section className="pt-0 sm:pt-6 pb-4 sm:pb-6 w-full">
         <div className="w-full overflow-visible sm:overflow-hidden px-0 sm:px-6">
           <img
-            src={`/${gifPath}`}
+            src={`/${bannerPath}`}
             alt={`${cfg.title} banner`}
             className="w-full h-[350px] sm:h-[450px] md:h-[550px] lg:h-[650px] object-contain sm:object-cover sm:rounded-2xl"
             style={{ 
