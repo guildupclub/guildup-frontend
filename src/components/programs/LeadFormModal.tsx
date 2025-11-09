@@ -5,7 +5,10 @@ import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
 import { primary, white } from "@/app/colours";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { leadsDb } from "@/lib/leadFirebase";
+import { saveInquiry } from "@/lib/services/diagnosticLeads";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 interface LeadFormModalProps {
   program: string;
@@ -16,6 +19,9 @@ interface LeadFormModalProps {
 }
 
 export default function LeadFormModal({ program, triggerLabel = "Get Started", variant = "outline", appearance = "default", triggerClassName = "" }: LeadFormModalProps) {
+  const { user } = useSelector((state: RootState) => state.user);
+  const userId = user?._id;
+  
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -32,6 +38,7 @@ export default function LeadFormModal({ program, triggerLabel = "Get Started", v
       setError(null);
       setSuccess(null);
 
+      // Save to programLeads collection
       await addDoc(collection(leadsDb, "programLeads"), {
         program,
         name,
@@ -41,6 +48,22 @@ export default function LeadFormModal({ program, triggerLabel = "Get Started", v
         createdAt: serverTimestamp(),
         source: "program-page",
       });
+
+      // Also save to inquiry collection
+      try {
+        await saveInquiry({
+          name: name.trim(),
+          phone: phone.trim(),
+          email: email.trim() || undefined,
+          concerns: message.trim() || undefined,
+          userId
+        });
+        console.log('✅ Inquiry saved successfully to inquiry collection');
+      } catch (inquiryError: any) {
+        // Log inquiry error but don't fail the whole submission
+        console.error('⚠️ Failed to save to inquiry collection:', inquiryError);
+        // Continue with success message since programLeads was saved
+      }
 
       setSuccess("Thanks! Our team will reach out shortly.");
       toast.success("Thank you! You will be contacted soon.");
@@ -75,15 +98,15 @@ export default function LeadFormModal({ program, triggerLabel = "Get Started", v
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-lg">
-        <h3 className="text-xl font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>Get your personalized plan</h3>
+        <h3 className="text-xl font-semibold" style={{ fontFamily: "'Poppins', sans-serif" }}>We will reach out to you soon</h3>
         <p className="text-sm mt-1 mb-4" style={{ fontFamily: "'Poppins', sans-serif", color: "#475569" }}>
-          Share your details and we’ll reach out with next steps.
+          Share your details and we'll reach out with next steps.
         </p>
         {error && <div className="text-red-600 text-sm mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{error}</div>}
         {success && <div className="text-green-700 text-sm mb-2" style={{ fontFamily: "'Poppins', sans-serif" }}>{success}</div>}
         <form onSubmit={handleSubmit} className="space-y-3">
           <input required placeholder="Full name" value={name} onChange={(e) => setName(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
-          <input required type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
+          <input type="email" placeholder="Email (optional)" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
           <input required placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full border rounded-lg px-3 py-2" />
           <textarea placeholder="Tell us a bit (optional)" value={message} onChange={(e) => setMessage(e.target.value)} className="w-full border rounded-lg px-3 py-2 min-h-[80px]" />
           <button disabled={submitting} className="w-full px-5 py-3 rounded-lg" style={{ backgroundColor: primary, color: white, opacity: submitting ? 0.7 : 1, fontFamily: "'Poppins', sans-serif" }}>
