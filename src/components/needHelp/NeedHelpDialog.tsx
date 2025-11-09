@@ -8,10 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { saveDiagnosticLead } from "@/lib/services/diagnosticLeads";
+import { saveInquiry } from "@/lib/services/diagnosticLeads";
 import { AnimatePresence, motion } from "framer-motion";
 import { primary } from "@/app/colours";
 import Loader from "@/components/Loader";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
 
 interface NeedHelpDialogProps {
   open: boolean;
@@ -77,23 +78,56 @@ export default function NeedHelpDialog({ open, onOpenChange }: NeedHelpDialogPro
     
     setIsSubmitting(true);
     try {
-      const submissionData = {
+      const inquiryData = {
         name: contactInfo.name.trim(),
         phone: contactInfo.phone.trim(),
         email: contactInfo.email.trim() || undefined,
         concerns: contactInfo.concerns.trim() || undefined,
-        responses: {}, // Empty for lead gen
-        score: 0,
-        level: 'lead_gen',
         userId
       };
 
-      const docId = await saveDiagnosticLead(submissionData);
+      console.log('Submitting inquiry data:', {
+        name: inquiryData.name,
+        phone: inquiryData.phone,
+        hasEmail: !!inquiryData.email,
+        hasConcerns: !!inquiryData.concerns,
+        userId: inquiryData.userId
+      });
+
+      const docId = await saveInquiry(inquiryData);
+      console.log('✅ Inquiry submitted successfully, document ID:', docId);
       setSubmissionId(docId);
       setCurrentStep('confirmation');
-    } catch (error) {
-      console.error('Error submitting lead:', error);
-      alert('Failed to save your information. Please try again.');
+    } catch (error: any) {
+      console.error('❌ Error submitting inquiry:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack
+      });
+      
+      // If it's a database storage error, redirect to WhatsApp
+      if (error?.code === 'permission-denied' || error?.code === 'unavailable' || error?.code === 'failed-precondition' || error?.message?.includes('Firebase')) {
+        // Create WhatsApp message with inquiry details
+        const whatsappMessage = encodeURIComponent(
+          `Hi! I need help.\n\n` +
+          `Name: ${inquiryData.name}\n` +
+          `Phone: ${inquiryData.phone}\n` +
+          (inquiryData.email ? `Email: ${inquiryData.email}\n` : '') +
+          (inquiryData.concerns ? `Concerns: ${inquiryData.concerns}` : '')
+        );
+        const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
+        
+        // Show alert and redirect to WhatsApp
+        alert('We encountered an issue saving your information. Redirecting you to WhatsApp so we can help you directly.');
+        window.open(whatsappUrl, '_blank');
+        
+        // Close the dialog
+        handleClose();
+      } else {
+        // For other errors, show alert
+        alert(`Failed to save your information: ${error?.message || 'Please try again.'}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
