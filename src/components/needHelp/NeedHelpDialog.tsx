@@ -326,7 +326,7 @@ export default function NeedHelpDialog({ open, onOpenChange }: NeedHelpDialogPro
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">Thank You for Reaching Out</h3>
                     <p className="text-gray-600 mb-4">
-                      We've received your information. Our experts will reach out to you within 24 hours to help you on your journey.
+                      We have received your information. Our experts will reach out to you within 24 hours to help you on your journey.
                     </p>
                   </div>
 

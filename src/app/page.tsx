@@ -550,7 +550,7 @@ function Page() {
                       color: black
                     }}
                   >
-                    GuildUp isn't here to fix you.
+                    GuildUp isn&apos;t here to fix you.
                   </p>
                   
                   <div className="h-px" style={{ 
@@ -565,7 +565,7 @@ function Page() {
                       color: black
                     }}
                   >
-                    We're here to remind you that nothing about you is broken.
+                    We are here to remind you that nothing about you is broken.
                   </p>
                   
                   <div className="h-px" style={{ 
@@ -589,7 +589,7 @@ function Page() {
                       color: black
                     }}
                   >
-                    Now, it's time to teach both that it's okay to rest.
+                    Now, it is time to teach both that it is okay to rest.
                   </p>
                   
                   <div className="h-px" style={{ 
@@ -603,7 +603,7 @@ function Page() {
                       color: primary
                     }}
                   >
-                    Because calm isn't found. It's rebuilt, gently, intentionally, and together.
+                    Because calm is not found. It is rebuilt, gently, intentionally, and together.
                   </p>
                 </div>
               </div>
