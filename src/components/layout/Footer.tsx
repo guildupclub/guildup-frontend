@@ -69,7 +69,7 @@ const Footer = () => {
         
         {/* Main Footer Content */}
         <div className="py-16">
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <div className="w-full max-w-4xl">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
                 
