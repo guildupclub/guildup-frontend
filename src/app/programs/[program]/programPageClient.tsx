@@ -63,7 +63,7 @@ export default function ProgramPageClient({ programKey }: { programKey: ProgramK
   }, []);
 
   // WhatsApp message for joining the program
-  const whatsappMessage = encodeURIComponent(`Hi!, I&apos;d like to know more aobut Guildup&apos;s program`);
+  const whatsappMessage = encodeURIComponent(`Hi!, I&apos;d like to know more about Guildup&apos;s program`);
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
 
   return (
