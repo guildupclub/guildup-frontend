@@ -229,10 +229,10 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
           )}
         </div>
 
-        <div className="mt-auto flex-shrink-0">
+        {/* Offerings section commented out */}
+        {/* <div className="mt-auto flex-shrink-0">
           {firstOffering ? (
             <div className="mt-4 rounded-lg bg-gradient-to-r from-white to-gray-50 border border-gray-100/80 overflow-hidden group-hover:border-blue-100 transition-all duration-500">
-              {/* Offering header */}
               <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100/80 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <IoVideocam className="text-primary-foreground h-4 w-4 transition-colors duration-300" />
@@ -245,7 +245,6 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
                 </span>
               </div>
 
-              {/* Pricing */}
               <div className="p-4 flex items-center justify-between">
                 <div>
                   {firstOffering?.discounted_price &&
@@ -289,7 +288,7 @@ function CommunityCard({ community, onClick }: CommunityCardProps) {
               </p>
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </Card>
   );
