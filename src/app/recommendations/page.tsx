@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { saveInquiry } from "@/lib/services/diagnosticLeads";
 import { primary, white, black } from "@/app/colours";
 import { toast } from "sonner";
-import { CheckCircle2, Sparkles, ArrowRight } from "lucide-react";
+import { CheckCircle2, Sparkles, ArrowRight, MessageCircle } from "lucide-react";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
 
 export default function RecommendationsPage() {
   const { user } = useSelector((state: RootState) => state.user);
@@ -138,7 +139,7 @@ export default function RecommendationsPage() {
     try {
       await saveInquiry({
         name: name.trim(),
-        phone: phone.trim() || undefined,
+        phone: phone.trim(),
         email: email.trim() || undefined,
         concerns: `Diagnostic test results - Score: ${scoreTotal ?? "-"}, Level: ${scoreLevel || diagnosis || "N/A"}`,
         userId,
@@ -330,6 +331,37 @@ export default function RecommendationsPage() {
             </div>
           </div>
         )}
+
+        {/* WhatsApp CTA - Join Stress Program */}
+        <div 
+          className="p-6 sm:p-8 rounded-2xl shadow-lg border-2"
+          style={{ 
+            backgroundColor: `${primary}08`,
+            borderColor: `${primary}30`
+          }}
+        >
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2" style={{ fontFamily: "'Poppins', sans-serif", color: black }}>
+                Join Our Stress Management Program
+              </h3>
+              <p className="text-sm sm:text-base text-gray-700" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                Get personalized support and guidance from our Coaches. Start your wellness journey today.
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                const message = encodeURIComponent("Hi!, I'd like to know more about Guildup's program.");
+                window.open(`https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${message}`, '_blank');
+              }}
+              className="px-6 sm:px-8 h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white"
+              style={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <MessageCircle className="w-5 h-5" />
+              Join on WhatsApp
+            </Button>
+          </div>
+        </div>
 
         {/* Guidance Card - Suggested Path */}
         <div 

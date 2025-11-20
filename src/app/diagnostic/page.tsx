@@ -143,6 +143,13 @@ export default function DiagnosticPage() {
               {currentIndex < questions.length - 1 && <div className="w-8" />}
             </div>
             
+            {/* PHQ-9 Instruction */}
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 font-medium" style={{ fontFamily: "'Poppins', sans-serif" }}>
+                Over the last 2 weeks, how often have you been bothered by the following problems?
+              </p>
+            </div>
+            
             {/* Minimal Progress */}
             <div className="flex items-center justify-between mb-1">
               <div className="text-xs text-gray-400" style={{ fontFamily: "'Poppins', sans-serif" }}>
