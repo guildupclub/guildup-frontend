@@ -1,59 +1,120 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { primary, white } from "@/app/colours";
+import { primary, white, black } from "@/app/colours";
 import LeadFormModal from "@/components/programs/LeadFormModal";
+import { motion, useInView } from "framer-motion";
+import { CheckCircle2, Users, Calendar, ArrowDown, ArrowRight } from "lucide-react";
 
 const steps = [
   { 
-    title: "Join a program", 
+    title: "Choose the program", 
     desc: "Pick the program that fits your goals.",
-    image: "/how-it-works/step-1.svg",
-    gradient: "linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%)"
+    icon: CheckCircle2,
+    number: "01"
   },
   { 
-    title: "Find the right expert", 
+    title: "Find your expert", 
     desc: "We match you to vetted professionals.",
-    image: "/how-it-works/step-2.svg",
-    gradient: "linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 50%, #a78bfa 100%)"
+    icon: Users,
+    number: "02"
   },
   { 
     title: "Begin your journey", 
     desc: "Book and start guided sessions.",
-    image: "/how-it-works/step-3.svg",
-    gradient: "linear-gradient(135deg, #bfdbfe 0%, #93c5fd 50%, #60a5fa 100%)"
+    icon: Calendar,
+    number: "03"
   },
 ];
 
+const StepCard = ({ step, index, ref, isInView }: { step: typeof steps[0], index: number, ref: React.RefObject<HTMLDivElement>, isInView: boolean }) => {
+  const Icon = step.icon;
+  
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.6, delay: index * 0.15, ease: [0.4, 0, 0.2, 1] }}
+      className="relative flex-1 flex flex-col items-center"
+    >
+      <div className="flex flex-col items-center gap-6 lg:gap-8 w-full">
+        {/* Icon Card */}
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={isInView ? { scale: 1 } : { scale: 0.9 }}
+          transition={{ duration: 0.5, delay: index * 0.15 + 0.2, ease: [0.4, 0, 0.2, 1] }}
+          className="relative flex-shrink-0"
+        >
+          <div 
+            className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-2xl flex items-center justify-center relative overflow-hidden transition-all duration-300 hover:scale-105"
+            style={{
+              background: `linear-gradient(135deg, ${primary}15 0%, ${primary}08 100%)`,
+              border: `2px solid ${primary}20`,
+              boxShadow: `0 8px 32px -8px ${primary}20`
+            }}
+          >
+            {/* Decorative background circles */}
+            <div 
+              className="absolute top-0 right-0 w-24 h-24 lg:w-32 lg:h-32 rounded-full opacity-20 blur-2xl transition-opacity duration-300"
+              style={{ background: primary }}
+            />
+            <div 
+              className="absolute bottom-0 left-0 w-16 h-16 lg:w-20 lg:h-20 rounded-full opacity-15 blur-xl transition-opacity duration-300"
+              style={{ background: primary }}
+            />
+            
+            {/* Icon */}
+            <Icon 
+              className="relative z-10 transition-transform duration-300 w-14 h-14 md:w-16 md:h-16 lg:w-20 lg:h-20" 
+              style={{ color: primary }}
+              strokeWidth={2}
+            />
+            
+            {/* Step number badge */}
+            <div 
+              className="absolute -top-2 -right-2 w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-xs lg:text-sm font-bold text-white shadow-lg"
+              style={{ backgroundColor: primary }}
+            >
+              {step.number}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Content */}
+        <div className="flex-1 text-center w-full px-2">
+          <h3 
+            className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 lg:mb-3"
+            style={{ fontFamily: "'Poppins', sans-serif", color: black }}
+          >
+            {step.title}
+          </h3>
+          <p 
+            className="text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            {step.desc}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const HowItWorks: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(0);
   const [showStickyButton, setShowStickyButton] = useState(false);
-  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+  const step1Ref = useRef<HTMLDivElement>(null);
+  const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
   const programsSectionRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const observers = stepRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      return new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveStep((prev) => Math.max(prev, index));
-          }
-        },
-        { threshold: 0.2 }
-      );
-    }).filter(Boolean) as IntersectionObserver[];
-
-    stepRefs.current.forEach((ref, index) => {
-      if (ref && observers[index]) {
-        observers[index].observe(ref);
-      }
-    });
-
-    return () => {
-      observers.forEach((obs) => obs.disconnect());
-    };
-  }, []);
+  
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const step1InView = useInView(step1Ref, { once: true, margin: "-50px" });
+  const step2InView = useInView(step2Ref, { once: true, margin: "-50px" });
+  const step3InView = useInView(step3Ref, { once: true, margin: "-50px" });
+  
+  const stepInViews = [step1InView, step2InView, step3InView];
+  const stepRefs = [step1Ref, step2Ref, step3Ref];
 
   useEffect(() => {
     // Function to check if Programs section is visible
@@ -132,156 +193,122 @@ const HowItWorks: React.FC = () => {
   }, []);
 
   return (
-    <section aria-labelledby="how-title" className="py-16" style={{ backgroundColor: white }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 id="how-title" className="text-5xl sm:text-5xl font-extrabold tracking-tight" style={{ fontFamily: "'Poppins', sans-serif", color: "#111827" }}>
-            &apos;<span style={{ color: primary }}>Start healing</span> Within &apos;
-          </h2>
-          <p className="text-gray-600 mt-2 text-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>Three simple steps to start your journey</p>
-        </div>
+    <section 
+      ref={sectionRef}
+      aria-labelledby="how-title" 
+      className="py-20 md:py-28 relative overflow-hidden"
+      style={{ backgroundColor: white }}
+    >
+      {/* Subtle background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-5 blur-3xl"
+          style={{ background: primary, transform: 'translate(30%, -30%)' }}
+        />
+        <div 
+          className="absolute bottom-0 left-0 w-96 h-96 rounded-full opacity-5 blur-3xl"
+          style={{ background: primary, transform: 'translate(-30%, 30%)' }}
+        />
+      </div>
 
-        <div className="space-y-16 md:space-y-24">
-          {steps.map((s, idx) => {
-            const isLeftImage = idx % 2 === 0;
-            const isActive = activeStep >= idx;
-            const imgInitialX = isLeftImage ? -40 : 40;
-            const textInitialX = isLeftImage ? 40 : -40;
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Header */}
+        <motion.div 
+          className="text-center mb-12 lg:mb-20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <h2 
+            id="how-title" 
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4"
+            style={{ fontFamily: "'Poppins', sans-serif", color: black }}
+          >
+            <span style={{ color: primary }}>Start healing</span> Within
+          </h2>
+          <p 
+            className="text-lg md:text-xl lg:text-2xl text-gray-600"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            Three simple steps to start your journey
+          </p>
+        </motion.div>
+
+        {/* Steps - Horizontal on desktop, vertical on mobile */}
+        <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-4 xl:gap-8 lg:items-start">
+          {steps.map((step, idx) => {
+            const stepInView = stepInViews[idx];
+            const stepRef = stepRefs[idx];
+            
             return (
-              <div key={s.title}>
-                <div
-                  ref={(el) => {
-                    stepRefs.current[idx] = el;
-                    if (idx === 2) step3Ref.current = el;
-                  }}
-                  className="grid grid-cols-1 md:grid-cols-2 items-center gap-10"
-                >
-                  {/* Image side */}
-                  <div
-                    className={`${isLeftImage ? '' : 'md:order-2'}`}
-                    style={{
-                      transform: `translateX(${isActive ? 0 : imgInitialX}px)`,
-                      opacity: isActive ? 1 : 0.85,
-                      transition: 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 700ms ease-out',
-                    }}
-                  >
-                    <div 
-                      className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden relative"
-                      style={{ 
-                        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%)`,
-                        backdropFilter: 'blur(20px) saturate(180%)',
-                        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                        border: `1px solid rgba(255, 255, 255, 0.3)`,
-                        boxShadow: isActive 
-                          ? `0 20px 60px -15px rgba(59, 71, 249, 0.3), 
-                             0 0 0 1px rgba(255, 255, 255, 0.4) inset,
-                             0 1px 2px rgba(0, 0, 0, 0.1)`
-                          : `0 10px 30px -10px rgba(59, 71, 249, 0.2),
-                             0 0 0 1px rgba(255, 255, 255, 0.3) inset`,
-                        transition: 'box-shadow 700ms ease-out, transform 700ms cubic-bezier(0.22, 1, 0.36, 1), border-color 700ms ease-out',
-                        transform: isActive ? 'scale(1)' : 'scale(0.98)',
-                        borderColor: isActive ? `rgba(59, 71, 249, 0.3)` : `rgba(59, 71, 249, 0.2)`,
-                      }}
+              <div key={step.title} className="flex flex-col lg:flex-row items-center lg:items-start flex-1">
+                <StepCard step={step} index={idx} ref={stepRef} isInView={stepInView} />
+                
+                {/* Flow connector - Vertical on mobile, Horizontal on desktop */}
+                {idx < steps.length - 1 && (
+                  <>
+                    {/* Mobile: Vertical connector */}
+                    <motion.div 
+                      className="flex justify-center my-6 lg:hidden"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={stepInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.4, delay: idx * 0.15 + 0.5, ease: [0.4, 0, 0.2, 1] }}
                     >
-                      {/* Glass reflection overlay */}
-                      <div 
-                        className="absolute inset-0 opacity-60"
-                        style={{
-                          background: `linear-gradient(135deg, 
-                            rgba(255, 255, 255, 0.4) 0%, 
-                            transparent 40%,
-                            transparent 60%,
-                            rgba(59, 71, 249, 0.1) 100%)`,
-                          borderRadius: '1rem'
-                        }}
-                      />
-                      
-                      {/* Primary color accent gradient */}
-                      <div 
-                        className="absolute inset-0 opacity-30"
-                        style={{
-                          background: `linear-gradient(135deg, ${primary}20 0%, transparent 50%)`,
-                          borderRadius: '1rem'
-                        }}
-                      />
-                      
-                      {/* Decorative glass circles */}
-                      <div 
-                        className="absolute top-4 right-4 w-20 h-20 rounded-full opacity-40 blur-xl"
-                        style={{ 
-                          background: `radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, ${primary}20 100%)`,
-                        }}
-                      />
-                      <div 
-                        className="absolute bottom-4 left-4 w-16 h-16 rounded-full opacity-30 blur-lg"
-                        style={{ 
-                          background: `radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, ${primary}15 100%)`,
-                        }}
-                      />
-                      
-                      {/* Subtle border highlight */}
-                      <div 
-                        className="absolute inset-0 rounded-2xl"
-                        style={{
-                          border: `1px solid rgba(255, 255, 255, 0.5)`,
-                          borderRadius: '1rem',
-                          pointerEvents: 'none',
-                          boxShadow: `0 0 20px -5px ${primary}30 inset`
-                        }}
-                      />
-                      
-                      {/* Image container with padding */}
-                      <div className="relative w-full h-full p-6 sm:p-8 md:p-10 flex items-center justify-center z-10">
-                        <img 
-                          src={s.image} 
-                          alt={s.title} 
-                          className="w-full h-full object-contain relative drop-shadow-lg"
-                          style={{
-                            filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))',
-                          }}
+                      <div className="relative">
+                        <motion.div
+                          className="w-0.5 h-12 mx-auto rounded-full"
+                          style={{ backgroundColor: primary }}
+                          initial={{ height: 0 }}
+                          animate={stepInView ? { height: 48 } : { height: 0 }}
+                          transition={{ duration: 0.6, delay: idx * 0.15 + 0.7, ease: [0.4, 0, 0.2, 1] }}
+                        />
+                        <motion.div
+                          initial={{ y: -10, opacity: 0 }}
+                          animate={stepInView ? { y: 0, opacity: 1 } : { y: -10, opacity: 0 }}
+                          transition={{ duration: 0.4, delay: idx * 0.15 + 1, ease: [0.4, 0, 0.2, 1] }}
+                          className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
+                        >
+                          <ArrowDown size={24} style={{ color: primary }} />
+                        </motion.div>
+                      </div>
+                    </motion.div>
+                    
+                    {/* Desktop: Horizontal connector */}
+                    <motion.div 
+                      className="hidden lg:flex items-center justify-center flex-shrink-0 px-2 xl:px-4"
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={stepInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.4, delay: idx * 0.15 + 0.5, ease: [0.4, 0, 0.2, 1] }}
+                    >
+                      <div className="relative flex items-center">
+                        <motion.div
+                          className="h-0.5 w-12 xl:w-16 rounded-full"
+                          style={{ backgroundColor: primary }}
+                          initial={{ width: 0 }}
+                          animate={stepInView ? { width: 64 } : { width: 0 }}
+                          transition={{ duration: 0.6, delay: idx * 0.15 + 0.7, ease: [0.4, 0, 0.2, 1] }}
+                        />
+                        <motion.div
+                          initial={{ x: -10, opacity: 0 }}
+                          animate={stepInView ? { x: 0, opacity: 1 } : { x: -10, opacity: 0 }}
+                          transition={{ duration: 0.4, delay: idx * 0.15 + 1, ease: [0.4, 0, 0.2, 1] }}
+                          className="relative"
+                        >
+                          <ArrowRight 
+                            size={24} 
+                            style={{ color: primary }}
+                          />
+                        </motion.div>
+                        <motion.div
+                          className="h-0.5 w-12 xl:w-16 rounded-full"
+                          style={{ backgroundColor: primary }}
+                          initial={{ width: 0 }}
+                          animate={stepInView ? { width: 64 } : { width: 0 }}
+                          transition={{ duration: 0.6, delay: idx * 0.15 + 0.7, ease: [0.4, 0, 0.2, 1] }}
                         />
                       </div>
-                      
-                      {/* Bottom shine effect */}
-                      <div 
-                        className="absolute bottom-0 left-0 right-0 h-1/3 opacity-50"
-                        style={{
-                          background: `linear-gradient(to top, ${primary}20 0%, transparent 100%)`,
-                          borderRadius: '0 0 1rem 1rem'
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text side */}
-                  <div
-                    className={`${isLeftImage ? '' : 'md:order-1'}`}
-                    style={{
-                      transform: `translateX(${isActive ? 0 : textInitialX}px)`,
-                      opacity: isActive ? 1 : 0.9,
-                      transition: 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1) 100ms, opacity 700ms ease-out 100ms',
-                    }}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="hidden md:block mt-2 w-3 h-3 rounded-full" style={{ backgroundColor: primary }}></div>
-                      <div>
-                        <h3 className="text-2xl sm:text-3xl font-semibold mb-3" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                          {s.title}
-                        </h3>
-                        <p className="text-gray-600 text-lg" style={{ fontFamily: "'Poppins', sans-serif" }}>{s.desc}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Flow arrow between steps */}
-                {idx < steps.length - 1 && (
-                  <div className="flex justify-center my-6">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={primary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <path d="M12 3v16" />
-                      <path d="M6 15l6 6 6-6" />
-                    </svg>
-                  </div>
+                    </motion.div>
+                  </>
                 )}
               </div>
             );

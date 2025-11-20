@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePrograms } from "@/lib/fetching/usePrograms";
 import { primary, white } from "@/app/colours";
 
@@ -11,7 +12,7 @@ const ProgramsGrid: React.FC = () => {
   if (isError || !data || data.length === 0) return null;
 
   return (
-    <section aria-labelledby="programs-title" className="py-12 sm:py-16">
+    <section id="programs-section" aria-labelledby="programs-title" className="py-12 sm:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 id="programs-title" className="text-3xl sm:text-4xl font-bold" style={{ fontFamily: "'Poppins', sans-serif" }}>
@@ -64,10 +65,14 @@ const ProgramsGrid: React.FC = () => {
                   />
                   
                   {p.illustration ? (
-                    <img 
+                    <Image 
                       src={p.illustration} 
                       alt={p.title} 
+                      width={256}
+                      height={256}
                       className="w-56 h-56 sm:w-64 sm:h-64 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110" 
+                      loading="lazy"
+                      sizes="(max-width: 640px) 224px, 256px"
                     />
                   ) : (
                     <div 

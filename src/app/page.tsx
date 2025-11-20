@@ -519,92 +519,87 @@ function Page() {
               />
             </div>
             
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              <div className="text-center mb-12">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              {/* Header */}
+              <div className="text-center mb-16">
                 <h2 
                   className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 tracking-tight"
                   style={{ 
                     color: black, 
-                    fontFamily: "'Poppins', sans-serif",
-                    background: `linear-gradient(135deg, ${black} 0%, ${primary} 100%)`,
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text'
+                    fontFamily: "'Poppins', sans-serif"
                   }}
                 >
                   Our Promise
                 </h2>
               </div>
               
-              <div className="rounded-3xl p-8 sm:p-12 lg:p-16" style={{ 
-                backgroundColor: white,
-                border: `1px solid ${black}10`,
-                boxShadow: `0 20px 60px -15px ${black}10`
-              }}>
-                <div className="space-y-8 max-w-3xl mx-auto">
+              {/* Content Card */}
+              <div 
+                className="rounded-3xl p-8 sm:p-12 lg:p-16 mx-auto" 
+                style={{ 
+                  backgroundColor: white,
+                  border: `2px solid ${primary}15`,
+                  boxShadow: `0 20px 60px -15px ${primary}10`,
+                  maxWidth: '800px'
+                }}
+              >
+                <div className="space-y-6 text-center">
+                  {/* Opening Statement - Large */}
                   <p 
-                    className="text-xl sm:text-2xl leading-relaxed" 
+                    className="text-2xl sm:text-3xl font-semibold leading-relaxed" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif", 
-                      fontWeight: 500,
                       color: black
                     }}
                   >
                     GuildUp isn&apos;t here to fix you.
                   </p>
                   
-                  <div className="h-px" style={{ 
-                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
-                  }}></div>
-                  
+                  {/* Second Statement - Large */}
                   <p 
-                    className="text-xl sm:text-2xl leading-relaxed" 
+                    className="text-2xl sm:text-3xl font-semibold leading-relaxed" 
                     style={{ 
                       fontFamily: "'Poppins', sans-serif", 
-                      fontWeight: 500,
                       color: black
                     }}
                   >
                     We are here to remind you that nothing about you is broken.
                   </p>
                   
-                  <div className="h-px" style={{ 
-                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
-                  }}></div>
+                  {/* Supporting Text - Medium */}
+                  <div className="space-y-4 pt-4">
+                    <p 
+                      className="text-lg sm:text-xl leading-relaxed text-gray-700" 
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif"
+                      }}
+                    >
+                      Your body has only been protecting you. Your mind has only been trying to keep you safe.
+                    </p>
+                    
+                    <p 
+                      className="text-lg sm:text-xl leading-relaxed text-gray-700" 
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif"
+                      }}
+                    >
+                      Now, it is time to teach both that it is okay to rest.
+                    </p>
+                  </div>
                   
-                  <p 
-                    className="text-lg sm:text-xl leading-relaxed" 
-                    style={{ 
-                      fontFamily: "'Poppins', sans-serif",
-                      color: black
-                    }}
-                  >
-                    Your body has only been protecting you. Your mind has only been trying to keep you safe.
-                  </p>
-                  
-                  <p 
-                    className="text-lg sm:text-xl leading-relaxed" 
-                    style={{ 
-                      fontFamily: "'Poppins', sans-serif",
-                      color: black
-                    }}
-                  >
-                    Now, it is time to teach both that it is okay to rest.
-                  </p>
-                  
-                  <div className="h-px" style={{ 
-                    background: `linear-gradient(to right, transparent, ${black}20, transparent)`
-                  }}></div>
-                  
-                  <p 
-                    className="text-2xl sm:text-3xl leading-relaxed font-semibold mt-8" 
-                    style={{ 
-                      fontFamily: "'Poppins', sans-serif",
-                      color: primary
-                    }}
-                  >
-                    Because calm is not found. It is rebuilt, gently, intentionally, and together.
-                  </p>
+                  {/* Final Statement - Highlighted */}
+                  <div className="pt-8 mt-8 border-t-2" style={{ borderColor: `${primary}20` }}>
+                    <p 
+                      className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-relaxed" 
+                      style={{ 
+                        fontFamily: "'Poppins', sans-serif",
+                        color: primary,
+                        lineHeight: '1.4'
+                      }}
+                    >
+                      Because calm is not found. It is rebuilt, gently, intentionally, and together.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { primary, black, white } from "@/app/colours";
 
 const Hero: React.FC = () => {
@@ -86,24 +87,14 @@ const Hero: React.FC = () => {
                     display: 'block'
                   }}
                 >
-                  Your wellness
-                </span>
-                <span
-                  style={{
-                    opacity: isVisible ? 1 : 0,
-                    transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-                    transition: 'opacity 0.8s ease-out 0.4s, transform 0.8s ease-out 0.4s',
-                    display: 'block'
-                  }}
-                >
-                  journey
+                  Find Your Perfect
                 </span>
                 <span
                   style={{
                     color: primary,
                     opacity: isVisible ? 1 : 0,
                     transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-                    transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s',
+                    transition: 'opacity 0.8s ease-out 0.4s, transform 0.8s ease-out 0.4s',
                     display: 'block',
                     background: `linear-gradient(135deg, ${primary} 0%, ${primary}dd 100%)`,
                     WebkitBackgroundClip: 'text',
@@ -111,9 +102,22 @@ const Hero: React.FC = () => {
                     backgroundClip: 'text'
                   }}
                 >
-                  starts here
+                  Wellness Coach
                 </span>
               </h1>
+              
+              {/* Value Proposition */}
+              <p
+                className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-2xl"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+                  transition: 'opacity 0.8s ease-out 0.5s, transform 0.8s ease-out 0.5s'
+                }}
+              >
+                A wellness coaching platform that helps you find the right coach to tackle your life challenges and achieve your life goals.
+              </p>
             </div>
 
             {/* CTA Buttons */}
@@ -127,15 +131,17 @@ const Hero: React.FC = () => {
             >
               <button
                 onClick={() => {
-                  const allExpertsSection = document.getElementById('all-experts');
-                  if (allExpertsSection) {
+                  const programsSection = document.getElementById('programs-section');
+                  if (programsSection) {
                     const headerOffset = 145;
-                    const elementPosition = allExpertsSection.getBoundingClientRect().top;
+                    const elementPosition = programsSection.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.scrollY - headerOffset;
                     window.scrollTo({
                       top: offsetPosition,
                       behavior: 'smooth'
                     });
+                  } else {
+                    router.push('/#programs-section');
                   }
                 }}
                 className="group relative px-10 py-4.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden"
@@ -154,7 +160,7 @@ const Hero: React.FC = () => {
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 10px 30px -10px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1) inset';
                 }}
               >
-                <span className="relative z-10">Take the 1st step</span>
+                <span className="relative z-10">Explore Programs</span>
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   style={{
@@ -186,7 +192,7 @@ const Hero: React.FC = () => {
                   (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 10px 30px -10px rgba(0, 0, 0, 0.1)';
                 }}
               >
-                <span className="relative z-10">Take the test</span>
+                <span className="relative z-10">Take the Stress Test</span>
               </button>
             </div>
           </div>
@@ -239,16 +245,21 @@ const Hero: React.FC = () => {
                     />
 
                     {/* Image container */}
-                    <div className="relative overflow-hidden rounded-2xl">
-                      <img
+                    <div className="relative overflow-hidden rounded-2xl w-full h-full">
+                      <Image
                         src={src}
                         alt="Wellness visual"
+                        width={320}
+                        height={320}
                         className="relative w-full h-full object-cover rounded-2xl transition-all duration-500 group-hover:scale-110"
                         style={{
                           border: `2px solid rgba(255, 255, 255, 0.8)`,
                           boxShadow: '0 20px 60px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05)',
                           filter: 'brightness(1) saturate(1)'
                         }}
+                        loading={i < 2 ? "eager" : "lazy"}
+                        priority={i < 2}
+                        sizes="(max-width: 768px) 160px, 240px"
                       />
 
                       {/* Subtle overlay gradient */}
