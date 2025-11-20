@@ -6,7 +6,7 @@ import { Providers } from "../../provider";
 import { Toaster } from "sonner";
 import { ChakraProvider } from '@chakra-ui/react';
 import NavbarClient from "@/components/layout/NavbarClient";
-import Breadcrumb from "@/components/layout/Breadcrumb";
+
 import { CookieConsentProvider } from "@/contexts/CookieConsentContext";
 import PostHogProviderWrapper from "@/components/providers/PostHogWrapper";
 import WelcomeBanner from "@/components/banner/Banner";
@@ -89,13 +89,13 @@ export default async function RootLayout({
     `,
           }}
         />
-        <Script 
-        id="ga4-loader"
-        async src="https://www.googletagmanager.com/gtag/js?id=G-8TF2QM56T0">
+        <Script
+          id="ga4-loader"
+          async src="https://www.googletagmanager.com/gtag/js?id=G-8TF2QM56T0">
         </Script>
         <Script
-        id="ga4"
-         dangerouslySetInnerHTML={{
+          id="ga4"
+          dangerouslySetInnerHTML={{
             __html: `
           window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -207,28 +207,27 @@ export default async function RootLayout({
         <AnalyticsWrapper />
         <AttributionInitializer />
         <CookieConsentProvider>
-        <PostHogProviderWrapper>
+          <PostHogProviderWrapper>
             <ChakraProvider>
               <div style={{ margin: 0, padding: 0 }}>
                 <Providers>
                   {/* {ENABLE_COUPON_BANNER && <CouponBanner />} */}
                   <div style={{ margin: 0, padding: 0 }}>
                     <NavbarClient />
-                    <Breadcrumb />
                   </div>
-                <RouteChangeTracker />
-                <GlobalInteractionTracker />
-                {children}
-                <ProgramCTABanner />
-                <FloatingNeedHelpButton />
-                {/* <GoogleOneTap /> */}
-                {/* <Toaster richColors position="top-center" />s */}
-                {/* <CookieConsent /> */}
-                {/* <WelcomeBanner /> */}
+                  <RouteChangeTracker />
+                  <GlobalInteractionTracker />
+                  {children}
+                  <ProgramCTABanner />
+                  <FloatingNeedHelpButton />
+                  {/* <GoogleOneTap /> */}
+                  {/* <Toaster richColors position="top-center" />s */}
+                  {/* <CookieConsent /> */}
+                  {/* <WelcomeBanner /> */}
                 </Providers>
               </div>
             </ChakraProvider>
-            </PostHogProviderWrapper>
+          </PostHogProviderWrapper>
         </CookieConsentProvider>
       </body>
     </html>
