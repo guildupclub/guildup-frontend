@@ -484,7 +484,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </>
                     ) : (
                       <>
-                        <div className="border-t border-gray-100 my-2"></div>
+                        {/* Sign In button commented out */}
+                        {/* <div className="border-t border-gray-100 my-2"></div>
                         <DropdownMenuItem
                           className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1 text-base font-medium"
                           onClick={() =>
@@ -494,7 +495,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                           }
                         >
                           {StringConstants.SIGN_IN}
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                       </>
                     )}
                   </DropdownMenuContent>
@@ -621,7 +622,8 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Button
+                    {/* Sign In button commented out */}
+                    {/* <Button
                       onClick={() =>
                         signIn(undefined, {
                           callbackUrl: `${window.location.href}?hero=2`,
@@ -631,7 +633,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       variant="outline"
                     >
                       Sign In
-                    </Button>
+                    </Button> */}
                   </div>
                 )}
               </div>

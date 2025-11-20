@@ -47,6 +47,9 @@ import TestimonialsSection from "../clientSays/ClientSays";
 import { WebinarOfferBanner } from "../webinarHolding/WebinarHoldingSection";
 import { primary, white, black } from "@/app/colours";
 import { useRouter } from "next/navigation";
+import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
+import { usePrograms } from "@/lib/fetching/usePrograms";
+import Link from "next/link";
 
 interface CommunityProfile {
   user: {
@@ -147,6 +150,148 @@ function Card({ item }: CardProps) {
           ))}
       </div>
     </div>
+  );
+}
+
+// Programs Section Component
+function ProgramsSection() {
+  const { data, isLoading, isError } = usePrograms();
+
+  if (isLoading || isError || !data || data.length === 0) return null;
+
+  return (
+    <section aria-labelledby="programs-title" className="py-12 sm:py-16 mt-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <h2 id="programs-title" className="text-3xl sm:text-4xl font-bold" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            Our Programs
+          </h2>
+          <p className="text-gray-600 mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
+            Choose a path and begin your journey
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {data.map((p) => (
+            <Link 
+              key={p.id} 
+              href={`/programs/${p.id}`} 
+              className="relative group rounded-2xl overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 bg-white"
+              style={{ 
+                boxShadow: '0 4px 20px -5px rgba(0, 0, 0, 0.1)',
+                border: `2px solid ${primary}20`
+              }}
+            >
+              {/* Outer glow effect */}
+              <div 
+                className="absolute -inset-2 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg"
+                style={{
+                  background: `radial-gradient(circle, ${primary}30 0%, transparent 70%)`,
+                  zIndex: -1
+                }}
+              />
+              
+              {/* Animated border glow */}
+              <div 
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  border: `2px solid ${primary}40`,
+                  boxShadow: `0 0 0 2px ${primary}20, 0 0 20px -5px ${primary}40`,
+                  borderRadius: '1rem'
+                }}
+              />
+              
+              {/* Inner content */}
+              <div className="relative bg-white rounded-2xl">
+                <div className="aspect-[4/3] bg-white flex items-center justify-center relative overflow-hidden">
+                  {/* Subtle gradient overlay */}
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: `linear-gradient(135deg, ${primary}05 0%, transparent 100%)`
+                    }}
+                  />
+                  
+                  {p.illustration ? (
+                    <img 
+                      src={p.illustration} 
+                      alt={p.title} 
+                      className="w-56 h-56 sm:w-64 sm:h-64 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110" 
+                    />
+                  ) : (
+                    <div 
+                      className="w-56 h-56 sm:w-64 sm:h-64 rounded-xl relative z-10" 
+                      style={{ backgroundColor: `${primary}10` }} 
+                    />
+                  )}
+                </div>
+                
+                <div className="p-5 relative">
+                  <h3 
+                    className="text-xl font-semibold transition-colors duration-300 group-hover:text-primary" 
+                    style={{ fontFamily: "'Poppins', sans-serif" }}
+                  >
+                    {p.title}
+                  </h3>
+                  {p.subtitle && (
+                    <p className="text-gray-600 mt-1" style={{ fontFamily: "'Poppins', sans-serif" }}>{p.subtitle}</p>
+                  )}
+                  <div className="mt-4">
+                    <span 
+                      className="inline-block px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 group-hover:scale-105 group-hover:shadow-md" 
+                      style={{ 
+                        backgroundColor: primary, 
+                        color: white, 
+                        fontFamily: "'Poppins', sans-serif",
+                        boxShadow: '0 2px 8px -2px rgba(0, 0, 0, 0.2)'
+                      }}
+                    >
+                      Explore
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Animated corner accent */}
+              <div 
+                className="absolute top-0 right-0 w-16 h-16 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  background: `linear-gradient(135deg, ${primary}20 0%, transparent 50%)`,
+                  borderRadius: '0 2rem 0 2rem',
+                  clipPath: 'polygon(100% 0, 100% 50%, 50% 100%, 0 100%, 0 0)'
+                }}
+              />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Join Program CTA Banner Component
+function JoinProgramCTABanner() {
+  const whatsappMessage = encodeURIComponent(`Hi!, I'd like to know more about Guildup's program`);
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
+
+  return (
+    <section className="relative w-full overflow-hidden py-16 mt-8" style={{ backgroundColor: primary }} aria-labelledby="join-program-cta-title">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 text-center">
+        <h2 id="join-program-cta-title" className="text-3xl sm:text-4xl font-bold mb-3" style={{ color: white, fontFamily: "'Poppins', sans-serif" }}>
+          Ready to Join Our Program?
+        </h2>
+        <p className="text-white/90 max-w-3xl mx-auto mb-8" style={{ fontFamily: "'Poppins', sans-serif" }}>
+          Get started on your wellness journey today. Chat with us on WhatsApp to learn more about our programs and find the right fit for you.
+        </p>
+        <button
+          onClick={() => window.open(whatsappUrl, '_blank')}
+          className="bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+          style={{ fontFamily: "'Poppins', sans-serif" }}
+        >
+          Join Our Program
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -1103,13 +1248,10 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                     className="w-full max-w-md transition-all duration-300 shadow-lg hover:shadow-xl"
                     style={{ backgroundColor: primary, color: white, fontFamily: "'Poppins', sans-serif" }}
                     onClick={() => {
-                      // Find first available offering or show booking dialog
-                      const availableOffering = offerings.find(
-                        (off) => off.type !== "webinar" || !off.when || new Date(off.when) > new Date()
-                      );
-                      if (availableOffering) {
-                        setSelectedOffering(availableOffering);
-                      }
+                      const communityOwnerName = displayProfile?.community?.name || "the expert";
+                      const whatsappMessage = encodeURIComponent(`I would like to book a session with ${communityOwnerName}`);
+                      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
+                      window.open(whatsappUrl, '_blank');
                     }}
                   >
                     Book a Session
@@ -1208,88 +1350,10 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                 </>
               )}
 
-              {/* Chat and Follow Button at the end of the section */}
-              {!isOwner && (
-                <div className="mt-6 pt-6 flex gap-3">
-                  {isCommunityFollowed ? (
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="flex-1 transition-all duration-300 border-black"
-                      style={{ 
-                        backgroundColor: black, 
-                        color: white, 
-                        fontFamily: "'Poppins', sans-serif",
-                        borderColor: black
-                      }}
-                      onClick={handleLeaveCommunity}
-                    >
-                      {StringConstants.FOLLOWING}
-                      <HiMiniUserGroup className="ml-2 h-5 w-5" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="flex-1 transition-all duration-300 border-black"
-                      style={{ 
-                        backgroundColor: black, 
-                        color: white, 
-                        fontFamily: "'Poppins', sans-serif",
-                        borderColor: black
-                      }}
-                      onClick={handleJoinCommunity}
-                    >
-                      <HiMiniUserGroup className="mr-2 h-5 w-5" />
-                      {StringConstants.FOLLOW}
-                    </Button>
-                  )}
-
-                  {/* Chat Support Button */}
-                  {activeCommunityId && isBankConnected && displayProfile?.user?.user_email !== user?.email && (
-                    <div className="flex-1">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full transition-all duration-300 border-black"
-                        style={{ 
-                          backgroundColor: white, 
-                          color: black, 
-                          fontFamily: "'Poppins', sans-serif",
-                          borderColor: black
-                        }}
-                        onClick={() => {
-                          const searchParams = new URLSearchParams({
-                            expertEmail: displayProfile?.user?.user_email || "",
-                            expertName: displayProfile?.user?.user_name || "Expert",
-                            expertImage: displayProfile?.user?.user_avatar || "",
-                          });
-                          router.push(`/chat?${searchParams.toString()}`);
-                        }}
-                      >
-                        <svg
-                          className="mr-2 h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                          />
-                        </svg>
-                        Chat with Expert
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
         </div>
 
-        {/* Section 4: Offerings */}
-        <div className="mt-8 rounded-xl p-6 bg-white">
+        {/* Section 4: Offerings - Commented out */}
+        {/* <div className="mt-8 rounded-xl p-6 bg-white">
               <div className="flex items-center justify-between mb-6">
                 <h2 
                   className="text-2xl font-semibold text-foreground"
@@ -1323,11 +1387,9 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                       key={offering._id || `${offering.title}-${index}`}
                       className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white p-6 transition-all duration-300 hover:border-blue-100 hover:shadow-md"
                     >
-                          {/* Top gradient accent */}
                           <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-blue-400 to-blue-600 opacity-80" />
 
                           <div className="flex gap-4 items-start">
-                            {/* Icon */}
                             <div className="flex flex-col items-center gap-2">
                               <div className="rounded-lg border border-blue-100 bg-blue-50 p-2.5 transition-colors group-hover:bg-blue-100">
                                 <svg
@@ -1378,7 +1440,6 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                               </div>
                             </div>
 
-                            {/* Title, Price, Description */}
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <h3 className="font-semibold text-gray-900 transition-colors duration-300 group-hover:text-blue-600">
@@ -1435,7 +1496,6 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                             offering.when &&
                             new Date(offering.when) > new Date() && (
                               <div className="flex justify-between items-center mt-4 w-full bg-blue-100 px-4 py-2 rounded-md shadow-sm">
-                                {/* Date */}
                                 <div className="flex items-center gap-2 text-sm text-gray-700">
                                   <BsCalendarCheck className="h-5 w-5 text-blue-500" />
                                   <span>
@@ -1450,7 +1510,6 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                                   </span>
                                 </div>
 
-                                {/* Time */}
                                 <div className="text-sm text-gray-700">
                                   {new Date(offering.when).toLocaleTimeString(
                                     "en-US",
@@ -1463,7 +1522,6 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                               </div>
                             )}
 
-                          {/* Buttons */}
                           <div className="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
                             {isOwner ? (
                               <div className="mr-auto flex justify-between w-full gap-2">
@@ -1577,20 +1635,20 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
                   })()}
                 </div>
               )}
+        </div> */}
 
-          {selectedOffering && (
-            <BookingDialog
-              offering={{
-                ...selectedOffering,
-                discounted_price: selectedOffering.discounted_price
-                  ? Number(selectedOffering.discounted_price)
-                  : 0,
-              }}
-              isOpen={!!selectedOffering}
-              onClose={() => setSelectedOffering(null)}
-            />
-          )}
-        </div>
+        {selectedOffering && (
+          <BookingDialog
+            offering={{
+              ...selectedOffering,
+              discounted_price: selectedOffering.discounted_price
+                ? Number(selectedOffering.discounted_price)
+                : 0,
+            }}
+            isOpen={!!selectedOffering}
+            onClose={() => setSelectedOffering(null)}
+          />
+        )}
 
 
         {/* Section 5: Stories of Change - Only show if testimonials exist */}
@@ -1630,6 +1688,12 @@ export function ProfileCard({ communityId, initialProfile: serverProfile, initia
           />
         )}
       </div>
+
+      {/* Programs Section - Before Footer */}
+      <ProgramsSection />
+
+      {/* CTA Banner - Join Program */}
+      <JoinProgramCTABanner />
 
       {/* Hidden file inputs */}
       <input

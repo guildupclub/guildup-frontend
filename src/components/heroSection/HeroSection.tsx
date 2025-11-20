@@ -19,9 +19,18 @@ export default function Hero() {
   const user = useSelector((state: RootState) => state.user);
   const activeCommunity = useSelector((state: any) => state.channel.activeCommunity);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showExpertCards, setShowExpertCards] = useState(false);
   const isCreator = user?.user?.is_creator ? true : false;
   const router = useRouter();
   const { isInstalled } = usePWAInstall();
+
+  // Defer expert cards loading for better initial performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowExpertCards(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Problem tags/icons for top right section with softer gradients and search integration
   const problemTags = [
@@ -186,9 +195,9 @@ export default function Hero() {
             {/* Centered Search Section */}
             <motion.div
               className="flex flex-col items-center justify-center space-y-6 lg:space-y-8 relative"
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
               {/* Subtle Background Gradient */}
               <div className="absolute inset-0 bg-gradient-to-br from-blue-50/20 via-transparent to-indigo-50/10 rounded-3xl -z-10"></div>
@@ -269,11 +278,12 @@ export default function Hero() {
           </div>
 
           {/* Expert Cards Section - Raised Up with Increased Spacing */}
+          {showExpertCards && (
           <motion.div
             className="mt-6 lg:mt-10"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
             {/* Section Header */}
             <div className="text-center mb-3 lg:mb-4">
@@ -305,6 +315,9 @@ export default function Hero() {
                             width={144}
                             height={128}
                             className="w-full h-full object-cover rounded-xl"
+                            loading="lazy"
+                            unoptimized={expert.avatar.startsWith('http')}
+                            priority={idx < 4}
                           />
                         </div>
                         <div className="flex flex-col items-center w-full flex-grow justify-start space-y-0.5 sm:space-y-1 mt-1 sm:mt-2">
@@ -371,13 +384,14 @@ export default function Hero() {
               }} />
             </div>
           </motion.div>
+          )}
 
           {/* Mobile Expert CTA - Simple and Minimal */}
           <motion.div
             className="block lg:hidden text-center mt-4 px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
           >
             <p className="text-sm text-gray-600">
               Are you an expert looking to get discovered?{" "}

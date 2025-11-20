@@ -32,7 +32,7 @@ export default function ProgramCommunities({ tag }: ProgramCommunitiesProps) {
           "6873fd21bb8cdb102a32e33c", // Annie (Anahata by Annie)
           "67e813849e012602676e0504", // Coach Jas (Millennial Life with Coach Jas)
           "6814bb85ca1a0821767ee20b", // Heal with Bhakti
-          "683fe1d209c82d665b688c30", // Manvi
+          "68527e2fa05733beb31e6380", // Shreya (Shreya | ICF- Certified Life Coach)
           "685bcf2d76aa736a1c6853fe", // Khushi Tayal
           "681ddea3060002ed6eff7b2e", // Divya Mittar (Therapy with Divya)
         ];
