@@ -697,7 +697,7 @@ export default function WellnessCheckPage() {
 
               {/* Benefits */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="font-semibold text-lg mb-4 text-gray-900">You'll experience:</h3>
+                <h3 className="font-semibold text-lg mb-4 text-gray-900">You&apos;ll experience:</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {["Better sleep", "Less spiraling", "Reduced overthinking", "More emotional stability"].map(
                     (benefit) => (
@@ -1075,7 +1075,7 @@ export default function WellnessCheckPage() {
                       </Button>
                     </div>
                     <p className="text-xs text-gray-600">
-                      Didn't receive it?{" "}
+                      Didn&apos;t receive it?{" "}
                       <button
                         onClick={handleSendOtp}
                         className="text-blue-600 hover:underline"
