@@ -1,5 +1,7 @@
 {
   "rules": {
+    ".read": "now < 1751740200000",
+    ".write": "now < 1751740200000",
     "programLeads": {
       "$program": {
         "$leadId": {
@@ -43,4 +45,5 @@
       }
     }
   }
-} 
+}
+

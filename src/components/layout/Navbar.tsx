@@ -16,7 +16,7 @@ import {
   MoreVertical,
 } from "lucide-react";
 import { FaBars, FaSignInAlt } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,12 +73,19 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     name: string;
   } | null>(null);
   const [searchType, setSearchType] = useState("post");
+  const [mounted, setMounted] = useState(false);
   const userId = user?._id;
+
+  // Prevent hydration mismatch by only rendering user-dependent content after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const { heroVisible } = useSelector((state: RootState) => state.ui);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   // State to store fetchCommunities API response
   const [fetchedCommunities, setFetchedCommunities] = useState<any[]>([]);
   const [isProgramsExpanded, setIsProgramsExpanded] = useState(false);
+  const hasSetFirstCommunity = useRef(false); // Track if we've set the first community
   const isCreator = user?.user?.is_creator ? true : false;
   console.log(isCreator);
 
@@ -134,20 +141,12 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
     return fetchedCommunities.find((community) => community && community._id);
   };
 
-  const cleanedCommunityName = activeCommunityName
-    ? activeCommunityName
-        .replace(/\s+/g, "-")
-        .replace(/\|/g, "-")
-        .replace(/-+/g, "-")
-    : "";
-  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-  const communityParams = `${encodedCommunityName}-${activeCommunityId}`;
-  const getMySpaceLink = () => {
-    if (activeCommunityId) {
-      return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
-    } else {
+  // Set first community as active when no active community is set
+  useEffect(() => {
+    if (!activeCommunityId && fetchedCommunities.length > 0 && !hasSetFirstCommunity.current) {
       const firstCommunity = getFirstValidCommunity();
       if (firstCommunity) {
+        hasSetFirstCommunity.current = true;
         // Set the first community as active
         dispatch(
           setActiveCommunity({
@@ -167,6 +166,30 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
             })
           );
         }
+      }
+    }
+    // Reset the ref if activeCommunityId changes (user manually selected a community)
+    if (activeCommunityId) {
+      hasSetFirstCommunity.current = false;
+    }
+  }, [activeCommunityId, fetchedCommunities, dispatch, user?._id]);
+
+  const cleanedCommunityName = activeCommunityName
+    ? activeCommunityName
+        .replace(/\s+/g, "-")
+        .replace(/\|/g, "-")
+        .replace(/-+/g, "-")
+    : "";
+  const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+  const communityParams = `${encodedCommunityName}-${activeCommunityId}`;
+  
+  // Pure function that just returns the link without side effects
+  const getMySpaceLink = () => {
+    if (activeCommunityId) {
+      return `${COMMUNITY_PATH}/${communityParams}${PROFILE_PATH}`;
+    } else {
+      const firstCommunity = getFirstValidCommunity();
+      if (firstCommunity) {
         return `${COMMUNITY_PATH}/${firstCommunity._id}${PROFILE_PATH}`;
       }
       return NO_COMMUNITIES_AVAILABLE;
@@ -461,7 +484,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       </Link>
                     </DropdownMenuItem>
 
-                    {user?._id ? (
+                    {mounted && user?._id ? (
                       <>
                         <div className="border-t border-gray-100 my-2"></div>
                         <DropdownMenuItem asChild className="hover:bg-gray-50/80 px-4 py-3 rounded-xl mx-2 my-1">
@@ -551,7 +574,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
               </div>
 
               <div className="hidden md:block ml-3 lg:ml-4 xl:ml-6">
-                {user?._id ? (
+                {mounted && user?._id ? (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -564,7 +587,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                               />
                             ) : (
                               <AvatarFallback>
-                                {session?.user?.name?.charAt(0)}
+                                {session?.user?.name?.charAt(0) || "U"}
                               </AvatarFallback>
                             )}
                           </Avatar>
