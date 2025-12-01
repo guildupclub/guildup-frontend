@@ -128,8 +128,8 @@ const Breadcrumb: React.FC = () => {
     return items;
   }, [pathname]);
 
-  // Don't show breadcrumb on home page or prototype pages
-  if (pathname === "/" || pathname?.startsWith("/prototype")) {
+  // Don't show breadcrumb on home page, prototype pages, or friendship pages
+  if (pathname === "/" || pathname?.startsWith("/prototype") || pathname?.startsWith("/friendship")) {
     return null;
   }
 

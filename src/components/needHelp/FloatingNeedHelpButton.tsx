@@ -3,8 +3,16 @@
 import { Button } from "@/components/ui/button";
 import { primary } from "@/app/colours";
 import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
+import { usePathname } from "next/navigation";
 
 export default function FloatingNeedHelpButton() {
+  const pathname = usePathname();
+  
+  // Hide on friendship pages
+  if (pathname?.startsWith("/friendship")) {
+    return null;
+  }
+
   const handleWhatsAppClick = () => {
     const whatsappMessage = encodeURIComponent(`Hi!, I'd like to know more about Guildup's program`);
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER_DIGITS}?text=${whatsappMessage}`;
