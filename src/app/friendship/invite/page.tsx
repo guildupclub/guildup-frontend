@@ -155,7 +155,7 @@ export default function InviteFriendPage() {
                   placeholder="Enter your friend&apos;s name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full"
+                  className="w-full text-gray-900 placeholder:text-gray-500"
                 />
               </div>
 
@@ -169,7 +169,7 @@ export default function InviteFriendPage() {
                   defaultCountry="IN"
                   value={phone}
                   onChange={(value) => setPhone(value || "")}
-                  className="border rounded-md p-2"
+                  className="border rounded-md p-2 [&_input]:text-gray-900 [&_input]:placeholder:text-gray-500"
                 />
                 <p className="text-sm text-gray-600 mt-2">
                   They&apos;ll receive an invite link via WhatsApp
@@ -197,7 +197,7 @@ export default function InviteFriendPage() {
                   Invite link generated! Share it with your friend:
                 </p>
                 <div className="flex items-center gap-2">
-                  <Input value={inviteLink} readOnly className="flex-1 text-xs sm:text-sm truncate" />
+                  <Input value={inviteLink} readOnly className="flex-1 text-xs sm:text-sm truncate text-gray-900" />
                   <Button
                     variant="outline"
                     size="icon"
