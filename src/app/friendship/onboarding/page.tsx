@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { savePersonality, saveCompatibilityAssessment } from "@/lib/api/friendship";
 
-type OnboardingStep = "phone-otp" | "basic-info" | "personality" | "compatibility" | "complete";
+type OnboardingStep = "name" | "phone-otp" | "basic-info" | "personality" | "compatibility" | "complete";
 
 // Personality questions (15 questions)
 const PERSONALITY_QUESTIONS = [
@@ -119,7 +119,7 @@ export default function FriendshipOnboardingPage() {
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
   
-  const [step, setStep] = useState<OnboardingStep>("phone-otp");
+  const [step, setStep] = useState<OnboardingStep>("name");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -170,12 +170,17 @@ export default function FriendshipOnboardingPage() {
           setDateOfBirth(userData.date_of_birth || "");
           setCity(userData.location || "");
           setStep("personality");
-        } else {
+        } else if (userData.name) {
+          // User has name but not DOB - go to basic-info
           setName(userData.name || "");
           setStep("basic-info");
+        } else {
+          // User logged in but no name - go to name step
+          setName(userData.name || "");
+          setStep("name");
         }
       } catch (e) {
-        // Continue with phone OTP
+        // Continue with name step
       }
     }
   }, [router]);
@@ -211,20 +216,37 @@ export default function FriendshipOnboardingPage() {
       return;
     }
 
+    if (!name || !name.trim()) {
+      toast.error("Please enter your name first");
+      setStep("name");
+      return;
+    }
+
     setIsVerifying(true);
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/auth/verify-otp`,
         {
           phone: phone.replace("+", ""),
-          name: name || "",
+          name: name.trim(), // Always send the name from the name step
           otp,
         }
       );
 
       if (response.data.r === "s") {
         toast.success("Phone verified successfully! ✨");
-        const { user: verifiedUser, token } = response.data.data;
+        const { user: verifiedUser, token, isNewUser } = response.data.data;
+
+        // Debug logging
+        console.log("[ONBOARDING] OTP verified - User data:", {
+          userId: verifiedUser._id,
+          name: verifiedUser.name,
+          isNewUser: isNewUser,
+          friendship_onboarding_completed: verifiedUser.friendship_onboarding_completed,
+          phone: verifiedUser.phone,
+          hasPersonality: !!verifiedUser.personality_profile,
+          hasCompatibility: verifiedUser.friendship_compatibility_questions?.length > 0
+        });
 
         sessionStorage.setItem("user", JSON.stringify(verifiedUser));
         sessionStorage.setItem("name", verifiedUser.name);
@@ -236,6 +258,39 @@ export default function FriendshipOnboardingPage() {
         setName(verifiedUser.name || "");
         setOtp("");
         setOtpSent(false);
+        
+        // Check if user has already completed onboarding - skip to dashboard
+        // Handle both explicit true and check if field exists and is truthy
+        const hasCompletedOnboarding = verifiedUser.friendship_onboarding_completed === true || 
+                                       verifiedUser.friendship_onboarding_completed === "true";
+        
+        if (hasCompletedOnboarding) {
+          console.log("[ONBOARDING] User has completed onboarding, redirecting to dashboard");
+          // Check if there's a redirect URL (from WhatsApp link or chat)
+          const redirectAfterLogin = sessionStorage.getItem("redirectAfterLogin");
+          if (redirectAfterLogin) {
+            sessionStorage.removeItem("redirectAfterLogin");
+            router.push(redirectAfterLogin);
+            return;
+          }
+          // Otherwise go to dashboard
+          router.push("/friendship/dashboard");
+          return;
+        }
+        
+        console.log("[ONBOARDING] User has NOT completed onboarding, continuing with onboarding flow", {
+          friendship_onboarding_completed: verifiedUser.friendship_onboarding_completed,
+          isNewUser: isNewUser
+        });
+        
+        // Check if there's a redirect URL (from WhatsApp link or chat)
+        const redirectAfterLogin = sessionStorage.getItem("redirectAfterLogin");
+        if (redirectAfterLogin) {
+          // Store it for later, after onboarding is complete
+          // Don't redirect now since onboarding is not complete
+        }
+        
+        // New user or existing user who hasn't completed onboarding - continue onboarding
         setStep("basic-info");
       } else {
         toast.error("Invalid OTP. Please try again.");
@@ -363,9 +418,17 @@ export default function FriendshipOnboardingPage() {
 
       setShowCelebration(true);
       
-      // Check for pending invite code
-      const pendingInviteCode = sessionStorage.getItem("pendingInviteCode");
       setTimeout(() => {
+        // Check for redirect URL first (from WhatsApp links or chat)
+        const redirectAfterLogin = sessionStorage.getItem("redirectAfterLogin");
+        if (redirectAfterLogin) {
+          sessionStorage.removeItem("redirectAfterLogin");
+          router.push(redirectAfterLogin);
+          return;
+        }
+
+        // Check for pending invite code
+        const pendingInviteCode = sessionStorage.getItem("pendingInviteCode");
         if (pendingInviteCode) {
           sessionStorage.removeItem("pendingInviteCode");
           router.push(`/friendship/invite/${pendingInviteCode}`);
@@ -420,6 +483,57 @@ export default function FriendshipOnboardingPage() {
         </CardHeader>
         <CardContent className="text-gray-900">
           <AnimatePresence mode="wait">
+            {/* Name Step - NEW */}
+            {step === "name" && (
+              <motion.div
+                key="name"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="space-y-6"
+              >
+                <div className="text-center mb-6">
+                  <motion.div
+                    animate={{ rotate: [0, 5, -5, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                  >
+                    <User className="h-12 w-12 mx-auto mb-4 text-purple-500" />
+                  </motion.div>
+                  <h2 className="text-2xl font-semibold mb-2 text-gray-900">What&apos;s Your Name? 👋</h2>
+                  <p className="text-gray-600">Let&apos;s start with your name</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="name" className="text-gray-900">Full Name *</Label>
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your name"
+                      className="mt-2"
+                      autoFocus
+                    />
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      if (!name.trim()) {
+                        toast.error("Please enter your name");
+                        return;
+                      }
+                      setStep("phone-otp");
+                    }}
+                    className="w-full"
+                    size="lg"
+                    disabled={!name.trim()}
+                  >
+                    Continue <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Phone OTP Step */}
             {step === "phone-otp" && (
               <motion.div
@@ -447,9 +561,18 @@ export default function FriendshipOnboardingPage() {
                   </div>
 
                   {!otpSent ? (
-                    <Button onClick={handleRequestOtp} className="w-full" size="lg">
-                      Send OTP <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-4">
+                      <Button
+                        variant="outline"
+                        onClick={() => setStep("name")}
+                        className="flex-1"
+                      >
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                      </Button>
+                      <Button onClick={handleRequestOtp} className="flex-1" size="lg">
+                        Send OTP <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
                   ) : (
                     <>
                       <div>
@@ -464,15 +587,24 @@ export default function FriendshipOnboardingPage() {
                           className="mt-2 text-center text-2xl tracking-widest"
                         />
                       </div>
-                      <Button
-                        onClick={handleVerifyOtp}
-                        disabled={isVerifying || otp.length !== 6}
-                        className="w-full"
-                        size="lg"
-                      >
-                        {isVerifying ? "Verifying..." : "Verify OTP"}
-                        {!isVerifying && <CheckCircle2 className="ml-2 h-4 w-4" />}
-                      </Button>
+                      <div className="flex gap-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => setStep("name")}
+                          className="flex-1"
+                        >
+                          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                        </Button>
+                        <Button
+                          onClick={handleVerifyOtp}
+                          disabled={isVerifying || otp.length !== 6}
+                          className="flex-1"
+                          size="lg"
+                        >
+                          {isVerifying ? "Verifying..." : "Verify OTP"}
+                          {!isVerifying && <CheckCircle2 className="ml-2 h-4 w-4" />}
+                        </Button>
+                      </div>
                     </>
                   )}
                 </div>
@@ -505,10 +637,10 @@ export default function FriendshipOnboardingPage() {
                     <Input
                       id="name"
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="mt-2"
+                      readOnly
+                      className="mt-2 bg-gray-50"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Name cannot be changed</p>
                   </div>
 
                   <div>

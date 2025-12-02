@@ -15,7 +15,7 @@ import {
   ArrowRight,
   PartyPopper
 } from "lucide-react";
-import { getInviteDetails, acceptInvite } from "@/lib/api/friendship";
+import { getInviteDetails, acceptInvite, verifyToken } from "@/lib/api/friendship";
 import Link from "next/link";
 
 export default function InviteAcceptancePage() {
@@ -28,11 +28,35 @@ export default function InviteAcceptancePage() {
   const [accepting, setAccepting] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const userId = typeof window !== "undefined" ? sessionStorage.getItem("id") : null;
-    setIsLoggedIn(!!userId);
-    loadInviteDetails();
+    const checkAuth = async () => {
+      const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
+      const userId = typeof window !== "undefined" ? sessionStorage.getItem("id") : null;
+      
+      if (!token || !userId) {
+        setIsLoggedIn(false);
+        setCheckingAuth(false);
+        loadInviteDetails();
+        return;
+      }
+
+      try {
+        // Verify token is valid
+        await verifyToken();
+        setIsLoggedIn(true);
+      } catch (error) {
+        // Token invalid, clear session
+        sessionStorage.clear();
+        setIsLoggedIn(false);
+      } finally {
+        setCheckingAuth(false);
+        loadInviteDetails();
+      }
+    };
+
+    checkAuth();
   }, []);
 
   const loadInviteDetails = async () => {
@@ -71,7 +95,7 @@ export default function InviteAcceptancePage() {
     }
   };
 
-  if (loading) {
+  if (loading || checkingAuth) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
@@ -122,8 +146,8 @@ export default function InviteAcceptancePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-white shadow-lg">
         <CardHeader className="text-center">
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}
@@ -131,9 +155,9 @@ export default function InviteAcceptancePage() {
           >
             <Sparkles className="h-12 w-12 mx-auto mb-4 text-purple-500" />
           </motion.div>
-          <CardTitle className="text-2xl text-gray-900">You&apos;ve Been Invited!</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">You&apos;ve Been Invited!</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 text-gray-900">
+        <CardContent className="space-y-6">
           <div className="text-center">
             <Avatar className="h-20 w-20 mx-auto mb-4">
               <AvatarImage src={inviteDetails.from_user?.avatar} />
@@ -141,29 +165,29 @@ export default function InviteAcceptancePage() {
                 {inviteDetails.from_user?.name?.charAt(0).toUpperCase() || "F"}
               </AvatarFallback>
             </Avatar>
-            <p className="text-lg font-medium mb-2 text-gray-900">
+            <p className="text-lg font-semibold mb-2 text-gray-900">
               {inviteDetails.from_user?.name} invited you to GuildUp!
             </p>
-            <p className="text-gray-600">
+            <p className="text-sm text-gray-700">
               Join them on a 30-day friendship journey to discover your compatibility
             </p>
           </div>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <p className="text-sm text-purple-800">
-              <strong>What&apos;s GuildUp?</strong> A platform where you and your friend answer daily
+            <p className="text-sm text-gray-900">
+              <strong className="font-semibold text-gray-900">What&apos;s GuildUp?</strong> A platform where you and your friend answer daily
               questions, build conversation streaks, and discover how compatible you are as friends!
             </p>
           </div>
 
           {!isLoggedIn ? (
             <div className="space-y-4">
-              <p className="text-center text-sm text-gray-600">
+              <p className="text-center text-sm font-medium text-gray-700">
                 Sign up or log in to accept this invitation
               </p>
               <Button
                 onClick={handleAccept}
-                className="w-full"
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white"
                 size="lg"
               >
                 Get Started <ArrowRight className="ml-2 h-4 w-4" />
@@ -171,13 +195,13 @@ export default function InviteAcceptancePage() {
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-center text-sm text-gray-600">
+              <p className="text-center text-sm font-medium text-gray-700">
                 Ready to start your friendship journey?
               </p>
               <Button
                 onClick={handleAccept}
                 disabled={accepting}
-                className="w-full"
+                className="w-full bg-purple-500 hover:bg-purple-600 text-white"
                 size="lg"
               >
                 {accepting ? "Accepting..." : "Accept Invitation"}
@@ -186,7 +210,7 @@ export default function InviteAcceptancePage() {
             </div>
           )}
 
-          <div className="text-center text-xs text-gray-500">
+          <div className="text-center text-xs text-gray-600 pt-2 border-t">
             <p>Invitation expires: {new Date(inviteDetails.expires_at).toLocaleDateString()}</p>
           </div>
         </CardContent>

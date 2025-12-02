@@ -39,13 +39,19 @@ import {
   getCompatibility,
   getFriendshipDetails,
   generateUserQuestion,
+  verifyToken,
+  getAllPreviousQAs,
+  updateActivity,
 } from "@/lib/api/friendship";
+import { setUser } from "@/redux/userSlice";
+import { useDispatch } from "react-redux";
 import { FriendshipChatProvider, useFriendshipChatContext } from "@/contexts/FriendshipChatContext";
 import { formatDistanceToNow } from "date-fns";
 
 function ChatContent() {
   const router = useRouter();
   const params = useParams();
+  const dispatch = useDispatch();
   const friendshipId = params.friendshipId as string;
   const { user } = useSelector((state: RootState) => state.user);
   
@@ -70,23 +76,74 @@ function ChatContent() {
   const [isGeneratingQuestion, setIsGeneratingQuestion] = useState(false);
   const [canGenerateQuestion, setCanGenerateQuestion] = useState(true);
   const [showQuestionReveal, setShowQuestionReveal] = useState(false);
+  const [previousQAs, setPreviousQAs] = useState<any[]>([]);
+  const [showPreviousQAs, setShowPreviousQAs] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (friendshipId) {
-      setCurrentFriendshipId(friendshipId);
-      loadData();
+    const checkAuthAndLoad = async () => {
+      // Check authentication first
+      const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
+      const userId = typeof window !== "undefined" ? sessionStorage.getItem("id") : null;
       
-      // Check if user came from WhatsApp link (check sessionStorage or URL params)
-      const fromWhatsApp = sessionStorage.getItem(`question_reveal_${friendshipId}`);
-      if (fromWhatsApp === 'true') {
-        setShowQuestionReveal(true);
-        sessionStorage.removeItem(`question_reveal_${friendshipId}`);
+      if (!token || !userId) {
+        // Store the current URL to redirect back after login
+        sessionStorage.setItem("redirectAfterLogin", `/friendship/chat/${friendshipId}`);
+        router.replace("/friendship/onboarding");
+        return;
       }
-    }
+
+      try {
+        // Verify token
+        const { user: verifiedUser } = await verifyToken();
+        
+        // Update sessionStorage and Redux
+        sessionStorage.setItem("user", JSON.stringify(verifiedUser));
+        sessionStorage.setItem("id", verifiedUser._id);
+        sessionStorage.setItem("name", verifiedUser.name || "");
+        dispatch(setUser(verifiedUser));
+        
+        if (friendshipId) {
+          setCurrentFriendshipId(friendshipId);
+          loadData();
+          
+          // Check if user came from WhatsApp link
+          const fromWhatsApp = sessionStorage.getItem(`question_reveal_${friendshipId}`);
+          if (fromWhatsApp === 'true') {
+            setShowQuestionReveal(true);
+            sessionStorage.removeItem(`question_reveal_${friendshipId}`);
+          }
+        }
+      } catch (error: any) {
+        // Token invalid, redirect to onboarding
+        console.error("Authentication failed:", error);
+        sessionStorage.clear();
+        sessionStorage.setItem("redirectAfterLogin", `/friendship/chat/${friendshipId}`);
+        router.replace("/friendship/onboarding");
+      }
+    };
+
+    checkAuthAndLoad();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [friendshipId, setCurrentFriendshipId]);
+  
+  // Update last activity when user is on chat page
+  useEffect(() => {
+    const updateUserActivity = async () => {
+      try {
+        await updateActivity();
+      } catch (error) {
+        // Ignore errors
+      }
+    };
+    
+    updateUserActivity();
+    const interval = setInterval(updateUserActivity, 60000); // Update every minute
+    
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [friendshipId]);
   
   // Check URL params for question reveal
   useEffect(() => {
@@ -122,6 +179,14 @@ function ChatContent() {
           setResponses(responsesData);
           clearInterval(pollInterval);
           toast.success("Both of you have answered! 🎉");
+          
+          // Refresh previousQAs to include the newly answered question
+          try {
+            const updatedQAs = await getAllPreviousQAs(friendshipId);
+            setPreviousQAs(updatedQAs.previous_qas || []);
+          } catch (e) {
+            // Ignore error
+          }
         } else if (responsesData && !responsesData.both_answered) {
           setResponses(responsesData);
         }
@@ -138,11 +203,12 @@ function ChatContent() {
 
   const loadData = async () => {
     try {
-      const [promptData, streakData, compatData, friendshipData] = await Promise.all([
+      const [promptData, streakData, compatData, friendshipData, previousQAsData] = await Promise.all([
         getCurrentPrompt(friendshipId),
         getStreak(friendshipId),
         getCompatibility(friendshipId),
         getFriendshipDetails(friendshipId),
+        getAllPreviousQAs(friendshipId).catch(() => ({ previous_qas: [] })),
       ]);
 
       const promptWithAnswered = {
@@ -155,6 +221,7 @@ function ChatContent() {
       setStreak(streakData);
       setCompatibility(compatData);
       setFriendship(friendshipData.friendship);
+      setPreviousQAs(previousQAsData.previous_qas || []);
 
       // Check if there's an unanswered user-initiated question
       // But allow the initiator to see the question even if they haven't answered
@@ -179,6 +246,16 @@ function ChatContent() {
         try {
           const responsesData = await getResponses(friendshipId);
           setResponses(responsesData);
+          
+          // If both answered, refresh previousQAs to include the current question
+          if (responsesData.both_answered) {
+            try {
+              const updatedQAs = await getAllPreviousQAs(friendshipId);
+              setPreviousQAs(updatedQAs.previous_qas || []);
+            } catch (e) {
+              // Ignore error, keep existing previousQAs
+            }
+          }
           
           // If both answered, allow generating new question
           if (responsesData.both_answered && promptData.prompt?.prompt_type === "user_initiated") {
@@ -392,10 +469,13 @@ function ChatContent() {
                 )}
               </div>
             </div>
-            {compat && (
-              <Badge className={`${compat.color} text-white text-xs`}>
-                {compatibility.score}%
-              </Badge>
+            {compat && compatibility && (
+              <div className="flex flex-col items-end">
+                <Badge className={`${compat.color} text-white text-xs mb-1`}>
+                  {compatibility.score}% {compat.emoji}
+                </Badge>
+                <span className="text-xs text-gray-500">Compatibility</span>
+              </div>
             )}
           </div>
         </div>
@@ -412,8 +492,10 @@ function ChatContent() {
               <Sparkles className="h-4 w-4 text-purple-500" />
               <span className="text-sm font-medium text-gray-900">
                 {prompt.prompt_type === "user_initiated" 
-                  ? `AI Question${prompt.initiated_by ? ` by ${prompt.initiated_by}` : ""}`
-                  : `Day ${prompt.day} Question`}
+                  ? `✨ AI Question${prompt.initiated_by ? ` by ${prompt.initiated_by}` : ""}`
+                  : prompt.day 
+                    ? `Day ${prompt.day} Question`
+                    : "✨ Most Recent Question"}
               </span>
               {prompt.prompt_type === "user_initiated" && (
                 <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
@@ -511,6 +593,65 @@ function ChatContent() {
                       </div>
                     )}
                   </div>
+                  
+                  {/* Previous Q&As Section - Show all previous questions (including current if both answered) */}
+                  {previousQAs.length > 0 && (
+                    <div className="pt-4 border-t mt-4">
+                      <button
+                        onClick={() => setShowPreviousQAs(!showPreviousQAs)}
+                        className="w-full flex items-center justify-between text-sm font-medium text-gray-700 hover:text-gray-900 py-2 transition-colors"
+                      >
+                        <span>
+                          All Questions & Answers ({previousQAs.length})
+                        </span>
+                        {showPreviousQAs ? (
+                          <ChevronUp className="h-4 w-4 text-gray-500" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-gray-500" />
+                        )}
+                      </button>
+                      
+                      {showPreviousQAs && (
+                        <div className="mt-3 space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                          {previousQAs.map((qa, idx) => (
+                            <div
+                              key={qa.prompt_id || idx}
+                              className="p-3 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                            >
+                              <div className="flex items-center gap-2 mb-2">
+                                {qa.day && (
+                                  <Badge variant="outline" className="text-xs bg-white text-gray-700 border-gray-300">
+                                    Day {qa.day}
+                                  </Badge>
+                                )}
+                                {qa.prompt_type === "user_initiated" && (
+                                  <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                    ✨ AI
+                                  </Badge>
+                                )}
+                                {!qa.day && qa.prompt_type !== "user_initiated" && (
+                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                    Recent
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm font-semibold text-gray-900 mb-3">{qa.question}</p>
+                              <div className="space-y-2">
+                                <div className="p-2.5 bg-blue-50 rounded-md border border-blue-200">
+                                  <p className="text-xs font-semibold text-blue-800 mb-1">You:</p>
+                                  <p className="text-sm text-blue-900 leading-relaxed">{qa.your_answer}</p>
+                                </div>
+                                <div className="p-2.5 bg-purple-50 rounded-md border border-purple-200">
+                                  <p className="text-xs font-semibold text-purple-800 mb-1">{friendship.friend.name}:</p>
+                                  <p className="text-sm text-purple-900 leading-relaxed">{qa.friend_answer}</p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}

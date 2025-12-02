@@ -20,7 +20,9 @@ import {
   Clock,
   CheckCircle2
 } from "lucide-react";
-import { getFriendshipPairs, getPendingInvitations } from "@/lib/api/friendship";
+import { getFriendshipPairs, getPendingInvitations, verifyToken } from "@/lib/api/friendship";
+import { setUser } from "@/redux/userSlice";
+import { useDispatch } from "react-redux";
 import Link from "next/link";
 
 interface FriendshipPair {
@@ -50,27 +52,69 @@ interface PendingInvitation {
 
 export default function FriendshipDashboardPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.user);
   const [pairs, setPairs] = useState<FriendshipPair[]>([]);
   const [pendingInvites, setPendingInvites] = useState<PendingInvitation[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const userId = typeof window !== "undefined" ? sessionStorage.getItem("id") : null;
-    if (!userId) {
-      router.push("/friendship/onboarding");
-      return;
-    }
+    const checkAuth = async () => {
+      // Check for token first
+      const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
+      const userId = typeof window !== "undefined" ? sessionStorage.getItem("id") : null;
+      
+      if (!token || !userId) {
+        // No token or user ID - redirect to onboarding immediately
+        sessionStorage.clear();
+        router.replace("/friendship/onboarding");
+        return;
+      }
 
-    loadData();
+      try {
+        // Verify token and get user data
+        const { user: verifiedUser } = await verifyToken();
+        
+        // Update sessionStorage and Redux
+        sessionStorage.setItem("user", JSON.stringify(verifiedUser));
+        sessionStorage.setItem("id", verifiedUser._id);
+        sessionStorage.setItem("name", verifiedUser.name || "");
+        dispatch(setUser(verifiedUser));
+        
+        // If user hasn't completed onboarding, redirect them
+        if (!verifiedUser.friendship_onboarding_completed) {
+          router.replace("/friendship/onboarding");
+          return;
+        }
+        
+        loadData();
+      } catch (error: any) {
+        // Token invalid, redirect to onboarding
+        console.error("Authentication failed:", error);
+        sessionStorage.clear();
+        router.replace("/friendship/onboarding");
+      }
+    };
+
+    checkAuth();
     
     // Refresh data every 5 seconds to catch new friendships
     const interval = setInterval(() => {
       loadData();
     }, 5000);
 
-    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  useEffect(() => {
+    if (!loading) {
+      // Refresh data every 5 seconds to catch new friendships
+      const interval = setInterval(() => {
+        loadData();
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [loading]);
 
   const loadData = async () => {
     try {
@@ -194,11 +238,14 @@ export default function FriendshipDashboardPage() {
                                   <Flame className="h-3 w-3 mr-1" />
                                   Day {pair.current_day}/30 - {pair.current_streak} day streak
                                 </Badge>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <Badge className={`${compat.color} text-white whitespace-nowrap`}>
-                                    {pair.compatibility_score}% {compat.emoji}
-                                  </Badge>
-                                  <span className="text-sm text-gray-600 whitespace-nowrap">{compat.message}</span>
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Badge className={`${compat.color} text-white whitespace-nowrap`}>
+                                      {pair.compatibility_score}% {compat.emoji}
+                                    </Badge>
+                                    <span className="text-xs text-gray-500 whitespace-nowrap">Compatibility</span>
+                                  </div>
+                                  <span className="text-xs text-gray-600 whitespace-nowrap">{compat.message}</span>
                                 </div>
                               </div>
                             </div>

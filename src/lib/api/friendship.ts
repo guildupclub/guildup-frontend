@@ -248,3 +248,53 @@ export const generateUserQuestion = async (friendshipId: string) => {
   return response.data.data;
 };
 
+// Get all previous questions and answers
+export const getAllPreviousQAs = async (friendshipId: string) => {
+  const userId = getUserId();
+  if (!userId) throw new Error("User not authenticated");
+
+  const response = await axios.get(`${API_BASE_URL}/v1/friendship/${friendshipId}/previous-qas`, {
+    headers: getAuthHeaders(),
+    params: { userId },
+  });
+
+  if (response.data.r === "e") {
+    throw new Error(response.data.e);
+  }
+
+  return response.data.data;
+};
+
+export const updateActivity = async () => {
+  const userId = getUserId();
+  if (!userId) throw new Error("User not authenticated");
+
+  const response = await axios.post(`${API_BASE_URL}/v1/friendship/update-activity`, {}, {
+    headers: getAuthHeaders(),
+  });
+
+  if (response.data.r === "e") {
+    throw new Error(response.data.e);
+  }
+
+  return response.data.data;
+};
+
+// Verify token and get user
+export const verifyToken = async () => {
+  const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : null;
+  if (!token) {
+    throw new Error("No token found");
+  }
+
+  const response = await axios.get(`${API_BASE_URL}/v1/auth/verify-token`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (response.data.r === "e") {
+    throw new Error(response.data.e);
+  }
+
+  return response.data.data;
+};
+
