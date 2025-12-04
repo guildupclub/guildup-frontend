@@ -23,6 +23,7 @@ import { saveToGoogleSheets } from "./utils/googleSheets";
 import { useCachedCommunities } from "@/hooks/useCachedCommunities";
 import { primary } from "@/app/colours";
 import { WHATSAPP_NUMBER_DIGITS } from "@/config/constants";
+import Loader from "@/components/Loader";
 
 declare global {
   interface Window {
@@ -65,11 +66,18 @@ export default function WellnessCheckPage() {
   const [score, setScore] = useState<{ total: number; level: string; labels: string[] } | null>(null);
   const [recoveryDays, setRecoveryDays] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
+  const [daysWithSlots, setDaysWithSlots] = useState<DaySlots[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 0, minutes: 0 });
   const [mounted, setMounted] = useState(false);
   
   // OTP flow state
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -211,6 +219,72 @@ export default function WellnessCheckPage() {
     };
   }, []);
 
+  // Fetch available slots for next 7 days (when results step loads)
+  useEffect(() => {
+    if (step === "results") {
+      setIsLoadingSlots(true);
+      const fetchAllSlots = async () => {
+        try {
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(0, 0, 0, 0);
+
+          const slotsPromises = [];
+          for (let i = 1; i <= 7; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() + i);
+            date.setHours(0, 0, 0, 0);
+            const formattedDate = format(date, "yyyy-MM-dd");
+
+            slotsPromises.push(
+              axios
+                .get(`${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`, {
+                  params: {
+                    offering_id: CLARITY_CALL_OFFERING._id,
+                    date: formattedDate,
+                  },
+                })
+                .then((res) => {
+                  const processedSlots = processSlotsForDisplay(res.data || [], date);
+                  return { date, slots: processedSlots };
+                })
+                .catch((error) => {
+                  console.error(`Error fetching slots for ${formattedDate}:`, error);
+                  return { date, slots: [] };
+                })
+            );
+          }
+
+          const results = await Promise.all(slotsPromises);
+          const daysWithAvailableSlots = results.filter((day) => {
+            const hasAvailableSlot = day.slots.some((slot: TimeSlot) => !slot.booked);
+            return day.slots.length > 0 && hasAvailableSlot;
+          });
+          setDaysWithSlots(daysWithAvailableSlots);
+
+          // Auto-select earliest available (non-booked) slot for tomorrow
+          const tomorrowResult = results.find((r) => isSameDay(r.date, tomorrow));
+          if (tomorrowResult && tomorrowResult.slots.length > 0) {
+            const firstAvailableSlot = tomorrowResult.slots.find((s: TimeSlot) => !s.booked) || tomorrowResult.slots[0];
+            setSelectedDate(tomorrowResult.date);
+            setSelectedSlot(firstAvailableSlot);
+          } else if (daysWithAvailableSlots.length > 0) {
+            const firstDay = daysWithAvailableSlots[0];
+            const firstAvailableSlot = firstDay.slots.find((s: TimeSlot) => !s.booked) || firstDay.slots[0];
+            setSelectedDate(firstDay.date);
+            setSelectedSlot(firstAvailableSlot);
+          }
+        } catch (error) {
+          console.error("Error fetching slots:", error);
+        } finally {
+          setIsLoadingSlots(false);
+        }
+      };
+
+      fetchAllSlots();
+    }
+  }, [step]);
+
   // Fix hydration error - only run on client
   useEffect(() => {
     setMounted(true);
@@ -337,6 +411,26 @@ export default function WellnessCheckPage() {
           }
         }
 
+        // Send WhatsApp template and email notifications
+        try {
+          if (score && recoveryDays !== null) {
+            await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/notification/wellness-check-notifications`,
+              {
+                phone: phone.replace("+", ""),
+                name,
+                email,
+                score: score.total,
+                severity: score.level,
+                recoveryDays,
+              }
+            );
+          }
+        } catch (error) {
+          console.error("Error sending notifications:", error);
+          // Don't block the flow if this fails
+        }
+
         // Move to results step
         setIsLoadingResults(true);
         setTimeout(() => {
@@ -353,6 +447,112 @@ export default function WellnessCheckPage() {
     }
   };
 
+
+  // Handle booking
+  const handleBook = async () => {
+    if (!selectedDate || !selectedSlot) {
+      toast.error("Please select a date and time slot.");
+      return;
+    }
+
+    // Prevent booking of "booked" slots (frontend-only check)
+    if (selectedSlot.booked) {
+      toast.error("This slot is already booked. Please select another time.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    try {
+      const storedUser = sessionStorage.getItem("user");
+      const bookingUserId = userId || (storedUser ? JSON.parse(storedUser)._id : undefined);
+
+      if (!bookingUserId) {
+        toast.error("Please log in to book a slot.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const dateObject = new Date(selectedSlot.start);
+      dateObject.setMinutes(dateObject.getMinutes() - dateObject.getTimezoneOffset());
+      const startTime = dateObject.toISOString().slice(0, 19);
+
+      // Format date as string for backend
+      const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined;
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/create-simple-order`,
+        {
+          offering_id: CLARITY_CALL_OFFERING._id,
+          user_id: bookingUserId,
+          date: formattedDate,
+          slot: selectedSlot,
+          startTime,
+          email: email || undefined,
+        }
+      );
+
+      if (response.data.r === "s") {
+        const order = response.data.data;
+
+        const razorpayOptions = {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+          amount: order.amount,
+          currency: order.currency || "INR",
+          name: "GuildUp",
+          description: "Clarity Call Booking",
+          order_id: order.id,
+          handler: async (paymentResponse: any) => {
+            setIsRazorpayOpen(false);
+            const verifyResponse = await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/payment/verify-simple-payment`,
+              {
+                razorpay_order_id: paymentResponse.razorpay_order_id,
+                razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                razorpay_signature: paymentResponse.razorpay_signature,
+                offering_id: CLARITY_CALL_OFFERING._id,
+                user_id: bookingUserId,
+                startTime,
+              }
+            );
+
+            if (verifyResponse.data.r === "s") {
+              toast.success("Booking confirmed successfully!");
+              router.push(
+                `/booking-confirmation?bookingId=${verifyResponse.data.data._id}&title=Clarity Call&duration=${CLARITY_CALL_OFFERING.duration}&price=${CLARITY_CALL_OFFERING.price}&currency=INR&type=${CLARITY_CALL_OFFERING.type}&isFree=false&selectedDate=${selectedDate?.toISOString()}&selectedTime=${selectedSlot?.start}`
+              );
+            } else {
+              toast.error("Payment verification failed");
+            }
+          },
+          prefill: {
+            name: (user?.name || name || "").trim(),
+            contact: user?.phone || phone || "",
+          },
+          theme: {
+            color: "#3399cc",
+          },
+          modal: {
+            ondismiss: () => {
+              setIsRazorpayOpen(false);
+            },
+          },
+        };
+
+        const razorpayInstance = new window.Razorpay(razorpayOptions);
+        setIsRazorpayOpen(true);
+        razorpayInstance.open();
+      } else {
+        toast.error("Failed to create order");
+      }
+    } catch (error: any) {
+      console.error("Error booking slot:", error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.e || error.message || "Failed to process booking";
+      toast.error(errorMessage);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   // Helper functions for results page
   const getSymptomDescription = () => {
@@ -385,6 +585,7 @@ export default function WellnessCheckPage() {
     const params = new URLSearchParams();
     if (name) params.set("name", name);
     if (phone) params.set("phone", phone);
+    if (email) params.set("email", email);
     router.push(`/clarity-call?${params.toString()}`);
   };
 
@@ -518,15 +719,15 @@ export default function WellnessCheckPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 sm:gap-4 lg:gap-6 py-4 sm:py-6">
-            <div className="flex items-center gap-2 text-gray-700">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-gray-700">
               <span className="text-xl sm:text-2xl">⭐</span>
               <span className="font-medium text-sm sm:text-base">Trusted by 1000+ people</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-gray-700">
               <span className="text-xl sm:text-2xl">💬</span>
               <span className="font-medium text-sm sm:text-base">Backed by real coaching experience</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-700">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-gray-700">
               <span className="text-xl sm:text-2xl">⏱️</span>
               <span className="font-medium text-sm sm:text-base">Takes under 2 minutes</span>
             </div>
@@ -634,7 +835,7 @@ export default function WellnessCheckPage() {
                   <button
                     key={value}
                     onClick={() => handleAnswer(String(value))}
-                    className="w-full text-left bg-white rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 px-4 sm:px-5 py-3 sm:py-4 transition-all text-sm sm:text-base leading-relaxed font-normal"
+                    className="w-full text-left bg-white rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 px-4 sm:px-5 py-3 sm:py-4 transition-all text-sm sm:text-base leading-relaxed font-normal break-words"
                   >
                     {PHQ9.response_scale[value]}
                   </button>
@@ -710,22 +911,38 @@ export default function WellnessCheckPage() {
             ) : (
               <>
                 <div className="space-y-4">
-                  <Label htmlFor="phone" className="text-base font-semibold">
-                    What&apos;s your phone number? <span className="text-red-500">*</span>
-                  </Label>
-                  <PhoneInput
-                    international
-                    defaultCountry="IN"
-                    value={phone}
-                    onChange={(value) => setPhone(value || "")}
-                    className="flex-1"
-                    required
-                    placeholder="Enter your phone number"
-                    autoFocus
-                  />
-                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                    Please enter the number with WhatsApp
-                  </p>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-base font-semibold">
+                      What&apos;s your email address? <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="flex-1"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-base font-semibold">
+                      What&apos;s your phone number? <span className="text-red-500">*</span>
+                    </Label>
+                    <PhoneInput
+                      international
+                      defaultCountry="IN"
+                      value={phone}
+                      onChange={(value) => setPhone(value || "")}
+                      className="flex-1"
+                      required
+                      placeholder="Enter your phone number"
+                      autoFocus
+                    />
+                    <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                      Please enter the number with WhatsApp
+                    </p>
+                  </div>
                 </div>
                 <Button
                   onClick={() => {
@@ -770,6 +987,7 @@ export default function WellnessCheckPage() {
   if (step === "otp-verify") {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-white pt-20 pb-16 px-4 sm:px-6 lg:px-8 font-sans">
+        {isLoadingResults && <Loader />}
         <div className="max-w-2xl mx-auto space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -778,6 +996,7 @@ export default function WellnessCheckPage() {
           >
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Verify Your Phone</h2>
             <p className="text-base sm:text-lg text-gray-600">We sent a 6-digit code to {phone}</p>
+            <p className="text-sm sm:text-base text-blue-600 font-medium">📱 Check your WhatsApp for OTP</p>
                 </motion.div>
 
                 <motion.div
@@ -797,7 +1016,7 @@ export default function WellnessCheckPage() {
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   placeholder="6-digit OTP"
                   required
-                  className="flex-1 text-center text-2xl tracking-widest"
+                    className="flex-1 text-center text-xl sm:text-2xl tracking-widest"
                   maxLength={6}
                 />
                       </div>
@@ -827,6 +1046,10 @@ export default function WellnessCheckPage() {
 
   // Results Page (Prototype-2 Design)
   if (step === "results" && score && recoveryDays !== null) {
+    // Get grouped slots for selected date
+    const groupedSlots = selectedDate ? groupSlotsByTimeOfDay(
+      daysWithSlots.find((d) => isSameDay(d.date, selectedDate))?.slots || []
+    ) : null;
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -858,34 +1081,26 @@ export default function WellnessCheckPage() {
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">Your Assessment Results</h1>
               <div className="space-y-3">
                   <div>
-                  <div className="text-4xl sm:text-5xl md:text-6xl font-bold mb-2">
+                  <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-2 break-words">
                     <span style={{ color: primary }}>{score.total}</span>{" "}
-                    <span className="text-xl sm:text-2xl md:text-3xl text-gray-600">/ 27</span>
+                    <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600">/ 27</span>
                       </div>
                   <div className="inline-block px-3 sm:px-4 py-1.5 sm:py-2 bg-orange-100 text-orange-700 rounded-full text-sm sm:text-lg font-semibold">
                     {score.level}
                     </div>
                     </div>
-                <p className="text-base sm:text-lg text-gray-700 font-medium px-2">{getSymptomDescription()}</p>
+                <p className="text-sm sm:text-base md:text-lg text-gray-700 font-medium px-2 break-words">{getSymptomDescription()}</p>
                   </div>
             </motion.div>
 
             {/* Recovery Timeline Comparison */}
-            {isLoadingResults ? (
-              <div className="text-center py-6 sm:py-8">
-                <div className="flex items-center justify-center gap-2 sm:gap-3 text-gray-600">
-                  <div className="animate-spin h-5 w-5 sm:h-6 sm:w-6 border-2 sm:border-3 border-blue-600 border-t-transparent rounded-full"></div>
-                  <p className="text-sm sm:text-lg">Calculating your personalized recovery timeline...</p>
-                        </div>
-                        </div>
-            ) : (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border-2 border-blue-200"
               >
                 <div className="text-center space-y-4 sm:space-y-6">
-                  <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 break-words">
                     How Long Will It Take You To Feel Better?
                 </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -895,8 +1110,8 @@ export default function WellnessCheckPage() {
                       <p className="text-xs sm:text-sm text-gray-600 mt-2">Traditional therapy & self-help</p>
                         </div>
                     <div className="bg-green-50 rounded-lg sm:rounded-xl p-4 sm:p-6 border-2 border-green-200">
-                      <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-2" style={{ color: primary }}>
-                        GuildUp: <span className="text-3xl sm:text-4xl md:text-5xl">{recoveryDays}</span> days
+                      <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 break-words" style={{ color: primary }}>
+                        <span className="block sm:inline">GuildUp: </span><span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">{recoveryDays}</span> <span className="text-base sm:text-lg md:text-xl lg:text-2xl">days</span>
                         </div>
                       <p className="text-xs sm:text-sm text-gray-600 mb-2">Based on your score</p>
                       <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-green-500 mx-auto" />
@@ -904,11 +1119,11 @@ export default function WellnessCheckPage() {
                   </div>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-3 sm:p-4">
-                    <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-900">
+                    <p className="text-sm sm:text-base md:text-lg font-semibold text-gray-900 break-words">
                       Most people at your stage start feeling{" "}
                       <span style={{ color: primary }}>
-                        <span className="text-xl sm:text-2xl font-bold">50–70%</span> better in the first{" "}
-                        <span className="text-xl sm:text-2xl font-bold">30 days</span>
+                        <span className="text-lg sm:text-xl md:text-2xl font-bold">50–70%</span> better in the first{" "}
+                        <span className="text-lg sm:text-xl md:text-2xl font-bold">30 days</span>
                       </span>
                     </p>
                   </div>
@@ -917,7 +1132,7 @@ export default function WellnessCheckPage() {
                   <Button
                     size="lg"
                       onClick={navigateToClarityCall}
-                      className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                      className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
                   >
                     Book Your Clarity Call Now
                   </Button>
@@ -925,7 +1140,6 @@ export default function WellnessCheckPage() {
                   </div>
               </div>
             </motion.div>
-          )}
         </div>
         </section>
 
@@ -938,11 +1152,11 @@ export default function WellnessCheckPage() {
               viewport={{ once: true }}
               className="space-y-6"
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 text-center">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 text-center break-words px-2">
                 What Your Score of{" "}
                 <span style={{ color: primary }}>{score.total}</span>/27 Really Means
               </h2>
-              <p className="text-base sm:text-lg md:text-xl text-gray-700 text-center px-2">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 text-center px-2 break-words">
                 You&apos;re experiencing{" "}
                 <span className="font-bold" style={{ color: primary }}>{score.level.toLowerCase()}</span> that are impacting your daily life
               </p>
@@ -962,7 +1176,7 @@ export default function WellnessCheckPage() {
                   ].map((symptom, idx) => (
                     <div key={idx} className="flex items-start gap-2">
                       <X className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{symptom}</span>
+                      <span className="text-gray-700 text-sm sm:text-base break-words">{symptom}</span>
                     </div>
                   ))}
                 </div>
@@ -981,20 +1195,20 @@ export default function WellnessCheckPage() {
                   ].map((item, idx) => (
                     <div key={idx} className="flex items-start gap-2">
                       <X className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600">{item}</span>
+                      <span className="text-gray-600 text-sm sm:text-base break-words">{item}</span>
                       </div>
                   ))}
                 </div>
               </div>
 
               <div className="bg-blue-50 border-l-4 rounded-lg p-4 sm:p-6" style={{ borderColor: primary }}>
-                <p className="text-base sm:text-lg md:text-xl font-semibold text-gray-900">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl font-semibold text-gray-900 break-words">
                   The Truth:{" "}
                   <span style={{ color: primary }}>
                     Anxiety, depression, and toxic relationship loops aren&apos;t thought problems. They&apos;re nervous system problems.
                         </span>
                 </p>
-                <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 sm:mt-3">
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg text-gray-700 mt-2 sm:mt-3 break-words">
                   Your mind and nervous system have been stuck in survival mode — reacting like you&apos;re under threat even when you&apos;re safe.
                 </p>
                       </div>
@@ -1004,7 +1218,7 @@ export default function WellnessCheckPage() {
                 <Button
                   size="lg"
                   onClick={navigateToClarityCall}
-                  className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
                 >
                   Book Your Clarity Call Now
                 </Button>
@@ -1023,9 +1237,9 @@ export default function WellnessCheckPage() {
               viewport={{ once: true }}
               className="text-center space-y-4 sm:space-y-6"
             >
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 px-2">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 px-2 break-words">
                 How <span style={{ color: primary }}>GuildUp</span> Framework Fixes This in{" "}
-                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl" style={{ color: primary }}>
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl break-words" style={{ color: primary }}>
                   {recoveryDays} Days
                       </span>
               </h2>
@@ -1093,7 +1307,7 @@ export default function WellnessCheckPage() {
                 <Button
                   size="lg"
                   onClick={navigateToClarityCall}
-                  className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
                 >
                   Book Your Clarity Call Now
                 </Button>
@@ -1157,7 +1371,7 @@ export default function WellnessCheckPage() {
                 <Button
                   size="lg"
                   onClick={navigateToClarityCall}
-                  className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
                 >
                   Book Your Clarity Call Now
                 </Button>
@@ -1213,7 +1427,7 @@ export default function WellnessCheckPage() {
                 <Button
                   size="lg"
                   onClick={navigateToClarityCall}
-                  className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
                 >
                   Book Your Clarity Call Now
                 </Button>
@@ -1336,7 +1550,7 @@ export default function WellnessCheckPage() {
               <Button
                 size="lg"
                 onClick={navigateToClarityCall}
-                className="bg-blue-600 hover:bg-blue-700 text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-3 sm:py-4 md:py-5 lg:py-6 xl:py-8 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all"
+                className="bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold px-4 sm:px-6 md:px-8 lg:px-12 py-3 sm:py-4 md:py-5 lg:py-6 w-full sm:w-auto shadow-lg hover:shadow-xl transition-all break-words"
               >
                 Book Your Clarity Call Now
               </Button>
@@ -1398,6 +1612,187 @@ export default function WellnessCheckPage() {
                 </div>
             </div>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* SCREEN 8: Booking Section with Pricing */}
+        <section className="py-8 sm:py-12 px-4 bg-white pb-24 sm:pb-12">
+          <div className="max-w-2xl mx-auto w-full space-y-6 sm:space-y-8">
+            {/* Pricing Notice */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 rounded-xl p-6 sm:p-8 text-center shadow-lg"
+              style={{ borderColor: primary }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm sm:text-base text-gray-600 mb-1">Limited Time Offer</p>
+                  <div className="text-lg sm:text-xl text-gray-500 line-through mb-2">Usually ₹1,999</div>
+                  <div className="text-4xl sm:text-5xl md:text-6xl font-bold flex items-center justify-center gap-2 mb-2" style={{ color: primary }}>
+                    <FaRupeeSign className="w-8 h-8 sm:w-10 sm:h-10" />
+                    299
+                  </div>
+                  <div className="inline-block px-4 py-2 bg-red-500 text-white rounded-full text-sm sm:text-base font-semibold mb-4">
+                    Save 85%
+                  </div>
+                </div>
+                <div className="bg-white/80 rounded-lg p-4 space-y-2">
+                  <p className="text-sm sm:text-base text-gray-700">
+                    This price is only available for the next{" "}
+                    <span className="font-bold text-lg sm:text-xl" style={{ color: primary }}>{timeLeft.days} days</span>.
+                  </p>
+                  <p className="text-sm sm:text-base text-gray-700">
+                    After that, the price will revise to ₹1,999.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Booking Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-200"
+            >
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center">
+                Book Your <span style={{ color: primary }}>40-Min</span> Clarity Call
+              </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Name</Label>
+                  <Input value={name} disabled className="bg-gray-50" />
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Phone</Label>
+                  <Input value={phone} disabled className="bg-gray-50" />
+                  <div className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Verified
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600 mb-2 block">Email</Label>
+                  <Input 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="bg-white"
+                  />
+                </div>
+
+                {/* Date Selection */}
+                {isLoadingSlots ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin h-8 w-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
+                    <p className="mt-3 text-gray-600">Loading available slots...</p>
+                  </div>
+                ) : daysWithSlots.length > 0 ? (
+                  <>
+                    <div>
+                      <Label className="text-sm text-gray-600 mb-2 block">Select Date</Label>
+                      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                        {daysWithSlots.slice(0, 3).map((day, idx) => {
+                          const availableSlots = day.slots.filter((s: TimeSlot) => !s.booked).length;
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setSelectedDate(day.date);
+                                if (day.slots.length > 0) {
+                                  // Select first available (non-booked) slot
+                                  const firstAvailableSlot = day.slots.find((s: TimeSlot) => !s.booked) || day.slots[0];
+                                  setSelectedSlot(firstAvailableSlot);
+                                }
+                              }}
+                              className={`p-2 sm:p-3 rounded-lg border-2 text-xs sm:text-sm ${
+                                selectedDate && isSameDay(day.date, selectedDate)
+                                  ? "border-blue-600 bg-blue-50"
+                                  : "border-gray-200 hover:border-blue-300"
+                              }`}
+                            >
+                              <div className="font-semibold">{format(day.date, "EEE")}</div>
+                              <div className="text-[10px] sm:text-xs text-gray-600">{format(day.date, "MMM d")}</div>
+                              <div className="text-[10px] sm:text-xs text-gray-500 mt-1">
+                                {availableSlots} {availableSlots === 1 ? "slot" : "slots"}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Time Selection */}
+                    {selectedDate && groupedSlots && (
+                      <div>
+                        <Label className="text-sm text-gray-600 mb-2 block">Select Time</Label>
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                          {[
+                            ...(groupedSlots.morning || []),
+                            ...(groupedSlots.afternoon || []),
+                            ...(groupedSlots.evening || []),
+                          ].map((slot, idx) => {
+                            const isBooked = slot.booked || false;
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => !isBooked && setSelectedSlot(slot)}
+                                disabled={isBooked}
+                                className={`p-2 sm:p-3 rounded-lg border-2 text-xs sm:text-sm transition-all ${
+                                  isBooked
+                                    ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                                    : selectedSlot?.start === slot.start
+                                    ? "border-blue-600 bg-blue-50 font-semibold"
+                                    : "border-gray-200 hover:border-blue-300"
+                                }`}
+                                title={isBooked ? "This slot is booked" : ""}
+                              >
+                                {formatTime(slot.start)}
+                                {isBooked && <span className="block text-[10px] text-gray-500 mt-1">Booked</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-gray-600">
+                    <p>No available slots in the next 7 days.</p>
+                    <p className="text-sm text-gray-500 mt-2">Please check back later or contact support.</p>
+                  </div>
+                )}
+                
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Clarity Call</span>
+                    <span className="font-semibold">₹299</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between items-center">
+                    <span className="font-bold text-lg">Total</span>
+                    <span className="text-2xl font-bold text-blue-600 flex items-center gap-1">
+                      <FaRupeeSign className="w-5 h-5" />
+                      299
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  size="lg"
+                  onClick={handleBook}
+                  disabled={!selectedDate || !selectedSlot || isProcessing || selectedSlot?.booked}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-base sm:text-lg md:text-xl lg:text-2xl font-bold py-4 sm:py-5 md:py-6 lg:py-7 disabled:opacity-50 disabled:cursor-not-allowed break-words"
+                >
+                  {isProcessing ? "Processing..." : selectedSlot?.booked ? "Slot Booked" : "Book My Clarity Call"}
+                </Button>
+                <p className="text-xs sm:text-sm text-center text-gray-600">
+                  Secure payment • Instant confirmation • 100% refund if not valuable
+                </p>
               </div>
             </motion.div>
           </div>
