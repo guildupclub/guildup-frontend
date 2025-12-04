@@ -48,12 +48,14 @@ export default function ClarityCallPage() {
   const { user } = useSelector((state: RootState) => state.user);
   const userId = user?._id;
 
-  // Get name and phone from URL params (if coming from wellness-check)
+  // Get name, phone, and email from URL params (if coming from wellness-check)
   const nameFromUrl = searchParams?.get("name") || "";
   const phoneFromUrl = searchParams?.get("phone") || "";
+  const emailFromUrl = searchParams?.get("email") || "";
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -62,7 +64,7 @@ export default function ClarityCallPage() {
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ days: 3, hours: 0, minutes: 0 });
 
-  // Prefill name and phone if coming from wellness-check
+  // Prefill name, phone, and email if coming from wellness-check
   useEffect(() => {
     if (nameFromUrl) {
       setName(nameFromUrl);
@@ -70,7 +72,26 @@ export default function ClarityCallPage() {
     if (phoneFromUrl) {
       setPhone(phoneFromUrl);
     }
-  }, [nameFromUrl, phoneFromUrl]);
+    if (emailFromUrl) {
+      setEmail(emailFromUrl);
+    }
+  }, [nameFromUrl, phoneFromUrl, emailFromUrl]);
+
+  // Load Razorpay script once on mount
+  useEffect(() => {
+    // Check if script already exists (e.g., from wellness-check page navigation)
+    if (window.Razorpay) return;
+    
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   // Helper functions
   const formatTime = (dateString: string) => {
@@ -273,6 +294,7 @@ export default function ClarityCallPage() {
           date: formattedDate,
           slot: selectedSlot,
           startTime,
+          email: email || undefined,
         }
       );
 
@@ -323,9 +345,29 @@ export default function ClarityCallPage() {
           },
         };
 
-        const razorpayInstance = new window.Razorpay(razorpayOptions);
-        setIsRazorpayOpen(true);
-        razorpayInstance.open();
+        // Wait for Razorpay to be available if script is still loading
+        if (!window.Razorpay) {
+          // Wait up to 5 seconds for Razorpay to load
+          let attempts = 0;
+          const checkRazorpay = setInterval(() => {
+            attempts++;
+            if (window.Razorpay || attempts > 50) {
+              clearInterval(checkRazorpay);
+              if (window.Razorpay) {
+                const razorpayInstance = new window.Razorpay(razorpayOptions);
+                setIsRazorpayOpen(true);
+                razorpayInstance.open();
+              } else {
+                toast.error("Payment gateway is still loading. Please try again in a moment.");
+                setIsProcessing(false);
+              }
+            }
+          }, 100);
+        } else {
+          const razorpayInstance = new window.Razorpay(razorpayOptions);
+          setIsRazorpayOpen(true);
+          razorpayInstance.open();
+        }
       } else {
         toast.error("Failed to create order");
       }
@@ -341,34 +383,30 @@ export default function ClarityCallPage() {
   const isFromWellnessCheck = !!nameFromUrl && !!phoneFromUrl;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-white pt-20 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-2xl mx-auto w-full space-y-6 sm:space-y-8">
+    <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-white pt-4 pb-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-2xl mx-auto w-full space-y-4 sm:space-y-6">
         {/* Pricing Notice */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 rounded-xl p-6 sm:p-8 text-center shadow-lg"
+          className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 rounded-xl p-4 sm:p-5 text-center shadow-lg"
           style={{ borderColor: primary }}
         >
-          <div className="space-y-4">
+          <div className="space-y-2 sm:space-y-3">
             <div>
-              <p className="text-sm sm:text-base text-gray-600 mb-1">Limited Time Offer</p>
-              <div className="text-lg sm:text-xl text-gray-500 line-through mb-2">Usually ₹1,999</div>
-              <div className="text-4xl sm:text-5xl md:text-6xl font-bold flex items-center justify-center gap-2 mb-2" style={{ color: primary }}>
-                <FaRupeeSign className="w-8 h-8 sm:w-10 sm:h-10" />
+              <p className="text-xs sm:text-sm text-gray-600 mb-0.5">Limited Time Offer</p>
+              <div className="text-sm sm:text-base text-gray-500 line-through mb-1">Usually ₹1,999</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold flex items-center justify-center gap-1.5 mb-1" style={{ color: primary }}>
+                <FaRupeeSign className="w-6 h-6 sm:w-8 sm:h-8" />
                 299
               </div>
-              <div className="inline-block px-4 py-2 bg-red-500 text-white rounded-full text-sm sm:text-base font-semibold mb-4">
+              <div className="inline-block px-3 py-1 bg-red-500 text-white rounded-full text-xs sm:text-sm font-semibold mb-2">
                 Save 85%
               </div>
             </div>
-            <div className="bg-white/80 rounded-lg p-4 space-y-2">
-              <p className="text-sm sm:text-base text-gray-700">
-                This price is only available for the next{" "}
-                <span className="font-bold text-lg sm:text-xl" style={{ color: primary }}>{timeLeft.days} days</span>.
-              </p>
-              <p className="text-sm sm:text-base text-gray-700">
-                After that, the price will revise to ₹1,999.
+            <div className="bg-white/80 rounded-lg p-2.5 sm:p-3">
+              <p className="text-xs sm:text-sm text-gray-700">
+                Only <span className="font-bold text-sm sm:text-base" style={{ color: primary }}>{timeLeft.days} days</span> left at this price. After that, price will revise to ₹1,999.
               </p>
             </div>
           </div>
@@ -411,6 +449,17 @@ export default function ClarityCallPage() {
                   Verified
                 </div>
               )}
+            </div>
+            <div>
+              <Label className="text-sm text-gray-600 mb-2 block">Email</Label>
+              <Input 
+                type="email"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isFromWellnessCheck && !!emailFromUrl}
+                className={isFromWellnessCheck && !!emailFromUrl ? "bg-gray-50" : ""}
+                placeholder="Enter your email"
+              />
             </div>
 
             {/* Date Selection */}
@@ -494,17 +543,19 @@ export default function ClarityCallPage() {
               </div>
             )}
             
-            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Clarity Call</span>
-                <span className="font-semibold">₹299</span>
-              </div>
-              <div className="border-t pt-2 flex justify-between items-center">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="flex justify-between items-center">
                 <span className="font-bold text-lg">Total</span>
-                <span className="text-2xl font-bold text-blue-600 flex items-center gap-1">
-                  <FaRupeeSign className="w-5 h-5" />
-                  299
-                </span>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="text-sm text-gray-500 line-through flex items-center gap-1">
+                    <FaRupeeSign className="w-3 h-3" />
+                    1,999
+                  </div>
+                  <span className="text-2xl font-bold text-blue-600 flex items-center gap-1">
+                    <FaRupeeSign className="w-5 h-5" />
+                    299
+                  </span>
+                </div>
               </div>
             </div>
             <Button
