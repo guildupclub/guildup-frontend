@@ -1,5 +1,7 @@
 {
   "rules": {
+    ".read": "now < 1751740200000",
+    ".write": "now < 1751740200000",
     "programLeads": {
       "$program": {
         "$leadId": {
@@ -41,19 +43,7 @@
           }
         }
       }
-    },
-    "friendshipPresence": {
-      ".read": true,
-      ".write": true,
-      "$friendshipId": {
-        ".read": true,
-        ".write": true,
-        "$userId": {
-          ".read": true,
-          ".write": true,
-          ".validate": "newData.hasChildren(['online', 'lastSeen', 'userId']) && newData.child('online').isBoolean() && newData.child('userId').isString()"
-        }
-      }
     }
   }
-} 
+}
+
