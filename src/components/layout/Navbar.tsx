@@ -419,6 +419,13 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                       >
                         <div className="pl-4 pr-2 py-2 space-y-1">
                           <Link
+                            href="/programs/colleges"
+                            className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
+                            onClick={() => setIsProgramsExpanded(false)}
+                          >
+                            For Colleges
+                          </Link>
+                          <Link
                             href="/programs/pcos"
                             className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50/80 hover:text-primary transition-colors duration-200 rounded-lg"
                             onClick={() => setIsProgramsExpanded(false)}
@@ -543,6 +550,7 @@ export function Navbar(props: React.HTMLAttributes<HTMLElement>) {
                     <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-56 bg-white/95 backdrop-blur-md border border-gray-200/60 rounded-2xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                       <div className="py-3">
                         {[
+                          { name: "For Colleges", href: "/programs/colleges" },
                           { name: "PCOS", href: "/programs/pcos" },
                           { name: "Stress & Anxiety", href: "/programs/stress-anxiety" },
                           { name: "Relationship", href: "/programs/relationship" },
