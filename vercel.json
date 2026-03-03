@@ -33,7 +33,7 @@
   "crons": [
     {
       "path": "/api/poll/notion",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
