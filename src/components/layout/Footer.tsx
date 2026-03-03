@@ -135,6 +135,11 @@ const Footer = () => {
                       </Link>
                     </li>
                     <li>
+                      <Link href="/programs/colleges" className="text-white/70 hover:text-primary transition-colors duration-200 text-sm" style={{fontFamily: 'Poppins, sans-serif'}}>
+                        For Colleges
+                      </Link>
+                    </li>
+                    <li>
                       <a 
                         href={API_ENDPOINTS.expertUrl} 
                         target="_blank" 

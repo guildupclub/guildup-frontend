@@ -14,6 +14,19 @@ export interface FormSubmissionData {
   timestamp: string;
 }
 
+// College leads → Google Sheets
+export interface CollegeLeadSubmission {
+  name: string;
+  email: string;
+  phone: string;
+  institutionName: string;
+  role?: string;
+  studentCount?: string;
+  message?: string;
+  source?: string;
+  timestamp: string;
+}
+
 /**
  * Save form data to Google Sheets via Google Apps Script Web App
  * Also sends email notification to hello@guildup.club and sales@guildup.club
@@ -62,6 +75,49 @@ export async function saveToGoogleSheets(data: FormSubmissionData): Promise<void
 }
 
 /**
+ * Save college lead data to Google Sheets via a dedicated Google Apps Script Web App.
+ * The Apps Script can also send an email notification to hello@guildup.club for every submission.
+ */
+export async function saveCollegeLeadToGoogleSheets(data: CollegeLeadSubmission): Promise<void> {
+  const webAppUrl =
+    process.env.NEXT_PUBLIC_COLLEGE_LEADS_WEB_APP_URL ||
+    "https://script.google.com/macros/s/AKfycbzgry0fCbOnFH4s0UdGk7flIhZ_RXZc9TwQTUMnixUHN7YBL9QHDNgG1bkwL2fwT9VY/exec";
+
+  if (!webAppUrl) {
+    console.warn("College leads Google Sheets Web App URL not configured. Skipping save.");
+    return;
+  }
+
+  try {
+    const payload = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      institutionName: data.institutionName,
+      role: data.role || "",
+      studentCount: data.studentCount || "",
+      message: data.message || "",
+      source: data.source || "",
+      timestamp: data.timestamp,
+    };
+
+    await fetch(webAppUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("College lead sent to Google Sheets:", payload);
+  } catch (error) {
+    console.error("Error saving college lead to Google Sheets:", error);
+    // Do not throw – we do not want to block the user flow if this fails
+  }
+}
+
+/**
  * Send email notification with form submission data
  * This is handled by the Google Apps Script, but we include it here for reference
  */
@@ -72,4 +128,5 @@ export async function sendEmailNotification(data: FormSubmissionData): Promise<v
   // This function is here for reference/documentation
   console.log("Email notification will be sent by Google Apps Script");
 }
+
 

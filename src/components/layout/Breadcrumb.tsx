@@ -35,18 +35,20 @@ const Breadcrumb: React.FC = () => {
       // If it's a specific program page
       if (segments[1]) {
         const programSlug = segments[1];
-        const program = PROGRAMS[programSlug as keyof typeof PROGRAMS];
-        if (program) {
-          // Remove "Program" suffix from title for breadcrumb
-          const programName = program.title.replace(" Program", "");
-          items.push({ label: programName, href: `/programs/${programSlug}` });
+        if (programSlug === "colleges") {
+          items.push({ label: "For Colleges", href: "/programs/colleges" });
         } else {
-          // Format the slug nicely
-          const formattedLabel = programSlug
-            .split("-")
-            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(" ");
-          items.push({ label: formattedLabel, href: `/programs/${programSlug}` });
+          const program = PROGRAMS[programSlug as keyof typeof PROGRAMS];
+          if (program) {
+            const programName = program.title.replace(" Program", "");
+            items.push({ label: programName, href: `/programs/${programSlug}` });
+          } else {
+            const formattedLabel = programSlug
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ");
+            items.push({ label: formattedLabel, href: `/programs/${programSlug}` });
+          }
         }
       }
     } else if (segments[0] === "community") {
@@ -128,8 +130,8 @@ const Breadcrumb: React.FC = () => {
     return items;
   }, [pathname]);
 
-  // Don't show breadcrumb on home page, prototype pages, wellness-check page, or clarity-call page
-  if (pathname === "/" || pathname?.startsWith("/prototype") || pathname === "/wellness-check" || pathname === "/clarity-call") {
+  // Don't show breadcrumb on home page, prototype pages, wellness-check page, clarity-call page, or gallop page
+  if (pathname === "/" || pathname?.startsWith("/prototype") || pathname === "/wellness-check" || pathname === "/clarity-call" || pathname === "/gallop") {
     return null;
   }
 
