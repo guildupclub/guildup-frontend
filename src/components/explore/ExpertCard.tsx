@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,30 +35,25 @@ interface ExpertCardProps {
 export default function ExpertCard({ expert, index, currentIndex }: ExpertCardProps) {
   const router = useRouter();
   const cardRef = React.useRef<HTMLDivElement>(null);
-
-  // Helper to slugify the community name
-  const slugify = (str: string) =>
-    str
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-
   const handleCardClick = () => {
     if (expert && expert.url) {
-      // Extract community id and name from url or expert
-      // expert.url is like `/community/[id]`
-      const idMatch = expert.url.match(/\/community\/(\w+)/);
-      const communityId = idMatch ? idMatch[1] : '';
-      const communityName = slugify(expert.name);
-      if (communityId && communityName) {
-        router.push(`/community/${communityName}-${communityId}/profile`);
-      } else if (expert.url) {
-        router.push(expert.url);
-      }
+      // The expert.url is already in the correct format: `/community/[name]-[id]/profile`
+      // Just use it directly
+      router.push(expert.url);
     }
   };
 
+  const handleBookingClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Navigate to the booking page with the expert's ID
+    const expertId = expert.url.split('/').pop()?.split('-').pop() || '';
+    // Extract community ID from the URL structure
+    const communityId = expert.url.split('/')[2] || 'default-community';
+    router.push(`/community/${communityId}/offerings/${expertId}`);
+  };
+
   return (
+    <>
     <motion.div
       key={`${expert.name}-${currentIndex}`}
       initial={{ opacity: 0, x: index === 0 ? -20 : 20 }}
@@ -73,12 +68,12 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
       ref={cardRef}
       onClick={handleCardClick}
     >
-      <div className="bg-primary/5 rounded-lg p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
+      <div className="bg-primary/5 rounded-lg p-4 md:p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
         {/* Top Section - Expert Profile */}
-        <div className="flex gap-4 mb-4">
+        <div className="flex gap-3 md:gap-4 mb-3 md:mb-4">
           {/* Expert Image */}
           <div className="relative flex-shrink-0">
-            <div className="w-28 h-32 rounded-lg overflow-hidden">
+            <div className="w-20 h-24 md:w-28 md:h-32 rounded-lg overflow-hidden">
               <Image
                 src={expert.avatar}
                 alt={expert.name}
@@ -92,27 +87,27 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
           {/* Expert Details */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">{expert.name}</h3>
-              <p className="text-sm text-gray-600 mb-2 line-clamp-3">{expert.specialty}</p>
+              <h3 className="text-base md:text-lg font-bold text-gray-900 mb-1">{expert.name}</h3>
+              <p className="text-xs md:text-sm text-gray-600 mb-2 line-clamp-3">{expert.specialty}</p>
               
               {/* Consultation Details */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-primary font-semibold">₹{expert.price}</span>
-                <span className="text-red-500 line-through text-sm">{expert.originalPrice}</span>
-                <span className="text-sm text-gray-600">{expert.consultation}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
+                <span className="text-primary font-semibold text-sm">{expert.price}</span>
+                <span className="text-red-500 line-through text-xs">{expert.originalPrice}</span>
+                <span className="text-xs md:text-sm text-gray-600">{expert.consultation}</span>
               </div>
 
               {/* Languages */}
-              <div className="flex items-center gap-2 mb-2">
-                <Globe className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-600">{expert.languages.join(", ")}</span>
+              <div className="flex items-center gap-1 md:gap-2 mb-2">
+                <Globe className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+                <span className="text-xs md:text-sm text-gray-600 truncate">{expert.languages.join(", ")}</span>
               </div>
             </div>
 
             {/* Rating */}
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="text-sm font-semibold bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md">
+            <div className="flex items-center gap-1 md:gap-2">
+              <Star className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 fill-current flex-shrink-0" />
+              <span className="text-xs md:text-sm font-semibold bg-yellow-100 text-yellow-800 px-1 md:px-2 py-0.5 md:py-1 rounded-md">
                 {expert.rating} ({expert.sessions} reviews)
               </span>
             </div>
@@ -120,48 +115,57 @@ export default function ExpertCard({ expert, index, currentIndex }: ExpertCardPr
         </div>
 
         {/* Middle Section - Skills/Categories */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {expert.skills.map((skill, skillIndex) => (
-            <Badge key={skillIndex} variant="secondary" className="text-sm bg-white border-gray-300 rounded-full px-3 py-1">
+        <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-4">
+          {expert.skills.slice(0, 3).map((skill, skillIndex) => (
+            <Badge key={skillIndex} variant="secondary" className="text-xs md:text-sm bg-white border-gray-300 rounded-full px-2 md:px-3 py-0.5 md:py-1">
               {skill}
             </Badge>
           ))}
+          {expert.skills.length > 3 && (
+            <Badge variant="secondary" className="text-xs md:text-sm bg-white border-gray-300 rounded-full px-2 md:px-3 py-0.5 md:py-1">
+              +{expert.skills.length - 3} more
+            </Badge>
+          )}
         </div>
 
         {/* Bottom Section - Key Metrics */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <div>
-              <div className="text-xs text-gray-600">Years of Experience</div>
-              <div className="text-sm font-semibold text-gray-900">{expert.experience}</div>
+        <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
+          <div className="flex items-center gap-1 md:gap-2">
+            <Shield className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+            <div className="min-w-0">
+              <div className="text-xs text-gray-600">Experience</div>
+              <div className="text-xs md:text-sm font-semibold text-gray-900 truncate">{expert.experience} yrs</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <div>
-              <div className="text-xs text-gray-600">Sessions Conducted</div>
-              <div className="text-sm font-semibold text-gray-900">{expert.sessions}+ Sessions</div>
+          <div className="flex items-center gap-1 md:gap-2">
+            <Users className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+            <div className="min-w-0">
+              <div className="text-xs text-gray-600">Sessions</div>
+              <div className="text-xs md:text-sm font-semibold text-gray-900 truncate">{expert.sessions}+</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
-            <div>
-              <div className="text-xs text-gray-600">Next available slot</div>
-              <div className="text-sm font-semibold text-gray-900">{expert.nextSlot}</div>
+          <div className="flex items-center gap-1 md:gap-2">
+            <Calendar className="w-3 h-3 md:w-4 md:h-4 text-gray-400 flex-shrink-0" />
+            <div className="min-w-0">
+              <div className="text-xs text-gray-600">Next slot</div>
+              <div className="text-xs md:text-sm font-semibold text-gray-900 truncate">{expert.nextSlot}</div>
             </div>
           </div>
         </div>
 
         {/* Call to Action Button */}
         <Button 
-          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold mt-auto"
-          onClick={() => window.open(expert.url, '_blank', 'noopener,noreferrer')}
+          className="w-full bg-primary hover:bg-primary/90 text-white font-semibold mt-auto text-sm md:text-base py-2 md:py-2"
+          onClick={handleBookingClick}
         >
-          <Phone className="w-4 h-4 mr-2" />
-          Quick Explore Call
+          <Phone className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+          <span className="hidden sm:inline">Quick Explore Call</span>
+          <span className="sm:hidden">Explore</span>
         </Button>
       </div>
     </motion.div>
+
+    </>
+
   );
 } 

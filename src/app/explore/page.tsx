@@ -1,27 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, Suspense, useRef, useCallback } from 'react';
-import { Search, Star, Users, MapPin, Clock, ChevronDown, MessageCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '@/redux/store';
+import { useDispatch } from 'react-redux';
 import { useSession } from 'next-auth/react';
 import { PageTracker } from '@/components/analytics/PageTracker';
-import CategoryBar from '@/components/explore/CategoryBar';
 import FeaturedExperts from '@/components/explore/FeaturedExperts';
 import { CategoryNavbar } from '@/components/layout/CategoryNavbar';
 import Loader from '@/components/Loader';
 import { useTracking } from '@/hooks/useTracking';
 import axios from 'axios';
 import { setUserFollowedCommunities } from '@/redux/userSlice';
-import Footer from '@/components/layout/Footer';
-import ExpertCard from '@/components/explore/ExpertCard';
 
 interface Category {
   _id: string;
@@ -54,27 +47,15 @@ const ExplorePage: React.FC = () => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.user);
   const tracking = useTracking();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("All Category");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const targetRef = useRef<HTMLDivElement | null>(null);
-  const [communities, setCommunities] = useState<any[]>([]);
-  const [loadingCommunities, setLoadingCommunities] = useState(false);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
 
-     // State for filters (removed - keeping only for compatibility)
-   const [selectedFilterCategory, setSelectedFilterCategory] = useState('');
-   const [offeringType, setOfferingType] = useState('');
-   const [priceRange, setPriceRange] = useState('');
-   const [duration, setDuration] = useState('');
-   const [sortBy, setSortBy] = useState('relevance');
    const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
 
      useEffect(() => {
@@ -132,61 +113,8 @@ const ExplorePage: React.FC = () => {
     }
   }, [session, status, isMounted, dispatch]);
 
-     const fetchCommunities = useCallback(async (pageNum = 0) => {
-     setLoadingCommunities(true);
-     try {
-       const params = new URLSearchParams({
-         page: String(pageNum),
-         limit: String(20),
-       });
-       
-       // Add category filter if not "All Category"
-       if (selectedCategoryId && selectedCategoryId !== 'all') {
-         params.append('category', selectedCategoryId);
-       }
-       
-       const apiUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?${params.toString()}`;
-       console.log('Fetching communities with URL:', apiUrl);
-       
-       const res = await axios.get(apiUrl);
-       console.log('API Response:', res.data);
-       
-       const newCommunities = res.data.data || [];
-       console.log('Fetched communities count:', newCommunities.length);
-       
-       setCommunities(prev => pageNum === 0 ? newCommunities : [...prev, ...newCommunities]);
-       setHasMore(newCommunities.length > 0);
-     } catch (error: any) {
-       console.error('Error fetching communities:', error);
-       console.error('Error details:', error?.response?.data);
-     } finally {
-       setLoadingCommunities(false);
-     }
-   }, [selectedCategoryId]);
-
-     // Fetch communities when filters change
-   useEffect(() => {
-     setPage(0);
-     fetchCommunities(0);
-   }, [fetchCommunities]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 300 &&
-        !loadingCommunities &&
-        hasMore
-      ) {
-        setPage(prev => {
-          const nextPage = prev + 1;
-          fetchCommunities(nextPage);
-          return nextPage;
-        });
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadingCommunities, hasMore, fetchCommunities]);
+     // Note: Communities fetching is now handled by the search page
+     // This logic is removed since we redirect to search page instead
 
   const categoryToUrl = (name: string) => {
     return name.replace(/\s+/g, "-");
@@ -228,17 +156,8 @@ const ExplorePage: React.FC = () => {
      [selectedCategory, router]
    );
 
-     // Update URL when category changes
-   useEffect(() => {
-     if (!categories.length) return;
-
-     // Add category if not "All Category"
-     if (selectedCategory !== "All Category") {
-       router.replace(`/explore?category=${categoryToUrl(selectedCategory)}`, { scroll: false });
-     } else {
-       router.replace('/explore', { scroll: false });
-     }
-   }, [selectedCategory, router, categories]);
+     // Note: URL updates are now handled by redirects to search page
+     // This effect is removed since we redirect instead of updating the current page
 
   const handleCategorySelect = (categoryId: string) => {
     const selectedCat = categories.find(
@@ -252,28 +171,12 @@ const ExplorePage: React.FC = () => {
       user_id: session?.user._id,
     });
 
-    setIsLoading(true);
-
-    if (selectedCat) {
-      setSelectedCategory(selectedCat.name);
-      setSelectedCategoryId(categoryId);
-    } else {
-      setSelectedCategory("All Category");
-      setSelectedCategoryId("all");
+    // Redirect to search page with category filter
+    const params = new URLSearchParams();
+    if (selectedCat && selectedCat.name !== "All Category") {
+      params.set('category', categoryToUrl(selectedCat.name));
     }
-
-    if (targetRef.current) {
-      const headerOffset = 145;
-      const elementPosition = targetRef.current.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-    }
-
-    setIsLoading(false);
+    router.push(`/search?${params.toString()}`);
   };
 
      const handleSearch = () => {
@@ -289,7 +192,7 @@ const ExplorePage: React.FC = () => {
        if (selectedCategory !== 'All Category') {
          params.set('category', categoryToUrl(selectedCategory));
        }
-       router.push(`/api/search?${params.toString()}`);
+       router.push(`/search?${params.toString()}`);
      }
    };
 
@@ -311,7 +214,7 @@ const ExplorePage: React.FC = () => {
          if (selectedCategory !== 'All Category') {
            params.set('category', categoryToUrl(selectedCategory));
          }
-         router.push(`/api/search?${params.toString()}`);
+         router.push(`/search?${params.toString()}`);
        }
      }, 500); // 500ms debounce for typing
      
@@ -371,6 +274,18 @@ const ExplorePage: React.FC = () => {
     }
   ];
 
+  // Handle popular category click
+  const handlePopularCategoryClick = (categoryName: string) => {
+    tracking.trackClick("popular_category_click", {
+      category_name: categoryName,
+      user_id: session?.user._id,
+    });
+    
+    const params = new URLSearchParams();
+    params.set('category', categoryToUrl(categoryName));
+    router.push(`/search?${params.toString()}`);
+  };
+
   // Popular sub categories for the bottom section
   const popularSubCategories = [
     {
@@ -404,6 +319,18 @@ const ExplorePage: React.FC = () => {
       isSelected: false
     }
   ];
+
+  // Handle sub-category click
+  const handleSubCategoryClick = (subCategoryName: string) => {
+    tracking.trackClick("sub_category_click", {
+      sub_category_name: subCategoryName,
+      user_id: session?.user._id,
+    });
+    
+    const params = new URLSearchParams();
+    params.set('q', subCategoryName);
+    router.push(`/search?${params.toString()}`);
+  };
 
   if (!isMounted || status === "loading") {
     return (
@@ -500,7 +427,10 @@ const ExplorePage: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <div className={`relative p-6 rounded-lg ${category.cardBg} hover:shadow-lg transition-all duration-300 cursor-pointer group ${category.isSelected ? 'ring-2 ring-primary' : ''}`}>
+                    <div 
+                      className={`relative p-6 rounded-lg ${category.cardBg} hover:shadow-lg transition-all duration-300 cursor-pointer group ${category.isSelected ? 'ring-2 ring-primary' : ''}`}
+                      onClick={() => handlePopularCategoryClick(category.name)}
+                    >
                       {/* External link icon for selected card */}
                       {category.isSelected && (
                         <div className="absolute top-4 right-4 text-primary">
@@ -583,7 +513,10 @@ const ExplorePage: React.FC = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                   >
-                    <div className={`relative p-4 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-all duration-300 cursor-pointer group ${subCategory.isSelected ? 'border-primary ring-2 ring-primary/20' : 'hover:border-gray-300'}`}>
+                    <div 
+                      className={`relative p-4 rounded-lg border border-gray-200 bg-white hover:shadow-md transition-all duration-300 cursor-pointer group ${subCategory.isSelected ? 'border-primary ring-2 ring-primary/20' : 'hover:border-gray-300'}`}
+                      onClick={() => handleSubCategoryClick(subCategory.name)}
+                    >
                       {/* External link icon for selected card */}
                       {subCategory.isSelected && (
                         <div className="absolute top-3 right-3 text-primary">
@@ -610,94 +543,24 @@ const ExplorePage: React.FC = () => {
               </div>
             </div>
           </div>
-          {/* Communities Section */}
-          <div id="communities-section" className="container mx-auto px-6 py-12">
-                         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
-               <div>
-                 <h2 className="text-2xl font-bold text-gray-900">All Communities</h2>
-                 <p className="text-sm text-gray-600 mt-1">
-                   Discover and connect with communities in your area of interest
-                 </p>
-               </div>
-               <div className="flex gap-2 flex-wrap">
-                 {/* Search Button - redirects to search page */}
-                 <div className="relative">
-                   <Input
-                     type="text"
-                     placeholder="Search communities..."
-                     value={searchQuery}
-                     onChange={(e) => handleCommunitySearch(e.target.value)}
-                     onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                     className="w-48 border rounded px-3 py-1 text-sm pl-8 focus:ring-2 focus:ring-primary/30"
-                   />
-                   <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
-                 </div>
-               </div>
-             </div>
-                         {/* No results message for empty community list */}
-             {!loadingCommunities && communities.length === 0 && (
-               <div className="text-center py-12">
-                 <div className="text-gray-500 mb-4">
-                   <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                   <p className="text-lg font-medium">No communities available</p>
-                   <p className="text-sm">Check back later for new communities</p>
-                 </div>
-               </div>
-             )}
-             
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {communities.map((communityObj, idx) => (
-                <ExpertCard
-                  key={communityObj.community ? communityObj.community._id : communityObj._id}
-                  expert={{
-                    name: communityObj.community ? communityObj.community.name : communityObj.name,
-                    specialty: communityObj.community ? communityObj.community.description : communityObj.description || '',
-                    rating: 5,
-                    sessions: communityObj.community ? communityObj.community.owner_sessions : communityObj.owner_sessions || 0,
-                    avatar: communityObj.community ? communityObj.community.image : communityObj.image || '/avatar-placeholder.png',
-                    verified: true,
-                    available: true,
-                    url: `/community/${communityObj.community ? communityObj.community._id : communityObj._id}`,
-                    languages: communityObj.community ? communityObj.community.owner_languages : communityObj.owner_languages || [],
-                    experience: String((communityObj.community ? communityObj.community.owner_experience : communityObj.owner_experience) || '1'),
-                    nextSlot: 'Tomorrow',
-                    price: '0',
-                    originalPrice: '',
-                    consultation: '',
-                    skills: communityObj.community ? communityObj.community.tags : communityObj.tags || [],
-                  }}
-                  index={idx % 2}
-                  currentIndex={idx}
-                />
-              ))}
-            </div>
-            {loadingCommunities && (
-              <div className="flex justify-center py-6">
-                <Loader />
-              </div>
-            )}
-            {!hasMore && communities.length > 0 && (
-              <div className="text-center text-gray-400 py-4">No more communities to load.</div>
-            )}
-          </div>
+          {/* Note: Communities section removed - users are redirected to search page for results */}
         </div>
         
-        <PageTracker
-          pageName="Explore"
-          pageCategory="discovery"
-          metadata={{
-            selected_category: selectedCategory,
-            selected_category_id: selectedCategoryId,
-            user_signed_in: !!session,
-            user_id: session?.user._id,
-            is_creator: session?.user?.is_creator,
-            categories_count: categories.length,
-            is_loading: isLoading,
-          }}
-          trackScrollDepth={true}
-          trackTimeOnPage={true}
-          trackClicks={true}
-        />
+                 <PageTracker
+           pageName="Explore"
+           pageCategory="discovery"
+           metadata={{
+             selected_category: selectedCategory,
+             selected_category_id: selectedCategoryId,
+             user_signed_in: !!session,
+             user_id: session?.user._id,
+             is_creator: session?.user?.is_creator,
+             categories_count: categories.length,
+           }}
+           trackScrollDepth={true}
+           trackTimeOnPage={true}
+           trackClicks={true}
+         />
       </SearchParamsProvider>
     </Suspense>
   );

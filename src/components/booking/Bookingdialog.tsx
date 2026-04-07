@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-import { CalendarIcon, Clock, ChevronLeft } from "lucide-react";
+import { CalendarIcon, Clock, ChevronLeft, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
@@ -79,6 +79,8 @@ export function BookingDialog({
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  const [slotError, setSlotError] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
   const [bookingStep, setBookingStep] = useState<
     "date" | "time" | "confirmation"
@@ -229,8 +231,14 @@ const handleApplyCoupon = async () => {
   }, [isLoggedIn, userId]);
 
   const fetchAvailableSlots = async (date: Date) => {
+    setIsLoadingSlots(true);
+    setSlotError(null);
+    setAvailableSlots([]);
+    
     try {
       const formattedDate = format(date, "yyyy-MM-dd");
+      console.log("Fetching available slots for date:", formattedDate, "offering:", offering._id);
+      
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`,
         {
@@ -238,12 +246,36 @@ const handleApplyCoupon = async () => {
             offering_id: offering._id,
             date: formattedDate,
           },
+          timeout: 10000, // 10 second timeout
         }
       );
-      setAvailableSlots(response.data);
-      console.log("Available slots:", response.data);
-    } catch (error) {
-      console.error("Error fetching slots:", error);
+      
+      if (response.data && Array.isArray(response.data)) {
+        setAvailableSlots(response.data);
+        console.log("Available slots fetched successfully:", response.data);
+        
+        if (response.data.length === 0) {
+          setSlotError("No available slots for this date. Please try another date.");
+        }
+      } else {
+        setSlotError("Invalid response format from server.");
+      }
+    } catch (error: any) {
+      console.error("Error fetching available slots:", error);
+      
+      if (error.response?.status === 401) {
+        setSlotError("Calendar access required. Please contact the creator to connect their calendar.");
+      } else if (error.response?.status === 404) {
+        setSlotError("Offering not found or no longer available.");
+      } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+        setSlotError("Request timed out. Please try again.");
+      } else if (error.response?.data?.error) {
+        setSlotError(error.response.data.error);
+      } else {
+        setSlotError("Failed to fetch available slots. Please try again.");
+      }
+    } finally {
+      setIsLoadingSlots(false);
     }
   };
 
@@ -251,6 +283,8 @@ const handleApplyCoupon = async () => {
     setSelectedDate(date);
     setSelectedSlot(null);
     setShowConfirmation(false);
+    setSlotError(null);
+    
     if (date) {
       // Track date selection
       tracking.trackClick("booking_date_selected", {
@@ -260,8 +294,10 @@ const handleApplyCoupon = async () => {
         selected_date: date.toISOString(),
         user_id: currentUserId,
       });
-      fetchAvailableSlots(date);
+      
+      // Show loading state and fetch slots
       setBookingStep("time");
+      fetchAvailableSlots(date);
     }
   };
 
@@ -890,18 +926,73 @@ const handleApplyCoupon = async () => {
                         {format(selectedDate!, "PPP")}
                       </p>
 
-                      <div className="grid grid-cols-2 gap-3">
-                        {filteredSlots.map((slot, index) => (
+                      {/* Loading State */}
+                      {isLoadingSlots && (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                          <p className="text-sm text-muted-foreground text-center">
+                            Fetching available slots from creator&apos;s calendar...
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Error State */}
+                      {slotError && !isLoadingSlots && (
+                        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                          <div className="flex items-center gap-2 text-red-500">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="font-medium">Calendar Error</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground text-center max-w-sm">
+                            {slotError}
+                          </p>
                           <Button
-                            key={index}
                             variant="outline"
-                            className="text-sm transition-all duration-200 hover:scale-105 hover:bg-primary/10 bg-transparent"
-                            onClick={() => handleSlotSelect(slot)}
+                            size="sm"
+                            onClick={() => fetchAvailableSlots(selectedDate!)}
+                            className="flex items-center gap-2"
                           >
-                            {formatTime(slot.start)} - {formatTime(slot.end)}
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Try Again
                           </Button>
-                        ))}
-                      </div>
+                        </div>
+                      )}
+
+                      {/* Available Slots */}
+                      {!isLoadingSlots && !slotError && (
+                        <>
+                          {filteredSlots.length > 0 ? (
+                            <div className="grid grid-cols-2 gap-3">
+                              {filteredSlots.map((slot, index) => (
+                                <Button
+                                  key={index}
+                                  variant="outline"
+                                  className="text-sm transition-all duration-200 hover:scale-105 hover:bg-primary/10 bg-transparent"
+                                  onClick={() => handleSlotSelect(slot)}
+                                >
+                                  {formatTime(slot.start)} - {formatTime(slot.end)}
+                                </Button>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-8 space-y-2">
+                              <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <p className="text-sm text-muted-foreground text-center">
+                                No available slots for this date
+                              </p>
+                              <p className="text-xs text-muted-foreground text-center">
+                                Please try selecting a different date
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </motion.div>
                 )}

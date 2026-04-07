@@ -69,6 +69,15 @@ function SearchPageContent() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  // Helper functions for URL conversion
+  const categoryToUrl = (name: string) => {
+    return name.replace(/\s+/g, "-");
+  };
+
+  const urlToCategory = (url: string) => {
+    return url.replace(/-/g, " ");
+  };
+
   // Function to map community data to Expert format
   const mapCommunityToExpert = (result: any): Expert => {
     console.log('Mapping result:', result);
@@ -85,8 +94,14 @@ function SearchPageContent() {
     const price = bestOffering?.discounted_price || bestOffering?.price?.amount || '0';
     const originalPrice = bestOffering?.price?.amount || price;
     
-    // Clean community name for URL
-    const cleanName = community.name ? community.name.replace(/\s+/g, '-').toLowerCase() : 'community';
+    // Clean community name for URL (following the same pattern as other components)
+    const cleanedCommunityName = community.name
+      ? community.name
+          .replace(/\s+/g, "-")
+          .replace(/\|/g, "-")
+          .replace(/-+/g, "-")
+      : "community";
+    const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
     
     const expert = {
       name: community.name || 'Unknown Community',
@@ -96,7 +111,7 @@ function SearchPageContent() {
       avatar: community.image || community.icon || community.imageUrl || 'https://via.placeholder.com/112x128?text=Community',
       verified: true,
       available: true,
-      url: `/community/${cleanName}-${community._id}/profile`,
+      url: `/community/${encodedCommunityName}-${community._id}/profile`,
       languages: community.owner_languages || ['English', 'Hindi'], // Default languages
       experience: community.owner_experience?.toString() || '5',
       nextSlot: 'Tomorrow',
@@ -120,12 +135,12 @@ function SearchPageContent() {
       setSearchQuery(queryFromUrl);
     }
     
-    // Handle category from URL
+    // Handle category from URL - expecting category ID
     if (categories.length > 0) {
       if (categoryFromUrl) {
-        const categoryName = urlToCategory(categoryFromUrl);
+        // The categoryFromUrl is now the category ID
         const categoryObj = categories.find(
-          (cat: Category) => cat.name.toLowerCase() === categoryName.toLowerCase()
+          (cat: Category) => cat._id === categoryFromUrl
         );
         if (categoryObj && categoryObj._id !== selectedCategoryId) {
           setSelectedCategory(categoryObj.name);
@@ -140,9 +155,7 @@ function SearchPageContent() {
     
     // Perform search when we have query and categories are loaded
     if (queryFromUrl && categories.length > 0 && !isInitialLoad) {
-      const finalCategoryId = categoryFromUrl ? 
-        categories.find(cat => cat.name.toLowerCase() === urlToCategory(categoryFromUrl).toLowerCase())?._id || "all" 
-        : "all";
+      const finalCategoryId = categoryFromUrl || "all";
       performSearch(queryFromUrl, finalCategoryId);
     }
     
@@ -151,81 +164,34 @@ function SearchPageContent() {
     }
   }, [searchParams, categories, isInitialLoad]);
 
-  // Fetch categories on mount
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
-        );
-        const categoriesData = [
-          { _id: "all", name: "All Category" },
-          ...response.data.data,
-        ];
-        setCategories(categoriesData);
-        
-        // After categories are loaded, check if we need to perform initial search
-        const queryFromUrl = searchParams?.get("q") || "";
-        const categoryFromUrl = searchParams?.get("category") || "";
-        
-        if (queryFromUrl || categoryFromUrl) {
-          const categoryId = categoryFromUrl ? 
-            categoriesData.find(cat => cat.name.toLowerCase() === urlToCategory(categoryFromUrl).toLowerCase())?._id || "all"
-            : "all";
-            
-          if (queryFromUrl) {
-            performSearch(queryFromUrl, categoryId);
-          } else if (categoryId !== "all") {
-            performSearch("*", categoryId);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
-      }
-    };
-    fetchCategories();
-  }, [searchParams, performSearch]);
-
   // Dynamic search function with debouncing
   const performSearch = useCallback(async (query: string, categoryId?: string) => {
-    // Clear results if no query and no category filter
-    if (!query.trim() && (!categoryId || categoryId === 'all')) {
-      setResults([]);
-      setLoading(false);
-      return;
-    }
-
     setLoading(true);
 
     try {
       let searchUrl: string;
+      let searchParams: URLSearchParams;
       
-      // If we have a real search query, use the search API
+      // Always use the search API for consistent category filtering
       if (query.trim() && query !== "*") {
-        const searchParams = new URLSearchParams({
+        // Real search query
+        searchParams = new URLSearchParams({
           q: query.trim(),
         });
-
-        // Add category filter if not "All Category"
-        if (categoryId && categoryId !== 'all') {
-          searchParams.append('category', categoryId);
-        }
-
-        searchUrl = `/api/search?${searchParams.toString()}`;
       } else {
-        // For category-only browsing, use the community browsing API
-        const browseParams = new URLSearchParams({
-          page: '0',
-          limit: '20',
+        // Use wildcard search for category-only or all communities
+        searchParams = new URLSearchParams({
+          q: "*", // Use wildcard to get all communities
         });
-
-        // Add category filter if not "All Category"
-        if (categoryId && categoryId !== 'all') {
-          browseParams.append('category', categoryId);
-        }
-
-        searchUrl = `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/community/all?${browseParams.toString()}`;
       }
+
+      // Add category filter if not "All Category"
+      if (categoryId && categoryId !== 'all') {
+        searchParams.append('category', categoryId);
+        console.log('SearchPage - Adding category filter:', categoryId);
+      }
+
+      searchUrl = `/api/search?${searchParams.toString()}`;
 
       console.log('Search URL:', searchUrl);
 
@@ -244,9 +210,9 @@ function SearchPageContent() {
         searchResults = response.data;
       }
       
-             console.log('Processed search results:', searchResults);
-       console.log('First result structure:', searchResults[0]);
-       setResults(searchResults);
+      console.log('Processed search results:', searchResults);
+      console.log('First result structure:', searchResults[0]);
+      setResults(searchResults);
     } catch (error) {
       console.error('Error performing search:', error);
       setResults([]);
@@ -254,6 +220,47 @@ function SearchPageContent() {
       setLoading(false);
     }
   }, []);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/category`
+        );
+        const categoriesData = [
+          { _id: "all", name: "All Category" },
+          ...response.data.data,
+        ];
+        setCategories(categoriesData);
+        
+                 // After categories are loaded, check if we need to perform initial search
+         const queryFromUrl = searchParams?.get("q") || "";
+         const categoryFromUrl = searchParams?.get("category") || "";
+         
+         if (queryFromUrl || categoryFromUrl) {
+           let categoryId = "all";
+           
+           if (categoryFromUrl) {
+             // The categoryFromUrl is now the category ID
+             categoryId = categoryFromUrl;
+           }
+           
+           if (queryFromUrl) {
+             performSearch(queryFromUrl, categoryId);
+           } else if (categoryId !== "all") {
+             performSearch("*", categoryId);
+           }
+         } else {
+           // If no search query and no category, show all communities
+           performSearch("*", "all");
+         }
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+      }
+    };
+    fetchCategories();
+  }, [searchParams, performSearch]);
 
   // Handle dynamic search with debouncing
   const handleSearchChange = (value: string) => {
@@ -269,8 +276,8 @@ function SearchPageContent() {
     if (value.trim()) {
       params.set('q', value.trim());
     }
-    if (selectedCategory !== 'All Category') {
-      params.set('category', categoryToUrl(selectedCategory));
+    if (selectedCategoryId !== 'all') {
+      params.set('category', selectedCategoryId);
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
@@ -284,20 +291,17 @@ function SearchPageContent() {
     setSearchTimeout(timeout);
   };
 
-  const categoryToUrl = (name: string) => {
-    return name.replace(/\s+/g, "-");
-  };
 
-  const urlToCategory = (url: string) => {
-    return url.replace(/-/g, " ");
-  };
 
   // Handle category selection
   const handleCategorySelect = (categoryId: string) => {
     const selectedCat = categories.find((cat: Category) => cat._id === categoryId);
 
+    console.log('=== CATEGORY SELECTION DEBUG ===');
     console.log('Category selected:', categoryId, selectedCat);
     console.log('Current state - selectedCategory:', selectedCategory, 'selectedCategoryId:', selectedCategoryId);
+    console.log('All categories:', categories.map(cat => ({ id: cat._id, name: cat.name })));
+    console.log('=== END DEBUG ===');
 
     // Update state
     if (selectedCat) {
@@ -310,13 +314,13 @@ function SearchPageContent() {
       setSelectedCategoryId("all");
     }
 
-    // Update URL with new category
+    // Update URL with new category - using category ID for API calls
     const params = new URLSearchParams();
     if (searchQuery.trim()) {
       params.set('q', searchQuery.trim());
     }
     if (selectedCat && selectedCat.name !== "All Category") {
-      params.set('category', categoryToUrl(selectedCat.name));
+      params.set('category', selectedCat._id); // Store category ID for API calls
     }
     const queryString = params.toString();
     const url = queryString ? `/search?${queryString}` : '/search';
@@ -342,6 +346,20 @@ function SearchPageContent() {
         return;
       }
 
+      // Clean and encode community name for URL
+      const cleanedCommunityName = communityData.community.name
+        ? communityData.community.name
+            .replace(/\s+/g, "-")
+            .replace(/\|/g, "-")
+            .replace(/-+/g, "-")
+        : "";
+      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
+      const communityParams = `${encodedCommunityName}-${communityData.community._id}`;
+
+      // Navigate to community profile page
+      router.push(`/community/${communityParams}/profile`);
+
+      // Update Redux state
       dispatch(
         setCommunityData({
           communityId: communityData.community._id,
@@ -359,15 +377,6 @@ function SearchPageContent() {
           user_iscalendarConnected: false
         })
       );
-      const cleanedCommunityName = communityData.community.name
-        ? communityData.community.name
-            .replace(/\s+/g, "-")
-            .replace(/\|/g, "-")
-            .replace(/-+/g, "-")
-        : "";
-      const encodedCommunityName = encodeURIComponent(cleanedCommunityName);
-      const communityParams = `${encodedCommunityName}-${communityData.community._id}`;
-      router.push(`/community/${communityParams}/profile`);
     },
     [dispatch, router]
   );
@@ -375,10 +384,11 @@ function SearchPageContent() {
   // Clear search
   const clearSearch = () => {
     setSearchQuery('');
-    setResults([]);
     setSelectedCategory("All Category");
     setSelectedCategoryId("all");
     router.replace('/search', { scroll: false });
+    // Show all communities after clearing
+    performSearch("*", "all");
   };
 
   // Cleanup timeout on unmount
@@ -390,33 +400,33 @@ function SearchPageContent() {
     };
   }, [searchTimeout]);
 
-  return (
-    <div className="min-h-screen bg-white">
+    return (
+    <div className=" bg-white">
       {/* Header Section */}
-      <div className="bg-white pt-8 pb-6 border-b border-gray-100">
-        <div className="container mx-auto px-6">
+      <div className="bg-white text-primary pt-4 md:pt-8 pb-4 md:pb-6 border-b border-gray-100">
+        <div className="container mx-auto px-4 md:px-6">
           <motion.h1 
-            className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6"
+            className="text-2xl md:text-3xl lg:text-4xl font-semibold text-gray-900 mb-4 md:mb-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            Search Communities
+            Search Experts
           </motion.h1>
 
           {/* Search Bar */}
           <motion.div 
-            className="flex gap-3 w-full max-w-2xl"
+            className="w-full max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 md:h-5 md:w-5" />
               <Input
                 type="text"
-                placeholder="Search communities..."
-                className="pl-10 pr-10 py-3 text-lg border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Search Experts..."
+                className="pl-10 pr-10 py-2 md:py-3 text-base md:text-lg border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full"
                 value={searchQuery}
                 onChange={(e) => handleSearchChange(e.target.value)}
                 autoFocus
@@ -426,35 +436,35 @@ function SearchPageContent() {
                   onClick={clearSearch}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-4 w-4 md:h-5 md:w-5" />
                 </button>
               )}
             </div>
           </motion.div>
 
           {/* Search Stats */}
-          {(searchQuery || selectedCategoryId !== "all") && (
-            <motion.div 
-              className="mt-4 flex items-center gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <p className="text-sm text-gray-600">
-                {loading 
-                  ? 'Searching...' 
-                  : searchQuery 
-                    ? `${results.length} ${results.length === 1 ? 'result' : 'results'} for "${searchQuery}"`
-                    : `${results.length} ${results.length === 1 ? 'community' : 'communities'} in ${selectedCategory}`
-                }
-              </p>
-              {selectedCategory !== 'All Category' && (
-                <Badge variant="secondary" className="text-xs">
-                  Category: {selectedCategory}
-                </Badge>
-              )}
-            </motion.div>
-          )}
+          <motion.div 
+            className="mt-3 md:mt-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* <p className="text-xs md:text-sm text-gray-600">
+              {loading 
+                ? 'Loading...' 
+                : searchQuery 
+                  ? `${results.length} ${results.length === 1 ? 'result' : 'results'} for "${searchQuery}"`
+                  : selectedCategoryId !== "all"
+                    ? `${results.length} ${results.length === 1 ? 'community' : 'communities'} in ${selectedCategory}`
+                    : `${results.length} ${results.length === 1 ? 'community' : 'communities'} available`
+              }
+            </p> */}
+            {selectedCategory !== 'All Category' && (
+              <Badge variant="secondary" className="text-xs w-fit">
+                Category: {selectedCategory}
+              </Badge>
+            )}
+          </motion.div>
         </div>
       </div>
 
@@ -467,168 +477,119 @@ function SearchPageContent() {
         />
       )}
 
-      {/* Results Section */}
-      <div className="container mx-auto px-6 py-8">
-        <AnimatePresence mode="wait">
-                     {/* Loading State */}
+             {/* Results Section */}
+       <div className="bg-white container mx-auto px-4 md:px-6 py-4 md:py-8">
+         <AnimatePresence mode="wait">
+           {/* Loading State */}
            {loading && (
              <motion.div 
                key="loading"
-               className="grid grid-cols-1 sm:grid-cols-2 gap-6"
+               className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
              >
                {[1, 2, 3, 4, 5, 6].map((i) => (
-                 <div key={i} className="bg-primary/5 rounded-lg p-6">
-                   <div className="flex gap-4 mb-4">
-                     <Skeleton className="w-28 h-32 rounded-lg" />
-                     <div className="flex-1">
-                       <Skeleton className="h-6 w-3/4 mb-2" />
-                       <Skeleton className="h-4 w-full mb-2" />
-                       <Skeleton className="h-4 w-2/3 mb-2" />
-                       <Skeleton className="h-4 w-1/2" />
+                 <div key={i} className="bg-primary/5 rounded-lg p-4 md:p-6">
+                   <div className="flex gap-3 md:gap-4 mb-3 md:mb-4">
+                     <Skeleton className="w-20 h-24 md:w-28 md:h-32 rounded-lg flex-shrink-0" />
+                     <div className="flex-1 min-w-0">
+                       <Skeleton className="h-5 md:h-6 w-3/4 mb-2" />
+                       <Skeleton className="h-3 md:h-4 w-full mb-1 md:mb-2" />
+                       <Skeleton className="h-3 md:h-4 w-2/3 mb-1 md:mb-2" />
+                       <Skeleton className="h-3 md:h-4 w-1/2" />
                      </div>
                    </div>
-                   <div className="flex flex-wrap gap-2 mb-4">
-                     <Skeleton className="h-6 w-16 rounded-full" />
-                     <Skeleton className="h-6 w-20 rounded-full" />
+                   <div className="flex flex-wrap gap-1 md:gap-2 mb-3 md:mb-4">
+                     <Skeleton className="h-5 md:h-6 w-12 md:w-16 rounded-full" />
+                     <Skeleton className="h-5 md:h-6 w-16 md:w-20 rounded-full" />
                    </div>
-                   <div className="grid grid-cols-3 gap-4 mb-6">
-                     <Skeleton className="h-8 w-full" />
-                     <Skeleton className="h-8 w-full" />
-                     <Skeleton className="h-8 w-full" />
+                   <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4 md:mb-6">
+                     <Skeleton className="h-6 md:h-8 w-full" />
+                     <Skeleton className="h-6 md:h-8 w-full" />
+                     <Skeleton className="h-6 md:h-8 w-full" />
                    </div>
-                   <Skeleton className="h-10 w-full rounded-md" />
+                   <Skeleton className="h-8 md:h-10 w-full rounded-md" />
                  </div>
                ))}
              </motion.div>
            )}
 
-                     {/* No Search Query and No Category Selected State */}
-           {!loading && !searchQuery.trim() && selectedCategoryId === "all" && (
+                     
+
+                                {/* No Results State */}
+           {!loading && results.length === 0 && (
              <motion.div 
-               key="no-query"
-               className="text-center py-16"
+               key="no-results"
+               className="text-center py-8 md:py-16 px-4"
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
                exit={{ opacity: 0, y: -20 }}
              >
-               <Search className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-               <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                 Start searching for communities
+               <Users className="h-12 w-12 md:h-16 md:w-16 mx-auto mb-3 md:mb-4 text-gray-300" />
+               <h2 className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
+                 No Experts found, Please use a different category.
                </h2>
-               <p className="text-gray-500">
-                 Type in the search box above or select a category to find communities
+               <p className="text-sm md:text-base text-gray-500 mb-3 md:mb-4 px-2">
+                 {searchQuery.trim() 
+                   ? `No results for "${searchQuery}" ${selectedCategory !== 'All Category' ? `in ${selectedCategory}` : ''}`
+                   : `No communities found in ${selectedCategory}`
+                 }
                </p>
-               
-               {/* Test ExpertCard */}
-               <div className="mt-8">
-                 <p className="text-sm text-gray-400 mb-4">Test ExpertCard component:</p>
-                 <div className="max-w-md mx-auto">
-                   <ExpertCard
-                     expert={{
-                       name: "Test Community",
-                       specialty: "This is a test to verify ExpertCard is working",
-                       rating: 5.0,
-                       sessions: 100,
-                       avatar: "https://via.placeholder.com/112x128?text=Test",
-                       verified: true,
-                       available: true,
-                       url: "/test",
-                       languages: ["English"],
-                       experience: "5",
-                       nextSlot: "Tomorrow",
-                       price: "Free",
-                       originalPrice: "₹100",
-                       consultation: "Test Consultation",
-                       skills: ["Test", "Demo"]
-                     }}
-                     index={0}
-                     currentIndex={0}
-                   />
-                 </div>
-               </div>
+               <Button
+                 onClick={clearSearch}
+                 variant="outline"
+                 className="text-sm"
+               >
+                 Clear search
+               </Button>
              </motion.div>
            )}
 
-          {/* No Results State */}
-          {!loading && (searchQuery.trim() || selectedCategoryId !== "all") && results.length === 0 && (
-            <motion.div 
-              key="no-results"
-              className="text-center py-16"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <Users className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <h2 className="text-xl font-semibold text-gray-700 mb-2">
-                No communities found
-              </h2>
-              <p className="text-gray-500 mb-4">
-                {searchQuery.trim() 
-                  ? `No results for "${searchQuery}" ${selectedCategory !== 'All Category' ? `in ${selectedCategory}` : ''}`
-                  : `No communities found in ${selectedCategory}`
-                }
-              </p>
-              <Button
-                onClick={clearSearch}
-                variant="outline"
-                className="text-sm"
-              >
-                Clear search
-              </Button>
-            </motion.div>
-          )}
-
-                                {/* Results */}
-           {!loading && (searchQuery.trim() || selectedCategoryId !== "all") && results.length > 0 && (
-             <div>
-               <p className="mb-4 text-sm text-blue-600">
-                 Found {results.length} results - rendering as cards
-               </p>
-               <motion.div 
-                 key="results"
-                 className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 exit={{ opacity: 0, y: -20 }}
-               >
-                 {results.map((result, index) => {
-                   console.log(`Rendering result ${index}:`, result);
-                   try {
-                     const expert = mapCommunityToExpert(result);
-                     console.log(`Mapped expert ${index}:`, expert);
-                     return (
-                       <motion.div
-                         key={result._id || result.community?._id || index}
-                         initial={{ opacity: 0, y: 20 }}
-                         animate={{ opacity: 1, y: 0 }}
-                         transition={{ duration: 0.3, delay: index * 0.05 }}
-                         className="border border-gray-200 rounded-lg p-2"
-                       >
-                         <ExpertCard
-                           expert={expert}
-                           index={index}
-                           currentIndex={0}
-                         />
-                       </motion.div>
-                     );
-                   } catch (error) {
-                     console.error('Error mapping result:', error, result);
-                     return (
-                       <div key={index} className="border border-red-200 bg-red-50 p-4 rounded-lg">
-                         <p className="text-red-600">Error rendering card</p>
-                         <pre className="text-xs text-red-500 mt-2 overflow-auto">
-                           {JSON.stringify(result, null, 2)}
-                         </pre>
-                       </div>
-                     );
-                   }
-                 })}
-               </motion.div>
-             </div>
-           )}
+                                                                                                                                   {/* Results */}
+             {!loading && results.length > 0 && (
+              <div>
+                <motion.div 
+                  key="results"
+                  className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  {results.map((result, index) => {
+                    console.log(`Rendering result ${index}:`, result);
+                    try {
+                      const expert = mapCommunityToExpert(result);
+                      console.log(`Mapped expert ${index}:`, expert);
+                      return (
+                        <motion.div
+                          key={result._id || result.community?._id || index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3, delay: index * 0.05 }}
+                        >
+                          <ExpertCard
+                            expert={expert}
+                            index={index}
+                            currentIndex={0}
+                          />
+                        </motion.div>
+                      );
+                    } catch (error) {
+                      console.error('Error mapping result:', error, result);
+                      return (
+                        <div key={index} className="border border-red-200 bg-red-50 p-3 md:p-4 rounded-lg">
+                          <p className="text-red-600 text-sm">That is not you, that is us. We are working on it.</p>
+                          <pre className="text-xs text-red-500 mt-2 overflow-auto">
+                            {JSON.stringify(result, null, 2)}
+                          </pre>
+                        </div>
+                      );
+                    }
+                  })}
+                </motion.div>
+              </div>
+            )}
         </AnimatePresence>
       </div>
     </div>

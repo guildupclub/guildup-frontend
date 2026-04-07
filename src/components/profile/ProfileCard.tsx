@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format, addDays, isToday, isTomorrow, startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns";
 import Loader from "../Loader";
 import { ChatSupportButton } from "../chat/ChatSupportButton";
 
 // Icons
-import { Edit, Phone, Calendar, Users, BarChart3, Target, Globe } from "lucide-react";
+import { Edit, Phone, Calendar, Users, BarChart3, Target, Globe, Loader2 } from "lucide-react";
 import { GrInstagram } from "react-icons/gr";
 import { FaLinkedinIn, FaTwitter, FaFacebook } from "react-icons/fa6";
 import { useParams } from "next/navigation";
@@ -21,11 +22,21 @@ import { ContentFeed } from "./ContentFeed";
 import { TestimonialSection } from "./TestimonialSection";
 import { ProfileSectionLeftHero } from "./ProfileSectionLeftHero";
 
+interface TimeSlot {
+  start: string;
+  end: string;
+}
+
+interface Offering {
+  _id: string;
+  title: string;
+  duration: number;
+  type: string;
+}
 
 interface ProfileCardProps {
   communityId: string;
 }
-
 
 export function ProfileCard() {
   const { data: session } = useSession();
@@ -39,6 +50,9 @@ export function ProfileCard() {
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [availableSlots, setAvailableSlots] = useState<{ [date: string]: TimeSlot[] }>({});
+  const [nextAvailableSlot, setNextAvailableSlot] = useState<{ date: string; slot: TimeSlot } | null>(null);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
 
   // Fetch community profile data using the aboutCommunity API
   const { data: profile, isLoading } = useQuery({
@@ -57,6 +71,105 @@ export function ProfileCard() {
     },
     enabled: !!communityIdFromParam,
   });
+
+  // Fetch community offerings
+  const { data: offerings } = useQuery({
+    queryKey: ["communityOfferings", communityIdFromParam],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL}/v1/offering/community/${communityIdFromParam}`
+      );
+      if (response.data.r === "s") {
+        return response.data.data;
+      }
+      throw new Error("Failed to fetch community offerings");
+    },
+    enabled: !!communityIdFromParam,
+  });
+
+  // Fetch available slots for the next 7 days
+  const fetchAvailableSlots = async () => {
+    if (!offerings || offerings.length === 0) {
+      console.log("No offerings available for this community");
+      return;
+    }
+    
+    setIsLoadingSlots(true);
+    const slotsData: { [date: string]: TimeSlot[] } = {};
+    let nextSlot: { date: string; slot: TimeSlot } | null = null;
+
+    try {
+      // Get the next 7 days
+      const today = new Date();
+      const next7Days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
+
+      // Fetch slots for each offering and each day
+      for (const offering of offerings) {
+        for (const date of next7Days) {
+          const formattedDate = format(date, "yyyy-MM-dd");
+          
+          try {
+            const response = await axios.get(
+              `${process.env.NEXT_PUBLIC_BACKEND_BASE_URL_BOOKING}/calendar/booking/available-slots`,
+              {
+                params: {
+                  offering_id: offering._id,
+                  date: formattedDate,
+                },
+                timeout: 5000,
+              }
+            );
+
+            if (response.data && response.data.slots && Array.isArray(response.data.slots)) {
+              if (!slotsData[formattedDate]) {
+                slotsData[formattedDate] = [];
+              }
+              slotsData[formattedDate].push(...response.data.slots);
+
+              // Find the next available slot
+              if (!nextSlot && response.data.slots.length > 0) {
+                nextSlot = {
+                  date: formattedDate,
+                  slot: response.data.slots[0]
+                };
+              }
+            } else if (response.data && Array.isArray(response.data)) {
+              // Handle case where response.data is directly an array of slots
+              if (!slotsData[formattedDate]) {
+                slotsData[formattedDate] = [];
+              }
+              slotsData[formattedDate].push(...response.data);
+
+              // Find the next available slot
+              if (!nextSlot && response.data.length > 0) {
+                nextSlot = {
+                  date: formattedDate,
+                  slot: response.data[0]
+                };
+              }
+            }
+          } catch (error) {
+            // Silently handle errors for individual slot requests
+            console.log(`No slots available for ${offering.title} on ${formattedDate}`);
+          }
+        }
+      }
+
+      setAvailableSlots(slotsData);
+      setNextAvailableSlot(nextSlot);
+    } catch (error) {
+      console.error("Error fetching available slots:", error);
+    } finally {
+      setIsLoadingSlots(false);
+    }
+  };
+
+  // Fetch slots when offerings are loaded
+  useEffect(() => {
+    if (offerings && offerings.length > 0) {
+      fetchAvailableSlots();
+    }
+  }, [offerings]);
 
   const isOwner = session?.user?.id === profile?.community?.user_id;
 
@@ -102,6 +215,48 @@ export function ProfileCard() {
     }
   };
 
+  // Generate calendar days from tomorrow until end of current month
+  const generateCalendarDays = () => {
+    const today = new Date();
+    const tomorrow = addDays(today, 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Last day of current month
+    const days = [];
+    
+    let currentDate = tomorrow;
+    while (currentDate <= endOfMonth) {
+      const formattedDate = format(currentDate, "yyyy-MM-dd");
+      const dayNumber = currentDate.getDate();
+      const isTodayDate = isToday(currentDate);
+      const hasSlot = availableSlots[formattedDate] && availableSlots[formattedDate].length > 0;
+      
+      days.push({
+        day: dayNumber,
+        date: formattedDate,
+        isToday: isTodayDate,
+        hasSlot,
+      });
+      
+      currentDate = addDays(currentDate, 1);
+    }
+    
+    return days;
+  };
+
+  const formatTime = (timeString: string) => {
+    return format(new Date(timeString), "HH:mm");
+  };
+
+  const formatNextSlotDate = (dateString: string) => {
+    const date = new Date(dateString);
+    if (isToday(date)) {
+      return "Today";
+    } else if (isTomorrow(date)) {
+      return "Tomorrow";
+    } else {
+      return format(date, "MMM dd");
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -119,6 +274,8 @@ export function ProfileCard() {
       </div>
     );
   }
+
+  const calendarDays = generateCalendarDays();
 
   return (
     <div className="h-screen bg-white">
@@ -224,48 +381,66 @@ export function ProfileCard() {
             {/* Available Slots */}
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Available Slots</h3>
-                <button className="text-blue-600 hover:text-blue-700">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold">Available Slots</h3>
+                  {!profile.user.user_iscalendarConnected && (
+                    <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                      Calendar not connected
+                    </span>
+                  )}
+                  {offerings && offerings.length === 0 && (
+                    <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
+                      No offerings
+                    </span>
+                  )}
+                </div>
+                <button 
+                  className="text-blue-600 hover:text-blue-700"
+                  onClick={fetchAvailableSlots}
+                  disabled={isLoadingSlots || !offerings || offerings.length === 0 || !profile.user.user_iscalendarConnected}
+                >
+                  {isLoadingSlots ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  )}
                 </button>
               </div>
               
               <div className="flex justify-between items-end">
-                {/* Calendar Grid */}
-                <div className="flex-1">
-                  <div className="grid grid-cols-7 gap-1 mb-3">
-                    {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-                      <div key={index} className="text-center text-xs text-gray-500 font-medium py-1">
-                        {day}
-                      </div>
-                    ))}
+                                 {/* Calendar Grid */}
+                 <div className="flex-1">
+                   {/* Month name */}
+                   <div className="text-center text-sm font-semibold text-gray-700 mb-2">
+                     {format(new Date(), "MMMM yyyy")}
+                   </div>
+                   <div className="grid grid-cols-7 gap-1 mb-3">
+                     {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
+                       <div key={index} className="text-center text-xs text-gray-500 font-medium py-1">
+                         {day}
+                       </div>
+                     ))}
                     
                     {/* Calendar days */}
-                    {Array.from({ length: 21 }, (_, index) => {
-                      const day = index + 17;
-                      const isToday = day === 20;
-                      const hasSlot = [19, 20, 21, 22].includes(day);
-                      
-                      return (
-                        <div
-                          key={index}
-                          className={`text-center text-xs p-2 cursor-pointer rounded relative ${
-                            isToday
-                              ? "bg-blue-600 text-white font-bold"
-                              : hasSlot && day !== 20
-                              ? "text-gray-700"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {day}
-                          {hasSlot && day !== 20 && (
-                            <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full"></div>
-                          )}
-                        </div>
-                      );
-                    })}
+                    {calendarDays.map((dayData, index) => (
+                      <div
+                        key={index}
+                        className={`text-center text-xs p-2 cursor-pointer rounded relative ${
+                          dayData.isToday
+                            ? "bg-primary text-white font-bold"
+                            : dayData.hasSlot
+                            ? "text-gray-700"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {dayData.day}
+                        {dayData.hasSlot && !dayData.isToday && (
+                          <div className="absolute bottom-0.5 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-blue-500 rounded-full"></div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -274,7 +449,18 @@ export function ProfileCard() {
                   <Calendar size={14} className="text-blue-600" />
                   <div>
                     <span className="block text-gray-500">Next available slot</span>
-                    <span className="font-bold text-gray-900">Today, 05:30 PM</span>
+                    {nextAvailableSlot ? (
+                      <span className="font-bold text-gray-900">
+                        {formatNextSlotDate(nextAvailableSlot.date)}, {formatTime(nextAvailableSlot.slot.start)}
+                      </span>
+                    ) : (
+                      <span className="font-bold text-gray-900">
+                        {isLoadingSlots ? "Loading..." : 
+                         !offerings || offerings.length === 0 ? "No offerings available" :
+                         !profile.user.user_iscalendarConnected ? "Calendar not connected" :
+                         "No slots available"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -291,7 +477,7 @@ export function ProfileCard() {
 
       {/* Offerings Section */}
       <div id="offerings-section">
-        <OfferingsList />
+        <OfferingsList offerings={offerings} />
       </div>
 
       {/* Call to Action Banner */}
@@ -299,12 +485,17 @@ export function ProfileCard() {
 
       {/* Content Feed */}
       <ContentFeed 
-        communityId={communityIdFromParam || ""} 
+        expertId={profile.user._id}
+        communityId={profile.community?._id}
         expertName={profile.user.user_name} 
       />
 
       {/* Testimonial Section */}
-      <TestimonialSection />
+      <TestimonialSection 
+        expertId={profile.user._id}
+        communityId={profile.community?._id}
+        expertName={profile.user.user_name}
+      />
     </div>
   );
 }
