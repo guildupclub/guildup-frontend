@@ -76,6 +76,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Warmly Script Loader */}
+        <Script
+          id="warmly-script-loader"
+          src="https://opps-widget.getwarmly.com/warmly.js?clientId=763f8ad95eda79622d76436b4f16dd66"
+          strategy="afterInteractive" 
+        />
         <Script
           id="gtm"
           strategy="afterInteractive"
