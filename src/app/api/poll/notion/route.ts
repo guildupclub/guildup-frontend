@@ -7,7 +7,7 @@ export const runtime = 'nodejs';
 
 /**
  * Polling endpoint to fetch latest data from Notion and invalidate cache
- * This endpoint can be called periodically (e.g., every 5 minutes) to keep blog posts up to date
+ * This endpoint can be called periodically (e.g., once every 24 hours) to keep blog posts up to date
  * 
  * Usage:
  * - Call via cron job: GET https://dev.guildup.club/api/poll/notion
