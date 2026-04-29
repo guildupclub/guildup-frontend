@@ -29,12 +29,6 @@
         }
       ]
     }
-  ],
-  "crons": [
-    {
-      "path": "/api/poll/notion",
-      "schedule": "*/5 * * * *"
-    }
   ]
 }
 
